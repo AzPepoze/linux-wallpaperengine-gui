@@ -9,11 +9,11 @@ url="https://github.com/AzPepoze/$_pkgname"
 license=('MIT')
 provides=("$_pkgname")
 conflicts=("$_pkgname")
-depends=('linux-wallpaperengine' 'electron')
+depends=('linux-wallpaperengine')
 makedepends=('git' 'pnpm')
 source=("git+https://github.com/AzPepoze/$_pkgname.git")
 sha256sums=('SKIP')
-pkgver=0.1.2.r21.d46c696
+pkgver=0.1.2.r22.ecfd22c
 options=('!debug')
 
 pkgver() {
