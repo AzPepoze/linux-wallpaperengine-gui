@@ -19,6 +19,7 @@ A graphical user interface for managing wallpapers on Linux, powered by Electron
 - **Mute Mode:** A setting to mute the wallpaper process, effectively muting the wallpaper.
 - **Customizable Settings:** Configure screen and FPS settings for the wallpaper.
 - **Wallpaper Details:** View detailed information about each wallpaper, including title, description, tags, and workshop URL.
+- **System Tray Integration:** Minimize the application to the system tray for background operation.
 
 ## Prerequisites
 
@@ -103,6 +104,7 @@ This will create an executable in the `dist` directory.
      - Set the `FPS` (frames per second) for the wallpaper.
      - Toggle **"Mute Wallpaper"** to mute the `linux-wallpaperengine` process and have no active wallpaper.
 - **Sidebar:** When a wallpaper is selected, a sidebar will appear on the right, showing detailed information about the wallpaper.
+- **System Tray:** The application minimizes to the system tray when closed, allowing it to run in the background. You can right-click the tray icon to quit the application.
 
 ## Contributing
 
