@@ -1,6 +1,6 @@
 {
      "name": "linux-wallpaperengine-gui",
-     "version": "0.1.1",
+     "version": "0.1.2",
      "description": "A graphical user interface for managing wallpapers on Linux, powered by Electron, Svelte, and linux-wallpaperengine.",
      "main": "./out/main/index.js",
      "author": "AzPepoze",
@@ -16,7 +16,7 @@
           "build": "npm run typecheck && electron-vite build",
           "postinstall": "electron-builder install-app-deps",
           "build:unpack": "npm run build && electron-builder --dir",
-          "build:release": "npm run build:unpack && mkdir -p release && zip -r release/linux-wallpaperengine-gui_$(node -p \"require('./package.json').version\").zip dist/linux-unpacked"
+          "build:release": "npm run build:unpack && mkdir -p release && zip -r release/linux-wallpaperengine-gui.zip dist/linux-unpacked"
      },
      "dependencies": {
           "@electron-toolkit/preload": "^3.0.1",

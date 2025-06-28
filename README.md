@@ -25,9 +25,7 @@ A graphical user interface for managing wallpapers on Linux, powered by Electron
 
 Before you begin, ensure you have the following installed:
 
-- 🟢 **Node.js and npm/pnpm:** For running the Electron application.
-- 🐧 **`linux-wallpaperengine`:** The command-line tool that this GUI interacts with. You can usually find this in your distribution's repositories or compile it from source.
-     - [Link to `linux-wallpaperengine` GitHub (if available, otherwise remove this line or replace with instructions)]
+- 🐧 **[linux-wallpaperengine](https://github.com/Almamu/linux-wallpaperengine):** The command-line tool that this GUI interacts with. You can usually find this in your distribution's repositories or compile it from source.
 
 ## 🚀 Installation
 
@@ -37,14 +35,15 @@ You have two options to get the Linux Wallpaper Engine GUI:
 
 Pre-built binaries for Linux are available in the [Releases](https://github.com/AzPepoze/linux-wallpaperengine-gui/releases) section of this repository.
 
-1.   Go to the [Releases page](https://github.com/AzPepoze/linux-wallpaperengine-gui/releases).
-2.   Download the latest release archive.
-3.   Extract the archive.
-4.   Run the `linux-wallpaperengine-gui` executable inside the extracted directory.
+1.   [Download the latest release archive](https://github.com/AzPepoze/linux-wallpaperengine-gui/releases/download/latest/linux-wallpaperengine-gui.zip).
+2.   Extract the archive.
+3.   Run the `linux-wallpaperengine-gui` executable inside the extracted directory.
 
 ### Option 2: Build from Source 🛠️
 
 If you prefer to build the application yourself, follow these steps:
+
+- **Node.js and npm/pnpm:** Ensure you have Node.js and either npm or pnpm installed. These are required to build the Electron application.
 
 1.   **Clone the repository:**
 
