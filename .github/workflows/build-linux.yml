@@ -3,7 +3,7 @@ name: Build for Linux
 on:
   push:
     tags:
-    - 'v*' # Triggers on tags like v1.0.0
+    - 'v*'
 
 jobs:
   build-and-release-linux:
@@ -13,16 +13,17 @@ jobs:
     - name: Checkout code
       uses: actions/checkout@v4
 
-    - name: Setup Node.js
+    - name: Install pnpm
+      uses: pnpm/action-setup@v4
+      with:
+        version: latest
+
+    - name: Use Node.js 20
       uses: actions/setup-node@v4
       with:
-        node-version: 20 # Or your project's Node.js version
+        node-version: 20
         cache: 'pnpm'
-        cache-dependency-path: pnpm-lock.yaml # Specify the lock file for caching
-        registry-url: 'https://registry.npmjs.org' # Ensure correct registry for pnpm
-
-    - name: Install pnpm
-      run: npm install -g pnpm
+        cache-dependency-path: pnpm-lock.yaml
 
     - name: Install dependencies
       run: pnpm install
@@ -34,6 +35,6 @@ jobs:
       uses: softprops/action-gh-release@v1
       if: startsWith(github.ref, 'refs/tags/')
       with:
-        files: dist/* # Upload all files in the dist directory
+        files: dist/*
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
