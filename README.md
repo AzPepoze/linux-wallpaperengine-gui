@@ -1,8 +1,8 @@
-# Linux Wallpaper Engine GUI
+# 🐧 Linux Wallpaper Engine GUI
 
 A graphical user interface for managing wallpapers on Linux, powered by Electron, Svelte, and `linux-wallpaperengine`.
 
-## Screenshots
+## 📸 Screenshots
 
 #### Main Window
 
@@ -12,28 +12,28 @@ A graphical user interface for managing wallpapers on Linux, powered by Electron
 
 ![Settings Window](imgs/setting.png)
 
-## Features
+## ✨ Features
 
-- **Wallpaper Management:** Browse and select wallpapers from your Steam Workshop content.
-- **Auto-Save & Auto-Run:** Automatically saves the last used wallpaper and applies it on application startup.
-- **Mute Mode:** A setting to mute the wallpaper process, effectively muting the wallpaper.
-- **Customizable Settings:** Configure screen and FPS settings for the wallpaper.
-- **Wallpaper Details:** View detailed information about each wallpaper, including title, description, tags, and workshop URL.
-- **System Tray Integration:** Minimize the application to the system tray for background operation.
+- 🖼️ **Wallpaper Management:** Browse and select wallpapers from your Steam Workshop content.
+- 💾 **Auto-Save & Auto-Run:** Automatically saves the last used wallpaper and applies it on application startup.
+- 🔇 **Mute Mode:** A setting to mute the wallpaper process, effectively muting the wallpaper.
+- ⚙️ **Customizable Settings:** Configure screen and FPS settings for the wallpaper.
+- 🔍 **Wallpaper Details:** View detailed information about each wallpaper, including title, description, tags, and workshop URL.
+- 🖥️ **System Tray Integration:** Minimize the application to the system tray for background operation.
 
-## Prerequisites
+## 📋 Prerequisites
 
 Before you begin, ensure you have the following installed:
 
-- **Node.js and npm/pnpm:** For running the Electron application.
-- **`linux-wallpaperengine`:** The command-line tool that this GUI interacts with. You can usually find this in your distribution's repositories or compile it from source.
+- 🟢 **Node.js and npm/pnpm:** For running the Electron application.
+- 🐧 **`linux-wallpaperengine`:** The command-line tool that this GUI interacts with. You can usually find this in your distribution's repositories or compile it from source.
      - [Link to `linux-wallpaperengine` GitHub (if available, otherwise remove this line or replace with instructions)]
 
-## Installation
+## 🚀 Installation
 
 You have two options to get the Linux Wallpaper Engine GUI:
 
-### Option 1: Download from Releases (Recommended)
+### Option 1: Download from Releases (Recommended) ⬇️
 
 Pre-built binaries for Linux are available in the [Releases](https://github.com/AzPepoze/linux-wallpaperengine-gui/releases) section of this repository.
 
@@ -42,7 +42,7 @@ Pre-built binaries for Linux are available in the [Releases](https://github.com/
 3.   Extract the archive.
 4.   Run the `linux-wallpaperengine-gui` executable inside the extracted directory.
 
-### Option 2: Build from Source
+### Option 2: Build from Source 🛠️
 
 If you prefer to build the application yourself, follow these steps:
 
@@ -74,7 +74,7 @@ If you prefer to build the application yourself, follow these steps:
      ./dist/linux-unpacked/linux-wallpaperengine-gui
      ```
 
-## Development Mode
+## 💻 Development Mode
 
 To run the application in development mode:
 
@@ -85,7 +85,7 @@ pnpm dev
 
 This will open the GUI.
 
-### Production Build
+### Production Build 📦
 
 To build the application for production:
 
@@ -96,16 +96,16 @@ pnpm build
 
 This will create an executable in the `dist` directory.
 
-## How to Use the GUI
+## 📖 How to Use the GUI
 
-- **Selecting a Wallpaper:** Click on any wallpaper in the grid to set it as your current wallpaper. The application will automatically save your selection.
-- **Settings:** Click on the "Settings" button (or equivalent, depending on UI) to open the settings panel. Here you can:
-     - Adjust the `SCREEN` (e.g., `DP-1`, `HDMI-A-1`) where the wallpaper will be displayed.
-     - Set the `FPS` (frames per second) for the wallpaper.
-     - Toggle **"Mute Wallpaper"** to mute the `linux-wallpaperengine` process and have no active wallpaper.
-- **Sidebar:** When a wallpaper is selected, a sidebar will appear on the right, showing detailed information about the wallpaper.
-- **System Tray:** The application minimizes to the system tray when closed, allowing it to run in the background. You can right-click the tray icon to quit the application.
+- 🖱️ **Selecting a Wallpaper:** Click on any wallpaper in the grid to set it as your current wallpaper. The application will automatically save your selection.
+- ⚙️ **Settings:** Click on the "Settings" button (or equivalent, depending on UI) to open the settings panel. Here you can:
+     - 🖥️ Adjust the `SCREEN` (e.g., `DP-1`, `HDMI-A-1`) where the wallpaper will be displayed.
+     - ⚡ Set the `FPS` (frames per second) for the wallpaper.
+     - 🔇 Toggle **"Mute Wallpaper"** to mute the `linux-wallpaperengine` process and have no active wallpaper.
+- ➡️ **Sidebar:** When a wallpaper is selected, a sidebar will appear on the right, showing detailed information about the wallpaper.
+- 🔽 **System Tray:** The application minimizes to the system tray when closed, allowing it to run in the background. You can right-click the tray icon to quit the application.
 
-## Contributing
+## 🤝 Contributing
 
 Feel free to contribute to this project by opening issues or submitting pull requests.
