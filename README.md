@@ -35,7 +35,7 @@ You have two options to get the Linux Wallpaper Engine GUI:
 
 Pre-built binaries for Linux are available in the [Releases](https://github.com/AzPepoze/linux-wallpaperengine-gui/releases) section of this repository.
 
-1.   [Download the latest release archive](https://github.com/AzPepoze/linux-wallpaperengine-gui/releases/download/latest/linux-wallpaperengine-gui.zip).
+1.   [Download the latest release.](https://github.com/AzPepoze/linux-wallpaperengine-gui/releases/latest/download/linux-wallpaperengine-gui.zip)
 2.   Extract the archive.
 3.   Run the `linux-wallpaperengine-gui` executable inside the extracted directory.
 
