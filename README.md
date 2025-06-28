@@ -33,11 +33,11 @@ You have two options to get the Linux Wallpaper Engine GUI:
 
 ### Option 1: Download from Releases (Recommended) ⬇️
 
-Pre-built binaries for Linux are available in the [Releases](https://github.com/AzPepoze/linux-wallpaperengine-gui-electron/releases) section of this repository.
+Pre-built binaries for Linux are available in the [Releases](https://github.com/AzPepoze/linux-wallpaperengine-gui/releases) section of this repository.
 
-1.   [Download the latest release.](https://github.com/AzPepoze/linux-wallpaperengine-gui-electron/releases/latest/download/linux-wallpaperengine-gui-electron.zip)
+1.   [Download the latest release.](https://github.com/AzPepoze/linux-wallpaperengine-gui/releases/latest/download/linux-wallpaperengine-gui.zip)
 2.   Extract the archive.
-3.   Run the `linux-wallpaperengine-gui-electron` executable inside the extracted directory.
+3.   Run the `linux-wallpaperengine-gui` executable inside the extracted directory.
 
 ### Option 2: Build from Source 🛠️
 
@@ -48,8 +48,8 @@ If you prefer to build the application yourself, follow these steps:
 1.   **Clone the repository:**
 
      ```bash
-     git clone https://github.com/AzPepoze/linux-wallpaperengine-gui-electron.git
-     cd linux-wallpaperengine-gui-electron
+     git clone https://github.com/AzPepoze/linux-wallpaperengine-gui.git
+     cd linux-wallpaperengine-gui
      ```
 
 2.   **Install dependencies:**
@@ -70,7 +70,7 @@ If you prefer to build the application yourself, follow these steps:
 
 4.   **Run the Unpacked Application:**
      ```bash
-     ./dist/linux-unpacked/linux-wallpaperengine-gui-electron
+     ./dist/linux-unpacked/linux-wallpaperengine-gui
      ```
 
 ## 💻 Development Mode

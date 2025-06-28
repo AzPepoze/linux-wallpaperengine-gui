@@ -1,0 +1,81 @@
+# Maintainer: AzPepoze <azpepoze@gmail.com>
+
+pkgname=linux-wallpaperengine-gui-git
+_pkgname=linux-wallpaperengine-gui
+pkgrel=1
+pkgdesc="A graphical user interface for managing wallpapers on Linux, powered by Electron, Svelte, and linux-wallpaperengine."
+arch=('x86_64')
+url="https://github.com/AzPepoze/$_pkgname"
+license=('MIT')
+provides=("$_pkgname")
+conflicts=("$_pkgname")
+depends=('linux-wallpaperengine' 'electron')
+makedepends=('git' 'pnpm')
+source=("git+https://github.com/AzPepoze/$_pkgname.git")
+sha256sums=('SKIP')
+pkgver=0.1.2.r21.d46c696
+options=('!debug')
+
+pkgver() {
+  cd "$_pkgname"
+  printf "%s.r%s.%s" "$(grep -oP '"version": "\K[^"]+' package.json | sed 's/^v//')" "$(git rev-list --count HEAD)" "$(git rev-parse --short HEAD)"
+}
+
+#
+#------------------------------------------------------
+# Prepare Function
+#-------------------------------------------------------
+#
+prepare() {
+  cd "$_pkgname"
+  git submodule update --init --recursive
+}
+
+#
+#------------------------------------------------------
+# Build Function
+#-------------------------------------------------------
+#
+build() {
+  cd "$_pkgname"
+
+  echo "Installing dependencies with pnpm..."
+  pnpm install --frozen-lockfile
+
+  echo "Building the application..."
+  pnpm build:unpack
+}
+
+#
+#------------------------------------------------------
+# Package Function
+#-------------------------------------------------------
+#
+package() {
+  cd "$_pkgname"
+
+  # Install application files
+  install -d "$pkgdir/usr/lib/$_pkgname"
+  cp -a "dist/linux-unpacked/." "$pkgdir/usr/lib/$_pkgname/"
+
+  # Create symlink for the executable
+  install -d "$pkgdir/usr/bin"
+  ln -s "/usr/lib/$_pkgname/$_pkgname" "$pkgdir/usr/bin/$_pkgname"
+
+  # Install application icon
+  install -d "$pkgdir/usr/share/pixmaps"
+  install -m644 "resources/icon.png" "$pkgdir/usr/share/pixmaps/$_pkgname.png"
+
+  # Install .desktop file
+  install -d "$pkgdir/usr/share/applications"
+  cat > "$pkgdir/usr/share/applications/$_pkgname.desktop" <<EOF
+[Desktop Entry]
+Name=Wallpaper Engine GUI
+Comment=GUI for linux-wallpaperengine
+Exec="$_pkgname"
+Icon="$_pkgname"
+Terminal=false
+Type=Application
+Categories=Utility;
+EOF
+}

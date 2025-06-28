@@ -1,5 +1,5 @@
-appId: com.azpepoze.linux-wallpaperengine-gui-electron.app
-productName: linux-wallpaperengine-gui-electron
+appId: com.azpepoze.linux-wallpaperengine-gui.app
+productName: linux-wallpaperengine-gui
 directories:
      buildResources: build
 files:
