@@ -4,7 +4,7 @@
      "description": "A graphical user interface for managing wallpapers on Linux, powered by Electron, Svelte, and linux-wallpaperengine.",
      "main": "./out/main/index.js",
      "author": "AzPepoze",
-     "homepage": "https://electron-vite.org",
+     "homepage": "https://github.com/AzPepoze/linux-wallpaperengine-gui",
      "scripts": {
           "format": "prettier --plugin prettier-plugin-svelte --write .",
           "lint": "eslint --cache .",
