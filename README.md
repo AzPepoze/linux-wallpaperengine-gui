@@ -72,7 +72,7 @@ pnpm build
 
 This will create an executable in the `dist` directory.
 
-### How to Use the GUI
+## How to Use the GUI
 
 - **Selecting a Wallpaper:** Click on any wallpaper in the grid to set it as your current wallpaper. The application will automatically save your selection.
 - **Settings:** Click on the "Settings" button (or equivalent, depending on UI) to open the settings panel. Here you can:
