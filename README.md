@@ -31,13 +31,30 @@ Before you begin, ensure you have the following installed:
 
 You have two options to get the Linux Wallpaper Engine GUI:
 
-### Option 1: Download from Releases (Recommended) ⬇️
+### Option 1: Install on Arch Linux 🐧
 
-Pre-built binaries for Linux are available in the [Releases](https://github.com/AzPepoze/linux-wallpaperengine-gui/releases) section of this repository.
+This method is for users of Arch Linux or Arch-based distributions.
 
-1.   [Download the latest release.](https://github.com/AzPepoze/linux-wallpaperengine-gui/releases/latest/download/linux-wallpaperengine-gui.zip)
-2.   Extract the archive.
-3.   Run the `linux-wallpaperengine-gui` executable inside the extracted directory.
+1.   **Create a temporary directory and download the PKGBUILD:**
+
+     ```bash
+     mkdir -p ~/linux-wallpaperengine-gui-build
+     cd ~/linux-wallpaperengine-gui-build
+     curl -O https://raw.githubusercontent.com/AzPepoze/linux-wallpaperengine-gui/main/installer/PKGBUILD
+     ```
+
+2.   **Build and install the package:**
+
+     ```bash
+     makepkg -si
+     ```
+
+     This command will automatically handle dependencies, build the package, and install it on your system.
+
+3.   **Clean up the temporary directory:**
+     ```bash
+     rm -rf ~/linux-wallpaperengine-gui-build
+     ```
 
 ### Option 2: Build from Source 🛠️
 
