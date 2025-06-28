@@ -110,12 +110,19 @@ Wallpaper Process Management
 -------------------------------------------------------
 */
 
+var kill = require('tree-kill')
+
 async function manageWallpaper(
      wallpaperFolderName: string | null
 ): Promise<{ success: boolean; error?: string }> {
      try {
-          if (wallpaperProcess) {
-               wallpaperProcess.kill()
+          if (wallpaperProcess && !wallpaperProcess.killed) {
+               try {
+                    kill(wallpaperProcess.pid)
+                    console.log('Successfully killed previous wallpaper process.')
+               } catch (killError) {
+                    console.error('Failed to kill wallpaper process:', killError)
+               }
                wallpaperProcess = null
           }
 
@@ -126,6 +133,7 @@ async function manageWallpaper(
 
           const shouldSpawn = wallpaperFolderName !== null || isSilenced
           if (!shouldSpawn) {
+               await writeConfig({ ...config, lastUsedWallpaper: null })
                return { success: true }
           }
 
@@ -135,6 +143,7 @@ async function manageWallpaper(
           }
           if (wallpaperFolderName) {
                args.push(wallpaperFolderName)
+               await writeConfig({ ...config, lastUsedWallpaper: wallpaperFolderName })
           }
 
           console.log(`Spawning command: linux-wallpaperengine ${args.join(' ')}`)
@@ -293,4 +302,13 @@ app.whenReady().then(async () => {
      })
 })
 
-app.on('window-all-closed', () => {})
+app.on('before-quit', () => {
+     if (wallpaperProcess && !wallpaperProcess.killed) {
+          console.log('Killing wallpaper process before application quits.')
+          wallpaperProcess.kill()
+     }
+})
+
+app.on('window-all-closed', () => {
+     // This is correct for a tray app, do not quit.
+})

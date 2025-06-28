@@ -100,17 +100,6 @@
                               on:click={async () => {
                                    await window.api.setWallpaper(wallpaper.folderName)
                                    selectedWallpaper = wallpaper
-                                   isSilenceMode = false // Exit silence mode when a wallpaper is selected
-                                   const configResult = await window.api.getConfig()
-                                   if (configResult.success) {
-                                        const currentConfig = {
-                                             SCREEN: configResult.SCREEN || 'DP-1',
-                                             FPS: configResult.FPS || 60,
-                                             lastUsedWallpaper: wallpaper.folderName,
-                                             SILENCE: false // Ensure silence is false when a wallpaper is selected
-                                        }
-                                        await window.api.saveConfig(currentConfig)
-                                   }
                               }}
                          >
                               {#if wallpaper.previewPath}
