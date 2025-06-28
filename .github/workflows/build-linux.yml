@@ -18,6 +18,11 @@ jobs:
       with:
         node-version: 20 # Or your project's Node.js version
         cache: 'pnpm'
+        cache-dependency-path: pnpm-lock.yaml # Specify the lock file for caching
+        registry-url: 'https://registry.npmjs.org' # Ensure correct registry for pnpm
+
+    - name: Install pnpm
+      run: npm install -g pnpm
 
     - name: Install dependencies
       run: pnpm install
