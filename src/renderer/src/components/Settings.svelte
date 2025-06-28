@@ -66,11 +66,11 @@
           // @ts-ignore
           const result = await window.api.openConfigInEditor()
           if (result.success) {
-               message = 'Config file opened in editor.'
+               message = 'Config file opened!'
           } else {
                message = `Failed to open config file: ${result.error}`
           }
-     }}>Open Config File in Editor</button
+     }}>Open Config File.</button
 >
 
 {#if message}

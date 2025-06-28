@@ -3,7 +3,7 @@ import { join, resolve } from 'path'
 import { electronApp, optimizer, is } from '@electron-toolkit/utils'
 import icon from '../../resources/icon.png?asset'
 import fs from 'fs/promises'
-import { spawn, ChildProcess } from 'child_process'
+import { spawn, ChildProcess, exec } from 'child_process'
 
 /*
 ------------------------------------------------------
@@ -76,7 +76,12 @@ function createTray(): void {
      const contextMenu = Menu.buildFromTemplate([
           { label: 'Show / Hide App', click: toggleWindow },
           { type: 'separator' },
-          { label: 'Quit', click: () => app.quit() }
+          {
+               label: 'Quit',
+               click: () => {
+                    app.quit()
+               }
+          }
      ])
 
      tray.setToolTip('Wallpaper Engine GUI')
@@ -124,6 +129,10 @@ async function killWallpaperProcess() {
      }
 }
 
+async function killAllWallpaperProcesses() {
+     exec('pkill -f linux-wallpaperengine')
+}
+
 async function manageWallpaper(
      wallpaperFolderName: string | null
 ): Promise<{ success: boolean; error?: string }> {
@@ -156,7 +165,6 @@ async function manageWallpaper(
                detached: false,
                stdio: 'ignore'
           })
-          wallpaperProcess.unref()
 
           wallpaperProcess.once('error', (err: Error) => {
                console.error(`Failed to start wallpaper process: ${err.message}`)
@@ -306,7 +314,7 @@ app.whenReady().then(async () => {
      })
 })
 
-app.on('before-quit', killWallpaperProcess)
+app.on('before-quit', killAllWallpaperProcesses)
 
 app.on('window-all-closed', () => {
      // This is correct for a tray app, do not quit.

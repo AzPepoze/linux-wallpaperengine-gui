@@ -14,7 +14,6 @@
           previewPath: string | null
           projectData: any
      } | null = null
-     let isSilenceMode: boolean = false
      let showSettingsPopup: boolean = false // New state for settings popup
 
      function getSidebarContent(wallpaper) {
@@ -29,9 +28,9 @@
                content += `\n\n**Content Rating:** ${projectData.contentrating}`
           if (projectData?.tags?.length) content += `\n\n**Tags:** ${projectData.tags.join(', ')}`
           if (projectData?.version) content += `\n\n**Version:** ${projectData.version}`
-          if (projectData?.workshopid) {
-               content += `\n\n[Workshop URL](${projectData.workshopurl})`
-          }
+          // if (projectData?.workshopid) {
+          content += `\n\n[Workshop URL](steam://url/CommunityFilePage/${folderName})`
+          // }
           return md.render(content)
      }
 
@@ -45,17 +44,15 @@
                     wallpapers = result.wallpapers || []
                     // Restore last used wallpaper from localStorage
                     const config = await window.api.getConfig()
-                    if (config.success) {
-                         isSilenceMode = config.SILENCE || false
-                         if (!isSilenceMode && config.lastUsedWallpaper) {
-                              const found = wallpapers.find(
-                                   (w) => w.folderName === config.lastUsedWallpaper
-                              )
-                              if (found) {
-                                   selectedWallpaper = found
-                                   // Auto set wallpaper on start
-                                   window.api.setWallpaper(found.folderName)
-                              }
+                    if (config.success && config.lastUsedWallpaper) {
+                         const found = wallpapers.find(
+                              (w) => w.folderName === config.lastUsedWallpaper
+                         )
+                         if (found) {
+                              selectedWallpaper = found
+
+                              // Auto set wallpaper on start
+                              window.api.setWallpaper(found.folderName)
                          }
                     }
                } else {
@@ -266,6 +263,7 @@
                border-radius: 25px;
                text-decoration: none;
                transition: background-color 0.3s ease;
+               color: #fff;
 
                &:hover {
                     background-color: #0056b3;
@@ -275,10 +273,10 @@
 
      .wallpaper-folders {
           flex-grow: 1;
-          padding: 20px;
           text-align: center;
           transition: width 0.3s ease-in-out;
           overflow-y: auto;
+          mask-image: linear-gradient(to bottom, transparent, black 20px, black 97%, transparent);
 
           .wallpaper-grid {
                display: grid;
@@ -287,8 +285,8 @@
                     minmax(180px, 1fr)
                ); /* Changed to auto-fit for better responsiveness */
                gap: 20px;
+               padding: 20px;
                justify-content: center;
-               padding: 0;
                list-style: none;
                overflow-y: auto;
           }
@@ -298,7 +296,7 @@
                border-radius: 15px;
                overflow: hidden;
                box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
-               transition: transform 0.2s ease-in-out;
+               transition: all 0.2s;
                display: flex;
                flex-direction: column;
                align-items: center;
