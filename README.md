@@ -6,7 +6,7 @@ A graphical user interface for managing wallpapers on Linux, powered by Electron
 
 - **Wallpaper Management:** Browse and select wallpapers from your Steam Workshop content.
 - **Auto-Save & Auto-Run:** Automatically saves the last used wallpaper and applies it on application startup.
-- **Silence Mode:** A setting to stop the wallpaper process, effectively silencing the wallpaper.
+- **Mute Mode:** A setting to mute the wallpaper process, effectively muting the wallpaper.
 - **Customizable Settings:** Configure screen and FPS settings for the wallpaper.
 - **Wallpaper Details:** View detailed information about each wallpaper, including title, description, tags, and workshop URL.
 
@@ -56,7 +56,7 @@ To run the application in development mode:
 
 ```bash
 pnpm dev
-# or npm run dev
+# or npm dev
 ```
 
 This will open the GUI.
@@ -67,7 +67,7 @@ To build the application for production:
 
 ```bash
 pnpm build
-# or npm run build
+# or npm build
 ```
 
 This will create an executable in the `dist` directory.
@@ -78,21 +78,9 @@ This will create an executable in the `dist` directory.
 - **Settings:** Click on the "Settings" button (or equivalent, depending on UI) to open the settings panel. Here you can:
      - Adjust the `SCREEN` (e.g., `DP-1`, `HDMI-A-1`) where the wallpaper will be displayed.
      - Set the `FPS` (frames per second) for the wallpaper.
-     - Toggle **"Silence Wallpaper"** to stop the `linux-wallpaperengine` process and have no active wallpaper.
+     - Toggle **Silent** to mute the `linux-wallpaperengine` process and have no active wallpaper.
 - **Sidebar:** When a wallpaper is selected, a sidebar will appear on the right, showing detailed information about the wallpaper.
-
-## Project Structure
-
-- `src/main/index.ts`: Main Electron process, handles IPC communication, wallpaper setting logic, and configuration management.
-- `src/preload/index.ts`: Preload script for exposing Electron APIs to the renderer process.
-- `src/renderer/src/App.svelte`: The main Svelte component for the user interface, displaying wallpapers and handling user interactions.
-- `src/renderer/src/components/Settings.svelte`: Svelte component for managing application settings.
-- `config.json`: Configuration file for storing user settings like `SCREEN`, `FPS`, `lastUsedWallpaper`, and `SILENCE` mode.
 
 ## Contributing
 
 Feel free to contribute to this project by opening issues or submitting pull requests.
-
-## License
-
-[Specify your license here, e.g., MIT License]
