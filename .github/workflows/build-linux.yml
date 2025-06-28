@@ -1,40 +1,40 @@
 name: Build for Linux
 
 on:
-  push:
-    tags:
-    - 'v*'
+     push:
+          tags:
+             - 'v*'
 
 jobs:
-  build-and-release-linux:
-    runs-on: ubuntu-latest
+     build-and-release-linux:
+          runs-on: ubuntu-latest
 
-    steps:
-    - name: Checkout code
-      uses: actions/checkout@v4
+          steps:
+             - name: Checkout code
+               uses: actions/checkout@v4
 
-    - name: Install pnpm
-      uses: pnpm/action-setup@v4
-      with:
-        version: latest
+             - name: Install pnpm
+               uses: pnpm/action-setup@v4
+               with:
+                    version: latest
 
-    - name: Use Node.js 20
-      uses: actions/setup-node@v4
-      with:
-        node-version: 20
-        cache: 'pnpm'
-        cache-dependency-path: pnpm-lock.yaml
+             - name: Use Node.js 20
+               uses: actions/setup-node@v4
+               with:
+                    node-version: 20
+                    cache: 'pnpm'
+                    cache-dependency-path: pnpm-lock.yaml
 
-    - name: Install dependencies
-      run: pnpm install
+             - name: Install dependencies
+               run: pnpm install
 
-    - name: Build Electron app for Linux
-      run: pnpm build:linux
+             - name: Build Electron app for Linux
+               run: pnpm build:release
 
-    - name: Create Release and Upload Asset
-      uses: softprops/action-gh-release@v1
-      if: startsWith(github.ref, 'refs/tags/')
-      with:
-        files: dist/*
-      env:
-        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+             - name: Create Release and Upload Asset
+               uses: softprops/action-gh-release@v1
+               if: startsWith(github.ref, 'refs/tags/')
+               with:
+                    files: release/*
+               env:
+                    GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
