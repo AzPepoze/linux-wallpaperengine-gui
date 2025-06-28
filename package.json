@@ -1,9 +1,9 @@
 {
      "name": "linux-wallpaperengine-gui",
-     "version": "0.1.0",
-     "description": "An Electron application with Svelte and TypeScript",
+     "version": "0.1.1",
+     "description": "A graphical user interface for managing wallpapers on Linux, powered by Electron, Svelte, and linux-wallpaperengine.",
      "main": "./out/main/index.js",
-     "author": "example.com",
+     "author": "AzPepoze",
      "homepage": "https://electron-vite.org",
      "scripts": {
           "format": "prettier --plugin prettier-plugin-svelte --write .",
