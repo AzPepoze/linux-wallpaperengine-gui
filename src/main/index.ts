@@ -112,19 +112,23 @@ Wallpaper Process Management
 
 var kill = require('tree-kill')
 
+async function killWallpaperProcess() {
+     if (wallpaperProcess && !wallpaperProcess.killed) {
+          try {
+               kill(wallpaperProcess.pid)
+               console.log('Successfully killed previous wallpaper process.')
+          } catch (killError) {
+               console.error('Failed to kill wallpaper process:', killError)
+          }
+          wallpaperProcess = null
+     }
+}
+
 async function manageWallpaper(
      wallpaperFolderName: string | null
 ): Promise<{ success: boolean; error?: string }> {
      try {
-          if (wallpaperProcess && !wallpaperProcess.killed) {
-               try {
-                    kill(wallpaperProcess.pid)
-                    console.log('Successfully killed previous wallpaper process.')
-               } catch (killError) {
-                    console.error('Failed to kill wallpaper process:', killError)
-               }
-               wallpaperProcess = null
-          }
+          await killWallpaperProcess()
 
           const config = await readConfig()
           const screen = config.SCREEN || 'DP-1'
@@ -302,12 +306,7 @@ app.whenReady().then(async () => {
      })
 })
 
-app.on('before-quit', () => {
-     if (wallpaperProcess && !wallpaperProcess.killed) {
-          console.log('Killing wallpaper process before application quits.')
-          wallpaperProcess.kill()
-     }
-})
+app.on('before-quit', killWallpaperProcess)
 
 app.on('window-all-closed', () => {
      // This is correct for a tray app, do not quit.
