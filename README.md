@@ -2,6 +2,16 @@
 
 A graphical user interface for managing wallpapers on Linux, powered by Electron, Svelte, and `linux-wallpaperengine`.
 
+## Screenshots
+
+#### Main Window
+
+![Main Window](imgs/main.png)
+
+#### Settings Window
+
+![Settings Window](imgs/setting.png)
+
 ## Features
 
 - **Wallpaper Management:** Browse and select wallpapers from your Steam Workshop content.
@@ -43,14 +53,27 @@ If you prefer to build the application yourself, follow these steps:
      ```
 
 2.   **Install dependencies:**
+
      ```bash
      pnpm install
      # or npm install
      ```
 
-## Usage
+3.   **Build and Unpack:**
 
-### Development Mode
+     ```bash
+     pnpm build:unpack
+     # or npm run build:unpack
+     ```
+
+     This will create an unpacked application in the `dist/linux-unpacked` directory.
+
+4.   **Run the Unpacked Application:**
+     ```bash
+     ./dist/linux-unpacked/linux-wallpaperengine-gui
+     ```
+
+## Development Mode
 
 To run the application in development mode:
 
@@ -78,7 +101,7 @@ This will create an executable in the `dist` directory.
 - **Settings:** Click on the "Settings" button (or equivalent, depending on UI) to open the settings panel. Here you can:
      - Adjust the `SCREEN` (e.g., `DP-1`, `HDMI-A-1`) where the wallpaper will be displayed.
      - Set the `FPS` (frames per second) for the wallpaper.
-     - Toggle **Silent** to mute the `linux-wallpaperengine` process and have no active wallpaper.
+     - Toggle **"Mute Wallpaper"** to mute the `linux-wallpaperengine` process and have no active wallpaper.
 - **Sidebar:** When a wallpaper is selected, a sidebar will appear on the right, showing detailed information about the wallpaper.
 
 ## Contributing
