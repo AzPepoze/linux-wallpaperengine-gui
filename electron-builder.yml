@@ -1,28 +1,28 @@
-appId: com.azpepoze.linux-wallpaperengine-gui.app
-productName: linux-wallpaperengine-gui
+appId: com.azpepoze.linux-wallpaperengine-gui-electron.app
+productName: linux-wallpaperengine-gui-electron
 directories:
-  buildResources: build
+     buildResources: build
 files:
-- '!**/.vscode/*'
-- '!src/*'
-- '!electron.vite.config.{js,ts,mjs,cjs}'
-- '!svelte.config.mjs'
-- '!{.eslintcache,eslint.config.mjs,.prettierignore,.prettierrc.yaml,dev-app-update.yml,CHANGELOG.md,README.md}'
-- '!{.env,.env.*,.npmrc,pnpm-lock.yaml}'
-- '!{tsconfig.json,tsconfig.node.json,tsconfig.web.json}'
+   - '!**/.vscode/*'
+   - '!src/*'
+   - '!electron.vite.config.{js,ts,mjs,cjs}'
+   - '!svelte.config.mjs'
+   - '!{.eslintcache,eslint.config.mjs,.prettierignore,.prettierrc.yaml,dev-app-update.yml,CHANGELOG.md,README.md}'
+   - '!{.env,.env.*,.npmrc,pnpm-lock.yaml}'
+   - '!{tsconfig.json,tsconfig.node.json,tsconfig.web.json}'
 asarUnpack:
-- resources/**
+   - resources/**
 dmg:
-  artifactName: ${name}-${version}.${ext}
+     artifactName: ${name}-${version}.${ext}
 linux:
-  target:
-  - AppImage
-  - snap
-  - deb
-  maintainer: AzPepoze@github
-  category: Utility
+     target:
+        - AppImage
+        - snap
+        - deb
+     maintainer: AzPepoze@github
+     category: Utility
 appImage:
-  artifactName: ${name}-${version}.${ext}
+     artifactName: ${name}-${version}.${ext}
 npmRebuild: false
 electronDownload:
-  mirror: https://npmmirror.com/mirrors/electron/
+     mirror: https://npmmirror.com/mirrors/electron/

@@ -316,6 +316,4 @@ app.whenReady().then(async () => {
 
 app.on('before-quit', killAllWallpaperProcesses)
 
-app.on('window-all-closed', () => {
-     // This is correct for a tray app, do not quit.
-})
+app.on('window-all-closed', () => {})

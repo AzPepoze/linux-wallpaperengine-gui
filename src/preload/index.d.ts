@@ -20,15 +20,14 @@ declare global {
                     success: boolean
                     SCREEN?: string
                     FPS?: number
-                    lastUsedWallpaper?: string
                     SILENCE?: boolean
+                    lastUsedWallpaper?: string | null
                     error?: string
                }>
                saveConfig: (config: {
                     SCREEN: string
                     FPS: number
-                    lastUsedWallpaper?: string
-                    SILENCE?: boolean
+                    SILENCE: boolean
                }) => Promise<{ success: boolean; error?: string }>
           }
      }
