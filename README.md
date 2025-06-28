@@ -52,8 +52,14 @@ This method is for users of Arch Linux or Arch-based distributions.
      This command will automatically handle dependencies, build the package, and install it on your system.
 
 3.   **Clean up the temporary directory:**
+
      ```bash
-     rm -rf ~/linux-wallpaperengine-gui-build
+     cd ~ && rm -rf ~/linux-wallpaperengine-gui-build
+     ```
+
+4.   **Remove pnpm (if you don't use it)**
+     ```bash
+     sudo pacman -R pnpm
      ```
 
 ### Option 2: Build from Source 🛠️
