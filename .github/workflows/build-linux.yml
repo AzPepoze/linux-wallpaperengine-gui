@@ -48,6 +48,5 @@ jobs:
                          !dist/*.yml
                     tag_name: ${{ steps.get_version.outputs.VERSION }}
                     name: ${{ steps.get_version.outputs.VERSION }}
-                    overwrite: true
                env:
                     GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
