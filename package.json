@@ -1,5 +1,6 @@
 {
      "name": "linux-wallpaperengine-gui",
+     "appId": "com.azpepoze.linux-wallpaperengine-gui.app",
      "version": "0.1.3",
      "description": "A graphical user interface for managing wallpapers on Linux, powered by Electron, Svelte, and linux-wallpaperengine.",
      "main": "./out/main/index.js",
