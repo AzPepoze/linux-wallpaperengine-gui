@@ -4,8 +4,6 @@ on:
      push:
           branches:
              - main
-     workflow_dispatch:
-
 
 jobs:
      build-and-release-linux:
@@ -39,46 +37,6 @@ jobs:
              - name: Get version from package.json
                id: get_version
                run: echo "VERSION=$(node -p "require('./package.json').version")" >> $GITHUB_OUTPUT
-
-             - name: Create or Update Tag
-               uses: actions/github-script@v7
-               with:
-                    script: |
-                         const version = process.env.VERSION;
-                         const tag = `v${version}`;
-                         const ref = `tags/${tag}`;
-
-                         try {
-                           await github.rest.git.getRef({
-                             owner: context.repo.owner,
-                             repo: context.repo.repo,
-                             ref,
-                           });
-                           console.log(`Tag ${tag} already exists. Updating...`);
-                           await github.rest.git.updateRef({
-                             owner: context.repo.owner,
-                             repo: context.repo.repo,
-                             ref,
-                             sha: context.sha,
-                             force: true
-                           });
-                           console.log(`Updated tag ${tag}`);
-                         } catch (error) {
-                           if (error.status === 404) {
-                             console.log(`Tag ${tag} does not exist. Creating...`);
-                             await github.rest.git.createRef({
-                               owner: context.repo.owner,
-                               repo: context.repo.repo,
-                               ref: `refs/${ref}`,
-                               sha: context.sha
-                             });
-                             console.log(`Created tag ${tag}`);
-                           } else {
-                             throw error;
-                           }
-                         }
-               env:
-                    VERSION: ${{ steps.get_version.outputs.VERSION }}
 
              - name: Create Release and Upload Asset
                uses: softprops/action-gh-release@v2
