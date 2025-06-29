@@ -1,7 +1,10 @@
 appId: com.azpepoze.linux-wallpaperengine-gui.app
 productName: linux-wallpaperengine-gui
+npmRebuild: false
+
 directories:
      buildResources: build
+
 files:
    - '!**/.vscode/*'
    - '!src/*'
@@ -10,10 +13,14 @@ files:
    - '!{.eslintcache,eslint.config.mjs,.prettierignore,.prettierrc.yaml,dev-app-update.yml,CHANGELOG.md,README.md}'
    - '!{.env,.env.*,.npmrc,pnpm-lock.yaml}'
    - '!{tsconfig.json,tsconfig.node.json,tsconfig.web.json}'
+
 asarUnpack:
    - resources/**
-dmg:
-     artifactName: ${name}-${version}.${ext}
+
+publish:
+     provider: github
+     owner: AzPepoze
+     repo: linux-wallpaperengine-gui
 linux:
      target:
         - AppImage
@@ -23,10 +30,6 @@ linux:
      maintainer: AzPepoze@github
      category: Utility
      artifactName: ${name}.${ext}
-npmRebuild: false
+
 electronDownload:
      mirror: https://npmmirror.com/mirrors/electron/
-publish:
-     provider: github
-     owner: AzPepoze
-     repo: linux-wallpaperengine-gui
