@@ -17,10 +17,10 @@ files:
 asarUnpack:
    - resources/**
 
-publish:
-     provider: github
-     owner: AzPepoze
-     repo: linux-wallpaperengine-gui
+# publish:
+#      provider: github
+#      owner: AzPepoze
+#      repo: linux-wallpaperengine-gui
 linux:
      target:
         - AppImage

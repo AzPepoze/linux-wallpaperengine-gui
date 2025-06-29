@@ -17,7 +17,7 @@
           "postinstall": "electron-builder install-app-deps",
           "build:unpack": "npm run build && electron-builder --dir",
           "build:linux": "npm run build && electron-builder --linux",
-          "build:release": "npm run build && electron-builder --linux --publish always && zip -r dist/linux-wallpaperengine-gui.zip dist/linux-unpacked"
+          "build:release": "npm run build && electron-builder --linux && zip -r dist/linux-wallpaperengine-gui.zip dist/linux-unpacked"
      },
      "dependencies": {
           "@electron-toolkit/preload": "^3.0.1",

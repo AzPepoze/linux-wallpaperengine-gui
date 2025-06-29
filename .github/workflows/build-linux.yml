@@ -33,18 +33,19 @@ jobs:
 
              - name: Build Electron app for Linux
                run: pnpm build:release
-               env:
-                    GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          #    - name: Get version from package.json
-          #      id: get_version
-          #      run: echo "VERSION=$(node -p "require('./package.json').version")" >> $GITHUB_OUTPUT
 
-          #    - name: Create Release and Upload Asset
-          #      uses: softprops/action-gh-release@v2
-          #      with:
-          #           files: dist/*
-          #           tag_name: v${{ steps.get_version.outputs.VERSION }}
-          #           name: v${{ steps.get_version.outputs.VERSION }}
-          #           overwrite: true
-          #      env:
-          #           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+             - name: Get version from package.json
+               id: get_version
+               run: echo "VERSION=$(node -p "require('./package.json').version")" >> $GITHUB_OUTPUT
+
+             - name: Create Release and Upload Asset
+               uses: softprops/action-gh-release@v2
+               with:
+                    files: |
+                         dist/*
+                         !dist/*.yml
+                    tag_name: ${{ steps.get_version.outputs.VERSION }}
+                    name: ${{ steps.get_version.outputs.VERSION }}
+                    overwrite: true
+               env:
+                    GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
