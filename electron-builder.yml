@@ -1,4 +1,4 @@
-appId: com.electron.linux-wallpaperengine-gui
+appId: com.azpepoze.linux-wallpaperengine-gui.app
 productName: linux-wallpaperengine-gui
 npmRebuild: false
 
