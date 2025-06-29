@@ -16,6 +16,7 @@ let mainWindow: BrowserWindow | null = null
 let tray: Tray | null = null
 let wallpaperProcess: ChildProcess | null = null
 const configPath = join(app.getPath('userData'), 'config.json')
+let isFirstLaunch = true
 
 interface AppConfig {
      SCREEN?: string
@@ -31,6 +32,9 @@ Core Application Setup
 */
 
 function createWindow(): void {
+     const shouldStartMinimized = process.argv.includes('--minimized') && isFirstLaunch
+     isFirstLaunch = false
+
      mainWindow = new BrowserWindow({
           width: 900,
           height: 670,
@@ -44,7 +48,9 @@ function createWindow(): void {
      })
 
      mainWindow.on('ready-to-show', () => {
-          mainWindow?.show()
+          if (!shouldStartMinimized) {
+               mainWindow?.show()
+          }
      })
 
      mainWindow.on('closed', () => {
