@@ -6,6 +6,8 @@ on:
              - main
           paths:
              - 'package.json'
+     workflow_dispatch:
+
 
 jobs:
      build-and-release-linux:
