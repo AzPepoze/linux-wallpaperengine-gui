@@ -1,34 +1,37 @@
 import { ElectronAPI } from '@electron-toolkit/preload'
 
+// A generic type for API responses to reduce repetition and improve maintainability.
+type ApiResponse<T = object> = Promise<{ success: boolean; error?: string } & T>
+
 declare global {
      interface Window {
           electron: ElectronAPI
           api: {
-               getWallpapers: () => Promise<{
-                    success: boolean
+               getWallpapers: () => ApiResponse<{
                     wallpapers?: {
                          folderName: string
                          previewPath: string | null
                          projectData: any
                     }[]
-                    error?: string
                }>
-               setWallpaper: (
-                    wallpaperFolderName: string | null
-               ) => Promise<{ success: boolean; error?: string }>
-               getConfig: () => Promise<{
-                    success: boolean
+               setWallpaper: (wallpaperFolderName: string | null) => ApiResponse
+               getConfig: () => ApiResponse<{
                     SCREEN?: string
                     FPS?: number
                     SILENCE?: boolean
                     lastUsedWallpaper?: string | null
-                    error?: string
                }>
                saveConfig: (config: {
                     SCREEN: string
                     FPS: number
                     SILENCE: boolean
-               }) => Promise<{ success: boolean; error?: string }>
+               }) => ApiResponse
+               openConfigInEditor: () => ApiResponse
+          }
+          updater: {
+               onUpdateAvailable: (callback: () => void) => () => void
+               onUpdateDownloaded: (callback: () => void) => () => void
+               restartAndUpdate: () => void
           }
      }
 }

@@ -1,6 +1,7 @@
 <script lang="ts">
      import { onMount } from 'svelte'
      import Settings from './components/Settings.svelte'
+     import UpdateNotification from './components/UpdateNotification.svelte'
      import MarkdownIt from 'markdown-it'
      import { fly } from 'svelte/transition'
 
@@ -136,6 +137,8 @@
           </div>
      </div>
 {/if}
+
+<UpdateNotification />
 
 <style lang="scss">
      * {

@@ -29,21 +29,19 @@ Before you begin, ensure you have the following installed:
 
 ## 🚀 Installation
 
-You have two options to get the Linux Wallpaper Engine GUI:
+You have three options to get the Linux Wallpaper Engine GUI:
 
 ### Option 1: Install on Arch Linux 🐧
 
 This method is for users of Arch Linux or Arch-based distributions.
 
-1.   **Create a temporary directory and download the PKGBUILD:**
-
+1. **Create a temporary directory and download the PKGBUILD:**
      ```bash
      mkdir -p ~/linux-wallpaperengine-gui-build
      cd ~/linux-wallpaperengine-gui-build
      curl -O https://raw.githubusercontent.com/AzPepoze/linux-wallpaperengine-gui/main/installer/PKGBUILD
      ```
-
-2.   **Build and install the package:**
+2. **Build and install the package:**
 
      ```bash
      makepkg -si
@@ -51,47 +49,72 @@ This method is for users of Arch Linux or Arch-based distributions.
 
      This command will automatically handle dependencies, build the package, and install it on your system.
 
-3.   **Clean up the temporary directory:**
-
+3. **Clean up the temporary directory:**
      ```bash
      cd ~ && rm -rf ~/linux-wallpaperengine-gui-build
      ```
-
-4.   **Remove pnpm (if you don't use it)**
+4. **Remove pnpm (if you don't use it)**
      ```bash
      sudo pacman -R pnpm
      ```
 
-### Option 2: Build from Source 🛠️
+### Option 2: Download from Releases 📦
+
+You can download pre-built packages for various Linux distributions directly from the GitHub Releases page.
+
+1. **Download the lastest release.**
+     - Go to the [Latest Release Page](https://github.com/AzPepoze/linux-wallpaperengine-gui/releases/latest)
+       Download the appropriate file for your system (`.AppImage`, `.deb`, `.rpm`, or `.snap`).
+     - Click on the link for your desired package type to download it directly.
+          - [Click here to download .AppImage file](https://github.com/AzPepoze/linux-wallpaperengine-gui/releases/latest/download/linux-wallpaperengine-gui.AppImage)
+          - [Click here to download .deb file](https://github.com/AzPepoze/linux-wallpaperengine-gui/releases/latest/download/linux-wallpaperengine-gui.deb)
+          - [Click here to download .rpm file](https://github.com/AzPepoze/linux-wallpaperengine-gui/releases/latest/download/linux-wallpaperengine-gui.rpm)
+          - [Click here to download .snap file](https://github.com/AzPepoze/linux-wallpaperengine-gui/releases/latest/download/linux-wallpaperengine-gui.snap)
+
+2. **Install it using your system's package manager.** For example:
+     - **For `.AppImage`:**
+          ```bash
+          chmod +x linux-wallpaperengine-gui.AppImage
+          ./linux-wallpaperengine-gui.AppImage
+          ```
+     - **For `.deb` (Debian, Ubuntu):**
+          ```bash
+          sudo dpkg -i linux-wallpaperengine-gui.deb
+          ```
+     - **For `.rpm` (Fedora, CentOS):**
+          ```bash
+          sudo rpm -i linux-wallpaperengine-gui.rpm
+          ```
+     - **For `.snap`:**
+          ```bash
+          sudo snap install linux-wallpaperengine-gui.snap --dangerous
+          ```
+          (The `--dangerous` flag is needed because the snap is not from the official Snap Store.)
+
+### Option 3: Build from Source 🛠️
 
 If you prefer to build the application yourself, follow these steps:
 
-- **Node.js and npm/pnpm:** Ensure you have Node.js and either npm or pnpm installed. These are required to build the Electron application.
+- **Node.js and pnpm:** Ensure you have Node.js and pnpm installed. These are required to build the Electron application.
 
-1.   **Clone the repository:**
-
+1. **Clone the repository:**
      ```bash
      git clone https://github.com/AzPepoze/linux-wallpaperengine-gui.git
      cd linux-wallpaperengine-gui
      ```
-
-2.   **Install dependencies:**
-
+2. **Install dependencies:**
      ```bash
      pnpm install
-     # or npm install
      ```
-
-3.   **Build and Unpack:**
+3. **Build and Unpack:**
 
      ```bash
      pnpm build:unpack
-     # or npm run build:unpack
      ```
 
      This will create an unpacked application in the `dist/linux-unpacked` directory.
 
-4.   **Run the Unpacked Application:**
+4. **Run the Unpacked Application:**
      ```bash
      ./dist/linux-unpacked/linux-wallpaperengine-gui
      ```
@@ -102,7 +125,6 @@ To run the application in development mode:
 
 ```bash
 pnpm dev
-# or npm dev
 ```
 
 This will open the GUI.

@@ -1,4 +1,4 @@
-import { contextBridge } from 'electron'
+import { contextBridge, ipcRenderer } from 'electron'
 import { electronAPI } from '@electron-toolkit/preload'
 
 // Custom APIs for renderer
@@ -40,6 +40,22 @@ const api = {
      }
 }
 
+const updaterApi = {
+     onUpdateAvailable: (callback: () => void) => {
+          ipcRenderer.on('update-available', callback)
+          // Return a cleanup function to be called on component unmount
+          return () => ipcRenderer.removeListener('update-available', callback)
+     },
+     onUpdateDownloaded: (callback: () => void) => {
+          ipcRenderer.on('update-downloaded', callback)
+          // Return a cleanup function
+          return () => ipcRenderer.removeListener('update-downloaded', callback)
+     },
+     restartAndUpdate: () => {
+          ipcRenderer.send('restart-and-update')
+     }
+}
+
 // Use `contextBridge` APIs to expose Electron APIs to
 // renderer only if context isolation is enabled, otherwise
 // just add to the DOM global.
@@ -47,6 +63,7 @@ if (process.contextIsolated) {
      try {
           contextBridge.exposeInMainWorld('electron', electronAPI)
           contextBridge.exposeInMainWorld('api', api)
+          contextBridge.exposeInMainWorld('updater', updaterApi)
      } catch (error) {
           console.error(error)
      }
@@ -55,4 +72,6 @@ if (process.contextIsolated) {
      window.electron = electronAPI
      // @ts-ignore (define in dts)
      window.api = api
+     // @ts-ignore (define in dts)
+     window.updater = updaterApi
 }
