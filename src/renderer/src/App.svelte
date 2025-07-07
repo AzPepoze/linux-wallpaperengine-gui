@@ -1,12 +1,21 @@
 <script lang="ts">
+     //-------------------------------------------------------
+     // Imports
+     //-------------------------------------------------------
      import { onMount } from 'svelte'
      import Settings from './components/Settings.svelte'
      import UpdateNotification from './components/UpdateNotification.svelte'
      import MarkdownIt from 'markdown-it'
      import { fly } from 'svelte/transition'
 
+     //-------------------------------------------------------
+     // Initialization
+     //-------------------------------------------------------
      const md = new MarkdownIt()
 
+     //-------------------------------------------------------
+     // Component State
+     //-------------------------------------------------------
      let wallpapers: { folderName: string; previewPath: string | null; projectData: any }[] = []
      let error: string | null = null
      let loading = true
@@ -15,35 +24,50 @@
           previewPath: string | null
           projectData: any
      } | null = null
-     let showSettingsPopup: boolean = false // New state for settings popup
+     let showSettingsPopup: boolean = false
 
+     //-------------------------------------------------------
+     // Helper Functions
+     //-------------------------------------------------------
      function getSidebarContent(wallpaper) {
           if (!wallpaper) return ''
           const { projectData, folderName } = wallpaper
           let content = `### ${projectData?.title || folderName}`
-          content += `\n*Folder: ${folderName}*`
-          if (projectData?.type) content += `\n*Type: ${projectData.type}*`
+          content += `
+*Folder: ${folderName}*`
+          if (projectData?.type) content += `
+*Type: ${projectData.type}*`
           if (projectData?.description)
-               content += `\n\n**Description:**\n${projectData.description}`
+               content += `
+
+**Description:**
+${projectData.description}`
           if (projectData?.contentrating)
-               content += `\n\n**Content Rating:** ${projectData.contentrating}`
-          if (projectData?.tags?.length) content += `\n\n**Tags:** ${projectData.tags.join(', ')}`
-          if (projectData?.version) content += `\n\n**Version:** ${projectData.version}`
-          // if (projectData?.workshopid) {
-          content += `\n\n[Workshop URL](steam://url/CommunityFilePage/${folderName})`
-          // }
+               content += `
+
+**Content Rating:** ${projectData.contentrating}`
+          if (projectData?.tags?.length) content += `
+
+**Tags:** ${projectData.tags.join(', ')}`
+          if (projectData?.version) content += `
+
+**Version:** ${projectData.version}`
+          content += `
+
+[Workshop URL](steam://url/CommunityFilePage/${folderName})`
           return md.render(content)
      }
 
+     //-------------------------------------------------------
+     // Lifecycle Hooks
+     //-------------------------------------------------------
      onMount(async () => {
           loading = true
           error = null
           try {
-               // @ts-ignore
                const result = await window.api.getWallpapers()
                if (result.success) {
                     wallpapers = result.wallpapers || []
-                    // Restore last used wallpaper from localStorage
                     const config = await window.api.getConfig()
                     if (config.success && config.lastUsedWallpaper) {
                          const found = wallpapers.find(
@@ -51,8 +75,6 @@
                          )
                          if (found) {
                               selectedWallpaper = found
-
-                              // Auto set wallpaper on start
                               window.api.setWallpaper(found.folderName)
                          }
                     }
@@ -162,7 +184,7 @@
      .content {
           display: flex;
           flex-grow: 1;
-          height: calc(100% - 80px); /* Adjust based on topbar height */
+          height: calc(100% - 80px);
      }
 
      .settings-button {
@@ -219,13 +241,13 @@
           border-radius: 15px;
           margin: 20px 0 20px 20px;
           position: relative;
-          display: flex; /* Added for flex layout */
-          flex-direction: column; /* Added for flex layout */
+          display: flex;
+          flex-direction: column;
 
           .sidebar-content {
                flex-grow: 1;
                overflow-y: auto;
-               padding-bottom: 20px; /* Space for the footer */
+               padding-bottom: 20px;
           }
 
           .sidebar-footer {
@@ -233,7 +255,7 @@
                display: flex;
                justify-content: center;
                align-items: center;
-               flex-shrink: 0; /* Prevent footer from shrinking */
+               flex-shrink: 0;
           }
 
           .close-btn {
@@ -286,7 +308,7 @@
                grid-template-columns: repeat(
                     auto-fit,
                     minmax(180px, 1fr)
-               ); /* Changed to auto-fit for better responsiveness */
+               );
                gap: 20px;
                padding: 20px;
                justify-content: center;
@@ -319,14 +341,14 @@
 
                &.selected,
                &[aria-pressed='true'] {
-                    border: 3px solid #007bff; /* Highlight color for selected item */
+                    border: 3px solid #007bff;
                     box-shadow: 0 0 15px rgba(0, 123, 255, 0.7);
                }
 
                .wallpaper-preview {
                     width: 150px;
                     height: 150px;
-                    border-radius: 5px; /* Changed to 5px round */
+                    border-radius: 5px;
                     object-fit: cover;
                     margin-bottom: 10px;
                     border: 3px solid #444;

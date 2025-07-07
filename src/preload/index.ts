@@ -1,64 +1,52 @@
 import { contextBridge, ipcRenderer } from 'electron'
 import { electronAPI } from '@electron-toolkit/preload'
 
-// Custom APIs for renderer
-const api = {
-     getWallpapers: async () => {
+//-------------------------------------------------------
+// Helper Functions
+//-------------------------------------------------------
+
+const createIpcCaller = (channel: string) => {
+     return async (...args: any[]) => {
           try {
-               return await electronAPI.ipcRenderer.invoke('get-wallpapers')
+               return await ipcRenderer.invoke(channel, ...args)
           } catch (e) {
-               return { success: false, error: 'IPC not available' }
-          }
-     },
-     setWallpaper: async (wallpaperFolderName: string) => {
-          try {
-               return await electronAPI.ipcRenderer.invoke('set-wallpaper', wallpaperFolderName)
-          } catch (e) {
-               return { success: false, error: 'IPC not available' }
-          }
-     },
-     getConfig: async () => {
-          try {
-               return await electronAPI.ipcRenderer.invoke('get-config')
-          } catch (e) {
-               return { success: false, error: 'IPC not available' }
-          }
-     },
-     saveConfig: async (config: { SCREEN: string; FPS: number; SILENCE: boolean }) => {
-          try {
-               return await electronAPI.ipcRenderer.invoke('save-config', config)
-          } catch (e) {
-               return { success: false, error: 'IPC not available' }
-          }
-     },
-     openConfigInEditor: async () => {
-          try {
-               return await electronAPI.ipcRenderer.invoke('open-config-in-editor')
-          } catch (e) {
-               return { success: false, error: 'IPC not available' }
+               console.error(`Error invoking IPC channel '${channel}':`, e)
+               return { success: false, error: 'IPC call failed' }
           }
      }
 }
 
+const createIpcListener = (channel: string) => {
+     return (callback: (...args: any[]) => void) => {
+          ipcRenderer.on(channel, (_event, ...args) => callback(...args))
+          return () => ipcRenderer.removeListener(channel, callback)
+     }
+}
+
+//-------------------------------------------------------
+// API Definition
+//-------------------------------------------------------
+
+const api = {
+     getWallpapers: createIpcCaller('get-wallpapers'),
+     setWallpaper: createIpcCaller('set-wallpaper'),
+     getConfig: createIpcCaller('get-config'),
+     saveConfig: createIpcCaller('save-config'),
+     openConfigInEditor: createIpcCaller('open-config-in-editor')
+}
+
 const updaterApi = {
-     onUpdateAvailable: (callback: () => void) => {
-          ipcRenderer.on('update-available', callback)
-          // Return a cleanup function to be called on component unmount
-          return () => ipcRenderer.removeListener('update-available', callback)
-     },
-     onUpdateDownloaded: (callback: () => void) => {
-          ipcRenderer.on('update-downloaded', callback)
-          // Return a cleanup function
-          return () => ipcRenderer.removeListener('update-downloaded', callback)
-     },
+     onUpdateAvailable: createIpcListener('update-available'),
+     onUpdateDownloaded: createIpcListener('update-downloaded'),
      restartAndUpdate: () => {
           ipcRenderer.send('restart-and-update')
      }
 }
 
-// Use `contextBridge` APIs to expose Electron APIs to
-// renderer only if context isolation is enabled, otherwise
-// just add to the DOM global.
+//-------------------------------------------------------
+// Context Bridge
+//-------------------------------------------------------
+
 if (process.contextIsolated) {
      try {
           contextBridge.exposeInMainWorld('electron', electronAPI)

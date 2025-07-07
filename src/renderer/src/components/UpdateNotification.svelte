@@ -7,19 +7,24 @@
 
      let removeUpdateAvailableListener: () => void
      let removeUpdateDownloadedListener: () => void
-
+ 
      onMount(() => {
           removeUpdateAvailableListener = window.updater.onUpdateAvailable(() => {
                updateAvailable = true
                message = 'A new update is available. Downloading now...'
                console.log('Update available.')
           })
-
+ 
           removeUpdateDownloadedListener = window.updater.onUpdateDownloaded(() => {
                updateDownloaded = true
                message = 'Update downloaded. It will be installed on restart.'
                console.log('Update downloaded.')
           })
+     })
+ 
+     onDestroy(() => {
+          if (removeUpdateAvailableListener) removeUpdateAvailableListener()
+          if (removeUpdateDownloadedListener) removeUpdateDownloadedListener()
      })
 
      onDestroy(() => {

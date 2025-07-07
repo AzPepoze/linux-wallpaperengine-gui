@@ -5,6 +5,7 @@ import icon from '../../resources/icon.png?asset'
 import fs from 'fs/promises'
 import { spawn, ChildProcess, exec } from 'child_process'
 import { autoUpdater } from 'electron-updater'
+import kill from 'tree-kill'
 
 /*
 ------------------------------------------------------
@@ -60,15 +61,11 @@ function createWindow(): void {
      //-------------------------------------------------------
      // Auto Updater Events
      //-------------------------------------------------------
-     // Forward events to the renderer process.
-     // These events are checked and sent to the UI when a new version is available.
      autoUpdater.on('update-available', () => {
-          // Make sure the window is still open before sending.
           mainWindow?.webContents.send('update-available')
      })
 
      autoUpdater.on('update-downloaded', () => {
-          // Make sure the window is still open before sending.
           mainWindow?.webContents.send('update-downloaded')
      })
 
@@ -137,10 +134,8 @@ Wallpaper Process Management
 -------------------------------------------------------
 */
 
-var kill = require('tree-kill')
-
 async function killWallpaperProcess() {
-     if (wallpaperProcess && !wallpaperProcess.killed) {
+     if (wallpaperProcess && !wallpaperProcess.killed && wallpaperProcess.pid) {
           try {
                kill(wallpaperProcess.pid)
                console.log('Successfully killed previous wallpaper process.')
@@ -302,7 +297,6 @@ function registerIpcHandlers(): void {
           }
      })
 
-     // Listen for the command from the UI to restart and update
      ipcMain.on('restart-and-update', () => {
           autoUpdater.quitAndInstall()
      })
@@ -324,7 +318,6 @@ app.whenReady().then(async () => {
      registerIpcHandlers()
      createWindow()
 
-     // Check for updates after the window has been created.
      autoUpdater.checkForUpdatesAndNotify()
 
      createTray()
