@@ -15,6 +15,8 @@ const app = mount(App, {
 Neutralino.init();
 
 // Event Listeners
+let isVisible = true;
+
 Neutralino.events.on("ready", async () => {
 	await Neutralino.os.setTray({
 		icon: "/icon.png",
@@ -29,6 +31,11 @@ Neutralino.events.on("ready", async () => {
 			},
 		],
 	});
+
+	if (NL_ARGS.includes("--minimized")) {
+		await Neutralino.window.hide();
+		isVisible = false;
+	}
 });
 
 let isVisible = true;

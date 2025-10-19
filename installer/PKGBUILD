@@ -1,0 +1,54 @@
+# Maintainer: Your Name <youremail@domain.com>
+pkgname=linux-wallpaperengine-gui
+pkgrel=1
+pkgdesc="A graphical user interface for managing wallpapers on Linux, powered by Neutralinojs."
+arch=('x86_64')
+url="https://github.com/AzPepoze/linux-wallpaperengine-gui"
+license=('MIT')
+depends=('gtk3' 'webkit2gtk')
+makedepends=('git' 'pnpm' 'npm')
+source=("$pkgname::git+$url.git")
+sha256sums=('SKIP')
+
+pkgver() {
+    cd "$srcdir/$pkgname"
+    grep '"version":' neutralino.config.json | cut -d '"' -f 4
+}
+
+build() {
+    cd "$srcdir/$pkgname"
+
+    # Build frontend
+    cd app
+    pnpm install
+    pnpm build
+    cd ..
+
+    # Build the application
+    npx --yes @neutralinojs/neu build
+}
+
+package() {
+    cd "$srcdir/$pkgname"
+
+    # Application binary
+    install -Dm755 "dist/$pkgname/$pkgname-linux_x64" "$pkgdir/usr/bin/$pkgname"
+
+    # Resources
+    install -Dm644 "dist/$pkgname/resources.neu" "$pkgdir/usr/lib/$pkgname/resources.neu"
+
+    # .desktop file
+    install -Dm644 /dev/stdin "$pkgdir/usr/share/applications/$pkgname.desktop" <<EOF
+[Desktop Entry]
+Name=Linux Wallpaper Engine GUI
+Comment=A graphical user interface for managing wallpapers on Linux.
+Exec=linux-wallpaperengine-gui
+Icon=linux-wallpaperengine-gui
+Terminal=false
+Type=Application
+Categories=Utility;
+EOF
+
+    # Icon
+    install -Dm644 "app/public/icon.png" "$pkgdir/usr/share/pixmaps/$pkgname.png"
+}
