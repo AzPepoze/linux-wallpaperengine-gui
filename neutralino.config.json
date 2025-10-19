@@ -1,54 +1,55 @@
 {
-	"applicationId": "azpepoze.linux-wallpaperengine-gui",
-	"name": "Linux Wallpaper Engine GUI",
-	"version": "1.0.1",
-	"defaultMode": "window",
-	"documentRoot": "/app/dist/",
-	"url": "/",
-	"enableServer": true,
-	"enableNativeAPI": true,
-	"nativeAllowList": [
-		"app.*",
-		"os.*",
-		"server.mount",
-		"debug.log",
-		"filesystem.readDirectory",
-		"filesystem.readFile",
-		"filesystem.readBinaryFile",
-		"filesystem.writeFile",
-		"filesystem.createDirectory",
-		"os.setTray",
-		"window.*"
-	],
-	"modes": {
-		"window": {
-			"enableInspector": true,
-			"openInspectorOnStartup": false,
-			"title": "linux-wallpaperengine-gui",
-			"width": 800,
-			"height": 500,
-			"minWidth": 400,
-			"minHeight": 200,
-			"icon": "/app/public/icon.png",
-			"center": true,
-			"resizable": true,
-			"injectGlobals": true,
-			"exitProcessOnClose": false
-		}
-	},
-	"cli": {
-		"binaryName": "linux-wallpaperengine-gui",
-		"resourcesPath": "/app/dist/",
-		"extensionsPath": "/extensions/",
-		"binaryVersion": "6.3.0",
-		"clientVersion": "6.3.0",
-		"frontendLibrary": {
-			"patchFile": "/app/dist/index.html",
-			"devUrl": "http://localhost:5173",
-			"projectPath": "/app/",
-			"initCommand": "npm install",
-			"devCommand": "node run-dev.js",
-			"buildCommand": "npm run build"
-		}
-	}
+     "applicationId": "azpepoze.linux-wallpaperengine-gui",
+     "name": "Linux Wallpaper Engine GUI",
+     "version": "1.0.1",
+     "defaultMode": "window",
+     "documentRoot": "/app/dist/",
+     "url": "/",
+     "enableServer": true,
+     "enableNativeAPI": true,
+     "nativeAllowList": [
+          "app.*",
+          "os.*",
+          "server.mount",
+          "debug.log",
+          "filesystem.readDirectory",
+          "filesystem.readFile",
+          "filesystem.readBinaryFile",
+          "filesystem.writeFile",
+          "filesystem.createDirectory",
+          "os.setTray",
+          "window.*"
+     ],
+     "modes": {
+          "window": {
+               "enableInspector": true,
+               "openInspectorOnStartup": false,
+               "hidden": true,
+               "title": "linux-wallpaperengine-gui",
+               "width": 800,
+               "height": 500,
+               "minWidth": 400,
+               "minHeight": 200,
+               "icon": "/app/public/icon.png",
+               "center": true,
+               "resizable": true,
+               "injectGlobals": true,
+               "exitProcessOnClose": false
+          }
+     },
+     "cli": {
+          "binaryName": "linux-wallpaperengine-gui",
+          "resourcesPath": "/app/dist/",
+          "extensionsPath": "/extensions/",
+          "binaryVersion": "6.3.0",
+          "clientVersion": "6.3.0",
+          "frontendLibrary": {
+               "patchFile": "/app/dist/index.html",
+               "devUrl": "http://localhost:5173",
+               "projectPath": "/app/",
+               "initCommand": "npm install",
+               "devCommand": "node run-dev.js",
+               "buildCommand": "npm run build"
+          }
+     }
 }
