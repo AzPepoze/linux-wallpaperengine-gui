@@ -37,7 +37,7 @@ You can download pre-built binaries for various Linux distributions directly fro
 
 ### Install on Arch Linux
 
-If you are using Arch Linux, you can build and install the application using the provided `PKGBUILD`.
+If you are using Arch Linux, you can build and install the application using the provided `PKGBUILD`. This will build and install a package named `linux-wallpaperengine-gui-git`.
 
 ```bash
 mkdir -p /tmp/linux-wallpaperengine-gui-build && \
