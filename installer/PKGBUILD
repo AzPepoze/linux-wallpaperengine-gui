@@ -27,9 +27,10 @@ build() {
     cd app
     pnpm install
     cd ..
+    npx @neutralinojs/neu update
 
     # Build the application
-    npx --yes @neutralinojs/neu build --release
+    npx @neutralinojs/neu build --release
 }
 
 package() {
