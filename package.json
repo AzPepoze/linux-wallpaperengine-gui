@@ -2,6 +2,12 @@
      "name": "linux-wallpaperengine-gui",
      "version": "0.1.6",
      "type": "module",
+     "description": "A graphical user interface for managing wallpapers on Linux, powered by Electron and linux-wallpaperengine.",
+     "author": {
+          "name": "AzPepoze",
+          "email": "azpepoze@gmail.com"
+     },
+     "main": "build/electron/main.js",
      "scripts": {
           "dev": "vite",
           "start": "npm run dev",
