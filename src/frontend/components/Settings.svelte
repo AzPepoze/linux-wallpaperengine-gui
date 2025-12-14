@@ -1,5 +1,6 @@
 <script lang="ts">
      import { onMount } from "svelte";
+     import { fade } from "svelte/transition";
      import {
           clearAllWallpapers,
           getConfig,
@@ -7,8 +8,28 @@
           saveConfig,
      } from "../core/wallpaperManager";
 
+     import SettingsSection from "./settings/SettingsSection.svelte";
+     import SettingItem from "./ui/SettingItem.svelte";
+     import Toggle from "./ui/Toggle.svelte";
+     import Input from "./ui/Input.svelte";
+     import Select from "./ui/Select.svelte";
+     import Range from "./ui/Range.svelte";
+
+     export let onClose: () => void;
+
      let fps: number = 60;
      let silence: boolean = false;
+     let customArgs: string = "";
+     let customArgsEnabled: boolean = false;
+     let volume: number = 100;
+     let noAutomute: boolean = false;
+     let noAudioProcessing: boolean = false;
+     let scaling: string = "default";
+     let clamping: string = "clamp";
+     let disableMouse: boolean = false;
+     let disableParallax: boolean = false;
+     let noFullscreenPause: boolean = false;
+
      let message: string | null = null;
      let messageType: "success" | "error" | null = null;
 
@@ -18,6 +39,16 @@
                if (config.success) {
                     fps = config.FPS || 60;
                     silence = config.SILENCE || false;
+                    customArgs = config.customArgs || "";
+                    customArgsEnabled = config.customArgsEnabled || false;
+                    volume = config.volume ?? 100;
+                    noAutomute = config.noAutomute || false;
+                    noAudioProcessing = config.noAudioProcessing || false;
+                    scaling = config.scaling || "default";
+                    clamping = config.clamping || "clamp";
+                    disableMouse = config.disableMouse || false;
+                    disableParallax = config.disableParallax || false;
+                    noFullscreenPause = config.noFullscreenPause || false;
                } else {
                     message = `Error loading config: ${config.error}`;
                     messageType = "error";
@@ -33,6 +64,16 @@
                const result = await saveConfig({
                     FPS: fps,
                     SILENCE: silence,
+                    customArgs,
+                    customArgsEnabled,
+                    volume,
+                    noAutomute,
+                    noAudioProcessing,
+                    scaling,
+                    clamping,
+                    disableMouse,
+                    disableParallax,
+                    noFullscreenPause,
                });
                if (result.success) {
                     message = "Settings saved successfully!";
@@ -62,23 +103,138 @@
                messageType = "error";
           }
      };
+
+     const scalingOptions = [
+          { value: "default", label: "Default" },
+          { value: "stretch", label: "Stretch" },
+          { value: "fit", label: "Fit" },
+          { value: "fill", label: "Fill" },
+     ];
+
+     const clampingOptions = [
+          { value: "clamp", label: "Clamp" },
+          { value: "border", label: "Border" },
+          { value: "repeat", label: "Repeat" },
+     ];
 </script>
 
-<div class="settings-container">
-     <h2>Settings</h2>
+<div class="settings-container" transition:fade={{ duration: 200 }}>
+     <button class="close-btn" on:click={onClose} aria-label="Close"
+          >&times;</button
+     >
 
-     <div class="form-group">
-          <label for="fps">FPS</label>
-          <input type="number" id="fps" bind:value={fps} min="1" />
+     <div class="header">
+          <h2>Settings</h2>
      </div>
 
-     <div class="form-group form-group-toggle">
-          <label for="silence">Silence Wallpaper</label>
-          <label class="toggle-switch">
-               <input type="checkbox" id="silence" bind:checked={silence} />
-               <span class="slider"></span>
-          </label>
+     <div class="settings-grid">
+          <SettingsSection title="General">
+               <SettingItem label="FPS" id="fps">
+                    <Input type="number" id="fps" bind:value={fps} min={1} />
+               </SettingItem>
+
+               <SettingItem label="Scaling Mode" id="scaling">
+                    <Select
+                         id="scaling"
+                         bind:value={scaling}
+                         options={scalingOptions}
+                    />
+               </SettingItem>
+
+               <SettingItem label="Clamping Mode" id="clamping">
+                    <Select
+                         id="clamping"
+                         bind:value={clamping}
+                         options={clampingOptions}
+                    />
+               </SettingItem>
+
+               <SettingItem label="No Fullscreen Pause" id="noFullscreenPause">
+                    <Toggle
+                         id="noFullscreenPause"
+                         bind:checked={noFullscreenPause}
+                    />
+               </SettingItem>
+          </SettingsSection>
+
+          <SettingsSection title="Audio">
+               <SettingItem label="Silence Wallpaper" id="silence">
+                    <Toggle id="silence" bind:checked={silence} />
+               </SettingItem>
+
+               {#if !silence}
+                    <SettingItem label="Volume ({volume}%)" id="volume">
+                         <Range
+                              id="volume"
+                              bind:value={volume}
+                              min={0}
+                              max={100}
+                         />
+                    </SettingItem>
+
+                    <SettingItem label="No Automute" id="noAutomute">
+                         <Toggle id="noAutomute" bind:checked={noAutomute} />
+                    </SettingItem>
+
+                    <SettingItem
+                         label="No Audio Processing"
+                         id="noAudioProcessing"
+                    >
+                         <Toggle
+                              id="noAudioProcessing"
+                              bind:checked={noAudioProcessing}
+                         />
+                    </SettingItem>
+               {/if}
+          </SettingsSection>
+
+          <SettingsSection title="Interaction">
+               <SettingItem label="Disable Mouse" id="disableMouse">
+                    <Toggle id="disableMouse" bind:checked={disableMouse} />
+               </SettingItem>
+
+               <SettingItem label="Disable Parallax" id="disableParallax">
+                    <Toggle
+                         id="disableParallax"
+                         bind:checked={disableParallax}
+                    />
+               </SettingItem>
+          </SettingsSection>
      </div>
+
+     <SettingsSection title="Advanced" full={true}>
+          <SettingItem label="Enable Custom Arguments" id="customArgsEnabled">
+               <Toggle
+                    id="customArgsEnabled"
+                    bind:checked={customArgsEnabled}
+               />
+          </SettingItem>
+
+          {#if customArgsEnabled}
+               <SettingItem
+                    label="Custom Command Args"
+                    id="customArgs"
+                    vertical
+               >
+                    <Input
+                         type="text"
+                         id="customArgs"
+                         bind:value={customArgs}
+                         placeholder="e.g. --window 1920x1080"
+                    />
+                    <p class="help-text">
+                         Refer to
+                         <a
+                              href="https://github.com/Almamu/linux-wallpaperengine?tab=readme-ov-file#-common-options"
+                              target="_blank"
+                              rel="noopener noreferrer"
+                              >linux-wallpaperengine common options</a
+                         >
+                         for available arguments.
+                    </p>
+               </SettingItem>
+          {/if}
+     </SettingsSection>
 
      <div class="button-group">
           <button class="btn btn-primary" on:click={saveSettings}
@@ -103,130 +259,100 @@
      {/if}
 </div>
 
-<style>
-     :root {
-          --input-bg-color: #3a3a3a;
-          --input-border-color: #444;
-          --input-text-color: #fff;
-          --btn-primary-bg: #007bff;
-          --btn-primary-hover-bg: #0056b3;
-          --btn-secondary-bg: #6c757d;
-          --btn-secondary-hover-bg: #5a6268;
-          --text-color: #fff;
-          --success-bg: #28a745;
-          --error-bg: #dc3545;
-     }
-
+<style lang="scss">
      .settings-container {
+          position: fixed;
+          top: 0;
+          left: 0;
+          width: 100vw;
+          height: 100vh;
+          overflow-y: auto;
+          background: rgba(0, 0, 0, 0.75);
+          backdrop-filter: blur(10px);
+          -webkit-backdrop-filter: blur(10px);
           color: var(--text-color);
+          padding: 40px;
+          box-sizing: border-box;
+          z-index: 1000;
+          display: flex;
+          flex-direction: column;
+          align-items: center;
+          gap: 20px;
+          padding-inline: 20%;
      }
 
-     h2 {
-          text-align: center;
-          margin-bottom: 25px;
+     .close-btn {
+          position: absolute;
+          top: 20px;
+          right: 30px;
+          background: transparent;
+          border: none;
+          font-size: 2.5em;
+          color: rgba(255, 255, 255, 0.8);
+          cursor: pointer;
+          z-index: 1001;
+          transition: all 0.2s ease;
+          line-height: 1;
+          padding: 5px;
      }
 
-     .form-group {
+     .close-btn:hover {
+          color: #fff;
+          transform: scale(1.1);
+     }
+
+     .header {
+          width: 100%;
+          display: flex;
+          justify-content: flex-start;
           margin-bottom: 20px;
      }
 
-     .form-group label {
-          display: block;
-          margin-bottom: 8px;
-          font-weight: bold;
-          font-size: 0.95em;
+     h2 {
+          font-size: 2em;
+          text-shadow: 0 2px 4px rgba(0, 0, 0, 0.5);
+          margin: 0;
      }
 
-     .form-group input[type="text"],
-     .form-group input[type="number"] {
+     .settings-grid {
+          display: grid;
+          grid-template-columns: 1fr;
+          gap: 20px;
           width: 100%;
-          padding: 12px;
-          border: 1px solid var(--input-border-color);
-          border-radius: 8px;
-          background-color: var(--input-bg-color);
-          color: var(--input-text-color);
-          box-sizing: border-box;
-          transition: border-color 0.2s;
      }
 
-     .form-group input[type="text"]:focus,
-     .form-group input[type="number"]:focus {
-          outline: none;
-          border-color: var(--btn-primary-bg);
-     }
-
-     .form-group-toggle {
-          display: flex;
-          justify-content: space-between;
-          align-items: center;
-     }
-
-     .toggle-switch {
-          position: relative;
-          display: inline-block;
-          width: 50px;
-          height: 28px;
-     }
-
-     .toggle-switch input {
-          opacity: 0;
-          width: 0;
-          height: 0;
-     }
-
-     .slider {
-          position: absolute;
-          cursor: pointer;
-          top: 0;
-          left: 0;
-          right: 0;
-          bottom: 0;
-          background-color: #ccc;
-          transition: 0.4s;
-          border-radius: 28px;
-     }
-
-     .slider:before {
-          position: absolute;
-          content: "";
-          height: 20px;
-          width: 20px;
-          left: 4px;
-          bottom: 4px;
-          background-color: white;
-          transition: 0.4s;
-          border-radius: 50%;
-     }
-
-     input:checked + .slider {
-          background-color: var(--btn-primary-bg);
-     }
-
-     input:focus + .slider {
-          box-shadow: 0 0 1px var(--btn-primary-bg);
-     }
-
-     input:checked + .slider:before {
-          transform: translateX(22px);
+     @media (min-width: 900px) {
+          .settings-grid {
+               grid-template-columns: 1fr 1fr;
+          }
      }
 
      .button-group {
-          margin-top: 30px;
+          margin-top: 40px;
           display: flex;
-          flex-direction: column;
-          gap: 10px;
+          flex-direction: row;
+          justify-content: center;
+          flex-wrap: wrap;
+          gap: 15px;
+          width: 100%;
      }
 
      .btn {
           color: white;
-          padding: 12px 20px;
+          padding: 10px 20px;
           border: none;
           border-radius: 8px;
           cursor: pointer;
           font-size: 1em;
-          font-weight: bold;
-          transition: background-color 0.2s ease-in-out;
-          width: 100%;
+          font-weight: 600;
+          transition:
+               transform 0.1s,
+               background-color 0.2s;
+          white-space: nowrap;
+     }
+
+     .btn:active {
+          transform: scale(0.98);
      }
 
      .btn-primary {
@@ -247,10 +373,12 @@
 
      .message {
           margin-top: 20px;
-          padding: 12px;
+          padding: 15px;
           border-radius: 8px;
           text-align: center;
           font-weight: bold;
+          width: 100%;
+          backdrop-filter: blur(5px);
      }
 
      .message.success {
@@ -261,5 +389,21 @@
      .message.error {
           background-color: var(--error-bg);
           color: white;
+     }
+
+     .help-text {
+          font-size: 0.85em;
+          color: rgba(255, 255, 255, 0.6);
+          margin-top: 5px;
+          text-align: left;
+     }
+
+     .help-text a {
+          color: #5daeff;
+          text-decoration: none;
+     }
+
+     .help-text a:hover {
+          text-decoration: underline;
      }
 </style>

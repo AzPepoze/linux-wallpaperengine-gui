@@ -1,16 +1,15 @@
 <script lang="ts">
-     import { createEventDispatcher } from "svelte";
      import type { Wallpaper } from "../types";
      import MarkdownIt from "markdown-it";
      import { getDominantColor, isLight } from "../lib/colorHelper";
 
      export let selectedWallpaper: Wallpaper | null = null;
+     export let onClose: () => void = () => {};
 
      let sidebarContentElement: HTMLDivElement;
      let backgroundColor = "#2a2a2a";
      let textColor = "#fff";
 
-     const dispatch = createEventDispatcher();
      const md = new MarkdownIt();
 
      $: {
@@ -56,7 +55,7 @@
      }
 
      function close() {
-          dispatch("close");
+          onClose();
      }
 </script>
 
@@ -92,9 +91,7 @@
           color: var(--text-color);
           box-shadow: -5px 0 15px rgba(0, 0, 0, 0.3);
           transition: all 0.3s ease-in-out;
-          padding: 0;
           border-radius: 15px;
-          margin: 20px 0;
           position: relative;
           display: flex;
           flex-direction: column;
@@ -103,17 +100,18 @@
           .sidebar-content {
                flex-grow: 1;
                overflow-y: auto;
-               overflow-x: hidden; /* Prevent horizontal scroll */
+               overflow-x: hidden;
                padding-bottom: 20px;
-               word-wrap: break-word; /* Ensure long words break */
-               
+               text-align: left;
+               // word-wrap: break-word;
+
                :global(img) {
-                   max-width: 100%;
-                   height: auto;
+                    max-width: 100%;
+                    height: auto;
                }
 
                :global(p) {
-                   white-space: pre-wrap; /* Preserve formatting but wrap */
+                    white-space: pre-wrap;
                }
 
                .preview-image {
@@ -154,9 +152,15 @@
           }
 
           &.open {
-               width: 300px;
-               padding: 0 20px;
+               width: 25%;
+               min-width: 250px;
+               max-width: 500px;
+               padding: 5px 10px;
                margin: 20px 0 20px 20px;
+
+               .sidebar-content {
+                    padding: 0 10px;
+               }
           }
 
           :global(a) {

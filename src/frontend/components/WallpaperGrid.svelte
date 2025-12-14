@@ -1,5 +1,4 @@
 <script lang="ts">
-     import { createEventDispatcher } from "svelte";
      import type { Wallpaper, WallpaperData } from "../types";
      import WallpaperItem from "./WallpaperItem.svelte";
 
@@ -7,11 +6,13 @@
      export let selectedWallpaper: Wallpaper | null = null;
      export let loading: boolean = true;
      export let error: string | null = null;
-
-     const dispatch = createEventDispatcher();
+     export let onSelect: (
+          folderName: string,
+          wallpaper: WallpaperData,
+     ) => void = () => {};
 
      function selectWallpaper(folderName: string, wallpaper: WallpaperData) {
-          dispatch("select", { folderName, wallpaper });
+          onSelect(folderName, wallpaper);
      }
 </script>
 
@@ -49,11 +50,12 @@
                black 97%,
                transparent
           );
+          width: -webkit-fill-available;
 
           .wallpaper-grid {
-               display: grid;
-               grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
-               gap: 20px;
+               display: flex;
+               flex-wrap: wrap;
+               gap: 10px;
                padding: 20px;
                justify-content: center;
                list-style: none;

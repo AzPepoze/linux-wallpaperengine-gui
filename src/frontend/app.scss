@@ -5,12 +5,22 @@
 
      color-scheme: light dark;
      color: rgba(255, 255, 255, 0.87);
-     background-color: #242424;
 
      font-synthesis: none;
      text-rendering: optimizeLegibility;
      -webkit-font-smoothing: antialiased;
      -moz-osx-font-smoothing: grayscale;
+
+     --input-bg-color: rgba(255, 255, 255, 0.1);
+     --input-border-color: rgba(255, 255, 255, 0.2);
+     --input-text-color: #fff;
+     --btn-primary-bg: #007bff;
+     --btn-primary-hover-bg: #0056b3;
+     --btn-secondary-bg: #6c757d;
+     --btn-secondary-hover-bg: #5a6268;
+     --text-color: #fff;
+     --success-bg: rgba(40, 167, 69, 0.8);
+     --error-bg: rgba(220, 53, 69, 0.8);
 }
 
 a {
@@ -23,12 +33,17 @@ a {
      }
 }
 
+html {
+     background: rgba(0, 0, 0, 0.8);
+}
+
 body {
      margin: 0;
      display: flex;
      place-items: center;
      min-width: 320px;
      min-height: 100vh;
+     background: transparent;
 }
 
 h1 {
@@ -41,8 +56,7 @@ h1 {
 }
 
 #app {
-     max-width: 1280px;
-     margin: 0 auto;
+     width: 100%;
      padding: 2rem;
      text-align: center;
 }
@@ -66,44 +80,58 @@ button {
      &:focus-visible {
           outline: 4px auto -webkit-focus-ring-color;
      }
-}
 
-@media (prefers-color-scheme: light) {
-     :root {
-          color: #213547;
-          background-color: #ffffff;
-     }
-
-     a {
-          &:hover {
-               color: #747bff;
-          }
-     }
-
-     button {
+     @media (prefers-color-scheme: light) {
           background-color: #f9f9f9;
      }
 }
 
-/* Custom Scrollbar */
 ::-webkit-scrollbar {
-  width: 10px;
-  height: 10px;
+     width: 5px;
+     height: 10px;
+
+     &-track {
+          background: transparent;
+     }
+
+     &-thumb {
+          background: #2d71c9;
+          border-radius: 5px;
+
+          &:hover {
+               background: #80ffe4;
+          }
+     }
+
+     &-corner {
+          background: #2e2e2e;
+     }
 }
 
-::-webkit-scrollbar-track {
-  background: transparent;
-}
+select {
+     appearance: none;
+     -webkit-appearance: none;
 
-::-webkit-scrollbar-thumb {
-  background: #555;
-  border-radius: 5px;
-}
+     background-color: #1a1a1a;
+     color: rgba(255, 255, 255, 0.87);
+     border-radius: 8px;
+     padding: 0.6em 2.5em 0.6em 1.2em;
+     font-size: 1em;
+     font-family: inherit;
+     font-weight: 500;
+     cursor: pointer;
+     transition: border-color 0.25s;
 
-::-webkit-scrollbar-thumb:hover {
-  background: #666;
-}
+     &:hover {
+          border-color: #646cff;
+     }
 
-::-webkit-scrollbar-corner {
-  background: #2e2e2e;
+     &:focus {
+          outline: 4px auto -webkit-focus-ring-color;
+     }
+
+     option {
+          background-color: #1a1a1a;
+          color: white;
+     }
 }

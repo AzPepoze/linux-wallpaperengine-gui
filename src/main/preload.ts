@@ -1,6 +1,5 @@
 import { ipcRenderer, contextBridge } from "electron";
 
-// --------- Expose some API to the Renderer process ---------
 contextBridge.exposeInMainWorld("electronAPI", {
      on: (channel: string, callback: (data: any) => void) => {
           ipcRenderer.on(channel, (_, data) => callback(data));
@@ -10,8 +9,11 @@ contextBridge.exposeInMainWorld("electronAPI", {
      maximize: () => ipcRenderer.invoke("window-maximize"),
      hide: () => ipcRenderer.invoke("window-hide"),
      getScreens: () => ipcRenderer.invoke("get-screens"),
-     execCommand: (command: string, args: string[] = [], show_log: boolean = true) =>
-          ipcRenderer.invoke("exec-command", command, args, show_log),
+     execCommand: (
+          command: string,
+          args: string[] = [],
+          show_log: boolean = true
+     ) => ipcRenderer.invoke("exec-command", command, args, show_log),
      readDirectory: (path: string) => ipcRenderer.invoke("fs-read-dir", path),
      readFile: (path: string) => ipcRenderer.invoke("fs-read-file", path),
      writeFile: (path: string, content: string) =>

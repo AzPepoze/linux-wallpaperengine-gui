@@ -7,7 +7,7 @@
      export let selected: boolean;
 
      const altText = `Preview for ${wallpaper.projectData?.title || folderName}`;
-     const fadeDuration = 200; // ms
+     const fadeDuration = 200;
 </script>
 
 <button
@@ -34,43 +34,33 @@
           {/if}
      </div>
 
-     <span class="wallpaper-name"
+     <!-- <span class="wallpaper-name"
           >{wallpaper.projectData?.title || folderName}</span
-     >
+     > -->
 </button>
 
 <style lang="scss">
      .wallpaper-item {
-          --item-bg-color: #2a2a2a;
+          --item-bg-color: rgba(66, 66, 66, 0.5);
           --item-text-color: #fff;
-          --item-border-radius: 15px;
-          --item-padding: 15px;
+          --item-padding: 3px;
           --item-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
           --item-hover-shadow: 0 0 15px rgba(0, 123, 255, 0.7);
           --item-selected-border-width: 3px;
           --item-selected-border-color: #007bff;
-          --preview-size: 150px;
-          --preview-border-radius: 5px;
-          --preview-border-color: #444;
+          --preview-border-radius: 20px;
           --preview-placeholder-bg: #3a3a3a;
           --transition-duration: 0.2s;
 
-          background-color: var(--item-bg-color);
-          color: var(--item-text-color);
-          border-radius: var(--item-border-radius);
-          overflow: hidden;
-          box-shadow: var(--item-shadow);
-          transition: all var(--transition-duration);
-          display: flex;
-          flex-direction: column;
-          align-items: center;
-          padding: var(--item-padding);
-          text-align: center;
+          width: 170px;
+          height: 170px;
+          border-radius: var(--preview-border-radius);
+          background: var(--item-bg-color);
+          padding: 2px;
           border: var(--item-selected-border-width) solid transparent;
-          cursor: pointer;
           outline: none;
-          font: inherit;
-          margin: 0;
+
+          transition: all var(--transition-duration) ease-out;
 
           &:hover,
           &:focus {
@@ -86,9 +76,9 @@
 
           .wallpaper-preview-container {
                position: relative;
-               width: var(--preview-size);
-               height: var(--preview-size);
-               margin-bottom: 10px;
+               width: 100%;
+               height: 100%;
+               display: flex;
           }
 
           .wallpaper-preview,
@@ -97,8 +87,6 @@
                height: 100%;
                border-radius: var(--preview-border-radius);
                object-fit: cover;
-               border: var(--item-selected-border-width) solid
-                    var(--preview-border-color);
                position: absolute;
                top: 0;
                left: 0;

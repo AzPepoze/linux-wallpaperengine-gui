@@ -1,6 +1,3 @@
-//-------------------------------------------------------
-// Type Definitions
-//-------------------------------------------------------
 let homePath: string;
 let configPath: string;
 let wallperBasePath: string;
@@ -34,18 +31,23 @@ interface AppConfig {
      screens?: ScreenConfig[];
      FPS?: number;
      SILENCE?: boolean;
+     customArgs?: string;
+     customArgsEnabled?: boolean;
+     volume?: number;
+     noAutomute?: boolean;
+     noAudioProcessing?: boolean;
+     scaling?: string;
+     clamping?: string;
+     disableMouse?: boolean;
+     disableParallax?: boolean;
+     noFullscreenPause?: boolean;
 }
-
-//-------------------------------------------------------
-// Helper Functions
-//-------------------------------------------------------
 
 const readConfig = async (): Promise<AppConfig> => {
      try {
           const configContent = await window.electronAPI.readFile(configPath);
           return JSON.parse(configContent);
      } catch (err: any) {
-          // Check for ENOENT (File not found)
           if (
                err.code !== "ENOENT" &&
                !JSON.stringify(err).includes("ENOENT")
@@ -75,11 +77,11 @@ export const manageWallpaper = async (): Promise<{
           const screens = config.screens || [];
           const fps = config.FPS || 60;
           const isSilenced = config.SILENCE || false;
+          const customArgs = config.customArgs || "";
+          const customArgsEnabled = config.customArgsEnabled || false;
 
-          // 1. Identify which screens are in the new config
           const configScreenNames = new Set(screens.map((s) => s.name));
 
-          // 2. Stop processes for screens that are NO LONGER in the config
           for (const [screenName, pid] of activeWallpapers.entries()) {
                if (!configScreenNames.has(screenName)) {
                     await window.electronAPI.execCommand(`kill -- -${pid}`);
@@ -87,12 +89,9 @@ export const manageWallpaper = async (): Promise<{
                }
           }
 
-          // 3. Start/Update processes for screens in the config
           for (const screen of screens) {
                if (!screen.wallpaper) continue;
 
-               // If we already have a running process for this screen, kill it first
-               // This ensures we apply any new settings or wallpaper selection
                if (activeWallpapers.has(screen.name)) {
                     const oldPid = activeWallpapers.get(screen.name);
                     console.log(oldPid);
@@ -100,13 +99,26 @@ export const manageWallpaper = async (): Promise<{
                     activeWallpapers.delete(screen.name);
                }
 
-               let args = `-r ${screen.name} -f ${fps}`;
+               let args = `${screen.wallpaper} -r ${screen.name} -f ${fps}`;
+
                if (isSilenced) {
                     args += " -s";
+               } else if (config.volume !== undefined) {
+                    args += ` --volume ${config.volume}`;
                }
-               args += ` ${screen.wallpaper}`;
 
-               // Spawn new process
+               if (config.noAutomute) args += " --noautomute";
+               if (config.noAudioProcessing) args += " --no-audio-processing";
+               if (config.scaling) args += ` --scaling ${config.scaling}`;
+               if (config.clamping) args += ` --clamping ${config.clamping}`;
+               if (config.disableMouse) args += " --disable-mouse";
+               if (config.disableParallax) args += " --disable-parallax";
+               if (config.noFullscreenPause) args += " --no-fullscreen-pause";
+
+               if (customArgsEnabled && customArgs) {
+                    args += ` ${customArgs}`;
+               }
+
                const result = await window.electronAPI.execCommand(
                     `linux-wallpaperengine ${args}`
                );
@@ -123,10 +135,6 @@ export const manageWallpaper = async (): Promise<{
           return { success: false, error };
      }
 };
-
-//-------------------------------------------------------
-// Exported API Functions
-//-------------------------------------------------------
 
 export const getWallpapers = async () => {
      try {
@@ -253,7 +261,6 @@ export const setWallpaper = async (
 
 export const openConfigInEditor = async () => {
      try {
-          // Use xdg-open for Linux
           await window.electronAPI.execCommand(`xdg-open "${configPath}"`);
           return { success: true };
      } catch (err: unknown) {
@@ -298,7 +305,7 @@ export const getScreens = async (): Promise<{
           let stdout = "";
 
           if (typeof commandResult === "string") {
-               stdout = commandResult; // Just in case
+               stdout = commandResult;
           } else if (commandResult.stdout) {
                stdout = commandResult.stdout;
           }
@@ -348,7 +355,7 @@ export const clearAllWallpapers = async (): Promise<{
           const currentConfig = await readConfig();
           const updatedConfig: AppConfig = { ...currentConfig, screens: [] };
           await writeConfig(updatedConfig);
-          await manageWallpaper(); // Stop all running wallpapers
+          await manageWallpaper();
           return { success: true };
      } catch (err: unknown) {
           const error = err instanceof Error ? err.message : String(err);

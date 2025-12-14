@@ -13,7 +13,6 @@ import path from "node:path";
 import fs from "node:fs/promises";
 import { spawn } from "node:child_process";
 import { fileURLToPath } from "node:url";
-import { killWallpaperEngineProcess } from "../frontend/core/wallpaperService";
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
@@ -33,7 +32,6 @@ let win: BrowserWindow | null = null;
 let tray: Tray | null = null;
 let isQuitting = false;
 
-// 🚧 Use ['ENV_NAME'] avoid vite:define plugin
 const VITE_DEV_SERVER_URL = process.env["VITE_DEV_SERVER_URL"];
 
 function createWindow() {
@@ -49,9 +47,10 @@ function createWindow() {
                nodeIntegration: false,
           },
           autoHideMenuBar: true,
+          transparent: true,
+          // frame: false,
      });
 
-     // Test active push message to Renderer-process
      win.webContents.on("did-finish-load", () => {
           win?.webContents.send(
                "main-process-message",
@@ -70,10 +69,18 @@ function createWindow() {
      if (VITE_DEV_SERVER_URL) {
           win.loadURL(VITE_DEV_SERVER_URL);
      } else {
-          // win.loadFile('dist/index.html')
           win.loadFile(path.join(process.env.DIST || "", "index.html"));
      }
-     // win.webContents.openDevTools();
+
+     win.on("ready-to-show", () => {
+          win?.webContents.openDevTools();
+     });
+}
+
+function quit() {
+     isQuitting = true;
+     spawn("killall -e linux-wallpaperengine", { shell: true, detached: true });
+     app.quit();
 }
 
 function createTray() {
@@ -88,8 +95,7 @@ function createTray() {
           {
                label: "Quit",
                click: () => {
-                    isQuitting = true;
-                    app.quit();
+                    quit();
                },
           },
      ]);
@@ -106,9 +112,6 @@ function createTray() {
      });
 }
 
-// Quit when all windows are closed, except on macOS. There, it's common
-// for applications and their menu bar to stay active until the user quits
-// explicitly with Cmd + Q.
 app.on("window-all-closed", () => {
      if (process.platform !== "darwin") {
           app.quit();
@@ -116,8 +119,6 @@ app.on("window-all-closed", () => {
 });
 
 app.on("activate", () => {
-     // On OS X it's common to re-create a window in the app when the
-     // dock icon is clicked and there are no other windows open.
      if (BrowserWindow.getAllWindows().length === 0) {
           createWindow();
      }
@@ -134,11 +135,8 @@ app.whenReady().then(() => {
      createTray();
 });
 
-// IPC Handlers
 ipcMain.handle("app-exit", async () => {
-     isQuitting = true;
-     await killWallpaperEngineProcess();
-     app.quit();
+     quit();
 });
 
 ipcMain.handle("window-minimize", () => {
@@ -173,8 +171,9 @@ ipcMain.handle(
                          detached: true,
                     });
 
-                    // process.stdout?.on('data', (data) => { if (show_log) console.log(`[Engine]: ${data}`) });
-                    // process.stderr?.on('data', (data) => { if (show_log) console.error(`[Engine Error]: ${data}`) });
+                    process.stderr?.on("data", (data) => {
+                         if (show_log) console.error(`[Engine Error]: ${data}`);
+                    });
 
                     process.on("error", (err) => {
                          console.error("Failed to start process:", err);
@@ -184,7 +183,6 @@ ipcMain.handle(
                     console.log(`running pid : ${process.pid}`);
                     resolve({ pid: process.pid });
                } else {
-                    // General command execution (like xrandr or kill/killall)
                     const proc = spawn(command, args, { shell: true });
                     let stdout = "";
                     let stderr = "";
@@ -204,7 +202,6 @@ ipcMain.handle(
                          if (code === 0) {
                               resolve({ stdout, stderr });
                          } else {
-                              // Resolve with error info instead of rejecting, so frontend can handle exit codes
                               resolve({
                                    stdout,
                                    stderr,
@@ -223,7 +220,6 @@ ipcMain.handle(
 );
 
 ipcMain.handle("fs-read-dir", async (_, dirPath: string) => {
-     // Resolve ~ to home dir
      if (dirPath.startsWith("~")) {
           dirPath = path.join(app.getPath("home"), dirPath.slice(1));
      }
@@ -261,7 +257,7 @@ ipcMain.handle("fs-read-binary", async (_, filePath: string) => {
           filePath = path.join(app.getPath("home"), filePath.slice(1));
      }
      const buffer = await fs.readFile(filePath);
-     return buffer.buffer; // Return ArrayBuffer
+     return buffer.buffer;
 });
 
 ipcMain.handle("get-env", async (_, key: string) => {

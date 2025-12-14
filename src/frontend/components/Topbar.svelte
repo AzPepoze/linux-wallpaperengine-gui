@@ -1,20 +1,19 @@
 <script lang="ts">
      import type { Wallpaper } from "../types";
-     import { createEventDispatcher } from "svelte";
 
      export let activeWallpaper: Wallpaper | null = null;
      export let screens: string[] = [];
      export let selectedScreen: string | null = null;
+     export let onShowSettings: () => void = () => {};
+     export let onScreenChange: (screen: string) => void = () => {};
 
-     const dispatch = createEventDispatcher();
-
-     function showSettings() {
-          dispatch("showSettings");
+     function handleShowSettings() {
+          onShowSettings();
      }
 
-     function onScreenChange(event: Event) {
+     function handleScreenChange(event: Event) {
           const target = event.target as HTMLSelectElement;
-          dispatch("screenChanged", target.value);
+          onScreenChange(target.value);
      }
 </script>
 
@@ -23,7 +22,7 @@
           <label for="screen-selector">Configure Screen:</label>
           <select
                id="screen-selector"
-               on:change={onScreenChange}
+               on:change={handleScreenChange}
                bind:value={selectedScreen}
           >
                {#each screens as screen}
@@ -41,7 +40,7 @@
                on {selectedScreen}
           </p>
      {/if}
-     <button class="settings-button" on:click={showSettings}> ⚙️ </button>
+     <button class="settings-button" on:click={handleShowSettings}> ⚙️ </button>
 </div>
 
 <style lang="scss">
@@ -52,7 +51,7 @@
           padding: 5px 15px;
           width: 100%;
           box-sizing: border-box;
-          flex-shrink: 0; /* Prevent topbar from shrinking */
+          flex-shrink: 0;
      }
 
      .screen-selector-container {

@@ -1,19 +1,12 @@
 <script lang="ts">
-     console.log("Running");
-     //-------------------------------------------------------
-     // Imports
-     //-------------------------------------------------------
      import Topbar from "./components/Topbar.svelte";
-     import SettingsModal from "./components/SettingsModal.svelte";
+     import Settings from "./components/Settings.svelte";
      import Sidebar from "./components/Sidebar.svelte";
      import WallpaperGrid from "./components/WallpaperGrid.svelte";
      import * as wallpaperManager from "./core/wallpaperManager";
      import { loadWallpapers } from "./core/wallpaperService";
      import type { WallpaperData } from "./types";
 
-     //-------------------------------------------------------
-     // Component State
-     //-------------------------------------------------------
      let wallpapers: Record<string, WallpaperData> = {};
      let error: string | null = null;
      let loading = true;
@@ -24,9 +17,6 @@
      let screens: string[] = [];
      let selectedScreenForConfig: string | null = null;
 
-     //-------------------------------------------------------
-     // Reactive Derivations
-     //-------------------------------------------------------
      $: selectedWallpaper = selectedFolderName
           ? {
                  ...wallpapers[selectedFolderName],
@@ -37,9 +27,6 @@
           ? { ...wallpapers[activeFolderName], folderName: activeFolderName }
           : null;
 
-     //-------------------------------------------------------
-     // Helper Functions
-     //-------------------------------------------------------
      async function initialize() {
           loading = true;
 
@@ -56,7 +43,7 @@
           if (screensResult.success && screensResult.screens) {
                screens = screensResult.screens;
                if (screens.length > 0) {
-                    selectedScreenForConfig = screens[0]; // Select the first screen by default
+                    selectedScreenForConfig = screens[0];
                }
           } else if (screensResult.error) {
                console.error(`Failed to get screens: ${screensResult.error}`);
@@ -91,28 +78,23 @@
           }
      }
 
-     async function handleSelectWallpaper(event: CustomEvent) {
-          const folderName = event.detail.folderName;
+     async function handleSelectWallpaper(folderName: string) {
           if (selectedScreenForConfig) {
                await wallpaperManager.setWallpaper(
                     selectedScreenForConfig,
                     folderName,
                );
-               // Update active wallpaper for the selected screen
-               activeFolderName = folderName; // This needs to be more granular for multi-screen
+               activeFolderName = folderName;
           } else {
                console.warn("No screen selected for configuration.");
           }
           selectedFolderName = folderName;
      }
 
-     function handleScreenChange(event: CustomEvent<string>) {
-          selectedScreenForConfig = event.detail;
+     function handleScreenChange(screen: string) {
+          selectedScreenForConfig = screen;
      }
 
-     //-------------------------------------------------------
-     // Lifecycle Hooks
-     //-------------------------------------------------------
      initialize();
 </script>
 
@@ -121,8 +103,8 @@
           {activeWallpaper}
           {screens}
           selectedScreen={selectedScreenForConfig}
-          on:showSettings={() => (showSettingsPopup = true)}
-          on:screenChanged={handleScreenChange}
+          onShowSettings={() => (showSettingsPopup = true)}
+          onScreenChange={handleScreenChange}
      />
 
      <div class="content">
@@ -131,16 +113,16 @@
                {selectedWallpaper}
                {loading}
                {error}
-               on:select={handleSelectWallpaper}
+               onSelect={handleSelectWallpaper}
           />
           <Sidebar
                {selectedWallpaper}
-               on:close={() => (selectedFolderName = null)}
+               onClose={() => (selectedFolderName = null)}
           />
      </div>
 
      {#if showSettingsPopup}
-          <SettingsModal on:close={() => (showSettingsPopup = false)} />
+          <Settings onClose={() => (showSettingsPopup = false)} />
      {/if}
 </div>
 
@@ -155,7 +137,6 @@
           display: flex;
           flex-direction: column;
           height: 100vh;
-          background-color: #1e1e1e;
      }
 
      * {

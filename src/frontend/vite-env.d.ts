@@ -8,7 +8,11 @@ interface ElectronAPI {
      maximize: () => Promise<void>;
      hide: () => Promise<void>;
      getScreens: () => Promise<Electron.Display[]>;
-     execCommand: (command: string, args?: string[], show_log?: boolean) => Promise<any>;
+     execCommand: (
+          command: string,
+          args?: string[],
+          show_log?: boolean
+     ) => Promise<any>;
      readDirectory: (
           path: string
      ) => Promise<{ entry: string; type: "DIRECTORY" | "FILE" }[]>;
