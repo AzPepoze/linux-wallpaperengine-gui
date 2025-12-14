@@ -33,6 +33,7 @@ let tray: Tray | null = null;
 let isQuitting = false;
 
 const VITE_DEV_SERVER_URL = process.env["VITE_DEV_SERVER_URL"];
+const isMinimized = process.argv.includes("--minimized");
 
 function createWindow() {
      const preloadPath = path.join(__dirname, "preload.mjs");
@@ -70,6 +71,10 @@ function createWindow() {
           win.loadURL(VITE_DEV_SERVER_URL);
      } else {
           win.loadFile(path.join(process.env.DIST || "", "index.html"));
+     }
+
+     if (isMinimized) {
+          win.hide();
      }
 
      // win.on("ready-to-show", () => {
