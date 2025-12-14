@@ -1,0 +1,53 @@
+{
+     "name": "linux-wallpaperengine-gui",
+     "version": "0.1.6",
+     "type": "module",
+     "scripts": {
+          "dev": "vite",
+          "start": "npm run dev",
+          "build": "vite build && electron-builder --linux AppImage pacman",
+          "build:all": "vite build && electron-builder --linux AppImage deb rpm pacman",
+          "preview": "vite preview",
+          "check": "svelte-check --tsconfig ./tsconfig.json && tsc -p tsconfig.json"
+     },
+     "devDependencies": {
+          "@sveltejs/vite-plugin-svelte": "^5.1.1",
+          "@tsconfig/svelte": "^5.0.5",
+          "@types/colorthief": "^2.6.0",
+          "@types/markdown-it": "^14.1.2",
+          "@types/node": "^22.0.0",
+          "electron": "^33.2.0",
+          "electron-builder": "^25.1.8",
+          "markdown-it": "^14.1.0",
+          "sass": "^1.93.2",
+          "svelte": "^5.40.0",
+          "svelte-check": "^4.3.3",
+          "typescript": "~5.6.3",
+          "vite": "^6.3.7",
+          "vite-plugin-electron": "^0.29.0",
+          "vite-plugin-electron-renderer": "^0.14.6"
+     },
+     "dependencies": {
+          "colorthief": "^2.6.0"
+     },
+     "pnpm": {
+          "onlyBuiltDependencies": [
+               "electron",
+               "esbuild",
+               "sharp",
+               "@parcel/watcher"
+          ]
+     },
+     "build": {
+          "directories": {
+               "output": "dist"
+          },
+          "files": [
+               "build/**/*"
+          ],
+          "linux": {
+               "artifactName": "${productName}.${ext}",
+               "category": "Utility"
+          }
+     }
+}

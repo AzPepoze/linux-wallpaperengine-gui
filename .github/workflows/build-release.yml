@@ -4,30 +4,33 @@ on:
      push:
           tags:
              - "v*.*.*"
+     workflow_dispatch:
+
+
+permissions:
+     contents: write
 
 jobs:
      build_release:
           runs-on: ubuntu-latest
-          # Add this permissions block
-          permissions:
-               contents: write
-          steps:
-             - uses: actions/checkout @v3
 
-             - name: Setup Neutralinojs
-               run: |
-                    npm install -g @neutralinojs/neu
-                    neu version
+          steps:
+             - uses: actions/checkout@v4
 
              - name: Setup Node.js
-               uses: actions/setup-node @v3
+               uses: actions/setup-node@v4
                with:
-                    node-version: "18"
+                    node-version: 20
+
+             - name: Install system dependencies (Linux)
+               run: |
+                    sudo apt-get update
+                    sudo apt-get install -y rpm libarchive-tools
 
              - name: Install pnpm
-               uses: pnpm/action-setup @v2
+               uses: pnpm/action-setup@v2
                with:
-                    version: 8
+                    version: 9
                     run_install: false
 
              - name: Get pnpm store directory
@@ -35,7 +38,7 @@ jobs:
                run: |
                     echo "STORE_PATH=$(pnpm store path --silent)" >> $GITHUB_ENV
 
-             - uses: actions/cache @v3
+             - uses: actions/cache@v3
                name: Setup pnpm cache
                with:
                     path: ${{ env.STORE_PATH }}
@@ -45,29 +48,31 @@ jobs:
 
              - name: Install dependencies
                run: pnpm install
-               working-directory: ./app
 
-             - name: Build Svelte app
-               run: pnpm build
-               working-directory: ./app
+             - name: Build App
+               run: pnpm run build:all
+               env:
+                    GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
-             - name: Build Neutralino app
-               run: neu build --release
-
-             - name: Zip build output
+             - name: Zip linux-unpacked
                run: |
-                    cd dist/linux-wallpaperengine-gui
-                    zip -r ../linux-wallpaperengine-gui-release.zip .
-                    cd ../..
-
-             - name: Upload release artifact
-               uses: actions/upload-artifact @v4
-               with:
-                    name: linux-wallpaperengine-gui-release
-                    path: dist/linux-wallpaperengine-gui-release.zip
+                    VERSION=$(node -p "require('./package.json').version")
+                    cd dist
+                    zip -r "linux-wallpaperengine-gui.zip" linux-unpacked
+                    cd ..
 
              - name: Create GitHub Release
-               uses: softprops/action-gh-release @v1
+               uses: softprops/action-gh-release@v1
                if: startsWith(github.ref, 'refs/tags/')
                with:
-                    files: dist/linux-wallpaperengine-gui-release.zip
+                    files: |
+                         dist/*.AppImage
+                         dist/*.deb
+                         dist/*.rpm
+                         dist/*.pacman
+                         dist/*.zip
+                         dist/latest-linux.yml
+                    draft: false
+                    prerelease: false
+               env:
+                    GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
