@@ -7,7 +7,9 @@ export async function killWallpaperEngineProcess(): Promise<{
 }> {
      try {
           // Use killall for simpler process management
-          await window.electronAPI.execCommand("killall linux-wallpaperengine");
+          await window.electronAPI.execCommand(
+               "killall -e linux-wallpaperengine"
+          );
           return { success: true };
      } catch (err: unknown) {
           // Ignore error if no process found (exit code 1)
@@ -23,7 +25,7 @@ export async function loadWallpapers() {
      let initialWallpaper: { folderName: string } | null = null;
 
      try {
-          await killWallpaperEngineProcess();
+          // await killWallpaperEngineProcess();
           await wallpaperManager.main();
           const result = await wallpaperManager.getWallpapers();
 

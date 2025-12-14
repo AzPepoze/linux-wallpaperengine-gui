@@ -13,6 +13,7 @@ import path from "node:path";
 import fs from "node:fs/promises";
 import { spawn } from "node:child_process";
 import { fileURLToPath } from "node:url";
+import { killWallpaperEngineProcess } from "../frontend/core/wallpaperService";
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
@@ -58,7 +59,7 @@ function createWindow() {
           );
      });
 
-     win.on('close', (event) => {
+     win.on("close", (event) => {
           if (!isQuitting) {
                event.preventDefault();
                win?.hide();
@@ -68,11 +69,11 @@ function createWindow() {
 
      if (VITE_DEV_SERVER_URL) {
           win.loadURL(VITE_DEV_SERVER_URL);
-          // win.webContents.openDevTools()
      } else {
           // win.loadFile('dist/index.html')
           win.loadFile(path.join(process.env.DIST || "", "index.html"));
      }
+     win.webContents.openDevTools();
 }
 
 function createTray() {
@@ -84,10 +85,13 @@ function createTray() {
           { label: "Show", click: () => win?.show() },
           { label: "Hide", click: () => win?.hide() },
           { type: "separator" },
-          { label: "Quit", click: () => {
-               isQuitting = true;
-               app.quit();
-          }},
+          {
+               label: "Quit",
+               click: () => {
+                    isQuitting = true;
+                    app.quit();
+               },
+          },
      ]);
 
      tray.setToolTip("Linux Wallpaper Engine");
@@ -133,8 +137,7 @@ app.whenReady().then(() => {
 // IPC Handlers
 ipcMain.handle("app-exit", async () => {
      isQuitting = true;
-     // Kill all running wallpaper engine processes
-     await window.electronAPI.execCommand("killall linux-wallpaperengine", [], false); // Don't log this kill command
+     await killWallpaperEngineProcess();
      app.quit();
 });
 
