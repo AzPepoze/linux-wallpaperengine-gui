@@ -72,9 +72,9 @@ function createWindow() {
           win.loadFile(path.join(process.env.DIST || "", "index.html"));
      }
 
-     win.on("ready-to-show", () => {
-          win?.webContents.openDevTools();
-     });
+     // win.on("ready-to-show", () => {
+     //      win?.webContents.openDevTools();
+     // });
 }
 
 function quit() {
