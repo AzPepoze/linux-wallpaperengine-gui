@@ -2,8 +2,8 @@ name: Build Release
 
 on:
      push:
-          tags:
-             - "v*.*.*"
+          branches:
+             - main
      workflow_dispatch:
 
 
@@ -21,6 +21,9 @@ jobs:
                uses: actions/setup-node@v4
                with:
                     node-version: 20
+
+             - name: Get version from package.json
+               run: echo "PACKAGE_VERSION=$(node -p "require('./package.json').version")" >> $GITHUB_ENV
 
              - name: Install system dependencies (Linux)
                run: |
@@ -56,15 +59,16 @@ jobs:
 
              - name: Zip linux-unpacked
                run: |
-                    VERSION=$(node -p "require('./package.json').version")
                     cd dist
                     zip -r "linux-wallpaperengine-gui.zip" linux-unpacked
                     cd ..
 
              - name: Create GitHub Release
                uses: softprops/action-gh-release@v1
-               if: startsWith(github.ref, 'refs/tags/')
                with:
+                    tag_name: v${{ env.PACKAGE_VERSION }}
+                    name: v${{ env.PACKAGE_VERSION }}
+                    target_commitish: ${{ github.sha }}
                     files: |
                          dist/*.AppImage
                          dist/*.deb
