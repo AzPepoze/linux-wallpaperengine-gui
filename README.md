@@ -39,11 +39,7 @@ A graphical user interface for managing wallpapers on Linux, powered by Electron
 
 ### Install on Other Linux Distributions
 
-- You can download pre-built binaries for various Linux distributions directly from the GitHub Releases page.
-
-  1. **Download the latest release for your system.**
-     - Go to the [Latest Release Page](https://github.com/AzPepoze/linux-wallpaperengine-gui/releases/latest)
-  2. **Extract/Install and run the application.**
+- You can download pre-built binaries for various Linux distributions directly from the GitHub [Releases page](https://github.com/AzPepoze/linux-wallpaperengine-gui/releases/latest).
 
 ## Usage
 
