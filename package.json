@@ -12,7 +12,7 @@
           "dev": "vite",
           "start": "npm run dev",
           "build": "vite build && electron-builder --linux --dir",
-          "build:all": "vite build && electron-builder --linux AppImage deb rpm pacman -c.publish=never",
+          "build:all": "vite build && electron-builder --linux AppImage deb rpm pacman --publish never",
           "preview": "vite preview",
           "check": "svelte-check --tsconfig ./tsconfig.json && tsc -p tsconfig.json"
      },
