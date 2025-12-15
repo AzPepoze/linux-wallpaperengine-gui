@@ -27,15 +27,30 @@ A graphical user interface for managing wallpapers on Linux, powered by Electron
 
 ## Installation
 
-- ### Install on Arch Linux
+### Install on Arch Linux
 
-  - You can download the pre-built `.pacman` package directly from the latest release and install it.
+- **Option 1: Using AUR**
 
-    ```bash
-    cd /tmp && \
-    curl -L -O https://github.com/AzPepoze/linux-wallpaperengine-gui/releases/latest/download/linux-wallpaperengine-gui.pacman && \
-    sudo pacman -U linux-wallpaperengine-gui.pacman
-    ```
+  You can install from the [AUR](https://aur.archlinux.org/packages/linux-wallpaperengine-gui-git):
+
+  ```bash
+  yay -S linux-wallpaperengine-gui
+  ```
+
+  Or with another AUR helper like `paru`:
+
+  ```bash
+  paru -S linux-wallpaperengine-gui
+  ```
+- **Option 2: Pre-built Package**
+
+  You can download the pre-built `.pacman` package directly from the latest release and install it.
+
+  ```bash
+  cd /tmp && \
+  curl -L -O https://github.com/AzPepoze/linux-wallpaperengine-gui/releases/latest/download/linux-wallpaperengine-gui.pacman && \
+  sudo pacman -U linux-wallpaperengine-gui.pacman
+  ```
 
 ### Install on Other Linux Distributions
 
@@ -53,7 +68,7 @@ How you run the application depends on how it was installed. The application sup
 ### Build from Source
 
 - **Prerequisites:**
-  - Ensure you have Node.js and pnpm installed.
+  - Ensure you have Node.js and (npm or pnpm) installed.
 
 1. **Clone the repository:**
 
@@ -64,12 +79,12 @@ How you run the application depends on how it was installed. The application sup
 2. **Install dependencies:**
 
    ```bash
-   pnpm install
+   npm install
    ```
 3. **Build the application:**
 
    ```bash
-   pnpm run build
+   npm run build
    ```
 
    This will create a distributable in the `dist` (or `release`) directory.
@@ -79,7 +94,7 @@ How you run the application depends on how it was installed. The application sup
 - To run the application with hot-reloading for development:
 
   ```bash
-  pnpm run dev
+  npm run dev
   ```
 
 ## Contributing
