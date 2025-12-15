@@ -4,16 +4,16 @@ A graphical user interface for managing wallpapers on Linux, powered by Electron
 
 ## Screenshots
 
-| Screen |                 Image                 |
-| :-----: | :------------------------------------: |
-|  Main  |    ![Main Window](showcase/main.png)    |
-|   :-:   |                  :-:                  |
+| Screen  |                  Image                   |
+| :-----: | :--------------------------------------: |
+|  Main   |    ![Main Window](showcase/main.png)     |
+|   :-:   |                   :-:                    |
 | Setting | ![Settings Window](showcase/setting.png) |
 
 ## Features
 
-| Feature                           | Description                                                                                                                              |
-| --------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------- |
+| Feature                     | Description                                                                                                                              |
+| --------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------- |
 | **Wallpaper Management**    | Browse and select wallpapers from your Steam Workshop content.                                                                           |
 | **Multi-Monitor Support**   | Select which screen to apply a wallpaper to from a dropdown in the top bar.                                                              |
 | **Auto-Save & Auto-Run**    | Automatically saves the last used wallpaper and applies it on application startup.                                                       |
@@ -23,79 +23,82 @@ A graphical user interface for managing wallpapers on Linux, powered by Electron
 
 ## Prerequisites
 
-> [linux-wallpaperengine](https://github.com/Almamu/linux-wallpaperengine)
+-    [linux-wallpaperengine](https://github.com/Almamu/linux-wallpaperengine)
 
 ## Installation
 
 ### Install on Arch Linux
 
-- **Option 1: Using AUR**
+-    **Option 1: Using AUR**
 
-  You can install from the [AUR](https://aur.archlinux.org/packages/linux-wallpaperengine-gui-git):
+     You can install from the [AUR](https://aur.archlinux.org/packages/linux-wallpaperengine-gui-git):
 
-  ```bash
-  yay -S linux-wallpaperengine-gui
-  ```
+     ```bash
+     yay -S linux-wallpaperengine-gui
+     ```
 
-  Or with another AUR helper like `paru`:
+     Or with another AUR helper like `paru`:
 
-  ```bash
-  paru -S linux-wallpaperengine-gui
-  ```
-- **Option 2: Pre-built Package**
+     ```bash
+     paru -S linux-wallpaperengine-gui
+     ```
 
-  You can download the pre-built `.pacman` package directly from the latest release and install it.
+-    **Option 2: Pre-built Package**
 
-  ```bash
-  cd /tmp && \
-  curl -L -O https://github.com/AzPepoze/linux-wallpaperengine-gui/releases/latest/download/linux-wallpaperengine-gui.pacman && \
-  sudo pacman -U linux-wallpaperengine-gui.pacman
-  ```
+     You can download the pre-built `.pacman` package directly from the latest release and install it.
+
+     ```bash
+     cd /tmp && \
+     curl -L -O https://github.com/AzPepoze/linux-wallpaperengine-gui/releases/latest/download/linux-wallpaperengine-gui.pacman && \
+     sudo pacman -U linux-wallpaperengine-gui.pacman
+     ```
 
 ### Install on Other Linux Distributions
 
-- You can download pre-built binaries for various Linux distributions directly from the GitHub [Releases page](https://github.com/AzPepoze/linux-wallpaperengine-gui/releases/latest).
+-    You can download pre-built binaries for various Linux distributions directly from the GitHub [Releases page](https://github.com/AzPepoze/linux-wallpaperengine-gui/releases/latest).
 
 ## Usage
 
 How you run the application depends on how it was installed. The application supports the following command-line arguments:
 
-| Argument        | Description                                          |
-| :-------------- | :--------------------------------------------------- |
+| Argument      | Description                                          |
+| :------------ | :--------------------------------------------------- |
 | `(none)`      | Launches the application in normal mode.             |
 | `--minimized` | Starts the application minimized in the system tray. |
 
 ### Build from Source
 
-- **Prerequisites:**
-  - Ensure you have Node.js and (npm or pnpm) installed.
+-    **Prerequisites:**
+     -    Ensure you have Node.js and (npm or pnpm) installed.
 
 1. **Clone the repository:**
 
-   ```bash
-   git clone https://github.com/AzPepoze/linux-wallpaperengine-gui
-   cd linux-wallpaperengine-gui
-   ```
+     ```bash
+     git clone https://github.com/AzPepoze/linux-wallpaperengine-gui
+     cd linux-wallpaperengine-gui
+     ```
+
 2. **Install dependencies:**
 
-   ```bash
-   npm install
-   ```
+     ```bash
+     npm install
+     ```
+
 3. **Build the application:**
 
-   ```bash
-   npm run build
-   ```
+     ```bash
+     npm run build
+     ```
 
-   This will create a distributable in the `dist` (or `release`) directory.
+     This will create a distributable in the `dist` (or `release`) directory.
 
 ### Development Mode
 
-- To run the application with hot-reloading for development:
+-    To run the application with hot-reloading for development:
 
-  ```bash
-  npm run dev
-  ```
+     ```bash
+     npm run dev
+     ```
 
 ## Contributing
 
