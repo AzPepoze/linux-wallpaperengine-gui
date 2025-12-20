@@ -2,8 +2,8 @@ name: Build Release
 
 on:
      push:
-          branches:
-             - main
+          tags:
+             - 'v*'
      workflow_dispatch:
 
 
@@ -73,7 +73,6 @@ jobs:
                          dist/*.AppImage
                          dist/*.deb
                          dist/*.rpm
-                         dist/*.pacman
                          dist/*.zip
                          dist/latest-linux.yml
                     draft: false
