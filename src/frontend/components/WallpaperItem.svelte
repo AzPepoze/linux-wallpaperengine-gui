@@ -1,8 +1,8 @@
 <script lang="ts">
+     import type { Wallpaper } from "../../shared/types";
      import { fade } from "svelte/transition";
-     import type { WallpaperData } from "../types";
 
-     export let wallpaper: WallpaperData;
+     export let wallpaper: Wallpaper;
      export let folderName: string;
      export let selected: boolean;
 
@@ -94,11 +94,6 @@
 
           .wallpaper-preview-placeholder {
                background-color: var(--preview-placeholder-bg);
-          }
-
-          .wallpaper-name {
-               font-size: 1em;
-               word-break: break-word;
           }
      }
 </style>

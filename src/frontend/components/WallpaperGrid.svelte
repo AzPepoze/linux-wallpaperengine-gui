@@ -1,5 +1,5 @@
 <script lang="ts">
-     import type { Wallpaper, WallpaperData } from "../types";
+     import type { WallpaperData, Wallpaper } from "../../shared/types";
      import WallpaperItem from "./WallpaperItem.svelte";
 
      export let wallpapers: Record<string, WallpaperData> = {};
@@ -27,7 +27,7 @@
           <div class="wallpaper-grid">
                {#each Object.entries(wallpapers) as [folderName, wallpaper]}
                     <WallpaperItem
-                         {wallpaper}
+                         wallpaper={{ ...wallpaper, folderName }}
                          {folderName}
                          selected={selectedWallpaper?.folderName === folderName}
                          on:click={() => selectWallpaper(folderName, wallpaper)}

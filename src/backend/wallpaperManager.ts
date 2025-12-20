@@ -1,3 +1,5 @@
+import { logGui } from "./logger";
+
 let homePath: string;
 let configPath: string;
 let wallperBasePath: string;
@@ -5,7 +7,7 @@ const activeWallpapers = new Map<string, number>();
 
 export async function main() {
      if (!window.electronAPI) {
-          console.error("electronAPI is not available");
+          logGui("electronAPI is not available");
           return;
      }
      homePath = (await window.electronAPI.getEnv("HOME")) || "";
@@ -52,8 +54,8 @@ const readConfig = async (): Promise<AppConfig> => {
                err.code !== "ENOENT" &&
                !JSON.stringify(err).includes("ENOENT")
           ) {
-               console.warn(
-                    "Could not read config.json, returning default. Error:",
+               logGui(
+                    "Could not read config.json, returning default. Error: " +
                     err
                );
           }
@@ -94,7 +96,7 @@ export const manageWallpaper = async (): Promise<{
 
                if (activeWallpapers.has(screen.name)) {
                     const oldPid = activeWallpapers.get(screen.name);
-                    console.log(oldPid);
+                    logGui(String(oldPid));
                     await window.electronAPI.execCommand(`kill -- -${oldPid}`);
                     activeWallpapers.delete(screen.name);
                }
@@ -131,7 +133,7 @@ export const manageWallpaper = async (): Promise<{
           return { success: true };
      } catch (err: unknown) {
           const error = err instanceof Error ? err.message : String(err);
-          console.error(`Error in manageWallpaper: ${error}`);
+          logGui(`Error in manageWallpaper: ${error}`);
           return { success: false, error };
      }
 };
@@ -151,7 +153,7 @@ export const getWallpapers = async () => {
           ].join("/");
 
           const entries = await window.electronAPI.readDirectory(basePath);
-          console.log(`Found ${entries.length} total entries.`);
+          logGui(`Found ${entries.length} total entries.`);
 
           const directoryEntries = entries.filter(
                (e) => e.type === "DIRECTORY"
@@ -168,7 +170,7 @@ export const getWallpapers = async () => {
                const batchPromises = batch.map(
                     async (
                          folder
-                    ): Promise<
+                    ): Promise< 
                          [
                               string,
                               { previewPath: string | null; projectData: any }
@@ -180,7 +182,7 @@ export const getWallpapers = async () => {
                          let projectData: any = {};
 
                          try {
-                              const projectJsonContent =
+                              const projectJsonContent = 
                                    await window.electronAPI.readFile(
                                         projectJsonPath
                                    );
@@ -190,8 +192,8 @@ export const getWallpapers = async () => {
                                    previewPath = `wallpapers/${folder.entry}/${projectData.preview}`;
                               }
                          } catch (readError) {
-                              console.warn(
-                                   `Could not process project.json for ${folder.entry}:`,
+                              logGui(
+                                   `Could not process project.json for ${folder.entry}: ` +
                                    readError
                               );
                          }
@@ -206,12 +208,12 @@ export const getWallpapers = async () => {
           return { success: true, wallpapers };
      } catch (err) {
           const error = err instanceof Error ? err.message : String(err);
-          console.error("Failed to get wallpapers:", error);
+          logGui("Failed to get wallpapers: " + error);
           return { success: false, error };
      }
 };
 
-export type GetConfigResult =
+export type GetConfigResult = 
      | ({ success: true } & AppConfig)
      | { success: false; error: string };
 
@@ -280,7 +282,7 @@ export const getWallpaperPreview = async (path: string) => {
           };
      } catch (err: unknown) {
           const error = err instanceof Error ? err.message : String(err);
-          console.error(
+          logGui(
                `Error in getWallpaperPreview for path "${path}": ${error}`
           );
           return { success: false, error };
@@ -294,13 +296,13 @@ export const getScreens = async (): Promise<{
 }> => {
      try {
           if (!window.electronAPI) {
-               console.error("electronAPI is not available");
+               logGui("electronAPI is not available");
                return { success: false, error: "electronAPI is not available" };
           }
           const commandResult = await window.electronAPI.execCommand(
                "xrandr --query"
           );
-          console.log("xrandr --query commandResult:", commandResult);
+          logGui("xrandr --query commandResult: " + JSON.stringify(commandResult));
 
           let stdout = "";
 
@@ -311,7 +313,7 @@ export const getScreens = async (): Promise<{
           }
 
           if (!stdout && commandResult.error) {
-               console.error(`Error executing xrandr: ${commandResult.error}`);
+               logGui(`Error executing xrandr: ${commandResult.error}`);
                return { success: false, error: commandResult.error };
           }
 
@@ -342,7 +344,7 @@ export const getScreens = async (): Promise<{
           return { success: true, screens: screenNames };
      } catch (err: unknown) {
           const error = err instanceof Error ? err.message : String(err);
-          console.error(`Error in getScreens: ${error}`);
+          logGui(`Error in getScreens: ${error}`);
           return { success: false, error };
      }
 };
@@ -359,7 +361,7 @@ export const clearAllWallpapers = async (): Promise<{
           return { success: true };
      } catch (err: unknown) {
           const error = err instanceof Error ? err.message : String(err);
-          console.error(`Error in clearAllWallpapers: ${error}`);
+          logGui(`Error in clearAllWallpapers: ${error}`);
           return { success: false, error };
      }
 };

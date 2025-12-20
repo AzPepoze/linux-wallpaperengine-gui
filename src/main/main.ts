@@ -176,8 +176,16 @@ ipcMain.handle(
                          detached: true,
                     });
 
+                    process.stdout?.on("data", (data) => {
+                         const message = data.toString();
+                         if (show_log) console.log(`[Engine Out]: ${message}`);
+                         win?.webContents.send("wallpaper-log", message);
+                    });
+
                     process.stderr?.on("data", (data) => {
-                         if (show_log) console.error(`[Engine Error]: ${data}`);
+                         const message = data.toString();
+                         if (show_log) console.error(`[Engine Error]: ${message}`);
+                         win?.webContents.send("wallpaper-log", message);
                     });
 
                     process.on("error", (err) => {

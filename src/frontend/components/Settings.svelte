@@ -1,12 +1,12 @@
 <script lang="ts">
      import { onMount } from "svelte";
-     import { fade } from "svelte/transition";
      import {
-          clearAllWallpapers,
           getConfig,
-          openConfigInEditor,
           saveConfig,
-     } from "../core/wallpaperManager";
+          openConfigInEditor,
+          clearAllWallpapers,
+     } from "../../backend/wallpaperManager";
+     import Fullscreen from "./ui/Fullscreen.svelte";
 
      import SettingsSection from "./settings/SettingsSection.svelte";
      import SettingItem from "./ui/SettingItem.svelte";
@@ -118,167 +118,184 @@
      ];
 </script>
 
-<div class="settings-container" transition:fade={{ duration: 200 }}>
-     <button class="close-btn" on:click={onClose} aria-label="Close"
-          >&times;</button
-     >
+<Fullscreen {onClose}>
+     <div class="settings-inner">
+          <button class="close-btn" on:click={onClose} aria-label="Close"
+               >&times;</button
+          >
 
-     <div class="header">
-          <h2>Settings</h2>
-     </div>
+          <div class="header">
+               <h2>Settings</h2>
+          </div>
 
-     <div class="settings-grid">
-          <SettingsSection title="General">
-               <SettingItem label="FPS" id="fps">
-                    <Input type="number" id="fps" bind:value={fps} min={1} />
-               </SettingItem>
-
-               <SettingItem label="Scaling Mode" id="scaling">
-                    <Select
-                         id="scaling"
-                         bind:value={scaling}
-                         options={scalingOptions}
-                    />
-               </SettingItem>
-
-               <SettingItem label="Clamping Mode" id="clamping">
-                    <Select
-                         id="clamping"
-                         bind:value={clamping}
-                         options={clampingOptions}
-                    />
-               </SettingItem>
-
-               <SettingItem label="No Fullscreen Pause" id="noFullscreenPause">
-                    <Toggle
-                         id="noFullscreenPause"
-                         bind:checked={noFullscreenPause}
-                    />
-               </SettingItem>
-          </SettingsSection>
-
-          <SettingsSection title="Audio">
-               <SettingItem label="Silence Wallpaper" id="silence">
-                    <Toggle id="silence" bind:checked={silence} />
-               </SettingItem>
-
-               {#if !silence}
-                    <SettingItem label="Volume ({volume}%)" id="volume">
-                         <Range
-                              id="volume"
-                              bind:value={volume}
-                              min={0}
-                              max={100}
+          <div class="settings-grid">
+               <SettingsSection title="General">
+                    <SettingItem label="FPS" id="fps">
+                         <Input
+                              type="number"
+                              id="fps"
+                              bind:value={fps}
+                              min={1}
                          />
                     </SettingItem>
 
-                    <SettingItem label="No Automute" id="noAutomute">
-                         <Toggle id="noAutomute" bind:checked={noAutomute} />
+                    <SettingItem label="Scaling Mode" id="scaling">
+                         <Select
+                              id="scaling"
+                              bind:value={scaling}
+                              options={scalingOptions}
+                         />
+                    </SettingItem>
+
+                    <SettingItem label="Clamping Mode" id="clamping">
+                         <Select
+                              id="clamping"
+                              bind:value={clamping}
+                              options={clampingOptions}
+                         />
                     </SettingItem>
 
                     <SettingItem
-                         label="No Audio Processing"
-                         id="noAudioProcessing"
+                         label="No Fullscreen Pause"
+                         id="noFullscreenPause"
                     >
                          <Toggle
-                              id="noAudioProcessing"
-                              bind:checked={noAudioProcessing}
+                              id="noFullscreenPause"
+                              bind:checked={noFullscreenPause}
                          />
+                    </SettingItem>
+               </SettingsSection>
+
+               <SettingsSection title="Audio">
+                    <SettingItem label="Silence Wallpaper" id="silence">
+                         <Toggle id="silence" bind:checked={silence} />
+                    </SettingItem>
+
+                    {#if !silence}
+                         <SettingItem label="Volume ({volume}%)" id="volume">
+                              <Range
+                                   id="volume"
+                                   bind:value={volume}
+                                   min={0}
+                                   max={100}
+                              />
+                         </SettingItem>
+
+                         <SettingItem label="No Automute" id="noAutomute">
+                              <Toggle
+                                   id="noAutomute"
+                                   bind:checked={noAutomute}
+                              />
+                         </SettingItem>
+
+                         <SettingItem
+                              label="No Audio Processing"
+                              id="noAudioProcessing"
+                         >
+                              <Toggle
+                                   id="noAudioProcessing"
+                                   bind:checked={noAudioProcessing}
+                              />
+                         </SettingItem>
+                    {/if}
+               </SettingsSection>
+
+               <SettingsSection title="Interaction">
+                    <SettingItem label="Disable Mouse" id="disableMouse">
+                         <Toggle
+                              id="disableMouse"
+                              bind:checked={disableMouse}
+                         />
+                    </SettingItem>
+
+                    <SettingItem
+                         label="Disable Parallax"
+                         id="disableParallax"
+                    >
+                         <Toggle
+                              id="disableParallax"
+                              bind:checked={disableParallax}
+                         />
+                    </SettingItem>
+               </SettingsSection>
+          </div>
+
+          <SettingsSection title="Advanced" full={true}>
+               <SettingItem
+                    label="Enable Custom Arguments"
+                    id="customArgsEnabled"
+               >
+                    <Toggle
+                         id="customArgsEnabled"
+                         bind:checked={customArgsEnabled}
+                    />
+               </SettingItem>
+
+               {#if customArgsEnabled}
+                    <SettingItem
+                         label="Custom Command Args"
+                         id="customArgs"
+                         vertical
+                    >
+                         <Input
+                              type="text"
+                              id="customArgs"
+                              bind:value={customArgs}
+                              placeholder="e.g. --window 1920x1080"
+                         />
+                         <p class="help-text">
+                              Refer to
+                              <a
+                                   href="https://github.com/Almamu/linux-wallpaperengine?tab=readme-ov-file#-common-options"
+                                   target="_blank"
+                                   rel="noopener noreferrer"
+                                   >linux-wallpaperengine common options</a
+                              >
+                              for available arguments.
+                         </p>
                     </SettingItem>
                {/if}
           </SettingsSection>
 
-          <SettingsSection title="Interaction">
-               <SettingItem label="Disable Mouse" id="disableMouse">
-                    <Toggle id="disableMouse" bind:checked={disableMouse} />
-               </SettingItem>
-
-               <SettingItem label="Disable Parallax" id="disableParallax">
-                    <Toggle
-                         id="disableParallax"
-                         bind:checked={disableParallax}
-                    />
-               </SettingItem>
-          </SettingsSection>
-     </div>
-
-     <SettingsSection title="Advanced" full={true}>
-          <SettingItem label="Enable Custom Arguments" id="customArgsEnabled">
-               <Toggle
-                    id="customArgsEnabled"
-                    bind:checked={customArgsEnabled}
-               />
-          </SettingItem>
-
-          {#if customArgsEnabled}
-               <SettingItem
-                    label="Custom Command Args"
-                    id="customArgs"
-                    vertical
+          <div class="button-group">
+               <button class="btn btn-primary" on:click={saveSettings}
+                    >Save Settings</button
                >
-                    <Input
-                         type="text"
-                         id="customArgs"
-                         bind:value={customArgs}
-                         placeholder="e.g. --window 1920x1080"
-                    />
-                    <p class="help-text">
-                         Refer to
-                         <a
-                              href="https://github.com/Almamu/linux-wallpaperengine?tab=readme-ov-file#-common-options"
-                              target="_blank"
-                              rel="noopener noreferrer"
-                              >linux-wallpaperengine common options</a
-                         >
-                         for available arguments.
-                    </p>
-               </SettingItem>
-          {/if}
-     </SettingsSection>
-
-     <div class="button-group">
-          <button class="btn btn-primary" on:click={saveSettings}
-               >Save Settings</button
-          >
-          <button class="btn btn-secondary" on:click={openConfig}
-               >Open Config File</button
-          >
-          <button class="btn btn-secondary" on:click={clearAllWallpapers}
-               >Clear All Wallpapers</button
-          >
-     </div>
-
-     {#if message}
-          <div
-               class="message"
-               class:success={messageType === "success"}
-               class:error={messageType === "error"}
-          >
-               {message}
+               <button class="btn btn-secondary" on:click={openConfig}
+                    >Open Config File</button
+               >
+               <button
+                    class="btn btn-secondary"
+                    on:click={clearAllWallpapers}>Clear All Wallpapers</button
+               >
           </div>
-     {/if}
-</div>
+
+          {#if message}
+               <div
+                    class="message"
+                    class:success={messageType === "success"}
+                    class:error={messageType === "error"}
+               >
+                    {message}
+               </div>
+          {/if}
+     </div>
+</Fullscreen>
 
 <style lang="scss">
-     .settings-container {
-          position: fixed;
-          top: 0;
-          left: 0;
-          width: 100vw;
-          height: 100vh;
+     .settings-inner {
+          width: 100%;
+          height: 100%;
           overflow-y: auto;
-          background: rgba(0, 0, 0, 0.75);
-          backdrop-filter: blur(10px);
-          -webkit-backdrop-filter: blur(10px);
           color: var(--text-color);
           padding: 40px;
           box-sizing: border-box;
-          z-index: 1000;
           display: flex;
           flex-direction: column;
           align-items: center;
           gap: 20px;
           padding-inline: 20%;
+          position: relative; /* For absolute positioning of close btn */
      }
 
      .close-btn {

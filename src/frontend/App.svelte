@@ -3,9 +3,10 @@
      import Settings from "./components/Settings.svelte";
      import Sidebar from "./components/Sidebar.svelte";
      import WallpaperGrid from "./components/WallpaperGrid.svelte";
-     import * as wallpaperManager from "./core/wallpaperManager";
-     import { loadWallpapers } from "./core/wallpaperService";
-     import type { WallpaperData } from "./types";
+     import * as wallpaperService from "../backend/wallpaperService";
+     import * as wallpaperManager from "../backend/wallpaperManager";
+     import { logWallpaper, logGui } from "../backend/logger";
+     import type { WallpaperData } from "../shared/types";
 
      let wallpapers: Record<string, WallpaperData> = {};
      let error: string | null = null;
@@ -30,11 +31,22 @@
      async function initialize() {
           loading = true;
 
+          // Setup Logging
+          if (window.electronAPI) {
+               window.electronAPI.on("wallpaper-log", (message: string) => {
+                    logWallpaper(message);
+               });
+          }
+
+          // Capture console logs to GUI logs (prevent infinite loop by checking caller or just manually replacing usages)
+          // For now, let's just log initialization
+          logGui("Application initialized");
+
           const {
                wallpapers: loadedWallpapers,
                error: loadError,
                selectedWallpaper: initialWallpaper,
-          } = await loadWallpapers();
+          } = await wallpaperService.loadWallpapers();
 
           wallpapers = loadedWallpapers;
           error = loadError;

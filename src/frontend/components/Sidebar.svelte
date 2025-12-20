@@ -1,7 +1,7 @@
 <script lang="ts">
-     import type { Wallpaper } from "../types";
+     import type { Wallpaper } from "../../shared/types";
      import MarkdownIt from "markdown-it";
-     import { getDominantColor, isLight } from "../lib/colorHelper";
+     import { getDominantColor, isLight } from "../../backend/colorHelper";
 
      export let selectedWallpaper: Wallpaper | null = null;
      export let onClose: () => void = () => {};

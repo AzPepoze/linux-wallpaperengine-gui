@@ -30,6 +30,7 @@
 		"src/frontend/**/*.ts",
 		"src/frontend/**/*.js",
 		"src/frontend/**/*.svelte",
+		"src/backend/**/*.ts",
 		"src/main/**/*.ts",
 		"vite.config.ts",
 		"tsconfig.json"

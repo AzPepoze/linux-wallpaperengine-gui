@@ -1,11 +1,15 @@
 <script lang="ts">
-     import type { Wallpaper } from "../types";
+     import type { Wallpaper } from "../../shared/types";
+     import LogsPopup from "./LogsPopup.svelte";
+     import Button from "./ui/Button.svelte";
 
      export let activeWallpaper: Wallpaper | null = null;
      export let screens: string[] = [];
      export let selectedScreen: string | null = null;
      export let onShowSettings: () => void = () => {};
      export let onScreenChange: (screen: string) => void = () => {};
+
+     let showLogs = false;
 
      function handleShowSettings() {
           onShowSettings();
@@ -40,8 +44,15 @@
                on {selectedScreen}
           </p>
      {/if}
-     <button class="settings-button" on:click={handleShowSettings}> ⚙️ </button>
+     <div class="actions">
+          <Button variant="secondary" on:click={() => (showLogs = true)}> Logs </Button>
+          <Button variant="secondary" on:click={handleShowSettings}> Settings </Button>
+     </div>
 </div>
+
+{#if showLogs}
+     <LogsPopup onClose={() => (showLogs = false)} />
+{/if}
 
 <style lang="scss">
      .topbar {
@@ -79,12 +90,8 @@
           margin: 0 20px;
      }
 
-     .settings-button {
-          background: none;
-          border: none;
-          font-size: 2em;
-          cursor: pointer;
-          z-index: 1000;
-          color: #fff;
+     .actions {
+          display: flex;
+          gap: 10px;
      }
 </style>

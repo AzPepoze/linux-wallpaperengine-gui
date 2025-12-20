@@ -1,5 +1,6 @@
 import * as wallpaperManager from "./wallpaperManager";
-import type { WallpaperData } from "../types";
+import type { WallpaperData } from "../shared/types";
+import { logGui } from "./logger";
 
 export async function killWallpaperEngineProcess(): Promise<{
      success: boolean;
@@ -54,7 +55,7 @@ export async function loadWallpapers() {
           }
      } catch (e: any) {
           error = e.message || String(e);
-          console.error(e);
+          if (error) logGui(error);
      }
 
      return { wallpapers, error, selectedWallpaper: initialWallpaper };
