@@ -1,7 +1,7 @@
 <h1 align="center">Linux Wallpaper Engine GUI</h1>
 
 <div align="center">
-<img src="showcase/preview-logo.jpg" alt="Linux Wallpaper Engine GUI Logo" width="128" height="128" style="border-radius: 20px;"/>
+<img src="showcase/preview-logo.png" alt="Linux Wallpaper Engine GUI Logo" width="128" height="128" style="border-radius: 20px;"/>
 </div>
 
 A graphical user interface for managing wallpapers on Linux, powered by Electron, Svelte, and `linux-wallpaperengine`.
@@ -11,7 +11,6 @@ A graphical user interface for managing wallpapers on Linux, powered by Electron
 | Screen  |                  Image                   |
 | :-----: | :--------------------------------------: |
 |  Main   |    ![Main Window](showcase/main.png)     |
-|   :-:   |                   :-:                    |
 | Setting | ![Settings Window](showcase/setting.png) |
 
 ## Features
