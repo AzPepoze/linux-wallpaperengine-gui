@@ -43,6 +43,7 @@ interface AppConfig {
      clamping?: string;
      disableMouse?: boolean;
      disableParallax?: boolean;
+     disableParticles?: boolean;
      noFullscreenPause?: boolean;
      executableLocation?: string;
 }
@@ -118,6 +119,7 @@ export const manageWallpaper = async (): Promise<{
                if (config.disableMouse) args += " --disable-mouse";
                if (config.disableParallax) args += " --disable-parallax";
                if (config.noFullscreenPause) args += " --no-fullscreen-pause";
+               if (config.disableParticles) args += " --disable-particles";
 
                if (customArgsEnabled && customArgs) {
                     args += ` ${customArgs}`;

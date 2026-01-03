@@ -30,6 +30,7 @@
      let disableMouse: boolean = false;
      let disableParallax: boolean = false;
      let noFullscreenPause: boolean = false;
+     let disableParticles: boolean = false;
 
      let message: string | null = null;
      let messageType: "success" | "error" | null = null;
@@ -51,7 +52,8 @@
                     disableMouse = config.disableMouse || false;
                     disableParallax = config.disableParallax || false;
                     noFullscreenPause = config.noFullscreenPause || false;
-                    binaryLocation = config.executableLocation ?? '';
+                    binaryLocation = config.executableLocation || '';
+                    disableParticles = config.disableParticles || false;
                } else {
                     message = `Error loading config: ${config.error}`;
                     messageType = "error";
@@ -64,7 +66,6 @@
 
      const saveSettings = async () => {
           try {
-               console.log(binaryLocation);
                const result = await saveConfig({
                     FPS: fps,
                     SILENCE: silence,
@@ -77,6 +78,7 @@
                     clamping,
                     disableMouse,
                     disableParallax,
+                    disableParticles,
                     noFullscreenPause,
                     executableLocation: binaryLocation
                });
@@ -167,6 +169,16 @@
                          <Toggle
                               id="noFullscreenPause"
                               bind:checked={noFullscreenPause}
+                         />
+                    </SettingItem>
+
+                    <SettingItem
+                         label="Disable particles"
+                         id="disableParticles"
+                    >
+                         <Toggle
+                              id="disableParticles"
+                              bind:checked={disableParticles}
                          />
                     </SettingItem>
                </SettingsSection>
