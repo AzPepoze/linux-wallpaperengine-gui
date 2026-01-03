@@ -1,4 +1,5 @@
 import { logGui } from "./logger";
+import { EXECUTABLE_NAME } from "../shared/constants"
 
 let homePath: string;
 let configPath: string;
@@ -43,6 +44,7 @@ interface AppConfig {
      disableMouse?: boolean;
      disableParallax?: boolean;
      noFullscreenPause?: boolean;
+     executableLocation?: string;
 }
 
 const readConfig = async (): Promise<AppConfig> => {
@@ -120,9 +122,12 @@ export const manageWallpaper = async (): Promise<{
                if (customArgsEnabled && customArgs) {
                     args += ` ${customArgs}`;
                }
-
+               
+               const executable = config.executableLocation && config.executableLocation !== ''
+                    ? `${config.executableLocation}/${EXECUTABLE_NAME}`
+                    : EXECUTABLE_NAME
                const result = await window.electronAPI.execCommand(
-                    `linux-wallpaperengine ${args}`
+                    `${executable} ${args}&`
                );
 
                if (result && result.pid) {

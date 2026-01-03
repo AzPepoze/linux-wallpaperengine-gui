@@ -21,6 +21,7 @@ interface ElectronAPI {
      readBinaryFile: (path: string) => Promise<ArrayBuffer>;
      getEnv: (key: string) => Promise<string | undefined>;
      getHomeDir: () => Promise<string>;
+     selectDir: () => Promise<string>;
 }
 
 interface Window {

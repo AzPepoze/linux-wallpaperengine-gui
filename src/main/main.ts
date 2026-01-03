@@ -8,11 +8,14 @@ import {
      screen,
      protocol,
      net,
+     dialog,
 } from "electron";
 import path from "node:path";
 import fs from "node:fs/promises";
 import { spawn } from "node:child_process";
 import { fileURLToPath } from "node:url";
+import { EXECUTABLE_NAME } from "../shared/constants";
+import { dir } from "node:console";
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
@@ -51,7 +54,7 @@ function createWindow() {
           transparent: true,
           // frame: false,
      });
-
+     
      win.webContents.on("did-finish-load", () => {
           win?.webContents.send(
                "main-process-message",
@@ -164,13 +167,25 @@ ipcMain.handle("get-screens", async () => {
      return screen.getAllDisplays();
 });
 
+ipcMain.handle("select-dir",  async () => {
+     const directory = await dialog.showOpenDialog(win!, {
+          properties: ['openDirectory']
+     });
+
+     return directory.filePaths[0];
+});
+
 ipcMain.handle(
      "exec-command",
      async (_, command: string, args: string[], show_log: boolean = true) => {
           if (show_log) console.log("Executing:", command, args);
 
           return new Promise((resolve, reject) => {
-               if (command.startsWith("linux-wallpaperengine")) {
+               const multipleWhitespaceRegex = /\s+/gi;
+               const isExecutableCommand = command.includes(' ') 
+                    && command.replace(multipleWhitespaceRegex, ' ').split(' ')[0].endsWith(EXECUTABLE_NAME);
+                    
+               if (isExecutableCommand) {
                     const process = spawn(command, args, {
                          shell: true,
                          detached: true,

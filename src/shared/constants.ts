@@ -1,0 +1,1 @@
+export const EXECUTABLE_NAME = 'linux-wallpaperengine';

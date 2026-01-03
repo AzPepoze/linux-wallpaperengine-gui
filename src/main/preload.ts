@@ -22,4 +22,5 @@ contextBridge.exposeInMainWorld("electronAPI", {
           ipcRenderer.invoke("fs-read-binary", path),
      getEnv: (key: string) => ipcRenderer.invoke("get-env", key),
      getHomeDir: () => ipcRenderer.invoke("get-home-dir"),
+     selectDir: () => ipcRenderer.invoke("select-dir")
 });

@@ -14,6 +14,7 @@
      import Input from "./ui/Input.svelte";
      import Select from "./ui/Select.svelte";
      import Range from "./ui/Range.svelte";
+     import FolderSelector from "./ui/FolderSelector.svelte";
 
      export let onClose: () => void;
 
@@ -32,6 +33,7 @@
 
      let message: string | null = null;
      let messageType: "success" | "error" | null = null;
+     let binaryLocation : string = '';
 
      onMount(async () => {
           try {
@@ -49,6 +51,7 @@
                     disableMouse = config.disableMouse || false;
                     disableParallax = config.disableParallax || false;
                     noFullscreenPause = config.noFullscreenPause || false;
+                    binaryLocation = config.executableLocation ?? '';
                } else {
                     message = `Error loading config: ${config.error}`;
                     messageType = "error";
@@ -61,6 +64,7 @@
 
      const saveSettings = async () => {
           try {
+               console.log(binaryLocation);
                const result = await saveConfig({
                     FPS: fps,
                     SILENCE: silence,
@@ -74,6 +78,7 @@
                     disableMouse,
                     disableParallax,
                     noFullscreenPause,
+                    executableLocation: binaryLocation
                });
                if (result.success) {
                     message = "Settings saved successfully!";
@@ -255,6 +260,15 @@
                          </p>
                     </SettingItem>
                {/if}
+
+               <SettingItem
+                    label="Binary location"
+                    id="binaryLocation"
+               >
+                    <FolderSelector bind:location={binaryLocation} />
+               </SettingItem>
+
+
           </SettingsSection>
 
           <div class="button-group">
