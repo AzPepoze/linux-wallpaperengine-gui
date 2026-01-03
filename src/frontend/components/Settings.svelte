@@ -14,6 +14,7 @@
      import Input from "./ui/Input.svelte";
      import Select from "./ui/Select.svelte";
      import Range from "./ui/Range.svelte";
+     import FolderSelector from "./ui/FolderSelector.svelte";
 
      export let onClose: () => void;
 
@@ -29,9 +30,11 @@
      let disableMouse: boolean = false;
      let disableParallax: boolean = false;
      let noFullscreenPause: boolean = false;
+     let disableParticles: boolean = false;
 
      let message: string | null = null;
      let messageType: "success" | "error" | null = null;
+     let binaryLocation : string = '';
 
      onMount(async () => {
           try {
@@ -49,6 +52,8 @@
                     disableMouse = config.disableMouse || false;
                     disableParallax = config.disableParallax || false;
                     noFullscreenPause = config.noFullscreenPause || false;
+                    binaryLocation = config.executableLocation || '';
+                    disableParticles = config.disableParticles || false;
                } else {
                     message = `Error loading config: ${config.error}`;
                     messageType = "error";
@@ -73,7 +78,9 @@
                     clamping,
                     disableMouse,
                     disableParallax,
+                    disableParticles,
                     noFullscreenPause,
+                    executableLocation: binaryLocation
                });
                if (result.success) {
                     message = "Settings saved successfully!";
@@ -162,6 +169,16 @@
                          <Toggle
                               id="noFullscreenPause"
                               bind:checked={noFullscreenPause}
+                         />
+                    </SettingItem>
+
+                    <SettingItem
+                         label="Disable particles"
+                         id="disableParticles"
+                    >
+                         <Toggle
+                              id="disableParticles"
+                              bind:checked={disableParticles}
                          />
                     </SettingItem>
                </SettingsSection>
@@ -255,6 +272,15 @@
                          </p>
                     </SettingItem>
                {/if}
+
+               <SettingItem
+                    label="Binary location"
+                    id="binaryLocation"
+               >
+                    <FolderSelector bind:location={binaryLocation} />
+               </SettingItem>
+
+
           </SettingsSection>
 
           <div class="button-group">
