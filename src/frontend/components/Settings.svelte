@@ -35,7 +35,7 @@
 
      let message: string | null = null;
      let messageType: "success" | "error" | null = null;
-     let binaryLocation : string = '';
+     let binaryLocation: string = "";
 
      onMount(async () => {
           try {
@@ -53,7 +53,7 @@
                     disableMouse = config.disableMouse || false;
                     disableParallax = config.disableParallax || false;
                     noFullscreenPause = config.noFullscreenPause || false;
-                    binaryLocation = config.executableLocation || '';
+                    binaryLocation = config.customExecutableLocation || "";
                     disableParticles = config.disableParticles || false;
                } else {
                     message = `Error loading config: ${config.error}`;
@@ -67,11 +67,18 @@
 
      const onSelectBinFile = async (path: string) => {
           if (!path) return;
-          
+
+          const exists = await window.electronAPI.fsExists(path);
+          if (!exists) {
+               alert("The selected file does not exist or is not accessible.");
+               binaryLocation = "";
+               return;
+          }
+
           const fileName = path.split('/').pop();
           if (fileName !== EXECUTABLE_NAME) {
                const confirmSelection = confirm(
-                    `The selected file "${fileName}" does not match the expected name "${EXECUTABLE_NAME}". Are you sure you want to use this file?`
+                    `The selected file "${fileName}" does not match the expected name "${EXECUTABLE_NAME}". Are you sure you want to use this file?`,
                );
                if (!confirmSelection) {
                     binaryLocation = "";
@@ -95,7 +102,7 @@
                     disableParallax,
                     disableParticles,
                     noFullscreenPause,
-                    executableLocation: binaryLocation
+                    customExecutableLocation: binaryLocation,
                });
                if (result.success) {
                     message = "Settings saved successfully!";
@@ -240,10 +247,7 @@
                          />
                     </SettingItem>
 
-                    <SettingItem
-                         label="Disable Parallax"
-                         id="disableParallax"
-                    >
+                    <SettingItem label="Disable Parallax" id="disableParallax">
                          <Toggle
                               id="disableParallax"
                               bind:checked={disableParallax}
@@ -289,11 +293,14 @@
                {/if}
           </SettingsSection>
 
-          <SettingsSection title="Linux-wallpaperengine binary location" full={true}>
-               <Browse 
-                    bind:location={binaryLocation} 
-                    onSelect={onSelectBinFile} 
-                    placeholder="Path to linux-wallpaperengine binary..." 
+          <SettingsSection
+               title="Custom linux-wallpaperengine executable location"
+               full={true}
+          >
+               <Browse
+                    bind:location={binaryLocation}
+                    onSelect={onSelectBinFile}
+                    placeholder="Path to linux-wallpaperengine binary... (Leave empty to use system PATH)"
                />
           </SettingsSection>
 
@@ -304,9 +311,8 @@
                <button class="btn btn-secondary" on:click={openConfig}
                     >Open Config File</button
                >
-               <button
-                    class="btn btn-secondary"
-                    on:click={clearAllWallpapers}>Clear All Wallpapers</button
+               <button class="btn btn-secondary" on:click={clearAllWallpapers}
+                    >Clear All Wallpapers</button
                >
           </div>
 

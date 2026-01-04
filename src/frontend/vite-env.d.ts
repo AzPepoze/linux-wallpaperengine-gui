@@ -19,6 +19,7 @@ interface ElectronAPI {
      readFile: (path: string) => Promise<string>;
      writeFile: (path: string, content: string) => Promise<void>;
      readBinaryFile: (path: string) => Promise<ArrayBuffer>;
+     fsExists: (path: string) => Promise<boolean>;
      getEnv: (key: string) => Promise<string | undefined>;
      getHomeDir: () => Promise<string>;
      selectDir: () => Promise<string>;

@@ -38,9 +38,14 @@
                });
           }
 
-          // Capture console logs to GUI logs (prevent infinite loop by checking caller or just manually replacing usages)
-          // For now, let's just log initialization
           logGui("Application initialized");
+
+          await wallpaperManager.main();
+
+          const isValidExecutable = await wallpaperManager.validateExecutable();
+          if (!isValidExecutable) {
+               showSettingsPopup = true;
+          }
 
           const {
                wallpapers: loadedWallpapers,

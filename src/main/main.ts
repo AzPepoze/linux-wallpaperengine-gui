@@ -296,6 +296,18 @@ ipcMain.handle("fs-read-binary", async (_, filePath: string) => {
      return buffer.buffer;
 });
 
+ipcMain.handle("fs-exists", async (_, filePath: string) => {
+     if (filePath.startsWith("~")) {
+          filePath = path.join(app.getPath("home"), filePath.slice(1));
+     }
+     try {
+          await fs.access(filePath);
+          return true;
+     } catch {
+          return false;
+     }
+});
+
 ipcMain.handle("get-env", async (_, key: string) => {
      return process.env[key];
 });

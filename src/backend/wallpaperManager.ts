@@ -1,5 +1,5 @@
 import { logGui } from "./logger";
-import { EXECUTABLE_NAME } from "../shared/constants"
+import { EXECUTABLE_NAME } from "../shared/constants";
 
 let homePath: string;
 let configPath: string;
@@ -7,22 +7,7 @@ let wallperBasePath: string;
 const activeWallpapers = new Map<string, number>();
 
 export async function main() {
-     if (!window.electronAPI) {
-          logGui("electronAPI is not available");
-          return;
-     }
-     homePath = (await window.electronAPI.getEnv("HOME")) || "";
-     configPath = `${homePath}/.config/linux-wallpaperengine-gui/config.json`;
-     wallperBasePath = [
-          homePath,
-          ".local",
-          "share",
-          "Steam",
-          "steamapps",
-          "workshop",
-          "content",
-          "431960",
-     ].join("/");
+     await ensureInitialized();
 }
 
 interface ScreenConfig {
@@ -45,11 +30,33 @@ interface AppConfig {
      disableParallax?: boolean;
      disableParticles?: boolean;
      noFullscreenPause?: boolean;
-     executableLocation?: string;
+     customExecutableLocation?: string;
+}
+
+const ensureInitialized = async () => {
+     if (configPath && homePath && wallperBasePath) return;
+     
+     if (!window.electronAPI) {
+          throw new Error("electronAPI is not available");
+     }
+
+     homePath = (await window.electronAPI.getEnv("HOME")) || "";
+     configPath = `${homePath}/.config/linux-wallpaperengine-gui/config.json`;
+     wallperBasePath = [
+          homePath,
+          ".local",
+          "share",
+          "Steam",
+          "steamapps",
+          "workshop",
+          "content",
+          "431960",
+     ].join("/");
 }
 
 const readConfig = async (): Promise<AppConfig> => {
      try {
+          await ensureInitialized();
           const configContent = await window.electronAPI.readFile(configPath);
           return JSON.parse(configContent);
      } catch (err: any) {
@@ -59,7 +66,7 @@ const readConfig = async (): Promise<AppConfig> => {
           ) {
                logGui(
                     "Could not read config.json, returning default. Error: " +
-                    err
+                         err
                );
           }
           return {};
@@ -67,6 +74,7 @@ const readConfig = async (): Promise<AppConfig> => {
 };
 
 const writeConfig = async (newConfig: AppConfig): Promise<void> => {
+     await ensureInitialized();
      await window.electronAPI.writeFile(
           configPath,
           JSON.stringify(newConfig, null, 2)
@@ -125,9 +133,7 @@ export const manageWallpaper = async (): Promise<{
                     args += ` ${customArgs}`;
                }
 
-               const executable = config.executableLocation && config.executableLocation !== ''
-                    ? config.executableLocation
-                    : EXECUTABLE_NAME
+               const executable = await getWallpaperExecutableLocation();
                const result = await window.electronAPI.execCommand(
                     `${executable} ${args}`
                );
@@ -201,7 +207,7 @@ export const getWallpapers = async () => {
                          } catch (readError) {
                               logGui(
                                    `Could not process project.json for ${folder.entry}: ` +
-                                   readError
+                                        readError
                               );
                          }
                          return [folder.entry, { previewPath, projectData }];
@@ -289,9 +295,7 @@ export const getWallpaperPreview = async (path: string) => {
           };
      } catch (err: unknown) {
           const error = err instanceof Error ? err.message : String(err);
-          logGui(
-               `Error in getWallpaperPreview for path "${path}": ${error}`
-          );
+          logGui(`Error in getWallpaperPreview for path "${path}": ${error}`);
           return { success: false, error };
      }
 };
@@ -309,7 +313,9 @@ export const getScreens = async (): Promise<{
           const commandResult = await window.electronAPI.execCommand(
                "xrandr --query"
           );
-          logGui("xrandr --query commandResult: " + JSON.stringify(commandResult));
+          logGui(
+               "xrandr --query commandResult: " + JSON.stringify(commandResult)
+          );
 
           let stdout = "";
 
@@ -370,5 +376,53 @@ export const clearAllWallpapers = async (): Promise<{
           const error = err instanceof Error ? err.message : String(err);
           logGui(`Error in clearAllWallpapers: ${error}`);
           return { success: false, error };
+     }
+};
+
+export const getWallpaperExecutableLocation = async (): Promise<string> => {
+     const config = await readConfig();
+     return config.customExecutableLocation &&
+          config.customExecutableLocation !== ""
+          ? config.customExecutableLocation
+          : EXECUTABLE_NAME;
+};
+
+export const validateExecutable = async (): Promise<boolean> => {
+     try {
+          const config = await readConfig();
+          const isCustom =
+               config.customExecutableLocation &&
+               config.customExecutableLocation !== "";
+          const executable = isCustom
+               ? config.customExecutableLocation!
+               : EXECUTABLE_NAME;
+
+          if (isCustom) {
+               return await window.electronAPI.fsExists(executable);
+          }
+
+          // For default EXECUTABLE_NAME, try running with --help to check if it's in PATH
+          try {
+               const result = await window.electronAPI.execCommand(
+                    `${executable} --help`,
+                    [],
+                    false
+               );
+
+               if (
+                    typeof result === "object" &&
+                    (result.pid ||
+                         result.stdout !== undefined ||
+                         result.stderr !== undefined)
+               ) {
+                    return true;
+               }
+
+               return false;
+          } catch (err) {
+               return false;
+          }
+     } catch {
+          return false;
      }
 };
