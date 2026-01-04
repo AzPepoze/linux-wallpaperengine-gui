@@ -124,12 +124,12 @@ export const manageWallpaper = async (): Promise<{
                if (customArgsEnabled && customArgs) {
                     args += ` ${customArgs}`;
                }
-               
+
                const executable = config.executableLocation && config.executableLocation !== ''
-                    ? `${config.executableLocation}/${EXECUTABLE_NAME}`
+                    ? config.executableLocation
                     : EXECUTABLE_NAME
                const result = await window.electronAPI.execCommand(
-                    `${executable} ${args}&`
+                    `${executable} ${args}`
                );
 
                if (result && result.pid) {
@@ -177,7 +177,7 @@ export const getWallpapers = async () => {
                const batchPromises = batch.map(
                     async (
                          folder
-                    ): Promise< 
+                    ): Promise<
                          [
                               string,
                               { previewPath: string | null; projectData: any }
@@ -189,7 +189,7 @@ export const getWallpapers = async () => {
                          let projectData: any = {};
 
                          try {
-                              const projectJsonContent = 
+                              const projectJsonContent =
                                    await window.electronAPI.readFile(
                                         projectJsonPath
                                    );
@@ -220,7 +220,7 @@ export const getWallpapers = async () => {
      }
 };
 
-export type GetConfigResult = 
+export type GetConfigResult =
      | ({ success: true } & AppConfig)
      | { success: false; error: string };
 

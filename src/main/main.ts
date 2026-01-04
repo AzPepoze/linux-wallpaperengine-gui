@@ -175,6 +175,14 @@ ipcMain.handle("select-dir",  async () => {
      return directory.filePaths[0];
 });
 
+ipcMain.handle("select-file", async () => {
+     const file = await dialog.showOpenDialog(win!, {
+          properties: ['openFile']
+     });
+
+     return file.filePaths[0];
+});
+
 ipcMain.handle(
      "exec-command",
      async (_, command: string, args: string[], show_log: boolean = true) => {

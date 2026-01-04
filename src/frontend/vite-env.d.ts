@@ -22,6 +22,7 @@ interface ElectronAPI {
      getEnv: (key: string) => Promise<string | undefined>;
      getHomeDir: () => Promise<string>;
      selectDir: () => Promise<string>;
+     selectFile: () => Promise<string>;
 }
 
 interface Window {

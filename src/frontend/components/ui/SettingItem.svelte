@@ -42,8 +42,9 @@
           overflow: hidden;
      }
 
-     :global(.form-group div) {
-          width: -webkit-fill-available;
+     :global(.form-group > div) {
+          flex: 1;
+          min-width: 0;
           display: flex;
           justify-content: flex-end;
      }

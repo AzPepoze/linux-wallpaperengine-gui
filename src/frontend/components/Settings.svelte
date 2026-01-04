@@ -6,6 +6,7 @@
           openConfigInEditor,
           clearAllWallpapers,
      } from "../../backend/wallpaperManager";
+     import { EXECUTABLE_NAME } from "../../shared/constants";
      import Fullscreen from "./ui/Fullscreen.svelte";
 
      import SettingsSection from "./settings/SettingsSection.svelte";
@@ -14,7 +15,7 @@
      import Input from "./ui/Input.svelte";
      import Select from "./ui/Select.svelte";
      import Range from "./ui/Range.svelte";
-     import FolderSelector from "./ui/FolderSelector.svelte";
+     import Browse from "./ui/Browse.svelte";
 
      export let onClose: () => void;
 
@@ -63,6 +64,20 @@
                messageType = "error";
           }
      });
+
+     const onSelectBinFile = async (path: string) => {
+          if (!path) return;
+          
+          const fileName = path.split('/').pop();
+          if (fileName !== EXECUTABLE_NAME) {
+               const confirmSelection = confirm(
+                    `The selected file "${fileName}" does not match the expected name "${EXECUTABLE_NAME}". Are you sure you want to use this file?`
+               );
+               if (!confirmSelection) {
+                    binaryLocation = "";
+               }
+          }
+     };
 
      const saveSettings = async () => {
           try {
@@ -272,15 +287,14 @@
                          </p>
                     </SettingItem>
                {/if}
+          </SettingsSection>
 
-               <SettingItem
-                    label="Binary location"
-                    id="binaryLocation"
-               >
-                    <FolderSelector bind:location={binaryLocation} />
-               </SettingItem>
-
-
+          <SettingsSection title="Linux-wallpaperengine binary location" full={true}>
+               <Browse 
+                    bind:location={binaryLocation} 
+                    onSelect={onSelectBinFile} 
+                    placeholder="Path to linux-wallpaperengine binary..." 
+               />
           </SettingsSection>
 
           <div class="button-group">
