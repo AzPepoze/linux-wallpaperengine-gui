@@ -404,7 +404,9 @@
           font-weight: 600;
           transition:
                transform 0.1s,
-               background-color 0.2s;
+               filter 0.2s,
+               background-color 0.2s,
+               border-color 0.2s;
           white-space: nowrap;
      }
 
@@ -417,15 +419,17 @@
      }
 
      .btn-primary:hover {
-          background-color: var(--btn-primary-hover-bg);
+          filter: brightness(1.2);
      }
 
      .btn-secondary {
           background-color: var(--btn-secondary-bg);
+          border: 1px solid rgba(255, 255, 255, 0.2);
      }
 
      .btn-secondary:hover {
-          background-color: var(--btn-secondary-hover-bg);
+          filter: brightness(1.5);
+          border-color: rgba(255, 255, 255, 0.4);
      }
 
      .message {

@@ -13,5 +13,10 @@
           max-width: 200px;
           margin: 0;
           cursor: pointer;
+          transition: all 0.2s;
+     }
+
+     input[type="range"]:hover {
+          filter: brightness(1.2);
      }
 </style>

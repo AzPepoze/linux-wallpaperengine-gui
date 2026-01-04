@@ -52,6 +52,10 @@
 		transition: all 0.2s;
 		text-overflow: ellipsis;
 
+		&:hover {
+			filter: brightness(1.2);
+		}
+
 		&:focus {
 			outline: none;
 			border-color: var(--btn-primary-bg, #007bff);
@@ -64,13 +68,15 @@
 		border-radius: 6px;
 		background-color: var(--btn-primary-bg, #007bff);
 		color: white;
-		border: none;
+		border: 1px solid rgba(255, 255, 255, 0.1);
 		cursor: pointer;
 		font-size: 0.9em;
+		transition: all 0.2s;
 		white-space: nowrap;
 
 		&:hover {
-			opacity: 0.9;
+			filter: brightness(1.2);
+			border-color: rgba(255, 255, 255, 0.3);
 		}
 	}
 </style>

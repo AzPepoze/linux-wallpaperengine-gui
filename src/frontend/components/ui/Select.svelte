@@ -35,6 +35,10 @@
           background-size: 0.65em auto;
      }
 
+     select:hover {
+          filter: brightness(1.2);
+     }
+
      select:focus {
           outline: none;
           border-color: var(--btn-primary-bg, #007bff);

@@ -36,6 +36,10 @@
           border-radius: 24px;
      }
 
+     .toggle-switch:hover .slider {
+          filter: brightness(1.2);
+     }
+
      .slider:before {
           position: absolute;
           content: "";

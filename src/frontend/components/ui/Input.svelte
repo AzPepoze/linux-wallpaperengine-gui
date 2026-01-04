@@ -39,6 +39,10 @@
           transition: all 0.2s;
      }
 
+     input:hover {
+          filter: brightness(1.2);
+     }
+
      input:focus {
           outline: none;
           border-color: var(--btn-primary-bg, #007bff);
