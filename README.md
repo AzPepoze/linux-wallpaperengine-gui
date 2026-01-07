@@ -32,11 +32,9 @@ A graphical user interface for managing wallpapers on Linux, powered by Electron
 
 ### Install on Arch Linux
 
--    **Option 1: Using AUR**
+You can install from the [AUR](https://aur.archlinux.org/packages/linux-wallpaperengine-gui-git):
 
-     You can install from the [AUR](https://aur.archlinux.org/packages/linux-wallpaperengine-gui-git):
-
-     ```bash
+```bash
      yay -S linux-wallpaperengine-gui
      ```
 
@@ -44,16 +42,6 @@ A graphical user interface for managing wallpapers on Linux, powered by Electron
 
      ```bash
      paru -S linux-wallpaperengine-gui
-     ```
-
--    **Option 2: Pre-built Package**
-
-     You can download the pre-built `.pacman` package directly from the latest release and install it.
-
-     ```bash
-     cd /tmp && \
-     curl -L -O https://github.com/AzPepoze/linux-wallpaperengine-gui/releases/latest/download/linux-wallpaperengine-gui.pacman && \
-     sudo pacman -U linux-wallpaperengine-gui.pacman
      ```
 
 ### Install on Other Linux Distributions
