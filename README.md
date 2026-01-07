@@ -35,14 +35,13 @@ A graphical user interface for managing wallpapers on Linux, powered by Electron
 You can install from the [AUR](https://aur.archlinux.org/packages/linux-wallpaperengine-gui-git):
 
 ```bash
-     yay -S linux-wallpaperengine-gui
-     ```
+yay -S linux-wallpaperengine-gui
+```
 
-     Or with another AUR helper like `paru`:
-
-     ```bash
-     paru -S linux-wallpaperengine-gui
-     ```
+Or with another AUR helper like `paru`:
+```bash
+paru -S linux-wallpaperengine-gui
+```
 
 ### Install on Other Linux Distributions
 
