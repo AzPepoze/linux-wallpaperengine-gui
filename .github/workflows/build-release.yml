@@ -63,19 +63,14 @@ jobs:
                     zip -r "linux-wallpaperengine-gui.zip" linux-unpacked
                     cd ..
 
-             - name: Create GitHub Release
+             - name: Upload Release Assets
                uses: softprops/action-gh-release@v1
                with:
-                    tag_name: v${{ env.PACKAGE_VERSION }}
-                    name: v${{ env.PACKAGE_VERSION }}
-                    target_commitish: ${{ github.sha }}
                     files: |
                          dist/*.AppImage
                          dist/*.deb
                          dist/*.rpm
                          dist/*.zip
                          dist/latest-linux.yml
-                    draft: false
-                    prerelease: false
                env:
                     GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
