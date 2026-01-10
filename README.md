@@ -6,6 +6,17 @@
 
 A graphical user interface for managing wallpapers on Linux, powered by Electron, Svelte, and `linux-wallpaperengine`.
 
+## Table of Contents
+
+-    [Screenshots](#screenshots)
+-    [Features](#features)
+-    [Prerequisites](#prerequisites)
+-    [Installation](#installation)
+-    [Usage](#usage)
+-    [Build from Source](#build-from-source)
+-    [Development Mode](#development-mode)
+-    [Contributing](#contributing)
+
 ## Screenshots
 
 | Screen  |                  Image                   |
@@ -39,6 +50,7 @@ yay -S linux-wallpaperengine-gui
 ```
 
 Or with another AUR helper like `paru`:
+
 ```bash
 paru -S linux-wallpaperengine-gui
 ```
@@ -49,14 +61,15 @@ paru -S linux-wallpaperengine-gui
 
 ## Usage
 
-How you run the application depends on how it was installed. The application supports the following command-line arguments:
+```bash
+linux-wallpaperengine-gui [options]
+```
 
-| Argument      | Description                                          |
-| :------------ | :--------------------------------------------------- |
-| `(none)`      | Launches the application in normal mode.             |
-| `--minimized` | Starts the application minimized in the system tray. |
+### [Options]
 
-### Build from Source
+-    `--minimized`: Starts the application minimized in the system tray.
+
+## Build from Source
 
 -    **Prerequisites:**
      -    Ensure you have Node.js and (npm or pnpm) installed.
@@ -71,24 +84,24 @@ How you run the application depends on how it was installed. The application sup
 2. **Install dependencies:**
 
      ```bash
-     npm install
+       npm install
      ```
 
 3. **Build the application:**
 
      ```bash
-     npm run build
+       npm run build
      ```
 
      This will create a distributable in the `dist` (or `release`) directory.
 
-### Development Mode
+## Development Mode
 
 -    To run the application with hot-reloading for development:
 
-     ```bash
-     npm run dev
-     ```
+```bash
+   npm run dev
+```
 
 ## Contributing
 
