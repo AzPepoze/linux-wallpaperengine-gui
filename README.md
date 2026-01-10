@@ -6,7 +6,7 @@
 
 A graphical user interface for managing wallpapers on Linux, powered by Electron, Svelte, and `linux-wallpaperengine`.
 
-## Table of Contents
+## Contents
 
 -    [Screenshots](#screenshots)
 -    [Features](#features)
@@ -106,3 +106,13 @@ linux-wallpaperengine-gui [options]
 ## Contributing
 
 Feel free to contribute to this project by opening issues or submitting pull requests.
+
+## Stonks!
+
+<a href="https://www.star-history.com/#AzPepoze/linux-wallpaperengine-gui&type=date&legend=top-left">
+ <picture>
+   <source media="(prefers-color-scheme: dark)" srcset="https://api.star-history.com/svg?repos=AzPepoze/linux-wallpaperengine-gui&type=date&theme=dark&legend=top-left" />
+   <source media="(prefers-color-scheme: light)" srcset="https://api.star-history.com/svg?repos=AzPepoze/linux-wallpaperengine-gui&type=date&legend=top-left" />
+   <img alt="Star History Chart" src="https://api.star-history.com/svg?repos=AzPepoze/linux-wallpaperengine-gui&type=date&legend=top-left" />
+ </picture>
+</a>
