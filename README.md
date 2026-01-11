@@ -8,11 +8,21 @@
 </p>
 
 <p align="center">
-  <img src="https://img.shields.io/github/v/release/AzPepoze/linux-wallpaperengine-gui?style=for-the-badge&label=%E2%97%88%20RELEASE%20%E2%97%88&labelColor=%23181818&color=%23007bff" alt="Latest Release">
-  <img src="https://img.shields.io/github/license/AzPepoze/linux-wallpaperengine-gui?style=for-the-badge&label=%E2%97%88%20LICENSE%20%E2%97%88&labelColor=%23181818&color=%23007bff" alt="License">
-  <img src="https://img.shields.io/github/stars/AzPepoze/linux-wallpaperengine-gui?style=for-the-badge&label=%E2%97%88%20STARS%20%E2%97%88&labelColor=%23181818&color=%23007bff" alt="Stars">
-  <img src="https://img.shields.io/aur/popularity/linux-wallpaperengine-gui-git?style=for-the-badge&label=%E2%97%88%20AUR%20POPULARITY%20%E2%97%88&labelColor=%23181818&color=%23007bff" alt="AUR Popularity">
-  <img src="https://img.shields.io/aur/votes/linux-wallpaperengine-gui-git?style=for-the-badge&label=%E2%97%88%20AUR%20VOTES%20%E2%97%88&labelColor=%23181818&color=%23007bff" alt="AUR Votes">
+  <a href="https://github.com/AzPepoze/linux-wallpaperengine-gui/releases/latest">
+    <img src="https://img.shields.io/github/v/release/AzPepoze/linux-wallpaperengine-gui?style=for-the-badge&label=%E2%97%88%20RELEASE%20%E2%97%88&labelColor=%23181818&color=%23007bff" alt="Latest Release">
+  </a>
+  <a href="LICENSE">
+    <img src="https://img.shields.io/github/license/AzPepoze/linux-wallpaperengine-gui?style=for-the-badge&label=%E2%97%88%20LICENSE%20%E2%97%88&labelColor=%23181818&color=%23007bff" alt="License">
+  </a>
+  <a href="https://github.com/AzPepoze/linux-wallpaperengine-gui/stargazers">
+    <img src="https://img.shields.io/github/stars/AzPepoze/linux-wallpaperengine-gui?style=for-the-badge&label=%E2%97%88%20STARS%20%E2%97%88&labelColor=%23181818&color=%23007bff" alt="Stars">
+  </a>
+  <a href="https://aur.archlinux.org/packages/linux-wallpaperengine-gui-git">
+    <img src="https://img.shields.io/aur/popularity/linux-wallpaperengine-gui-git?style=for-the-badge&label=%E2%97%88%20AUR%20POPULARITY%20%E2%97%88&labelColor=%23181818&color=%23007bff" alt="AUR Popularity">
+  </a>
+  <a href="https://aur.archlinux.org/packages/linux-wallpaperengine-gui-git">
+    <img src="https://img.shields.io/aur/votes/linux-wallpaperengine-gui-git?style=for-the-badge&label=%E2%97%88%20AUR%20VOTES%20%E2%97%88&labelColor=%23181818&color=%23007bff" alt="AUR Votes">
+  </a>
 </p>
 
 ## CONTENTS
