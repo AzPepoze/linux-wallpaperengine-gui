@@ -15,7 +15,6 @@ import fs from "node:fs/promises";
 import { spawn } from "node:child_process";
 import { fileURLToPath } from "node:url";
 import { EXECUTABLE_NAME } from "../shared/constants";
-import { dir } from "node:console";
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
@@ -54,7 +53,7 @@ function createWindow() {
           transparent: true,
           // frame: false,
      });
-     
+
      win.webContents.on("did-finish-load", () => {
           win?.webContents.send(
                "main-process-message",
@@ -141,6 +140,13 @@ app.whenReady().then(() => {
 
      createWindow();
      createTray();
+
+     screen.on("display-added", () => {
+          win?.webContents.send("screens-changed");
+     });
+     screen.on("display-removed", () => {
+          win?.webContents.send("screens-changed");
+     });
 });
 
 ipcMain.handle("app-exit", async () => {
@@ -167,9 +173,9 @@ ipcMain.handle("get-screens", async () => {
      return screen.getAllDisplays();
 });
 
-ipcMain.handle("select-dir",  async () => {
+ipcMain.handle("select-dir", async () => {
      const directory = await dialog.showOpenDialog(win!, {
-          properties: ['openDirectory']
+          properties: ["openDirectory"],
      });
 
      return directory.filePaths[0];
@@ -177,7 +183,7 @@ ipcMain.handle("select-dir",  async () => {
 
 ipcMain.handle("select-file", async () => {
      const file = await dialog.showOpenDialog(win!, {
-          properties: ['openFile']
+          properties: ["openFile"],
      });
 
      return file.filePaths[0];
@@ -190,9 +196,13 @@ ipcMain.handle(
 
           return new Promise((resolve, reject) => {
                const multipleWhitespaceRegex = /\s+/gi;
-               const isExecutableCommand = command.includes(' ') 
-                    && command.replace(multipleWhitespaceRegex, ' ').split(' ')[0].endsWith(EXECUTABLE_NAME);
-                    
+               const isExecutableCommand =
+                    command.includes(" ") &&
+                    command
+                         .replace(multipleWhitespaceRegex, " ")
+                         .split(" ")[0]
+                         .endsWith(EXECUTABLE_NAME);
+
                if (isExecutableCommand) {
                     const process = spawn(command, args, {
                          shell: true,
@@ -207,7 +217,8 @@ ipcMain.handle(
 
                     process.stderr?.on("data", (data) => {
                          const message = data.toString();
-                         if (show_log) console.error(`[Engine Error]: ${message}`);
+                         if (show_log)
+                              console.error(`[Engine Error]: ${message}`);
                          win?.webContents.send("wallpaper-log", message);
                     });
 

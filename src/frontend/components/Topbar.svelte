@@ -1,97 +1,63 @@
 <script lang="ts">
-     import type { Wallpaper } from "../../shared/types";
-     import LogsPopup from "./LogsPopup.svelte";
      import Button from "./ui/Button.svelte";
+     import LogsIcon from "../icons/LogsIcon.svelte";
+     import SettingIcon from "../icons/SettingIcon.svelte";
+     import HomeIcon from "../icons/HomeIcon.svelte";
+     import { activeView } from "../scripts/ui";
 
-     export let activeWallpaper: Wallpaper | null = null;
-     export let screens: string[] = [];
-     export let selectedScreen: string | null = null;
-     export let onShowSettings: () => void = () => {};
-     export let onScreenChange: (screen: string) => void = () => {};
-
-     let showLogs = false;
-
-     function handleShowSettings() {
-          onShowSettings();
-     }
-
-     function handleScreenChange(event: Event) {
-          const target = event.target as HTMLSelectElement;
-          onScreenChange(target.value);
+     function setView(view: "wallpapers" | "logs" | "settings") {
+          activeView.set(view);
      }
 </script>
 
 <div class="topbar">
-     <div class="screen-selector-container">
-          <label for="screen-selector">Configure Screen:</label>
-          <select
-               id="screen-selector"
-               on:change={handleScreenChange}
-               bind:value={selectedScreen}
+     <div class="center-actions">
+          <Button
+               variant={$activeView === "wallpapers" ? "primary" : "secondary"}
+               on:click={() => setView("wallpapers")}
+               title="Wallpapers"
           >
-               {#each screens as screen}
-                    <option value={screen}>{screen}</option>
-               {/each}
-          </select>
-     </div>
+               <HomeIcon width="20" height="20" />
+          </Button>
 
-     {#if activeWallpaper}
-          <p class="current-status">
-               Currently using: <strong
-                    >{activeWallpaper.projectData?.title ||
-                         activeWallpaper.folderName}</strong
-               >
-               on {selectedScreen}
-          </p>
-     {/if}
-     <div class="actions">
-          <Button variant="secondary" on:click={() => (showLogs = true)}> Logs </Button>
-          <Button variant="secondary" on:click={handleShowSettings}> Settings </Button>
+          <Button
+               variant={$activeView === "logs" ? "primary" : "secondary"}
+               on:click={() => setView("logs")}
+               title="Logs"
+          >
+               <LogsIcon width="20" height="20" />
+          </Button>
+
+          <Button
+               variant={$activeView === "settings" ? "primary" : "secondary"}
+               on:click={() => setView("settings")}
+               title="Settings"
+          >
+               <SettingIcon width="20" height="20" />
+          </Button>
      </div>
 </div>
-
-{#if showLogs}
-     <LogsPopup onClose={() => (showLogs = false)} />
-{/if}
 
 <style lang="scss">
      .topbar {
           display: flex;
-          justify-content: space-between;
+          justify-content: center;
           align-items: center;
-          padding: 5px 15px;
+          padding: 8px 20px;
           width: 100%;
           box-sizing: border-box;
           flex-shrink: 0;
+          min-height: 60px;
+          background: var(--top-bar-bg);
+          border-radius: 0 0 12px 12px;
      }
 
-     .screen-selector-container {
+     .center-actions {
           display: flex;
-          align-items: center;
-          gap: 10px;
-
-          label {
-               font-weight: bold;
-          }
-
-          select {
-               background-color: #3a3a3a;
-               color: #fff;
-               border: 1px solid #444;
-               border-radius: 5px;
-               padding: 5px 10px;
-               font-size: 0.9em;
-          }
-     }
-
-     .current-status {
-          flex-grow: 1;
-          text-align: center;
-          margin: 0 20px;
-     }
-
-     .actions {
-          display: flex;
-          gap: 10px;
+          gap: 12px;
+          background: rgba(255, 255, 255, 0.05);
+          padding: 6px;
+          border-radius: 12px;
+          border: 1px solid rgba(255, 255, 255, 0.1);
      }
 </style>

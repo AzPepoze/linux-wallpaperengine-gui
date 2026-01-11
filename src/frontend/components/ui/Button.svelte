@@ -11,6 +11,7 @@
   class="btn {variant}"
   {disabled}
   on:click
+  {...$$restProps}
 >
   <slot />
 </button>

@@ -21,6 +21,10 @@
      --text-color: #fff;
      --success-bg: rgba(40, 167, 69, 0.8);
      --error-bg: rgba(220, 53, 69, 0.8);
+     --top-bar-bg: rgba(0, 0, 0, 0.3);
+     --preview-placeholder-bg: #3a3a3a;
+
+     --normal-shadow: 3px 3px 10px rgba(0, 0, 0, 0.3);
 }
 
 a {
@@ -46,6 +50,13 @@ body {
      background: transparent;
 }
 
+html,
+body {
+     height: 100%;
+     margin: 0;
+     overflow: hidden;
+}
+
 h1 {
      font-size: 3.2em;
      line-height: 1.1;
@@ -57,8 +68,8 @@ h1 {
 
 #app {
      width: 100%;
-     padding: 2rem;
      text-align: center;
+     min-width: 0;
 }
 
 button {
@@ -70,16 +81,18 @@ button {
      font-family: inherit;
      background-color: #1a1a1a;
      cursor: pointer;
-     transition: border-color 0.25s;
+     transition: all 0.2s;
+     user-select: none;
+     background: var(--btn-primary-bg);
 
      &:hover {
-          border-color: #646cff;
+          filter: brightness(1.2);
      }
 
-     &:focus,
-     &:focus-visible {
-          outline: 4px auto -webkit-focus-ring-color;
-     }
+     // &:focus,
+     // &:focus-visible {
+     //      outline: 4px auto -webkit-focus-ring-color;
+     // }
 
      @media (prefers-color-scheme: light) {
           background-color: #f9f9f9;
@@ -88,18 +101,18 @@ button {
 
 ::-webkit-scrollbar {
      width: 5px;
-     height: 10px;
+     height: 5px;
 
      &-track {
           background: transparent;
      }
 
      &-thumb {
-          background: #2d71c9;
+          background: var(--btn-primary-bg);
           border-radius: 5px;
 
           &:hover {
-               background: #80ffe4;
+               background: var(--btn-primary-hover-bg);
           }
      }
 
@@ -134,4 +147,13 @@ select {
           background-color: #1a1a1a;
           color: white;
      }
+}
+
+hr {
+     border: none;
+     border-top: 1px solid var(--btn-primary-hover-bg);
+}
+
+* {
+     color: var(--text-color, #fff);
 }

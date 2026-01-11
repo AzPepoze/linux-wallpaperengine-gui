@@ -35,7 +35,7 @@ interface AppConfig {
 
 const ensureInitialized = async () => {
      if (configPath && homePath && wallperBasePath) return;
-     
+
      if (!window.electronAPI) {
           throw new Error("electronAPI is not available");
      }
@@ -52,7 +52,7 @@ const ensureInitialized = async () => {
           "content",
           "431960",
      ].join("/");
-}
+};
 
 const readConfig = async (): Promise<AppConfig> => {
      try {
@@ -135,7 +135,9 @@ export const manageWallpaper = async (): Promise<{
 
                const executable = await getWallpaperExecutableLocation();
                const result = await window.electronAPI.execCommand(
-                    `${executable} ${args}`
+                    `${executable} ${args}`,
+                    [],
+                    false
                );
 
                if (result && result.pid) {
@@ -311,7 +313,9 @@ export const getScreens = async (): Promise<{
                return { success: false, error: "electronAPI is not available" };
           }
           const commandResult = await window.electronAPI.execCommand(
-               "xrandr --query"
+               "xrandr --query",
+               [],
+               false
           );
           logGui(
                "xrandr --query commandResult: " + JSON.stringify(commandResult)
