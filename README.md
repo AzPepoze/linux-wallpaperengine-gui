@@ -8,26 +8,25 @@
 </p>
 
 <p align="center">
-  <img src="https://img.shields.io/github/v/release/AzPepoze/linux-wallpaperengine-gui?style=for-the-badge&label=◈%20RELEASE%20◈&labelColor=%23181818&color=%23007bff" alt="Latest Release">
-  <img src="https://img.shields.io/github/license/AzPepoze/linux-wallpaperengine-gui?style=for-the-badge&label=◈%20LICENSE%20◈&labelColor=%23181818&color=%23007bff" alt="License">
-  <img src="https://img.shields.io/github/stars/AzPepoze/linux-wallpaperengine-gui?style=for-the-badge&label=◈%20STARS%20◈&labelColor=%23181818&color=%23007bff" alt="Stars">
-  <img src="https://img.shields.io/aur/popularity/linux-wallpaperengine-gui-git?style=for-the-badge&label=◈%20AUR%20POPULARITY%20◈&labelColor=%23181818&color=%23007bff" alt="AUR Popularity">
-  <img src="https://img.shields.io/aur/votes/linux-wallpaperengine-gui-git?style=for-the-badge&label=◈%20AUR%20VOTES%20◈&labelColor=%23181818&color=%23007bff" alt="AUR Votes">
-
+  <img src="https://img.shields.io/github/v/release/AzPepoze/linux-wallpaperengine-gui?style=for-the-badge&label=%E2%97%88%20RELEASE%20%E2%97%88&labelColor=%23181818&color=%23007bff" alt="Latest Release">
+  <img src="https://img.shields.io/github/license/AzPepoze/linux-wallpaperengine-gui?style=for-the-badge&label=%E2%97%88%20LICENSE%20%E2%97%88&labelColor=%23181818&color=%23007bff" alt="License">
+  <img src="https://img.shields.io/github/stars/AzPepoze/linux-wallpaperengine-gui?style=for-the-badge&label=%E2%97%88%20STARS%20%E2%97%88&labelColor=%23181818&color=%23007bff" alt="Stars">
+  <img src="https://img.shields.io/aur/popularity/linux-wallpaperengine-gui-git?style=for-the-badge&label=%E2%97%88%20AUR%20POPULARITY%20%E2%97%88&labelColor=%23181818&color=%23007bff" alt="AUR Popularity">
+  <img src="https://img.shields.io/aur/votes/linux-wallpaperengine-gui-git?style=for-the-badge&label=%E2%97%88%20AUR%20VOTES%20%E2%97%88&labelColor=%23181818&color=%23007bff" alt="AUR Votes">
 </p>
 
-## ◈ CONTENTS
+## CONTENTS
 
--    [Screenshots](#◈-screenshots)
--    [Features](#◈-features)
--    [Prerequisites](#◈-prerequisites)
--    [Installation](#◈-installation)
--    [Usage](#◈-usage)
--    [Build from Source](#◈-build-from-source)
--    [Development](#◈-development)
--    [Contributing](#◈-contributing)
+-    [Screenshots](#screenshots)
+-    [Features](#features)
+-    [Prerequisites](#prerequisites)
+-    [Installation](#installation)
+-    [Usage](#usage)
+-    [Build from Source](#build-from-source)
+-    [Development](#development)
+-    [Contributing](#contributing)
 
-## ◈ FEATURES
+## FEATURES
 
 -    **Wallpaper Management** – Browse and select wallpapers from your Steam Workshop content with ease.
 -    **Multi-Monitor Support** – Effortlessly choose which screen to apply wallpapers to via the top bar.
@@ -36,7 +35,7 @@
 -    **Detailed View** – Get full information about each wallpaper, including titles, descriptions, and Workshop links.
 -    **System Tray** – Minimize to the tray for seamless background operation without cluttering your workspace.
 
-## ◈ SCREENSHOTS
+## SCREENSHOTS
 
 |            Main Window            |           Main Window (List)           |
 | :-------------------------------: | :------------------------------------: |
@@ -44,12 +43,12 @@
 |         Display Settings          |                Settings                |
 | ![Details](showcase/display.png)  | ![Select Screen](showcase/setting.png) |
 
-## ◈ PREREQUISITES
+## PREREQUISITES
 
 > [!IMPORTANT]
 > This application requires [linux-wallpaperengine](https://github.com/Almamu/linux-wallpaperengine) to be installed on your system to function.
 
-## ◈ INSTALLATION
+## INSTALLATION
 
 ### Arch Linux (AUR)
 
@@ -67,7 +66,7 @@ paru -S linux-wallpaperengine-gui-git
 
 Download the latest pre-built binaries (AppImage, deb, rpm) from the [**Releases**](https://github.com/AzPepoze/linux-wallpaperengine-gui/releases/latest) page.
 
-## ◈ USAGE
+## USAGE
 
 Launch it from your application menu or via terminal:
 
@@ -79,7 +78,7 @@ linux-wallpaperengine-gui [options]
 
 -    `--minimized`: Starts the application minimized in the system tray.
 
-## ◈ BUILD FROM SOURCE
+## BUILD FROM SOURCE
 
 **Requirements:** [Node.js](https://nodejs.org/) & [pnpm](https://pnpm.io/) (preferred) or npm.
 
@@ -100,7 +99,7 @@ linux-wallpaperengine-gui [options]
 
      The output will be in the `dist` directory.
 
-## ◈ DEVELOPMENT
+## DEVELOPMENT
 
 Run with hot-reloading:
 
@@ -108,11 +107,11 @@ Run with hot-reloading:
 pnpm run dev
 ```
 
-## ◈ CONTRIBUTING
+## CONTRIBUTING
 
 Feel free to contribute to this project by opening issues or submitting pull requests.
 
-## ◈ STONKS!
+## STONKS!
 
 <div align="center">
   <a href="https://www.star-history.com/#AzPepoze/linux-wallpaperengine-gui&type=date&legend=top-left">
