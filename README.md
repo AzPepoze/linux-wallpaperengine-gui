@@ -1,65 +1,75 @@
-<h1 align="center">Linux Wallpaper Engine GUI</h1>
+<h1 align="center">
+  <img src="showcase/preview-logo.png" alt="Logo" width="128" height="128" style="border-radius: 20px;"/><br>
+  ✦ LINUX WALLPAPER ENGINE GUI ✦
+</h1>
 
-<div align="center">
-<img src="showcase/preview-logo.png" alt="Linux Wallpaper Engine GUI Logo" width="128" height="128" style="border-radius: 20px;"/>
-</div>
+<p align="center">
+  <strong>◈ A graphical user interface for managing wallpapers on Linux, powered by Electron and linux-wallpaperengine ◈</strong>
+</p>
 
-A graphical user interface for managing wallpapers on Linux, powered by Electron, Svelte, and `linux-wallpaperengine`.
+<p align="center">
+  <img src="https://img.shields.io/github/v/release/AzPepoze/linux-wallpaperengine-gui?style=for-the-badge&label=◈%20RELEASE%20◈&labelColor=%23181818&color=%23007bff" alt="Latest Release">
+  <img src="https://img.shields.io/github/license/AzPepoze/linux-wallpaperengine-gui?style=for-the-badge&label=◈%20LICENSE%20◈&labelColor=%23181818&color=%23007bff" alt="License">
+  <img src="https://img.shields.io/github/stars/AzPepoze/linux-wallpaperengine-gui?style=for-the-badge&label=◈%20STARS%20◈&labelColor=%23181818&color=%23007bff" alt="Stars">
+  <img src="https://img.shields.io/aur/popularity/linux-wallpaperengine-gui-git?style=for-the-badge&label=◈%20AUR%20POPULARITY%20◈&labelColor=%23181818&color=%23007bff" alt="AUR Popularity">
+  <img src="https://img.shields.io/aur/votes/linux-wallpaperengine-gui-git?style=for-the-badge&label=◈%20AUR%20VOTES%20◈&labelColor=%23181818&color=%23007bff" alt="AUR Votes">
 
-## Contents
+</p>
 
--    [Screenshots](#screenshots)
--    [Features](#features)
--    [Prerequisites](#prerequisites)
--    [Installation](#installation)
--    [Usage](#usage)
--    [Build from Source](#build-from-source)
--    [Development Mode](#development-mode)
--    [Contributing](#contributing)
+## ◈ CONTENTS
 
-## Screenshots
+-    [Screenshots](#◈-screenshots)
+-    [Features](#◈-features)
+-    [Prerequisites](#◈-prerequisites)
+-    [Installation](#◈-installation)
+-    [Usage](#◈-usage)
+-    [Build from Source](#◈-build-from-source)
+-    [Development](#◈-development)
+-    [Contributing](#◈-contributing)
 
-| Screen  |                  Image                   |
-| :-----: | :--------------------------------------: |
-|  Main   |    ![Main Window](showcase/main.png)     |
-| Setting | ![Settings Window](showcase/setting.png) |
+## ◈ FEATURES
 
-## Features
+-    **Wallpaper Management** – Browse and select wallpapers from your Steam Workshop content with ease.
+-    **Multi-Monitor Support** – Effortlessly choose which screen to apply wallpapers to via the top bar.
+-    **Auto-Save & Auto-Run** – Remembers your last used wallpaper and applies it automatically on startup.
+-    **Customizable Settings** – Fine-tune performance with FPS control, mute audio, or edit raw JSON config.
+-    **Detailed View** – Get full information about each wallpaper, including titles, descriptions, and Workshop links.
+-    **System Tray** – Minimize to the tray for seamless background operation without cluttering your workspace.
 
-| Feature                     | Description                                                                                                                              |
-| --------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------- |
-| **Wallpaper Management**    | Browse and select wallpapers from your Steam Workshop content.                                                                           |
-| **Multi-Monitor Support**   | Select which screen to apply a wallpaper to from a dropdown in the top bar.                                                              |
-| **Auto-Save & Auto-Run**    | Automatically saves the last used wallpaper and applies it on application startup.                                                       |
-| **Customizable Settings**   | Adjust the wallpaper's FPS and mute its audio. For advanced configuration, you can open the JSON config file directly from the settings. |
-| **Wallpaper Details**       | View detailed information about each wallpaper, including title, description, and workshop URL.                                          |
-| **System Tray Integration** | Minimize the application to the system tray for background operation.                                                                    |
+## ◈ SCREENSHOTS
 
-## Prerequisites
+|            Main Window            |           Main Window (List)           |
+| :-------------------------------: | :------------------------------------: |
+| ![Main Window](showcase/main.png) | ![Main Window](showcase/main-list.png) |
+|         Display Settings          |                Settings                |
+| ![Details](showcase/display.png)  | ![Select Screen](showcase/setting.png) |
 
--    [linux-wallpaperengine](https://github.com/Almamu/linux-wallpaperengine)
+## ◈ PREREQUISITES
 
-## Installation
+> [!IMPORTANT]
+> This application requires [linux-wallpaperengine](https://github.com/Almamu/linux-wallpaperengine) to be installed on your system to function.
 
-### Install on Arch Linux
+## ◈ INSTALLATION
 
-You can install from the [AUR](https://aur.archlinux.org/packages/linux-wallpaperengine-gui-git):
+### Arch Linux (AUR)
+
+Install using your favorite AUR helper:
 
 ```bash
-yay -S linux-wallpaperengine-gui
+# Using yay
+yay -S linux-wallpaperengine-gui-git
+
+# Using paru
+paru -S linux-wallpaperengine-gui-git
 ```
 
-Or with another AUR helper like `paru`:
+### Other Distributions
 
-```bash
-paru -S linux-wallpaperengine-gui
-```
+Download the latest pre-built binaries (AppImage, deb, rpm) from the [**Releases**](https://github.com/AzPepoze/linux-wallpaperengine-gui/releases/latest) page.
 
-### Install on Other Linux Distributions
+## ◈ USAGE
 
--    You can download pre-built binaries for various Linux distributions directly from the GitHub [Releases page](https://github.com/AzPepoze/linux-wallpaperengine-gui/releases/latest).
-
-## Usage
+Launch it from your application menu or via terminal:
 
 ```bash
 linux-wallpaperengine-gui [options]
@@ -69,50 +79,50 @@ linux-wallpaperengine-gui [options]
 
 -    `--minimized`: Starts the application minimized in the system tray.
 
-## Build from Source
+## ◈ BUILD FROM SOURCE
 
--    **Prerequisites:**
-     -    Ensure you have Node.js and (npm or pnpm) installed.
+**Requirements:** [Node.js](https://nodejs.org/) & [pnpm](https://pnpm.io/) (preferred) or npm.
 
-1. **Clone the repository:**
-
+1. **Clone & Enter:**
      ```bash
      git clone https://github.com/AzPepoze/linux-wallpaperengine-gui
      cd linux-wallpaperengine-gui
      ```
-
-2. **Install dependencies:**
+2. **Install Deps:**
+     ```bash
+     pnpm install
+     ```
+3. **Build:**
 
      ```bash
-       npm install
+     pnpm run build
      ```
 
-3. **Build the application:**
+     The output will be in the `dist` directory.
 
-     ```bash
-       npm run build
-     ```
+## ◈ DEVELOPMENT
 
-     This will create a distributable in the `dist` (or `release`) directory.
-
-## Development Mode
-
--    To run the application with hot-reloading for development:
+Run with hot-reloading:
 
 ```bash
-   npm run dev
+pnpm run dev
 ```
 
-## Contributing
+## ◈ CONTRIBUTING
 
 Feel free to contribute to this project by opening issues or submitting pull requests.
 
-## Stonks!
+## ◈ STONKS!
 
-<a href="https://www.star-history.com/#AzPepoze/linux-wallpaperengine-gui&type=date&legend=top-left">
- <picture>
-   <source media="(prefers-color-scheme: dark)" srcset="https://api.star-history.com/svg?repos=AzPepoze/linux-wallpaperengine-gui&type=date&theme=dark&legend=top-left" />
-   <source media="(prefers-color-scheme: light)" srcset="https://api.star-history.com/svg?repos=AzPepoze/linux-wallpaperengine-gui&type=date&legend=top-left" />
-   <img alt="Star History Chart" src="https://api.star-history.com/svg?repos=AzPepoze/linux-wallpaperengine-gui&type=date&legend=top-left" />
- </picture>
-</a>
+<div align="center">
+  <a href="https://www.star-history.com/#AzPepoze/linux-wallpaperengine-gui&type=date&legend=top-left">
+    <picture>
+      <source media="(prefers-color-scheme: dark)" srcset="https://api.star-history.com/svg?repos=AzPepoze/linux-wallpaperengine-gui&type=date&theme=dark&legend=top-left" />
+      <source media="(prefers-color-scheme: light)" srcset="https://api.star-history.com/svg?repos=AzPepoze/linux-wallpaperengine-gui&type=date&legend=top-left" />
+      <img alt="Star History Chart" src="https://api.star-history.com/svg?repos=AzPepoze/linux-wallpaperengine-gui&type=date&legend=top-left" width="600" />
+    </picture>
+  </a>
+  <br>
+  <br>
+  <strong>✦ Made with ♥︎ by AzPepoze ✦</strong>
+</div>
