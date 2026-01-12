@@ -51,16 +51,16 @@
           box-sizing: border-box;
           flex-shrink: 0;
           min-height: 60px;
-          background: var(--top-bar-bg);
+          // background: var(--top-bar-bg);
           border-radius: 0 0 12px 12px;
      }
 
      .center-actions {
           display: flex;
           gap: 12px;
-          background: rgba(255, 255, 255, 0.05);
+          // background: rgba(255, 255, 255, 0.05);
           padding: 6px;
           border-radius: 12px;
-          border: 1px solid rgba(255, 255, 255, 0.1);
+          // border: 1px solid rgba(255, 255, 255, 0.1);
      }
 </style>

@@ -31,7 +31,7 @@ interface AppConfig {
      disableParticles?: boolean;
      noFullscreenPause?: boolean;
      customExecutableLocation?: string;
-     singleWallpaperMode?: boolean;
+     cloneMode?: boolean;
      globalWallpaper?: string | null;
 }
 
@@ -106,7 +106,7 @@ export const manageWallpaper = async (): Promise<{
 
           for (const screen of screens) {
                let targetWallpaper = screen.wallpaper;
-               if (config.singleWallpaperMode && config.globalWallpaper) {
+               if (config.cloneMode && config.globalWallpaper) {
                     targetWallpaper = config.globalWallpaper;
                }
 
@@ -280,7 +280,7 @@ export const setWallpaper = async (
      }
 
      const updateData: Partial<AppConfig> = { screens };
-     if (config.singleWallpaperMode) {
+     if (config.cloneMode) {
           updateData.globalWallpaper = wallpaperFolderName;
      }
 
@@ -288,13 +288,13 @@ export const setWallpaper = async (
      return await manageWallpaper();
 };
 
-export const toggleSingleWallpaperMode = async (
+export const toggleCloneMode = async (
      enabled: boolean,
      globalWallpaper?: string | null
 ) => {
      const config = await readConfig();
      const updateData: Partial<AppConfig> = {
-          singleWallpaperMode: enabled,
+          cloneMode: enabled,
      };
 
      if (globalWallpaper !== undefined) {

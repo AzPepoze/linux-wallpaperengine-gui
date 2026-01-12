@@ -4,7 +4,7 @@ import { logGui } from "../../backend/logger";
 
 export const screens = writable<Record<string, string | null>>({});
 export const selectedScreen = writable<string | null>(null);
-export const singleWallpaperMode = writable<boolean>(false);
+export const cloneMode = writable<boolean>(false);
 
 export async function refreshScreens() {
      logGui("Refreshing screens...");
@@ -32,7 +32,7 @@ export async function refreshScreens() {
 
      const configResult = await wallpaperManager.getConfig();
      if (configResult.success) {
-          singleWallpaperMode.set(configResult.singleWallpaperMode || false);
+          cloneMode.set(configResult.cloneMode || false);
 
           if (configResult.screens) {
                configResult.screens.forEach((s: any) => {
@@ -86,14 +86,11 @@ export async function applyWallpaperToAllDisplays(wallpaperFolderName: string) {
      }
 }
 
-export async function toggleSingleMode(
+export async function toggleCloneMode(
      enabled: boolean,
      currentWallpaper?: string | null,
 ) {
-     await wallpaperManager.toggleSingleWallpaperMode(
-          enabled,
-          currentWallpaper,
-     );
+     await wallpaperManager.toggleCloneMode(enabled, currentWallpaper);
      await refreshScreens();
 }
 

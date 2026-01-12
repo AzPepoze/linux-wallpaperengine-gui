@@ -19,64 +19,98 @@
 	}
 </script>
 
-<div class="browse">
-	<input
-		type="text"
-		class="path-input"
-		bind:value={location}
-		onblur={handleBlur}
-		{placeholder}
-	/>
-	<button class="select-btn" onclick={select}> Browse </button>
+<div class="browse-container">
+	<div class="input-group">
+		<input
+			type="text"
+			class="path-input"
+			bind:value={location}
+			onblur={handleBlur}
+			{placeholder}
+		/>
+		<button class="browse-btn" onclick={select}>
+			<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+				<path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"></path>
+			</svg>
+			<span>Browse</span>
+		</button>
+	</div>
 </div>
 
 <style lang="scss">
-	.browse {
+	.browse-container {
+		width: 100%;
+		display: flex;
+		min-width: 0;
+	}
+
+	.input-group {
 		display: flex;
 		width: 100%;
-		gap: 10px;
-		align-items: center;
-		min-width: 0;
+		background-color: rgba(255, 255, 255, 0.03);
+		border: 1px solid rgba(255, 255, 255, 0.08);
+		border-radius: 12px;
+		overflow: hidden;
+		transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+
+		&:hover {
+			border-color: rgba(255, 255, 255, 0.15);
+			background-color: rgba(255, 255, 255, 0.05);
+		}
+
+		&:focus-within {
+			border-color: var(--btn-primary-bg, #007bff);
+			box-shadow: 0 0 0 3px rgba(0, 123, 255, 0.15);
+			background-color: rgba(255, 255, 255, 0.08);
+		}
 	}
 
 	.path-input {
 		flex: 1;
 		min-width: 0;
-		padding: 8px 12px;
-		border: 1px solid rgba(255, 255, 255, 0.2);
-		border-radius: 6px;
-		background-color: rgba(255, 255, 255, 0.1);
+		padding: 12px 16px;
+		border: none;
+		background: transparent;
 		color: #fff;
 		font-family: inherit;
 		font-size: 0.9em;
-		transition: all 0.2s;
 		text-overflow: ellipsis;
-
-		&:hover {
-			filter: brightness(1.2);
-		}
 
 		&:focus {
 			outline: none;
-			border-color: var(--btn-primary-bg, #007bff);
-			background-color: rgba(255, 255, 255, 0.15);
+		}
+
+		&::placeholder {
+			color: rgba(255, 255, 255, 0.25);
 		}
 	}
 
-	.select-btn {
-		padding: 8px 16px;
-		border-radius: 6px;
-		background-color: var(--btn-primary-bg, #007bff);
-		color: white;
-		border: 1px solid rgba(255, 255, 255, 0.1);
+	.browse-btn {
+		display: flex;
+		align-items: center;
+		gap: 8px;
+		padding: 0 20px;
+		background-color: rgba(255, 255, 255, 0.05);
+		color: rgba(255, 255, 255, 0.9);
+		border: none;
+		border-left: 1px solid rgba(255, 255, 255, 0.08);
 		cursor: pointer;
-		font-size: 0.9em;
+		font-size: 0.85em;
+		font-weight: 600;
 		transition: all 0.2s;
 		white-space: nowrap;
 
 		&:hover {
-			filter: brightness(1.2);
-			border-color: rgba(255, 255, 255, 0.3);
+			background-color: var(--btn-primary-bg, #007bff);
+			color: #fff;
+		}
+
+		&:active {
+			filter: brightness(0.9);
+		}
+
+		svg {
+			opacity: 0.7;
 		}
 	}
 </style>

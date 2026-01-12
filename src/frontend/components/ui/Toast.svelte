@@ -1,0 +1,51 @@
+<script lang="ts">
+     import { fly } from "svelte/transition";
+     import { quintOut, quintIn } from "svelte/easing";
+
+     export let message: string;
+     export let type: "success" | "error" = "success";
+</script>
+
+<div
+     class="toast"
+     class:success={type === "success"}
+     class:error={type === "error"}
+     in:fly={{ y: 30, duration: 400, easing: quintOut }}
+     out:fly={{ y: 20, duration: 300, easing: quintIn, opacity: 0 }}
+>
+     {message}
+</div>
+
+<style lang="scss">
+     .toast {
+          position: fixed;
+          bottom: 32px;
+          right: 32px;
+          padding: 14px 28px;
+          border-radius: 12px;
+          font-weight: 600;
+          font-size: 0.95em;
+          backdrop-filter: blur(10px);
+          z-index: 1000;
+          box-shadow: 0 8px 24px rgba(0, 0, 0, 0.2);
+          transition: transform 0.2s ease;
+
+          &:hover {
+               transform: translateY(-2px);
+          }
+
+          &.success {
+               background: rgba(40, 167, 69, 0.25);
+               color: #4ade80;
+               border: 1px solid rgba(40, 167, 69, 0.4);
+               box-shadow: 0 8px 24px rgba(40, 167, 69, 0.15);
+          }
+
+          &.error {
+               background: rgba(220, 53, 69, 0.25);
+               color: #ef4444;
+               border: 1px solid rgba(220, 53, 69, 0.4);
+               box-shadow: 0 8px 24px rgba(220, 53, 69, 0.15);
+          }
+     }
+</style>

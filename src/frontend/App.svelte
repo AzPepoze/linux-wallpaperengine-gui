@@ -16,6 +16,8 @@
      import * as display from "./scripts/display";
      import { screens, selectedScreen } from "./scripts/display";
      import LogsPopup from "./components/LogsPopup.svelte";
+     import Toast from "./components/ui/Toast.svelte";
+     import { toastStore } from "./scripts/settings";
 
      let wallpapers: Record<string, WallpaperData> = {};
      let error: string | null = null;
@@ -132,7 +134,10 @@
           if ($selectedScreen) {
                await wallpaperManager.setWallpaper($selectedScreen, folderName);
                activeFolderName = folderName;
-               screens.update(s => ({ ...s, [$selectedScreen as string]: folderName }));
+               screens.update((s) => ({
+                    ...s,
+                    [$selectedScreen as string]: folderName,
+               }));
           } else {
                console.warn("No screen selected for configuration.");
           }
@@ -167,9 +172,7 @@
                                    class="display-manager-wrapper"
                                    transition:customSlide={{ duration: 400 }}
                               >
-                                   <DisplayManager
-                                        {wallpapers}
-                                   />
+                                   <DisplayManager {wallpapers} />
                               </div>
                          {/if}
 
@@ -203,11 +206,15 @@
                     in:scale={pageTransitionInParams}
                     out:scale={pageTransitionOutParams}
                >
-                    <Settings full={true} />
+                    <Settings />
                </div>
           {/if}
      </div>
 </div>
+
+{#if $toastStore}
+     <Toast message={$toastStore.message} type={$toastStore.type} />
+{/if}
 
 <style lang="scss">
      .view-container {

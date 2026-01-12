@@ -8,11 +8,7 @@
      import WallpaperItemGrid from "./WallpaperItemGrid.svelte";
      import WallpaperItemList from "./WallpaperItemList.svelte";
      import { showDisplayManager } from "../scripts/ui";
-     import {
-          applyWallpaperToAllDisplays,
-          singleWallpaperMode,
-          toggleSingleMode,
-     } from "../scripts/display";
+     import { cloneMode, toggleCloneMode } from "../scripts/display";
 
      export let wallpapers: Record<string, WallpaperData> = {};
      export let activeWallpaper: Wallpaper | null = null;
@@ -31,9 +27,9 @@
           onSelect(folderName, wallpaper);
      }
 
-     async function handleToggleSingleMode() {
-          const newMode = !$singleWallpaperMode;
-          await toggleSingleMode(
+     async function handleToggleCloneMode() {
+          const newMode = !$cloneMode;
+          await toggleCloneMode(
                newMode,
                selectedWallpaper?.folderName || activeWallpaper?.folderName,
           );
@@ -54,10 +50,10 @@
                          >
                     </div>
                {/if}
-               {#if selectedScreen || $singleWallpaperMode}
+               {#if selectedScreen || $cloneMode}
                     <div class="status-item">
                          <span class="label">DISPLAY :</span>
-                         <span class="value">{$singleWallpaperMode ? "ALL" : selectedScreen}</span>
+                         <span class="value">{$cloneMode ? "ALL" : selectedScreen}</span>
 
                          <Button
                               variant={$showDisplayManager
@@ -73,15 +69,13 @@
                          </Button>
 
                          <Button
-                              variant={$singleWallpaperMode
-                                   ? "primary"
-                                   : "secondary"}
-                              on:click={handleToggleSingleMode}
-                              title="Single Wallpaper Mode (Apply to all displays)"
+                              variant={$cloneMode ? "primary" : "secondary"}
+                              on:click={handleToggleCloneMode}
+                              title="Clone mode (Apply to all displays)"
                               style="padding: 8px; margin-right: 10px; border-radius: 10px;"
                          >
                               <ApplyAllIcon width="20" height="20" />
-                              <span>Single Wallpaper</span>
+                              <span>Clone mode</span>
                          </Button>
                     </div>
                {/if}

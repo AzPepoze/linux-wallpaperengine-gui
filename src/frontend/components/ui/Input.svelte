@@ -7,7 +7,7 @@
      export let max: number | undefined = undefined;
 </script>
 
-<div>
+<div class="input-wrapper">
      <input
           {type}
           {id}
@@ -21,31 +21,37 @@
      />
 </div>
 
-<style>
-     div {
+<style lang="scss">
+     .input-wrapper {
           width: 100%;
-          min-width: 100%;
+          display: flex;
      }
 
      input {
           width: 100%;
-          flex: 1;
-          padding: 8px 12px;
-          border: 1px solid var(--input-border-color, rgba(255, 255, 255, 0.2));
-          border-radius: 6px;
-          background-color: var(--input-bg-color, rgba(255, 255, 255, 0.1));
-          color: var(--input-text-color, #fff);
+          padding: 10px 14px;
+          border: 1px solid rgba(255, 255, 255, 0.08);
+          border-radius: 10px;
+          background-color: rgba(255, 255, 255, 0.03);
+          color: #fff;
+          font-size: 0.9em;
           box-sizing: border-box;
-          transition: all 0.2s;
-     }
+          transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
 
-     input:hover {
-          filter: brightness(1.2);
-     }
+          &:hover {
+               background-color: rgba(255, 255, 255, 0.05);
+               border-color: rgba(255, 255, 255, 0.15);
+          }
 
-     input:focus {
-          outline: none;
-          border-color: var(--btn-primary-bg, #007bff);
-          background-color: rgba(255, 255, 255, 0.2);
+          &:focus {
+               outline: none;
+               border-color: var(--btn-primary-bg, #007bff);
+               background-color: rgba(255, 255, 255, 0.08);
+               box-shadow: 0 0 0 3px rgba(0, 123, 255, 0.15);
+          }
+
+          &::placeholder {
+               color: rgba(255, 255, 255, 0.25);
+          }
      }
 </style>

@@ -1,0 +1,174 @@
+import { writable } from "svelte/store";
+import type { Writable } from "svelte/store";
+import {
+     getConfig,
+     saveConfig,
+     openConfigInEditor,
+} from "../../backend/wallpaperManager";
+import { EXECUTABLE_NAME } from "../../shared/constants";
+
+// Toast Management
+export interface ToastMessage {
+     message: string;
+     type: "success" | "error";
+}
+
+export const toastStore: Writable<ToastMessage | null> = writable(null);
+
+export function showToast(
+     message: string,
+     type: "success" | "error" = "success",
+     duration: number = 3000
+) {
+     toastStore.set({ message, type });
+     setTimeout(() => {
+          toastStore.set(null);
+     }, duration);
+}
+
+export function clearToast() {
+     toastStore.set(null);
+}
+
+// Helper function for error handling
+function getErrorMessage(error: unknown): string {
+     return error instanceof Error ? error.message : String(error);
+}
+
+// Settings State Management
+export interface SettingsState {
+     [key: string]: any; // Index signature to allow dynamic access
+     fps: number;
+     silence: boolean;
+     customArgs: string;
+     customArgsEnabled: boolean;
+     volume: number;
+     noAutomute: boolean;
+     noAudioProcessing: boolean;
+     scaling: string;
+     clamping: string;
+     disableMouse: boolean;
+     disableParallax: boolean;
+     noFullscreenPause: boolean;
+     disableParticles: boolean;
+     binaryLocation: string;
+}
+
+// Default settings values
+const defaultSettings: SettingsState = {
+     fps: 60,
+     silence: false,
+     customArgs: "",
+     customArgsEnabled: false,
+     volume: 100,
+     noAutomute: false,
+     noAudioProcessing: false,
+     scaling: "default",
+     clamping: "clamp",
+     disableMouse: false,
+     disableParallax: false,
+     noFullscreenPause: false,
+     disableParticles: false,
+     binaryLocation: "",
+};
+
+export const settingsStore: Writable<SettingsState> = writable(defaultSettings);
+
+const configFieldMap: Record<string, string> = {
+     fps: "FPS",
+     silence: "SILENCE",
+     customArgs: "customArgs",
+     customArgsEnabled: "customArgsEnabled",
+     volume: "volume",
+     noAutomute: "noAutomute",
+     noAudioProcessing: "noAudioProcessing",
+     scaling: "scaling",
+     clamping: "clamping",
+     disableMouse: "disableMouse",
+     disableParallax: "disableParallax",
+     noFullscreenPause: "noFullscreenPause",
+     disableParticles: "disableParticles",
+     binaryLocation: "customExecutableLocation",
+};
+
+// Settings Actions
+export async function loadSettings(): Promise<void> {
+     try {
+          const config = await getConfig();
+          if (config.success) {
+               const settings: SettingsState = { ...defaultSettings };
+
+               // Map config values to settings
+               for (const [key, configKey] of Object.entries(configFieldMap)) {
+                    const configValue = (config as any)[configKey];
+                    if (configValue !== undefined) {
+                         settings[key] = configValue;
+                    }
+               }
+
+               settingsStore.set(settings);
+          } else {
+               showToast(`Error loading config: ${config.error}`, "error");
+          }
+     } catch (e) {
+          showToast(`Error loading config: ${getErrorMessage(e)}`, "error");
+     }
+}
+
+export async function saveSettings(settings: SettingsState): Promise<void> {
+     try {
+          // Map settings to config object
+          const configData: Record<string, any> = {};
+          for (const [key, configKey] of Object.entries(configFieldMap)) {
+               configData[configKey] = settings[key];
+          }
+
+          const result = await saveConfig(configData);
+          if (result.success) {
+               showToast("Settings saved successfully!", "success");
+          } else {
+               showToast(`Error saving settings: ${result.error}`, "error");
+          }
+     } catch (e) {
+          showToast(`Error saving settings: ${getErrorMessage(e)}`, "error");
+     }
+}
+
+export async function openConfigFile(): Promise<void> {
+     try {
+          const result = await openConfigInEditor();
+          if (result.success) {
+               showToast("Config file opened!", "success");
+          } else {
+               showToast(
+                    `Failed to open config file: ${result.error}`,
+                    "error"
+               );
+          }
+     } catch (e) {
+          showToast(
+               `Failed to open config file: ${getErrorMessage(e)}`,
+               "error"
+          );
+     }
+}
+
+export async function validateBinaryFile(path: string): Promise<boolean> {
+     if (!path) return true;
+
+     const exists = await window.electronAPI.fsExists(path);
+     if (!exists) {
+          alert("The selected file does not exist or is not accessible.");
+          return false;
+     }
+
+     const fileName = path.split("/").pop();
+     if (fileName !== EXECUTABLE_NAME) {
+          const confirmSelection = confirm(
+               `The selected file "${fileName}" does not match the expected name "${EXECUTABLE_NAME}". Are you sure you want to use this file?`
+          );
+          return confirmSelection;
+     }
+
+     return true;
+}

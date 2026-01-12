@@ -1,13 +1,13 @@
 <script lang="ts">
      import { onMount } from "svelte";
+     import { clearAllWallpapers } from "../../backend/wallpaperManager";
      import {
-          getConfig,
-          saveConfig,
-          openConfigInEditor,
-          clearAllWallpapers,
-     } from "../../backend/wallpaperManager";
-     import { EXECUTABLE_NAME } from "../../shared/constants";
-     import Fullscreen from "./ui/Fullscreen.svelte";
+          settingsStore,
+          loadSettings,
+          saveSettings,
+          openConfigFile,
+          validateBinaryFile,
+     } from "../scripts/settings";
 
      import SettingsSection from "./settings/SettingsSection.svelte";
      import SettingItem from "./ui/SettingItem.svelte";
@@ -16,38 +16,36 @@
      import Select from "./ui/Select.svelte";
      import Range from "./ui/Range.svelte";
      import Browse from "./ui/Browse.svelte";
+     // Icons
+     import DisplayIcon from "../icons/DisplayIcon.svelte";
+     import AudioIcon from "../icons/AudioIcon.svelte";
+     import MouseIcon from "../icons/MouseIcon.svelte";
+     import SettingIcon from "../icons/SettingIcon.svelte";
+     import FolderIcon from "../icons/FolderIcon.svelte";
 
-     export let onClose: () => void = () => {};
-     export let full: boolean = false;
+     const scalingOptions = [
+          { value: "default", label: "Default" },
+          { value: "stretch", label: "Stretch" },
+          { value: "fit", label: "Fit" },
+          { value: "fill", label: "Fill" },
+     ];
 
-     let fps: number = 60;
-     let silence: boolean = false;
-     let customArgs: string = "";
-     let customArgsEnabled: boolean = false;
-     let volume: number = 100;
-     let noAutomute: boolean = false;
-     let noAudioProcessing: boolean = false;
-     let scaling: string = "default";
-     let clamping: string = "clamp";
-     let disableMouse: boolean = false;
-     let disableParallax: boolean = false;
-     let noFullscreenPause: boolean = false;
-     let disableParticles: boolean = false;
-
-     let message: string | null = null;
-     let messageType: "success" | "error" | null = null;
-     let binaryLocation: string = "";
+     const clampingOptions = [
+          { value: "clamp", label: "Clamp" },
+          { value: "border", label: "Border" },
+          { value: "repeat", label: "Repeat" },
+     ];
 
      const sections = [
-          { id: "general", label: "General" },
-          { id: "audio", label: "Audio" },
-          { id: "interaction", label: "Interaction" },
-          { id: "advanced", label: "Advanced" },
-          { id: "executable", label: "Executable" },
+          { id: "general", label: "General", icon: DisplayIcon },
+          { id: "audio", label: "Audio", icon: AudioIcon },
+          { id: "interaction", label: "Interaction", icon: MouseIcon },
+          { id: "advanced", label: "Advanced", icon: SettingIcon },
+          { id: "executable", label: "Executable", icon: FolderIcon },
      ];
 
      let activeSection = "general";
-     let contentElement: HTMLDivElement;
+     let contentElement: HTMLElement;
 
      function scrollToSection(id: string) {
           activeSection = id;
@@ -58,7 +56,7 @@
      }
 
      onMount(async () => {
-          if (full && contentElement) {
+          if (contentElement) {
                const observer = new IntersectionObserver(
                     (entries) => {
                          entries.forEach((entry) => {
@@ -79,452 +77,255 @@
                });
           }
 
-          try {
-               const config = await getConfig();
-               if (config.success) {
-                    fps = config.FPS || 60;
-                    silence = config.SILENCE || false;
-                    customArgs = config.customArgs || "";
-                    customArgsEnabled = config.customArgsEnabled || false;
-                    volume = config.volume ?? 100;
-                    noAutomute = config.noAutomute || false;
-                    noAudioProcessing = config.noAudioProcessing || false;
-                    scaling = config.scaling || "default";
-                    clamping = config.clamping || "clamp";
-                    disableMouse = config.disableMouse || false;
-                    disableParallax = config.disableParallax || false;
-                    noFullscreenPause = config.noFullscreenPause || false;
-                    binaryLocation = config.customExecutableLocation || "";
-                    disableParticles = config.disableParticles || false;
-               } else {
-                    message = `Error loading config: ${config.error}`;
-                    messageType = "error";
-               }
-          } catch (e) {
-               message = `Error loading config: ${e instanceof Error ? e.message : String(e)}`;
-               messageType = "error";
-          }
+          await loadSettings();
      });
 
      const onSelectBinFile = async (path: string) => {
-          if (!path) return;
-
-          const exists = await window.electronAPI.fsExists(path);
-          if (!exists) {
-               alert("The selected file does not exist or is not accessible.");
-               binaryLocation = "";
-               return;
-          }
-
-          const fileName = path.split("/").pop();
-          if (fileName !== EXECUTABLE_NAME) {
-               const confirmSelection = confirm(
-                    `The selected file "${fileName}" does not match the expected name "${EXECUTABLE_NAME}". Are you sure you want to use this file?`,
-               );
-               if (!confirmSelection) {
-                    binaryLocation = "";
-               }
+          const isValid = await validateBinaryFile(path);
+          if (!isValid) {
+               $settingsStore.binaryLocation = "";
           }
      };
 
-     const saveSettings = async () => {
-          try {
-               const result = await saveConfig({
-                    FPS: fps,
-                    SILENCE: silence,
-                    customArgs,
-                    customArgsEnabled,
-                    volume,
-                    noAutomute,
-                    noAudioProcessing,
-                    scaling,
-                    clamping,
-                    disableMouse,
-                    disableParallax,
-                    disableParticles,
-                    noFullscreenPause,
-                    customExecutableLocation: binaryLocation,
-               });
-               if (result.success) {
-                    message = "Settings saved successfully!";
-                    messageType = "success";
-               } else {
-                    message = `Error saving settings: ${result.error}`;
-                    messageType = "error";
-               }
-          } catch (e) {
-               message = `Error saving settings: ${e instanceof Error ? e.message : String(e)}`;
-               messageType = "error";
-          }
+     const handleSaveSettings = async () => {
+          await saveSettings($settingsStore);
      };
 
-     const openConfig = async () => {
-          try {
-               const result = await openConfigInEditor();
-               if (result.success) {
-                    message = "Config file opened!";
-                    messageType = "success";
-               } else {
-                    message = `Failed to open config file: ${result.error}`;
-                    messageType = "error";
-               }
-          } catch (e) {
-               message = `Failed to open config file: ${e instanceof Error ? e.message : String(e)}`;
-               messageType = "error";
-          }
+     const handleOpenConfig = async () => {
+          await openConfigFile();
      };
-
-     const scalingOptions = [
-          { value: "default", label: "Default" },
-          { value: "stretch", label: "Stretch" },
-          { value: "fit", label: "Fit" },
-          { value: "fill", label: "Fill" },
-     ];
-
-     const clampingOptions = [
-          { value: "clamp", label: "Clamp" },
-          { value: "border", label: "Border" },
-          { value: "repeat", label: "Repeat" },
-     ];
 </script>
 
-{#if full}
-     <div class="settings-layout">
-          <nav class="settings-nav">
-               <div class="nav-header">
-                    <h2>Settings</h2>
-               </div>
-               <div class="nav-links">
-                    {#each sections as section}
-                         <button
-                              class="nav-link"
-                              class:active={activeSection === section.id}
-                              on:click={() => scrollToSection(section.id)}
-                         >
-                              {section.label}
-                         </button>
-                    {/each}
-               </div>
-
-               <div class="nav-footer">
+<div class="settings-container">
+     <aside class="settings-sidebar">
+          <div class="sidebar-header">
+               <h2>Settings</h2>
+               <p>Configure your experience</p>
+          </div>
+          <nav class="sidebar-nav">
+               {#each sections as section}
                     <button
-                         class="btn btn-primary w-full"
-                         on:click={saveSettings}>Save Changes</button
+                         class="nav-item"
+                         class:active={activeSection === section.id}
+                         on:click={() => scrollToSection(section.id)}
                     >
-                    <button
-                         class="btn btn-secondary w-full"
-                         on:click={openConfig}>Open Config</button
-                    >
-                    <button
-                         class="btn btn-secondary w-full"
-                         on:click={clearAllWallpapers}>Clear All</button
-                    >
-               </div>
+                         <svelte:component
+                              this={section.icon}
+                              width="18"
+                              height="18"
+                         />
+                         <span>{section.label}</span>
+                    </button>
+               {/each}
           </nav>
 
-          <div class="settings-content" bind:this={contentElement}>
-               <div class="sections-list">
-                    <SettingsSection title="General" id="general">
-                         <SettingItem label="FPS" id="fps">
-                              <Input
-                                   type="number"
-                                   id="fps"
-                                   bind:value={fps}
-                                   min={1}
-                              />
-                         </SettingItem>
-
-                         <SettingItem label="Scaling Mode" id="scaling">
-                              <Select
-                                   id="scaling"
-                                   bind:value={scaling}
-                                   options={scalingOptions}
-                              />
-                         </SettingItem>
-
-                         <SettingItem label="Clamping Mode" id="clamping">
-                              <Select
-                                   id="clamping"
-                                   bind:value={clamping}
-                                   options={clampingOptions}
-                              />
-                         </SettingItem>
-
-                         <SettingItem
-                              label="No Fullscreen Pause"
-                              id="noFullscreenPause"
-                         >
-                              <Toggle
-                                   id="noFullscreenPause"
-                                   bind:checked={noFullscreenPause}
-                              />
-                         </SettingItem>
-
-                         <SettingItem
-                              label="Disable particles"
-                              id="disableParticles"
-                         >
-                              <Toggle
-                                   id="disableParticles"
-                                   bind:checked={disableParticles}
-                              />
-                         </SettingItem>
-                    </SettingsSection>
-
-                    <SettingsSection title="Audio" id="audio">
-                         <SettingItem label="Silence Wallpaper" id="silence">
-                              <Toggle id="silence" bind:checked={silence} />
-                         </SettingItem>
-
-                         {#if !silence}
-                              <SettingItem
-                                   label="Volume ({volume}%)"
-                                   id="volume"
-                              >
-                                   <Range
-                                        id="volume"
-                                        bind:value={volume}
-                                        min={0}
-                                        max={100}
-                                   />
-                              </SettingItem>
-
-                              <SettingItem label="No Automute" id="noAutomute">
-                                   <Toggle
-                                        id="noAutomute"
-                                        bind:checked={noAutomute}
-                                   />
-                              </SettingItem>
-
-                              <SettingItem
-                                   label="No Audio Processing"
-                                   id="noAudioProcessing"
-                              >
-                                   <Toggle
-                                        id="noAudioProcessing"
-                                        bind:checked={noAudioProcessing}
-                                   />
-                              </SettingItem>
-                         {/if}
-                    </SettingsSection>
-
-                    <SettingsSection title="Interaction" id="interaction">
-                         <SettingItem label="Disable Mouse" id="disableMouse">
-                              <Toggle
-                                   id="disableMouse"
-                                   bind:checked={disableMouse}
-                              />
-                         </SettingItem>
-
-                         <SettingItem
-                              label="Disable Parallax"
-                              id="disableParallax"
-                         >
-                              <Toggle
-                                   id="disableParallax"
-                                   bind:checked={disableParallax}
-                              />
-                         </SettingItem>
-                    </SettingsSection>
-
-                    <SettingsSection title="Advanced" id="advanced">
-                         <SettingItem
-                              label="Enable Custom Arguments"
-                              id="customArgsEnabled"
-                         >
-                              <Toggle
-                                   id="customArgsEnabled"
-                                   bind:checked={customArgsEnabled}
-                              />
-                         </SettingItem>
-
-                         {#if customArgsEnabled}
-                              <SettingItem
-                                   label="Custom Command Args"
-                                   id="customArgs"
-                                   vertical
-                              >
-                                   <Input
-                                        type="text"
-                                        id="customArgs"
-                                        bind:value={customArgs}
-                                        placeholder="e.g. --window 1920x1080"
-                                   />
-                                   <p class="help-text">
-                                        Refer to
-                                        <a
-                                             href="https://github.com/Almamu/linux-wallpaperengine?tab=readme-ov-file#-common-options"
-                                             target="_blank"
-                                             rel="noopener noreferrer"
-                                             >linux-wallpaperengine common
-                                             options</a
-                                        >
-                                        for available arguments.
-                                   </p>
-                              </SettingItem>
-                         {/if}
-                    </SettingsSection>
-
-                    <SettingsSection
-                         title="Executable Location"
-                         id="executable"
-                    >
-                         <Browse
-                              bind:location={binaryLocation}
-                              onSelect={onSelectBinFile}
-                              placeholder="Path to linux-wallpaperengine binary... (Leave empty to use system PATH)"
-                         />
-                    </SettingsSection>
-               </div>
-
-               {#if message}
-                    <div
-                         class="message"
-                         class:success={messageType === "success"}
-                         class:error={messageType === "error"}
-                    >
-                         {message}
-                    </div>
-               {/if}
+          <div class="sidebar-actions">
+               <button class="action-btn primary" on:click={handleSaveSettings}>
+                    Save Changes
+               </button>
+               <button class="action-btn secondary" on:click={handleOpenConfig}>
+                    Open Config
+               </button>
+               <button class="action-btn danger" on:click={clearAllWallpapers}>
+                    Clear All
+               </button>
           </div>
-     </div>
-{:else}
-     <Fullscreen {onClose}>
-          <div class="settings-inner">
-               <button class="close-btn" on:click={onClose} aria-label="Close"
-                    >&times;</button
+     </aside>
+
+     <main class="settings-main" bind:this={contentElement}>
+          <div class="content-wrapper">
+               <SettingsSection
+                    title="General"
+                    id="general"
+                    description="Basic wallpaper engine behavior and performance."
                >
+                    <SettingItem
+                         label="FPS Limit"
+                         id="fps"
+                         description="Target frames per second for animations."
+                    >
+                         <Input
+                              type="number"
+                              id="fps"
+                              bind:value={$settingsStore.fps}
+                              min={1}
+                         />
+                    </SettingItem>
 
-               <div class="header">
-                    <h2>Settings</h2>
-               </div>
+                    <SettingItem
+                         label="Scaling Mode"
+                         id="scaling"
+                         description="How the wallpaper fits the screen."
+                    >
+                         <Select
+                              id="scaling"
+                              bind:value={$settingsStore.scaling}
+                              options={scalingOptions}
+                         />
+                    </SettingItem>
 
-               <div class="settings-grid">
-                    <SettingsSection title="General">
-                         <SettingItem label="FPS" id="fps">
-                              <Input
-                                   type="number"
-                                   id="fps"
-                                   bind:value={fps}
-                                   min={1}
-                              />
-                         </SettingItem>
+                    <SettingItem
+                         label="Clamping Mode"
+                         id="clamping"
+                         description="Texture wrapping behavior."
+                    >
+                         <Select
+                              id="clamping"
+                              bind:value={$settingsStore.clamping}
+                              options={clampingOptions}
+                         />
+                    </SettingItem>
 
-                         <SettingItem label="Scaling Mode" id="scaling">
-                              <Select
-                                   id="scaling"
-                                   bind:value={scaling}
-                                   options={scalingOptions}
-                              />
-                         </SettingItem>
-
-                         <SettingItem label="Clamping Mode" id="clamping">
-                              <Select
-                                   id="clamping"
-                                   bind:value={clamping}
-                                   options={clampingOptions}
-                              />
-                         </SettingItem>
-
-                         <SettingItem
-                              label="No Fullscreen Pause"
+                    <SettingItem
+                         label="No Fullscreen Pause"
+                         id="noFullscreenPause"
+                         description="Keep running when other apps are fullscreen."
+                    >
+                         <Toggle
                               id="noFullscreenPause"
-                         >
-                              <Toggle
-                                   id="noFullscreenPause"
-                                   bind:checked={noFullscreenPause}
-                              />
-                         </SettingItem>
+                              bind:checked={$settingsStore.noFullscreenPause}
+                         />
+                    </SettingItem>
 
-                         <SettingItem
-                              label="Disable particles"
+                    <SettingItem
+                         label="Disable Particles"
+                         id="disableParticles"
+                         description="Turn off particle effects to save resources."
+                    >
+                         <Toggle
                               id="disableParticles"
+                              bind:checked={$settingsStore.disableParticles}
+                         />
+                    </SettingItem>
+               </SettingsSection>
+
+               <div class="divider"></div>
+
+               <SettingsSection
+                    title="Audio"
+                    id="audio"
+                    description="Control how audio is handled in wallpapers."
+               >
+                    <SettingItem
+                         label="Silence Wallpaper"
+                         id="silence"
+                         description="Mute all audio output."
+                    >
+                         <Toggle
+                              id="silence"
+                              bind:checked={$settingsStore.silence}
+                         />
+                    </SettingItem>
+
+                    {#if !$settingsStore.silence}
+                         <SettingItem
+                              label="Volume"
+                              id="volume"
+                              description="Adjust master volume level."
                          >
-                              <Toggle
-                                   id="disableParticles"
-                                   bind:checked={disableParticles}
-                              />
-                         </SettingItem>
-                    </SettingsSection>
-
-                    <SettingsSection title="Audio">
-                         <SettingItem label="Silence Wallpaper" id="silence">
-                              <Toggle id="silence" bind:checked={silence} />
-                         </SettingItem>
-
-                         {#if !silence}
-                              <SettingItem
-                                   label="Volume ({volume}%)"
-                                   id="volume"
-                              >
+                              <div class="volume-control">
                                    <Range
                                         id="volume"
-                                        bind:value={volume}
+                                        bind:value={$settingsStore.volume}
                                         min={0}
                                         max={100}
                                    />
-                              </SettingItem>
+                                   <div class="volume-input">
+                                        <Input
+                                             type="number"
+                                             bind:value={$settingsStore.volume}
+                                             min={0}
+                                             max={100}
+                                        />
+                                        <span class="unit">%</span>
+                                   </div>
+                              </div>
+                         </SettingItem>
 
-                              <SettingItem label="No Automute" id="noAutomute">
-                                   <Toggle
-                                        id="noAutomute"
-                                        bind:checked={noAutomute}
-                                   />
-                              </SettingItem>
-
-                              <SettingItem
-                                   label="No Audio Processing"
-                                   id="noAudioProcessing"
-                              >
-                                   <Toggle
-                                        id="noAudioProcessing"
-                                        bind:checked={noAudioProcessing}
-                                   />
-                              </SettingItem>
-                         {/if}
-                    </SettingsSection>
-
-                    <SettingsSection title="Interaction">
-                         <SettingItem label="Disable Mouse" id="disableMouse">
+                         <SettingItem
+                              label="No Automute"
+                              id="noAutomute"
+                              description="Prevent automatic muting when not in focus."
+                         >
                               <Toggle
-                                   id="disableMouse"
-                                   bind:checked={disableMouse}
+                                   id="noAutomute"
+                                   bind:checked={$settingsStore.noAutomute}
                               />
                          </SettingItem>
 
                          <SettingItem
-                              label="Disable Parallax"
-                              id="disableParallax"
+                              label="No Audio Processing"
+                              id="noAudioProcessing"
+                              description="Disable audio analysis features."
                          >
                               <Toggle
-                                   id="disableParallax"
-                                   bind:checked={disableParallax}
+                                   id="noAudioProcessing"
+                                   bind:checked={
+                                        $settingsStore.noAudioProcessing
+                                   }
                               />
                          </SettingItem>
-                    </SettingsSection>
-               </div>
+                    {/if}
+               </SettingsSection>
 
-               <SettingsSection title="Advanced" full={true}>
+               <div class="divider"></div>
+
+               <SettingsSection
+                    title="Interaction"
+                    id="interaction"
+                    description="Customize how you interact with wallpapers."
+               >
+                    <SettingItem
+                         label="Disable Mouse"
+                         id="disableMouse"
+                         description="Ignore mouse movement and clicks."
+                    >
+                         <Toggle
+                              id="disableMouse"
+                              bind:checked={$settingsStore.disableMouse}
+                         />
+                    </SettingItem>
+
+                    <SettingItem
+                         label="Disable Parallax"
+                         id="disableParallax"
+                         description="Turn off mouse-following parallax effects."
+                    >
+                         <Toggle
+                              id="disableParallax"
+                              bind:checked={$settingsStore.disableParallax}
+                         />
+                    </SettingItem>
+               </SettingsSection>
+
+               <div class="divider"></div>
+
+               <SettingsSection
+                    title="Advanced"
+                    id="advanced"
+                    description="Power user options and custom parameters."
+               >
                     <SettingItem
                          label="Enable Custom Arguments"
                          id="customArgsEnabled"
                     >
                          <Toggle
                               id="customArgsEnabled"
-                              bind:checked={customArgsEnabled}
+                              bind:checked={$settingsStore.customArgsEnabled}
                          />
                     </SettingItem>
 
-                    {#if customArgsEnabled}
+                    {#if $settingsStore.customArgsEnabled}
                          <SettingItem
                               label="Custom Command Args"
                               id="customArgs"
                               vertical
+                              description="Pass raw arguments to the backend."
                          >
                               <Input
                                    type="text"
                                    id="customArgs"
-                                   bind:value={customArgs}
+                                   bind:value={$settingsStore.customArgs}
                                    placeholder="e.g. --window 1920x1080"
                               />
                               <p class="help-text">
@@ -533,287 +334,224 @@
                                         href="https://github.com/Almamu/linux-wallpaperengine?tab=readme-ov-file#-common-options"
                                         target="_blank"
                                         rel="noopener noreferrer"
-                                        >linux-wallpaperengine common options</a
                                    >
-                                   for available arguments.
+                                        linux-wallpaperengine common options
+                                   </a>
                               </p>
                          </SettingItem>
                     {/if}
                </SettingsSection>
 
+               <div class="divider"></div>
+
                <SettingsSection
-                    title="Custom linux-wallpaperengine executable location"
-                    full={true}
+                    title="Executable"
+                    id="executable"
+                    description="Set the path to your linux-wallpaperengine binary."
                >
-                    <Browse
-                         bind:location={binaryLocation}
-                         onSelect={onSelectBinFile}
-                         placeholder="Path to linux-wallpaperengine binary... (Leave empty to use system PATH)"
-                    />
+                    <SettingItem
+                         label="Binary Location"
+                         id="binary"
+                         vertical
+                         description="Leave empty to use system PATH."
+                    >
+                         <Browse
+                              bind:location={$settingsStore.binaryLocation}
+                              onSelect={onSelectBinFile}
+                              placeholder="Path to linux-wallpaperengine binary..."
+                         />
+                    </SettingItem>
                </SettingsSection>
-
-               <div class="button-group">
-                    <button class="btn btn-primary" on:click={saveSettings}
-                         >Save Settings</button
-                    >
-                    <button class="btn btn-secondary" on:click={openConfig}
-                         >Open Config File</button
-                    >
-                    <button
-                         class="btn btn-secondary"
-                         on:click={clearAllWallpapers}
-                         >Clear All Wallpapers</button
-                    >
-               </div>
-
-               {#if message}
-                    <div
-                         class="message"
-                         class:success={messageType === "success"}
-                         class:error={messageType === "error"}
-                    >
-                         {message}
-                    </div>
-               {/if}
           </div>
-     </Fullscreen>
-{/if}
+     </main>
+</div>
 
 <style lang="scss">
-     .settings-layout {
+     .settings-container {
           display: flex;
           height: 100%;
           width: 100%;
-          background: rgba(0, 0, 0, 0.2);
+          border-radius: 16px;
           overflow: hidden;
-          border-radius: 12px;
+          border: 1px solid rgba(255, 255, 255, 0.08);
+          box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
+          background: rgba(0, 0, 0, 0.6);
      }
 
-     .settings-nav {
-          width: 250px;
-          background: rgba(0, 0, 0, 0.3);
+     .settings-sidebar {
+          width: 280px;
+          background: rgba(20, 20, 20, 0.6);
           border-right: 1px solid rgba(255, 255, 255, 0.05);
           display: flex;
           flex-direction: column;
-          padding: 20px;
-          gap: 20px;
+          padding: 32px 16px;
 
-          .nav-header {
-               padding-bottom: 20px;
-               border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+          .sidebar-header {
+               padding: 0 16px 32px;
                h2 {
                     margin: 0;
                     font-size: 1.5em;
+                    font-weight: 800;
+                    background: linear-gradient(135deg, #fff 0%, #aaa 100%);
+                    background-clip: text;
+                    -webkit-background-clip: text;
+                    -webkit-text-fill-color: transparent;
+               }
+               p {
+                    margin: 4px 0 0;
+                    font-size: 0.85em;
+                    color: rgba(255, 255, 255, 0.4);
                }
           }
 
-          .nav-links {
+          .sidebar-nav {
+               flex: 1;
                display: flex;
                flex-direction: column;
-               gap: 5px;
-               flex-grow: 1;
+               gap: 4px;
 
-               .nav-link {
+               .nav-item {
+                    display: flex;
+                    align-items: center;
+                    gap: 12px;
+                    padding: 12px 16px;
                     background: transparent;
                     border: none;
-                    color: #aaa;
-                    text-align: left;
-                    padding: 10px 15px;
-                    border-radius: 8px;
+                    color: rgba(255, 255, 255, 0.5);
+                    border-radius: 10px;
                     cursor: pointer;
-                    transition: all 0.2s;
+                    transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+                    text-align: left;
                     font-weight: 500;
 
                     &:hover {
                          background: rgba(255, 255, 255, 0.05);
-                         color: #fff;
+                         color: rgba(255, 255, 255, 0.8);
                     }
 
                     &.active {
                          background: var(--btn-primary-bg);
                          color: #fff;
+                         box-shadow: 0 4px 12px rgba(0, 123, 255, 0.3);
                     }
                }
           }
 
-          .nav-footer {
+          .sidebar-actions {
                display: flex;
                flex-direction: column;
                gap: 10px;
-               padding-top: 20px;
-               border-top: 1px solid rgba(255, 255, 255, 0.1);
+               padding-top: 24px;
+               border-top: 1px solid rgba(255, 255, 255, 0.05);
+          }
+     }
 
-               .w-full {
-                    width: 100%;
+     .settings-main {
+          flex: 1;
+          overflow-y: auto;
+          scroll-behavior: smooth;
+          position: relative;
+
+          .content-wrapper {
+               max-width: 1000px;
+               margin: 0 auto;
+               padding: 60px 40px 120px;
+               display: flex;
+               flex-direction: column;
+               gap: 48px;
+          }
+     }
+
+     .divider {
+          height: 1px;
+          background: linear-gradient(
+               90deg,
+               transparent,
+               rgba(255, 255, 255, 0.05),
+               transparent
+          );
+     }
+
+     .volume-control {
+          display: flex;
+          align-items: center;
+          flex-wrap: wrap;
+          gap: 16px;
+          width: 100%;
+
+          .volume-input {
+               display: flex;
+               align-items: center;
+               gap: 8px;
+               width: 90px;
+               background: rgba(255, 255, 255, 0.03);
+               border-radius: 8px;
+               padding-right: 12px;
+               border: 1px solid rgba(255, 255, 255, 0.08);
+
+               :global(input) {
+                    border: none !important;
+                    background: transparent !important;
+                    padding: 8px 0 8px 12px !important;
+                    text-align: left;
+                    box-shadow: none !important;
+                    width: 50px !important;
+               }
+
+               .unit {
+                    font-size: 0.85em;
+                    color: rgba(255, 255, 255, 0.4);
+                    font-weight: 600;
                }
           }
      }
 
-     .settings-content {
-          flex-grow: 1;
-          overflow-y: auto;
-          padding: 40px;
-          display: flex;
-          flex-direction: column;
-          align-items: center;
-          scroll-behavior: smooth;
-
-          .sections-list {
-               width: 100%;
-               max-width: 800px;
-               display: flex;
-               flex-direction: column;
-               gap: 30px;
-               padding-bottom: 100px;
-          }
-     }
-
-     .settings-inner {
+     .action-btn {
           width: 100%;
-          height: 100%;
-          overflow-y: auto;
-          color: var(--text-color);
-          padding: 40px;
-          box-sizing: border-box;
-          display: flex;
-          flex-direction: column;
-          align-items: center;
-          gap: 20px;
-          padding-inline: 20%;
-          position: relative; /* For absolute positioning of close btn */
-
-          &.full {
-               padding-inline: 10%; /* More space for full view */
-          }
-     }
-
-     .close-btn {
-          position: absolute;
-          top: 20px;
-          right: 30px;
-          background: transparent;
+          padding: 12px;
+          border-radius: 10px;
           border: none;
-          font-size: 2.5em;
-          color: rgba(255, 255, 255, 0.8);
-          cursor: pointer;
-          z-index: 1001;
-          transition: all 0.2s ease;
-          line-height: 1;
-          padding: 5px;
-     }
-
-     .close-btn:hover {
-          color: #fff;
-          transform: scale(1.1);
-     }
-
-     .header {
-          width: 100%;
-          display: flex;
-          justify-content: flex-start;
-          margin-bottom: 20px;
-     }
-
-     h2 {
-          font-size: 2em;
-          text-shadow: 0 2px 4px rgba(0, 0, 0, 0.5);
-          margin: 0;
-     }
-
-     .settings-grid {
-          display: grid;
-          grid-template-columns: 1fr;
-          gap: 20px;
-          width: 100%;
-     }
-
-     @media (min-width: 900px) {
-          .settings-grid {
-               grid-template-columns: 1fr 1fr;
-          }
-     }
-
-     .button-group {
-          margin-top: 40px;
-          display: flex;
-          flex-direction: row;
-          justify-content: center;
-          flex-wrap: wrap;
-          gap: 15px;
-          width: 100%;
-     }
-
-     .btn {
-          color: white;
-          padding: 10px 20px;
-          border: none;
-          border-radius: 8px;
-          cursor: pointer;
-          font-size: 1em;
           font-weight: 600;
-          transition:
-               transform 0.1s,
-               filter 0.2s,
-               background-color 0.2s,
-               border-color 0.2s;
-          white-space: nowrap;
-     }
+          font-size: 0.9em;
+          cursor: pointer;
+          transition: all 0.2s;
 
-     .btn:active {
-          transform: scale(0.98);
-     }
+          &.primary {
+               background: var(--btn-primary-bg);
+               color: white;
+               &:hover {
+                    filter: brightness(1.1);
+               }
+          }
 
-     .btn-primary {
-          background-color: var(--btn-primary-bg);
-     }
+          &.secondary {
+               background: rgba(255, 255, 255, 0.05);
+               color: rgba(255, 255, 255, 0.8);
+               border: 1px solid rgba(255, 255, 255, 0.1);
+               &:hover {
+                    background: rgba(255, 255, 255, 0.1);
+               }
+          }
 
-     .btn-primary:hover {
-          filter: brightness(1.2);
-     }
-
-     .btn-secondary {
-          background-color: var(--btn-secondary-bg);
-          border: 1px solid rgba(255, 255, 255, 0.2);
-     }
-
-     .btn-secondary:hover {
-          filter: brightness(1.5);
-          border-color: rgba(255, 255, 255, 0.4);
-     }
-
-     .message {
-          margin-top: 20px;
-          padding: 15px;
-          border-radius: 8px;
-          text-align: center;
-          font-weight: bold;
-          width: 100%;
-          backdrop-filter: blur(5px);
-     }
-
-     .message.success {
-          background-color: var(--success-bg);
-          color: white;
-     }
-
-     .message.error {
-          background-color: var(--error-bg);
-          color: white;
+          &.danger {
+               background: transparent;
+               color: #ff4d4d;
+               &:hover {
+                    background: rgba(255, 77, 77, 0.1);
+               }
+          }
      }
 
      .help-text {
-          font-size: 0.85em;
-          color: rgba(255, 255, 255, 0.6);
-          margin-top: 5px;
-          text-align: left;
-     }
-
-     .help-text a {
-          color: #5daeff;
-          text-decoration: none;
-     }
-
-     .help-text a:hover {
-          text-decoration: underline;
+          font-size: 0.8em;
+          margin-top: 8px;
+          color: rgba(255, 255, 255, 0.4);
+          a {
+               color: var(--btn-primary-bg);
+               text-decoration: none;
+               &:hover {
+                    text-decoration: underline;
+               }
+          }
      }
 </style>
