@@ -21,15 +21,15 @@
      input[type="range"] {
           width: 100%;
           height: 6px;
-          background: rgba(255, 255, 255, 0.1);
-          border-radius: 6px;
+          background: var(--bg-surface-active);
+          border-radius: var(--radius-full);
           appearance: none;
           outline: none;
           cursor: pointer;
-          transition: all 0.2s;
+          transition: var(--transition-base);
 
           &:hover {
-               background: rgba(255, 255, 255, 0.15);
+               background: var(--border-color-hover);
                
                &::-webkit-slider-thumb {
                     transform: scale(1.1);
@@ -40,22 +40,22 @@
                appearance: none;
                width: 18px;
                height: 18px;
-               background: var(--btn-primary-bg, #007bff);
+               background: var(--btn-primary-bg);
                border-radius: 50%;
                cursor: pointer;
-               transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
-               box-shadow: 0 2px 6px rgba(0, 0, 0, 0.3);
+               transition: var(--transition-base);
+               box-shadow: var(--shadow-sm);
                border: 2px solid #fff;
           }
 
           &::-moz-range-thumb {
                width: 18px;
                height: 18px;
-               background: var(--btn-primary-bg, #007bff);
+               background: var(--btn-primary-bg);
                border-radius: 50%;
                cursor: pointer;
-               transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
-               box-shadow: 0 2px 6px rgba(0, 0, 0, 0.3);
+               transition: var(--transition-base);
+               box-shadow: var(--shadow-sm);
                border: 2px solid #fff;
           }
      }

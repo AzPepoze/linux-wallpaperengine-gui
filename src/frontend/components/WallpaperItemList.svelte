@@ -58,7 +58,7 @@
      .wallpaper-list {
           display: flex;
           flex-direction: column;
-          gap: 8px;
+          gap: 10px;
           padding: 20px;
           box-sizing: border-box;
           width: 100%;
@@ -67,23 +67,25 @@
                display: flex;
                align-items: center;
                gap: 16px;
-               padding: 10px;
-               background: rgba(255, 255, 255, 0.05);
-               border-radius: 8px;
+               padding: 12px;
+               background: var(--bg-surface);
+               border-radius: var(--radius-lg);
                cursor: pointer;
-               transition: all 0.2s ease;
+               transition: var(--transition-base);
                border: 2px solid transparent;
                text-align: left;
                box-sizing: border-box;
 
                &:hover {
-                    background: rgba(255, 255, 255, 0.1);
+                    background: var(--bg-surface-hover);
                     transform: translateX(4px);
+                    border-color: var(--border-color-hover);
                }
 
                &.selected {
-                    border-color: var(--btn-primary-bg, #007bff);
+                    border-color: var(--btn-primary-bg);
                     background: rgba(0, 123, 255, 0.1);
+                    box-shadow: var(--shadow-sm);
                }
 
                .item-preview {
@@ -92,10 +94,10 @@
                     width: var(--size);
                     height: var(--size);
                     flex-shrink: 0;
-                    border-radius: 4px;
+                    border-radius: var(--radius-md);
                     overflow: hidden;
                     background: var(--preview-placeholder-bg);
-                    box-shadow: var(--normal-shadow);
+                    box-shadow: var(--shadow-sm);
 
                     img {
                          width: 100%;
@@ -115,7 +117,8 @@
 
                     .item-title {
                          font-weight: 600;
-                         margin-bottom: 4px;
+                         font-size: 1.1em;
+                         margin-bottom: 6px;
                          white-space: nowrap;
                          overflow: hidden;
                          text-overflow: ellipsis;
@@ -123,23 +126,26 @@
 
                     .item-desc {
                          font-size: 0.85em;
-                         color: #aaa;
-                         white-space: nowrap;
-                         overflow: hidden;
-                         text-overflow: ellipsis;
+                         color: var(--text-muted);
+                         display: flex;
+                         flex-direction: column;
+                         gap: 2px;
 
                          p {
                               margin: 0;
+                              white-space: nowrap;
+                              overflow: hidden;
+                              text-overflow: ellipsis;
                          }
 
                          .item-type {
-                              color: rgb(125, 255, 255);
+                              color: #7dd3fc;
                          }
                          .item-tags {
-                              color: rgb(255, 200, 100);
+                              color: #fbbf24;
                          }
                          .item-folder {
-                              color: rgb(150, 255, 150);
+                              color: #86efac;
                          }
                     }
                }

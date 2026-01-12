@@ -371,17 +371,17 @@
           display: flex;
           height: 100%;
           width: 100%;
-          border-radius: 16px;
+          border-radius: var(--radius-xl);
           overflow: hidden;
-          border: 1px solid rgba(255, 255, 255, 0.08);
-          box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
-          background: rgba(0, 0, 0, 0.6);
+          border: 1px solid var(--border-color);
+          box-shadow: var(--shadow-lg);
+          background: var(--bg-modal);
      }
 
      .settings-sidebar {
           width: 280px;
           background: rgba(20, 20, 20, 0.6);
-          border-right: 1px solid rgba(255, 255, 255, 0.05);
+          border-right: 1px solid var(--border-color);
           display: flex;
           flex-direction: column;
           padding: 32px 16px;
@@ -400,7 +400,7 @@
                p {
                     margin: 4px 0 0;
                     font-size: 0.85em;
-                    color: rgba(255, 255, 255, 0.4);
+                    color: var(--text-muted);
                }
           }
 
@@ -417,16 +417,16 @@
                     padding: 12px 16px;
                     background: transparent;
                     border: none;
-                    color: rgba(255, 255, 255, 0.5);
-                    border-radius: 10px;
+                    color: var(--text-muted);
+                    border-radius: var(--radius-md);
                     cursor: pointer;
-                    transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+                    transition: var(--transition-base);
                     text-align: left;
                     font-weight: 500;
 
                     &:hover {
-                         background: rgba(255, 255, 255, 0.05);
-                         color: rgba(255, 255, 255, 0.8);
+                         background: var(--bg-surface);
+                         color: var(--text-color);
                     }
 
                     &.active {
@@ -442,7 +442,7 @@
                flex-direction: column;
                gap: 10px;
                padding-top: 24px;
-               border-top: 1px solid rgba(255, 255, 255, 0.05);
+               border-top: 1px solid var(--border-color);
           }
      }
 
@@ -467,7 +467,7 @@
           background: linear-gradient(
                90deg,
                transparent,
-               rgba(255, 255, 255, 0.05),
+               var(--border-color),
                transparent
           );
      }
@@ -484,10 +484,10 @@
                align-items: center;
                gap: 8px;
                width: 90px;
-               background: rgba(255, 255, 255, 0.03);
-               border-radius: 8px;
+               background: var(--bg-surface);
+               border-radius: var(--radius-sm);
                padding-right: 12px;
-               border: 1px solid rgba(255, 255, 255, 0.08);
+               border: 1px solid var(--border-color);
 
                :global(input) {
                     border: none !important;
@@ -500,7 +500,7 @@
 
                .unit {
                     font-size: 0.85em;
-                    color: rgba(255, 255, 255, 0.4);
+                    color: var(--text-muted);
                     font-weight: 600;
                }
           }
@@ -509,12 +509,12 @@
      .action-btn {
           width: 100%;
           padding: 12px;
-          border-radius: 10px;
+          border-radius: var(--radius-md);
           border: none;
           font-weight: 600;
           font-size: 0.9em;
           cursor: pointer;
-          transition: all 0.2s;
+          transition: var(--transition-base);
 
           &.primary {
                background: var(--btn-primary-bg);
@@ -525,17 +525,17 @@
           }
 
           &.secondary {
-               background: rgba(255, 255, 255, 0.05);
-               color: rgba(255, 255, 255, 0.8);
-               border: 1px solid rgba(255, 255, 255, 0.1);
+               background: var(--bg-surface);
+               color: var(--text-color);
+               border: 1px solid var(--border-color);
                &:hover {
-                    background: rgba(255, 255, 255, 0.1);
+                    background: var(--bg-surface-hover);
                }
           }
 
           &.danger {
                background: transparent;
-               color: #ff4d4d;
+               color: var(--error-color);
                &:hover {
                     background: rgba(255, 77, 77, 0.1);
                }
@@ -545,7 +545,7 @@
      .help-text {
           font-size: 0.8em;
           margin-top: 8px;
-          color: rgba(255, 255, 255, 0.4);
+          color: var(--text-muted);
           a {
                color: var(--btn-primary-bg);
                text-decoration: none;

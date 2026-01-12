@@ -93,12 +93,14 @@
      class="sidebar"
      class:open={selectedWallpaper}
      class:resizing={isResizing}
-     style="--background-color: {backgroundColor}; --text-color: {textColor}; width: {selectedWallpaper ? $sidebarWidth + 'px' : '0'};"
+     style="--background-color: {backgroundColor}; --text-color: {textColor}; width: {selectedWallpaper
+          ? $sidebarWidth + 'px'
+          : '0'};"
 >
      {#if selectedWallpaper}
           <!-- svelte-ignore a11y_no_static_element_interactions -->
-          <div 
-               class="resize-handle" 
+          <div
+               class="resize-handle"
                class:resizing={isResizing}
                on:mousedown={startResizing}
           ></div>
@@ -121,15 +123,15 @@
 
 <style lang="scss">
      .sidebar {
-          --button-bg-color: #007bff;
-          --button-hover-bg-color: #0056b3;
+          --button-bg-color: var(--btn-primary-bg);
+          --button-hover-bg-color: var(--btn-primary-hover-bg);
           --button-text-color: #fff;
 
           width: 0;
           background-color: var(--background-color);
           color: var(--text-color);
           box-shadow: -5px 0 15px rgba(0, 0, 0, 0.3);
-          transition: all 0.3s ease-in-out;
+          transition: var(--transition-slow);
           border-radius: 15px;
           position: relative;
           display: flex;
@@ -148,10 +150,12 @@
                width: 5px;
                cursor: col-resize;
                z-index: 10;
-               background-color: rgba(255, 255, 255, 0.05);
-               transition: all 0.2s ease;
+               transition: var(--transition-base);
+               border-radius: var(--radius-md);
+               border: 2px dashed var(--btn-secondary-bg);
 
-               &:hover, &.resizing {
+               &:hover,
+               &.resizing {
                     background-color: var(--button-bg-color);
                     width: 7px;
                     box-shadow: 2px 0 10px var(--button-bg-color);
@@ -165,7 +169,6 @@
                padding-bottom: 20px;
                text-align: left;
                border-radius: 15px;
-               // word-wrap: break-word;
 
                :global(img) {
                     max-width: 100%;
@@ -178,7 +181,7 @@
 
                .preview-image {
                     width: 100%;
-                    border-radius: 10px;
+                    border-radius: var(--radius-md);
                     margin-top: 20px;
                     margin-bottom: 15px;
                     object-fit: cover;

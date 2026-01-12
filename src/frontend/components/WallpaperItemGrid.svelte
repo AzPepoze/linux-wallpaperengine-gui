@@ -60,38 +60,31 @@
 
      .wallpaper-item {
           --item-bg-color: rgba(66, 66, 66, 0.5);
-          --item-text-color: #fff;
-          --item-padding: 3px;
-          --item-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
-          --item-hover-shadow: 0 0 15px rgba(0, 123, 255, 0.7);
-          --item-selected-border-width: 3px;
-          --item-selected-border-color: #007bff;
-          --preview-border-radius: 5px;
-          --transition-duration: 0.2s;
           --wallpaper-name-bg: black;
 
           width: 170px;
           height: 170px;
-          border-radius: var(--preview-border-radius);
+          border-radius: 5px;
           background: var(--item-bg-color);
           padding: 0px;
           outline: none;
           position: relative;
           display: flex;
-          transition: all var(--transition-duration) ease-out;
-          filter: none;
+          transition: all 0.2s ease-out;
           overflow: hidden;
+          border: 3px solid transparent;
+          cursor: pointer;
 
           &:hover,
           &:focus {
                transform: translateY(-5px);
-               box-shadow: var(--item-hover-shadow);
+               box-shadow: 0 0 15px rgba(0, 123, 255, 0.7);
           }
 
           &.selected,
           &[aria-pressed="true"] {
-               border-color: var(--item-selected-border-color);
-               box-shadow: var(--item-hover-shadow);
+               border-color: #007bff;
+               box-shadow: 0 0 15px rgba(0, 123, 255, 0.7);
           }
 
           .wallpaper-preview-container {
@@ -105,7 +98,7 @@
           .wallpaper-preview-placeholder {
                width: 100%;
                height: 100%;
-               border-radius: var(--preview-border-radius);
+               border-radius: 5px;
                object-fit: cover;
                position: absolute;
                top: 0;
@@ -127,8 +120,10 @@
                border-radius: 10px;
                font-weight: 100;
                transition: all 0.2s;
-               border: 2px solid var(--item-selected-border-color);
+               border: 2px solid #007bff;
                padding: 5px;
+               text-align: center;
+               color: #fff;
           }
 
           &:hover .wallpaper-name {

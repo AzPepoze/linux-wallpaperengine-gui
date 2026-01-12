@@ -81,31 +81,27 @@
                align-items: center;
                cursor: pointer;
                opacity: 0.8;
-               transition:
-                    transform 0.2s,
-                    opacity 0.2s,
-                    border-color 0.2s,
-                    box-shadow 0.2s;
+               transition: var(--transition-base);
                border: 2px solid transparent;
                padding: 8px;
-               border-radius: 12px;
+               border-radius: var(--radius-lg);
                scroll-snap-align: start;
-               background-color: var(--btn-secondary-bg, #2a2a2a);
-               box-shadow: 0 4px 6px rgba(0, 0, 0, 0.3);
+               background-color: var(--btn-secondary-bg);
+               box-shadow: var(--shadow-sm);
 
                &:hover {
                     opacity: 1;
                     transform: translateY(-2px);
-                    box-shadow: 0 8px 12px rgba(0, 0, 0, 0.4);
+                    box-shadow: var(--shadow-md);
                }
 
                &.selected {
                     opacity: 1;
-                    border-color: var(--btn-primary-bg, #007bff);
+                    border-color: var(--btn-primary-bg);
                     box-shadow: 0 0 0 2px
                          color-mix(
                               in srgb,
-                              var(--btn-primary-bg, #007bff),
+                              var(--btn-primary-bg),
                               transparent 70%
                          );
                }
@@ -115,12 +111,12 @@
 
                     width: var(--size);
                     height: var(--size);
-                    background-color: #444;
+                    background-color: var(--preview-placeholder-bg);
                     margin-bottom: 8px;
                     display: flex;
                     align-items: center;
                     justify-content: center;
-                    border-radius: 8px;
+                    border-radius: var(--radius-sm);
                     overflow: hidden;
 
                     img {
@@ -131,7 +127,7 @@
 
                     .placeholder {
                          font-size: 0.8em;
-                         color: #aaa;
+                         color: var(--text-muted);
                     }
                }
 

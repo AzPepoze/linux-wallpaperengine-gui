@@ -31,14 +31,14 @@
                margin: 0;
                font-size: 1.25em;
                font-weight: 700;
-               color: #fff;
+               color: var(--text-color);
                letter-spacing: -0.01em;
           }
 
           p {
                margin: 6px 0 0 0;
                font-size: 0.9em;
-               color: rgba(255, 255, 255, 0.5);
+               color: var(--text-muted);
           }
      }
 

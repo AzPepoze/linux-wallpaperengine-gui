@@ -26,10 +26,10 @@
           flex-wrap: wrap;
           gap: 40px;
           padding: 16px;
-          background: rgba(255, 255, 255, 0.03);
-          border-radius: 12px;
-          transition: all 0.2s ease;
-          border: 1px solid rgba(255, 255, 255, 0.05);
+          background: var(--bg-surface);
+          border-radius: var(--radius-lg);
+          transition: var(--transition-base);
+          border: 1px solid var(--border-color);
 
           @media (min-width: 900px) {
                &.align-end {
@@ -48,8 +48,8 @@
           }
 
           &:hover {
-               background: rgba(255, 255, 255, 0.05);
-               border-color: rgba(255, 255, 255, 0.1);
+               background: var(--bg-surface-hover);
+               border-color: var(--border-color-hover);
           }
 
           &.vertical {
@@ -83,13 +83,13 @@
                label {
                     font-weight: 600;
                     font-size: 0.95em;
-                    color: #efefef;
+                    color: var(--text-color);
                     cursor: pointer;
                }
 
                .description {
                     font-size: 0.8em;
-                    color: rgba(255, 255, 255, 0.5);
+                    color: var(--text-muted);
                     margin: 0;
                     line-height: 1.4;
                }

@@ -138,7 +138,7 @@
           height: 100%;
           padding: 20px;
           box-sizing: border-box;
-          color: #fff;
+          color: var(--text-color);
 
           &.full {
                flex-grow: 1;
@@ -154,7 +154,7 @@
 
           h2 {
                margin: 0;
-               color: #fff;
+               color: var(--text-color);
           }
      }
 
@@ -166,13 +166,14 @@
           button {
                padding: 5px 10px;
                cursor: pointer;
-               background-color: #444;
-               border: 1px solid #555;
-               color: #fff;
-               border-radius: 4px;
+               background-color: var(--btn-secondary-bg);
+               border: 1px solid var(--border-color);
+               color: var(--text-color);
+               border-radius: var(--radius-sm);
+               transition: var(--transition-base);
 
                &:hover {
-                    background-color: #555;
+                    background-color: var(--btn-secondary-hover-bg);
                }
           }
 
@@ -185,7 +186,7 @@
 
                &:hover {
                     background-color: transparent;
-                    color: #ff6b6b;
+                    color: var(--error-color);
                }
           }
      }
@@ -206,7 +207,8 @@
           overflow: hidden;
 
           h3 {
-               color: #ddd;
+               color: var(--text-color);
+               opacity: 0.8;
                margin-top: 0;
                margin-bottom: 10px;
                flex-shrink: 0;
@@ -216,20 +218,20 @@
      .log-box {
           flex: 1;
           background-color: #1a1a1a;
-          border: 1px solid #333;
-          border-radius: 4px;
+          border: 1px solid var(--border-color);
+          border-radius: var(--radius-sm);
           padding: 10px;
-          overflow: auto; /* Enable both scrollbars */
+          overflow: auto; 
           font-family: monospace;
           font-size: 0.9em;
-          color: #ccc;
-          white-space: pre; /* Disable wrap */
-          text-align: left; /* Explicitly align left */
+          color: var(--text-muted);
+          white-space: pre; 
+          text-align: left; 
      }
 
      .log-entry {
           margin-bottom: 4px;
-          border-bottom: 1px solid #222;
+          border-bottom: 1px solid rgba(255, 255, 255, 0.05);
           padding-bottom: 2px;
      }
 </style>

@@ -30,28 +30,28 @@
      input {
           width: 100%;
           padding: 10px 14px;
-          border: 1px solid rgba(255, 255, 255, 0.08);
-          border-radius: 10px;
-          background-color: rgba(255, 255, 255, 0.03);
-          color: #fff;
+          border: 1px solid var(--border-color);
+          border-radius: var(--radius-md);
+          background-color: var(--bg-surface);
+          color: var(--text-color);
           font-size: 0.9em;
           box-sizing: border-box;
-          transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+          transition: var(--transition-base);
 
           &:hover {
-               background-color: rgba(255, 255, 255, 0.05);
-               border-color: rgba(255, 255, 255, 0.15);
+               background-color: var(--bg-surface-hover);
+               border-color: var(--border-color-hover);
           }
 
           &:focus {
                outline: none;
-               border-color: var(--btn-primary-bg, #007bff);
-               background-color: rgba(255, 255, 255, 0.08);
+               border-color: var(--btn-primary-bg);
+               background-color: var(--bg-surface-active);
                box-shadow: 0 0 0 3px rgba(0, 123, 255, 0.15);
           }
 
           &::placeholder {
-               color: rgba(255, 255, 255, 0.25);
+               color: var(--text-muted);
           }
      }
 </style>

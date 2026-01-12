@@ -47,21 +47,21 @@
 	.input-group {
 		display: flex;
 		width: 100%;
-		background-color: rgba(255, 255, 255, 0.03);
-		border: 1px solid rgba(255, 255, 255, 0.08);
-		border-radius: 12px;
+		background-color: var(--bg-surface);
+		border: 1px solid var(--border-color);
+		border-radius: var(--radius-lg);
 		overflow: hidden;
-		transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+		transition: var(--transition-base);
 
 		&:hover {
-			border-color: rgba(255, 255, 255, 0.15);
-			background-color: rgba(255, 255, 255, 0.05);
+			border-color: var(--border-color-hover);
+			background-color: var(--bg-surface-hover);
 		}
 
 		&:focus-within {
-			border-color: var(--btn-primary-bg, #007bff);
+			border-color: var(--btn-primary-bg);
 			box-shadow: 0 0 0 3px rgba(0, 123, 255, 0.15);
-			background-color: rgba(255, 255, 255, 0.08);
+			background-color: var(--bg-surface-active);
 		}
 	}
 
@@ -71,7 +71,7 @@
 		padding: 12px 16px;
 		border: none;
 		background: transparent;
-		color: #fff;
+		color: var(--text-color);
 		font-family: inherit;
 		font-size: 0.9em;
 		text-overflow: ellipsis;
@@ -81,7 +81,7 @@
 		}
 
 		&::placeholder {
-			color: rgba(255, 255, 255, 0.25);
+			color: var(--text-muted);
 		}
 	}
 
@@ -90,18 +90,18 @@
 		align-items: center;
 		gap: 8px;
 		padding: 0 20px;
-		background-color: rgba(255, 255, 255, 0.05);
-		color: rgba(255, 255, 255, 0.9);
+		background-color: var(--bg-surface-hover);
+		color: var(--text-color);
 		border: none;
-		border-left: 1px solid rgba(255, 255, 255, 0.08);
+		border-left: 1px solid var(--border-color);
 		cursor: pointer;
 		font-size: 0.85em;
 		font-weight: 600;
-		transition: all 0.2s;
+		transition: var(--transition-base);
 		white-space: nowrap;
 
 		&:hover {
-			background-color: var(--btn-primary-bg, #007bff);
+			background-color: var(--btn-primary-bg);
 			color: #fff;
 		}
 

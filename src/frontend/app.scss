@@ -1,69 +1,126 @@
 :root {
-     font-family: Inter, system-ui, Avenir, Helvetica, Arial, sans-serif;
-     line-height: 1.5;
-     font-weight: 400;
+     /* -------------------------------------------------------------------------- */
+     /*                                   Fonts                                    */
+     /* -------------------------------------------------------------------------- */
+     --font-main: Inter, system-ui, Avenir, Helvetica, Arial, sans-serif;
 
-     color-scheme: light dark;
-     color: rgba(255, 255, 255, 0.87);
+     /* -------------------------------------------------------------------------- */
+     /*                                   Colors                                   */
+     /* -------------------------------------------------------------------------- */
 
-     font-synthesis: none;
-     text-rendering: optimizeLegibility;
-     -webkit-font-smoothing: antialiased;
-     -moz-osx-font-smoothing: grayscale;
+     /* Base Text & Background */
+     --text-color: rgba(255, 255, 255, 0.87);
+     --text-muted: rgba(255, 255, 255, 0.4);
+     --bg-app: rgba(0, 0, 0, 0.8);
 
-     --input-bg-color: rgba(255, 255, 255, 0.1);
-     --input-border-color: rgba(255, 255, 255, 0.2);
-     --input-text-color: #fff;
+     /* Surfaces & Interactive */
+     --bg-surface: rgba(0, 0, 0, 0.3);
+     --bg-surface-hover: rgba(255, 255, 255, 0.05);
+     --bg-surface-active: rgba(255, 255, 255, 0.08);
+
+     /* Overlays & Modals */
+     --bg-dropdown: #1e1e1e;
+     --bg-modal: rgba(20, 20, 20, 0.5);
+     --top-bar-bg: rgba(0, 0, 0, 0.3);
+
+     /* Primary Brand Colors */
      --btn-primary-bg: #007bff;
      --btn-primary-hover-bg: #0056b3;
      --btn-secondary-bg: #2a2a2a;
      --btn-secondary-hover-bg: #1a1a1a;
-     --text-color: #fff;
-     --success-bg: rgba(40, 167, 69, 0.8);
-     --error-bg: rgba(220, 53, 69, 0.8);
-     --top-bar-bg: rgba(0, 0, 0, 0.3);
+
+     /* Status Colors */
+     --success-bg: rgba(40, 167, 69, 0.25);
+     --success-color: #4ade80;
+     --error-bg: rgba(220, 53, 69, 0.25);
+     --error-color: #ef4444;
+
+     /* -------------------------------------------------------------------------- */
+     /*                                   Assets                                   */
+     /* -------------------------------------------------------------------------- */
      --preview-placeholder-bg: #3a3a3a;
 
-     --normal-shadow: 3px 3px 10px rgba(0, 0, 0, 0.3);
+     /* -------------------------------------------------------------------------- */
+     /*                                   Borders                                  */
+     /* -------------------------------------------------------------------------- */
+     --border-color: rgba(255, 255, 255, 0.08);
+     --border-color-hover: rgba(255, 255, 255, 0.15);
+
+     /* -------------------------------------------------------------------------- */
+     /*                                   Radius                                   */
+     /* -------------------------------------------------------------------------- */
+     --radius-sm: 8px;
+     --radius-md: 10px;
+     --radius-lg: 12px;
+     --radius-xl: 16px;
+     --radius-full: 9999px;
+
+     /* -------------------------------------------------------------------------- */
+     /*                                   Shadows                                  */
+     /* -------------------------------------------------------------------------- */
+     --shadow-sm: 0 2px 6px rgba(0, 0, 0, 0.3);
+     --shadow-md: 0 4px 12px rgba(0, 0, 0, 0.4);
+     --shadow-lg: 0 10px 25px rgba(0, 0, 0, 0.5);
+
+     /* -------------------------------------------------------------------------- */
+     /*                                Transitions                                 */
+     /* -------------------------------------------------------------------------- */
+     --transition-base: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+     --transition-slow: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+
+     /* -------------------------------------------------------------------------- */
+     /*                                Global Settings                             */
+     /* -------------------------------------------------------------------------- */
+     font-family: var(--font-main);
+     line-height: 1.5;
+     font-weight: 400;
+     color-scheme: dark;
+     color: var(--text-color);
+     font-synthesis: none;
+     text-rendering: optimizeLegibility;
+     -webkit-font-smoothing: antialiased;
+     -moz-osx-font-smoothing: grayscale;
 }
 
-a {
-     font-weight: 500;
-     color: #646cff;
-     text-decoration: inherit;
-
-     &:hover {
-          color: #535bf2;
-     }
-}
-
-html {
-     background: rgba(0, 0, 0, 0.8);
-}
-
-body {
-     margin: 0;
-     display: flex;
-     place-items: center;
-     min-width: 320px;
-     min-height: 100vh;
-     background: transparent;
-}
-
+/* Base Styles */
 html,
 body {
      height: 100%;
      margin: 0;
      overflow: hidden;
+     background: transparent;
+}
+
+html {
+     background: var(--bg-app);
+}
+
+body {
+     display: flex;
+     place-items: center;
+     min-width: 320px;
+     min-height: 100vh;
+}
+
+* {
+     color: var(--text-color);
+     box-sizing: border-box;
+}
+
+a {
+     font-weight: 500;
+     color: var(--btn-primary-bg);
+     text-decoration: inherit;
+     transition: var(--transition-base);
+
+     &:hover {
+          color: var(--btn-primary-hover-bg);
+     }
 }
 
 h1 {
      font-size: 3.2em;
      line-height: 1.1;
-}
-
-.card {
-     padding: 2em;
 }
 
 #app {
@@ -73,35 +130,14 @@ h1 {
 }
 
 button {
-     border-radius: 8px;
-     border: 1px solid transparent;
-     padding: 0.6em 1.2em;
-     font-size: 1em;
-     font-weight: 500;
      font-family: inherit;
-     background-color: #1a1a1a;
-     cursor: pointer;
-     transition: all 0.2s;
      user-select: none;
-     background: var(--btn-primary-bg);
-
-     &:hover {
-          filter: brightness(1.2);
-     }
-
-     // &:focus,
-     // &:focus-visible {
-     //      outline: 4px auto -webkit-focus-ring-color;
-     // }
-
-     @media (prefers-color-scheme: light) {
-          background-color: #f9f9f9;
-     }
 }
 
+/* Scrollbar Styles */
 ::-webkit-scrollbar {
-     width: 5px;
-     height: 5px;
+     width: 6px;
+     height: 6px;
 
      &-track {
           background: transparent;
@@ -109,7 +145,7 @@ button {
 
      &-thumb {
           background: var(--btn-primary-bg);
-          border-radius: 5px;
+          border-radius: var(--radius-full);
 
           &:hover {
                background: var(--btn-primary-hover-bg);
@@ -117,43 +153,12 @@ button {
      }
 
      &-corner {
-          background: #2e2e2e;
+          background: transparent;
      }
 }
 
-select {
-     appearance: none;
-     -webkit-appearance: none;
-
-     background-color: #1a1a1a;
-     color: rgba(255, 255, 255, 0.87);
-     border-radius: 8px;
-     padding: 0.6em 2.5em 0.6em 1.2em;
-     font-size: 1em;
-     font-family: inherit;
-     font-weight: 500;
-     cursor: pointer;
-     transition: border-color 0.25s;
-
-     &:hover {
-          border-color: #646cff;
-     }
-
-     &:focus {
-          outline: 4px auto -webkit-focus-ring-color;
-     }
-
-     option {
-          background-color: #1a1a1a;
-          color: white;
-     }
-}
-
+/* Utilities */
 hr {
      border: none;
-     border-top: 1px solid var(--btn-primary-hover-bg);
-}
-
-* {
-     color: var(--text-color, #fff);
+     border-top: 1px solid var(--border-color);
 }

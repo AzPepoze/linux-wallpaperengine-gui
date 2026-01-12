@@ -31,10 +31,10 @@
           left: 0;
           right: 0;
           bottom: 0;
-          background-color: rgba(255, 255, 255, 0.1);
-          transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-          border-radius: 24px;
-          border: 1px solid rgba(255, 255, 255, 0.05);
+          background-color: var(--bg-surface-active);
+          transition: var(--transition-slow);
+          border-radius: var(--radius-full);
+          border: 1px solid var(--border-color);
 
           &:before {
                position: absolute;
@@ -44,15 +44,15 @@
                left: 2px;
                bottom: 2px;
                background-color: #fff;
-               transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+               transition: var(--transition-slow);
                border-radius: 50%;
-               box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+               box-shadow: var(--shadow-sm);
           }
      }
 
      input:checked + .slider {
-          background-color: var(--btn-primary-bg, #007bff);
-          border-color: rgba(255, 255, 255, 0.1);
+          background-color: var(--btn-primary-bg);
+          border-color: var(--border-color);
 
           &:before {
                transform: translateX(20px);

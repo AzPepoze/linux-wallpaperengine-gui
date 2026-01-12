@@ -9,6 +9,7 @@
      import WallpaperItemList from "./WallpaperItemList.svelte";
      import { showDisplayManager } from "../scripts/ui";
      import { cloneMode, toggleCloneMode } from "../scripts/display";
+     import { fly } from "svelte/transition";
 
      export let wallpapers: Record<string, WallpaperData> = {};
      export let activeWallpaper: Wallpaper | null = null;
@@ -41,44 +42,49 @@
           <div class="left-actions"></div>
 
           <div class="status-info">
-               {#if activeWallpaper}
-                    <div class="status-item">
-                         <span class="label">CURRENTLY USING :</span>
-                         <span class="value"
+               <div class="status-item">
+                    <span class="label">CURRENTLY USING :</span>
+                    {#if activeWallpaper}
+                         <span
+                              in:fly={{ y: 20, duration: 300 }}
+                              out:fly={{ y: -20, duration: 300 }}
+                              class="value"
                               >{activeWallpaper.projectData?.title ||
                                    activeWallpaper.folderName}</span
                          >
-                    </div>
-               {/if}
-               {#if selectedScreen || $cloneMode}
-                    <div class="status-item">
-                         <span class="label">DISPLAY :</span>
-                         <span class="value">{$cloneMode ? "ALL" : selectedScreen}</span>
-
-                         <Button
-                              variant={$showDisplayManager
-                                   ? "primary"
-                                   : "secondary"}
-                              on:click={() =>
-                                   showDisplayManager.update((v) => !v)}
-                              title="Toggle Display Manager"
-                              style="padding: 8px; margin-right: 5px; border-radius: 10px;"
+                    {/if}
+               </div>
+               <div class="status-item">
+                    <span class="label">DISPLAY :</span>
+                    {#if selectedScreen || $cloneMode}
+                         <span
+                              in:fly={{ y: 20, duration: 300 }}
+                              out:fly={{ y: -20, duration: 300 }}
+                              class="value"
+                              >{$cloneMode ? "ALL" : selectedScreen}</span
                          >
-                              <DisplayIcon width="20" height="20" />
-                              <span>Display</span>
-                         </Button>
+                    {/if}
 
-                         <Button
-                              variant={$cloneMode ? "primary" : "secondary"}
-                              on:click={handleToggleCloneMode}
-                              title="Clone mode (Apply to all displays)"
-                              style="padding: 8px; margin-right: 10px; border-radius: 10px;"
-                         >
-                              <ApplyAllIcon width="20" height="20" />
-                              <span>Clone mode</span>
-                         </Button>
-                    </div>
-               {/if}
+                    <Button
+                         variant={$showDisplayManager ? "primary" : "secondary"}
+                         on:click={() => showDisplayManager.update((v) => !v)}
+                         title="Toggle Display Manager"
+                         style="padding: 8px; margin-right: 5px; border-radius: 10px;"
+                    >
+                         <DisplayIcon width="20" height="20" />
+                         <span>Display</span>
+                    </Button>
+
+                    <Button
+                         variant={$cloneMode ? "primary" : "secondary"}
+                         on:click={handleToggleCloneMode}
+                         title="Clone mode (Apply to all displays)"
+                         style="padding: 8px; margin-right: 10px; border-radius: 10px;"
+                    >
+                         <ApplyAllIcon width="20" height="20" />
+                         <span>Clone mode</span>
+                    </Button>
+               </div>
           </div>
 
           <div class="mode-toggles">
@@ -141,10 +147,10 @@
           align-items: center;
           background: var(--top-bar-bg);
           border-radius: 20px;
-          gap: 15px; // Increase gap for wrapped items
+          gap: 15px;
           width: 100%;
           box-sizing: border-box;
-          flex-shrink: 0; // Prevent the toolbar itself from shrinking
+          flex-shrink: 0;
 
           .left-actions {
                display: flex;
@@ -152,30 +158,31 @@
                justify-content: flex-start;
           }
 
-                         .status-info {
-                              display: flex;
-                              flex-wrap: wrap;
-                              justify-content: center;
-                              align-items: center;
-                              gap: 15px 32px;
-                              font-size: 0.95em;
-                              flex: 0 1 auto;
-          
-                              .status-item {
-                                   display: flex;
-                                   flex-wrap: wrap;
-                                   gap: 10px;
-                                   align-items: center;
-                                   justify-content: center;
-                              .label {
-                         color: #888;
+          .status-info {
+               display: flex;
+               flex-wrap: wrap;
+               justify-content: center;
+               align-items: center;
+               gap: 15px 32px;
+               font-size: 0.95em;
+               flex: 0 1 auto;
+
+               .status-item {
+                    display: flex;
+                    flex-wrap: wrap;
+                    gap: 10px;
+                    align-items: center;
+                    justify-content: center;
+
+                    .label {
+                         color: var(--text-muted);
                          font-weight: 600;
                          letter-spacing: 0.5px;
                          font-size: 0.85em;
                     }
 
                     .value {
-                         color: var(--btn-primary-bg, #007bff);
+                         color: var(--btn-primary-bg);
                          font-weight: 700;
                          text-transform: uppercase;
                     }
@@ -206,11 +213,11 @@
 
           .status-msg {
                padding: 40px;
-               color: #aaa;
+               color: var(--text-muted);
                font-size: 1.1em;
 
                &.error {
-                    color: #ff6b6b;
+                    color: var(--error-color);
                }
           }
      }

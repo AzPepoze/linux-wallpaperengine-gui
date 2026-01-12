@@ -17,12 +17,12 @@
 <style lang="scss">
   .btn {
     padding: 8px 16px;
-    border-radius: 8px;
+    border-radius: var(--radius-sm);
     border: none;
     cursor: pointer;
     font-size: 0.9em;
     font-weight: 600;
-    transition: all 0.2s ease;
+    transition: var(--transition-base);
     white-space: nowrap;
     display: flex;
     align-items: center;
@@ -39,28 +39,28 @@
     }
 
     &.primary {
-      background-color: var(--btn-primary-bg, #007bff);
+      background-color: var(--btn-primary-bg);
       color: white;
       &:hover:not(:disabled) {
-        background-color: var(--btn-primary-hover-bg, #0056b3);
+        background-color: var(--btn-primary-hover-bg);
       }
     }
 
     &.secondary {
-      background-color: var(--btn-secondary-bg, #444);
+      background-color: var(--btn-secondary-bg);
       color: white;
       &:hover:not(:disabled) {
-        background-color: var(--btn-secondary-hover-bg, #555);
+        background-color: var(--btn-secondary-hover-bg);
       }
     }
 
     &.ghost {
       background-color: transparent;
       color: white;
-      border: 1px solid rgba(255, 255, 255, 0.2);
+      border: 1px solid var(--border-color);
       &:hover:not(:disabled) {
-        background-color: rgba(255, 255, 255, 0.1);
-        border-color: rgba(255, 255, 255, 0.4);
+        background-color: var(--bg-surface);
+        border-color: var(--border-color-hover);
       }
     }
   }
