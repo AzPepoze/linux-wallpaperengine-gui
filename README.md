@@ -47,11 +47,21 @@
 
 ## SCREENSHOTS
 
-|            Main Window            |           Main Window (List)           |
-| :-------------------------------: | :------------------------------------: |
-| ![Main Window](showcase/main.png) | ![Main Window](showcase/main-list.png) |
-|         Display Settings          |                Settings                |
-| ![Details](showcase/display.png)  | ![Select Screen](showcase/setting.png) |
+|            Main Window            |
+| :-------------------------------: |
+| ![Main Window](showcase/main.png) |
+
+|           Main Window (List)           |
+| :------------------------------------: |
+| ![Main Window](showcase/main-list.png) |
+
+|         Display Settings         |
+| :------------------------------: |
+| ![Details](showcase/display.png) |
+
+|                Settings                |
+| :------------------------------------: |
+| ![Select Screen](showcase/setting.png) |
 
 ## PREREQUISITES
 

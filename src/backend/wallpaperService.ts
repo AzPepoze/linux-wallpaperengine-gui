@@ -32,12 +32,29 @@ export async function loadWallpapers() {
                     (result.wallpapers as Record<string, WallpaperData>) || {};
                const config = await wallpaperManager.getConfig();
 
+               console.log(config);
+
                if (
                     config.success &&
                     config.screens &&
                     config.screens.length > 0
                ) {
-                    const firstScreenConfig = config.screens[0];
+                    const availableScreens =
+                         await wallpaperManager.getScreens();
+
+                    let filteredScreens = config.screens;
+
+                    if (availableScreens.success) {
+                         filteredScreens = filteredScreens.filter((screen) => {
+                              return availableScreens.screens?.some(
+                                   (s) => s === screen.name
+                              );
+                         });
+                    }
+
+                    logGui(JSON.stringify(filteredScreens));
+
+                    const firstScreenConfig = filteredScreens[0];
                     if (firstScreenConfig.wallpaper) {
                          const wallpaperData =
                               wallpapers[firstScreenConfig.wallpaper];

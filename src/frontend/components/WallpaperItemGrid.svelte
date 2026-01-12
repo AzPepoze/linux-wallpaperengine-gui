@@ -72,7 +72,7 @@
           display: flex;
           transition: all 0.2s ease-out;
           overflow: hidden;
-          border: 3px solid transparent;
+          border: 1px solid transparent;
           cursor: pointer;
 
           &:hover,
