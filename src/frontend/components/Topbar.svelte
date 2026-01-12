@@ -18,6 +18,7 @@
                title="Wallpapers"
           >
                <HomeIcon width="20" height="20" />
+               <span>Home</span>
           </Button>
 
           <Button
@@ -26,6 +27,7 @@
                title="Logs"
           >
                <LogsIcon width="20" height="20" />
+               <span>Logs</span>
           </Button>
 
           <Button
@@ -34,6 +36,7 @@
                title="Settings"
           >
                <SettingIcon width="20" height="20" />
+               <span>Settings</span>
           </Button>
      </div>
 </div>

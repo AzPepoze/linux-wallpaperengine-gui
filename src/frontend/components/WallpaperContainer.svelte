@@ -3,10 +3,16 @@
      import GridIcon from "../icons/GridIcon.svelte";
      import ListIcon from "../icons/ListIcon.svelte";
      import DisplayIcon from "../icons/DisplayIcon.svelte";
+     import ApplyAllIcon from "../icons/ApplyAllIcon.svelte";
      import Button from "./ui/Button.svelte";
      import WallpaperItemGrid from "./WallpaperItemGrid.svelte";
      import WallpaperItemList from "./WallpaperItemList.svelte";
      import { showDisplayManager } from "../scripts/ui";
+     import {
+          applyWallpaperToAllDisplays,
+          singleWallpaperMode,
+          toggleSingleMode,
+     } from "../scripts/display";
 
      export let wallpapers: Record<string, WallpaperData> = {};
      export let activeWallpaper: Wallpaper | null = null;
@@ -24,6 +30,14 @@
      function selectWallpaper(folderName: string, wallpaper: WallpaperData) {
           onSelect(folderName, wallpaper);
      }
+
+     async function handleToggleSingleMode() {
+          const newMode = !$singleWallpaperMode;
+          await toggleSingleMode(
+               newMode,
+               selectedWallpaper?.folderName || activeWallpaper?.folderName,
+          );
+     }
 </script>
 
 <div class="container">
@@ -40,10 +54,10 @@
                          >
                     </div>
                {/if}
-               {#if selectedScreen}
+               {#if selectedScreen || $singleWallpaperMode}
                     <div class="status-item">
                          <span class="label">DISPLAY :</span>
-                         <span class="value">{selectedScreen}</span>
+                         <span class="value">{$singleWallpaperMode ? "ALL" : selectedScreen}</span>
 
                          <Button
                               variant={$showDisplayManager
@@ -52,9 +66,22 @@
                               on:click={() =>
                                    showDisplayManager.update((v) => !v)}
                               title="Toggle Display Manager"
-                              style="padding: 8px; margin-right: 10px; border-radius: 10px;"
+                              style="padding: 8px; margin-right: 5px; border-radius: 10px;"
                          >
                               <DisplayIcon width="20" height="20" />
+                              <span>Display</span>
+                         </Button>
+
+                         <Button
+                              variant={$singleWallpaperMode
+                                   ? "primary"
+                                   : "secondary"}
+                              on:click={handleToggleSingleMode}
+                              title="Single Wallpaper Mode (Apply to all displays)"
+                              style="padding: 8px; margin-right: 10px; border-radius: 10px;"
+                         >
+                              <ApplyAllIcon width="20" height="20" />
+                              <span>Single Wallpaper</span>
                          </Button>
                     </div>
                {/if}
@@ -67,6 +94,7 @@
                     title="Grid View"
                >
                     <GridIcon />
+                    <span>Grid</span>
                </Button>
                <Button
                     variant={viewMode === "detail" ? "primary" : "secondary"}
@@ -74,6 +102,7 @@
                     title="Detail View"
                >
                     <ListIcon />
+                    <span>List</span>
                </Button>
           </div>
      </div>
@@ -111,13 +140,17 @@
      }
 
      .toolbar {
-          padding: 8px 15px;
+          padding: 10px 15px;
           display: flex;
-          justify-content: center;
+          flex-wrap: wrap;
+          justify-content: space-between;
           align-items: center;
           background: var(--top-bar-bg);
-          min-height: 60px;
           border-radius: 20px;
+          gap: 15px; // Increase gap for wrapped items
+          width: 100%;
+          box-sizing: border-box;
+          flex-shrink: 0; // Prevent the toolbar itself from shrinking
 
           .left-actions {
                display: flex;
@@ -125,19 +158,22 @@
                justify-content: flex-start;
           }
 
-          .status-info {
-               display: flex;
-               gap: 32px;
-               font-size: 0.95em;
-
-               white-space: nowrap;
-
-               .status-item {
-                    display: flex;
-                    gap: 10px;
-                    align-items: center;
-
-                    .label {
+                         .status-info {
+                              display: flex;
+                              flex-wrap: wrap;
+                              justify-content: center;
+                              align-items: center;
+                              gap: 15px 32px;
+                              font-size: 0.95em;
+                              flex: 0 1 auto;
+          
+                              .status-item {
+                                   display: flex;
+                                   flex-wrap: wrap;
+                                   gap: 10px;
+                                   align-items: center;
+                                   justify-content: center;
+                              .label {
                          color: #888;
                          font-weight: 600;
                          letter-spacing: 0.5px;
@@ -163,7 +199,6 @@
      .wallpaper-container {
           flex-grow: 1;
           text-align: center;
-          transition: width 0.3s ease-in-out;
           overflow-y: auto;
           width: 100%;
           position: relative;

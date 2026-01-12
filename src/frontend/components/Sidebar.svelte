@@ -155,6 +155,7 @@
                width: 25%;
                min-width: 250px;
                max-width: 500px;
+               flex-shrink: 0;
                padding: 5px 10px;
                margin: 20px 0 20px 20px;
 

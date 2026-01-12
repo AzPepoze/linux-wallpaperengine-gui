@@ -31,6 +31,8 @@ interface AppConfig {
      disableParticles?: boolean;
      noFullscreenPause?: boolean;
      customExecutableLocation?: string;
+     singleWallpaperMode?: boolean;
+     globalWallpaper?: string | null;
 }
 
 const ensureInitialized = async () => {
@@ -103,7 +105,12 @@ export const manageWallpaper = async (): Promise<{
           }
 
           for (const screen of screens) {
-               if (!screen.wallpaper) continue;
+               let targetWallpaper = screen.wallpaper;
+               if (config.singleWallpaperMode && config.globalWallpaper) {
+                    targetWallpaper = config.globalWallpaper;
+               }
+
+               if (!targetWallpaper) continue;
 
                if (activeWallpapers.has(screen.name)) {
                     const oldPid = activeWallpapers.get(screen.name);
@@ -112,7 +119,7 @@ export const manageWallpaper = async (): Promise<{
                     activeWallpapers.delete(screen.name);
                }
 
-               let args = `${screen.wallpaper} -r ${screen.name} -f ${fps}`;
+               let args = `${targetWallpaper} -r ${screen.name} -f ${fps}`;
 
                if (isSilenced) {
                     args += " -s";
@@ -272,7 +279,29 @@ export const setWallpaper = async (
           screens.push({ name: screenName, wallpaper: wallpaperFolderName });
      }
 
-     await writeConfig({ ...config, screens });
+     const updateData: Partial<AppConfig> = { screens };
+     if (config.singleWallpaperMode) {
+          updateData.globalWallpaper = wallpaperFolderName;
+     }
+
+     await writeConfig({ ...config, ...updateData });
+     return await manageWallpaper();
+};
+
+export const toggleSingleWallpaperMode = async (
+     enabled: boolean,
+     globalWallpaper?: string | null
+) => {
+     const config = await readConfig();
+     const updateData: Partial<AppConfig> = {
+          singleWallpaperMode: enabled,
+     };
+
+     if (globalWallpaper !== undefined) {
+          updateData.globalWallpaper = globalWallpaper;
+     }
+
+     await writeConfig({ ...config, ...updateData });
      return await manageWallpaper();
 };
 

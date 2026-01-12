@@ -2,8 +2,6 @@
   export let type: "button" | "submit" | "reset" = "button";
   export let variant: "primary" | "secondary" | "ghost" = "primary";
   export let disabled = false;
-
-  // For capturing the click event
 </script>
 
 <button
@@ -34,6 +32,10 @@
     &:disabled {
       opacity: 0.5;
       cursor: not-allowed;
+    }
+
+    &:active:not(:disabled) {
+      transform: scale(0.95);
     }
 
     &.primary {

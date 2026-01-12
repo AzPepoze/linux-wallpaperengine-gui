@@ -4,6 +4,7 @@ import { logGui } from "../../backend/logger";
 
 export const screens = writable<Record<string, string | null>>({});
 export const selectedScreen = writable<string | null>(null);
+export const singleWallpaperMode = writable<boolean>(false);
 
 export async function refreshScreens() {
      logGui("Refreshing screens...");
@@ -30,12 +31,16 @@ export async function refreshScreens() {
      }
 
      const configResult = await wallpaperManager.getConfig();
-     if (configResult.success && configResult.screens) {
-          configResult.screens.forEach((s: any) => {
-               if (nextScreens.hasOwnProperty(s.name)) {
-                    nextScreens[s.name] = s.wallpaper;
-               }
-          });
+     if (configResult.success) {
+          singleWallpaperMode.set(configResult.singleWallpaperMode || false);
+
+          if (configResult.screens) {
+               configResult.screens.forEach((s: any) => {
+                    if (nextScreens.hasOwnProperty(s.name)) {
+                         nextScreens[s.name] = s.wallpaper;
+                    }
+               });
+          }
      }
 
      let currentSelected = get(selectedScreen);
@@ -66,6 +71,30 @@ export async function refreshScreens() {
      } else {
           selectedScreen.set(null);
      }
+}
+
+export async function applyWallpaperToAllDisplays(wallpaperFolderName: string) {
+     const screensResult = await wallpaperManager.getScreens();
+     if (screensResult.success && screensResult.screens) {
+          for (const screenName of screensResult.screens) {
+               await wallpaperManager.setWallpaper(
+                    screenName,
+                    wallpaperFolderName,
+               );
+          }
+          await refreshScreens();
+     }
+}
+
+export async function toggleSingleMode(
+     enabled: boolean,
+     currentWallpaper?: string | null,
+) {
+     await wallpaperManager.toggleSingleWallpaperMode(
+          enabled,
+          currentWallpaper,
+     );
+     await refreshScreens();
 }
 
 export function initDisplay() {
