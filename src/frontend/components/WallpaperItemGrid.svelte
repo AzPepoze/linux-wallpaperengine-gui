@@ -1,6 +1,6 @@
 <script lang="ts">
      import type { WallpaperData, Wallpaper } from "../../shared/types";
-     import { fade } from "svelte/transition";
+     import { fade, fly } from "svelte/transition";
 
      export let wallpapers: Record<string, WallpaperData> = {};
      export let selectedWallpaper: Wallpaper | null = null;
@@ -12,8 +12,12 @@
      const fadeDuration = 200;
 </script>
 
-<div class="wallpaper-grid" in:fade={{ duration: 200 }}>
-     {#each Object.entries(wallpapers) as [folderName, wallpaper]}
+<div
+     class="wallpaper-grid"
+     in:fly={{ x: -20, delay: 200, duration: 200 }}
+     out:fly={{ x: -20, duration: 200 }}
+>
+     {#each Object.entries(wallpapers) as [folderName, wallpaper], index (folderName)}
           {@const selected = selectedWallpaper?.folderName === folderName}
           {@const altText = `Preview for ${wallpaper.projectData?.title || folderName}`}
           <button
@@ -22,6 +26,7 @@
                class:selected
                aria-pressed={selected}
                on:click={() => onSelect(folderName, wallpaper)}
+               style="animation-delay: {10 + index * 50}ms"
           >
                <div class="wallpaper-preview-container">
                     {#if wallpaper.previewData}

@@ -1,6 +1,6 @@
 <script lang="ts">
      import type { WallpaperData, Wallpaper } from "../../shared/types";
-     import { fade } from "svelte/transition";
+     import { fly } from "svelte/transition";
 
      export let wallpapers: Record<string, WallpaperData> = {};
      export let selectedWallpaper: Wallpaper | null = null;
@@ -10,7 +10,11 @@
      ) => void;
 </script>
 
-<div class="wallpaper-list" in:fade={{ duration: 200 }}>
+<div
+     class="wallpaper-list"
+     in:fly={{ x: 20, delay: 200, duration: 200 }}
+     out:fly={{ x: 20, duration: 200 }}
+>
      {#each Object.entries(wallpapers) as [folderName, wallpaper]}
           <!-- svelte-ignore a11y-click-events-have-key-events -->
           <div

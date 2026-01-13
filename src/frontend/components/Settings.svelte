@@ -425,7 +425,7 @@
                     font-weight: 500;
 
                     &:hover {
-                         background: var(--bg-surface);
+                         background: var(--bg-surface-hover);
                          color: var(--text-color);
                     }
 

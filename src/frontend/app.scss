@@ -11,11 +11,11 @@
      /* Base Text & Background */
      --text-color: rgba(255, 255, 255, 0.87);
      --text-muted: rgba(255, 255, 255, 0.4);
-     --bg-app: rgba(0, 0, 0, 0.8);
+     --bg-app: rgb(29, 29, 29);
 
      /* Surfaces & Interactive */
-     --bg-surface: rgba(0, 0, 0, 0.3);
-     --bg-surface-hover: rgba(255, 255, 255, 0.05);
+     --bg-surface: rgba(61, 61, 61, 0.4);
+     --bg-surface-hover: rgba(255, 255, 255, 0.15);
      --bg-surface-active: rgba(255, 255, 255, 0.08);
 
      /* Overlays & Modals */
@@ -25,9 +25,9 @@
 
      /* Primary Brand Colors */
      --btn-primary-bg: #007bff;
-     --btn-primary-hover-bg: #0056b3;
+     --btn-primary-hover-bg: #53a6ff;
      --btn-secondary-bg: #2a2a2a;
-     --btn-secondary-hover-bg: #1a1a1a;
+     --btn-secondary-hover-bg: #464646;
 
      /* Status Colors */
      --success-bg: rgba(40, 167, 69, 0.25);

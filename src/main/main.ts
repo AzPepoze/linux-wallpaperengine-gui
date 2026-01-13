@@ -50,7 +50,7 @@ function createWindow() {
                nodeIntegration: false,
           },
           autoHideMenuBar: true,
-          transparent: true,
+          // transparent: true,
           // frame: false,
      });
 
