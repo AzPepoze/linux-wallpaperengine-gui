@@ -346,7 +346,7 @@
                                         type="text"
                                         id="customArgs"
                                         bind:value={$settingsStore.customArgs}
-                                        placeholder="e.g. --window 1920x1080"
+                                        placeholder="e.g. --window 0x0x1920x1080"
                                    />
                                    <div class="doc-actions">
                                         <Button
