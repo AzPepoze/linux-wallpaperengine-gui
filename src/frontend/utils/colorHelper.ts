@@ -1,4 +1,5 @@
 import ColorThief from "colorthief";
+import { logger } from "../scripts/logger";
 
 export function getDominantColor(
      base64String: string
@@ -11,12 +12,12 @@ export function getDominantColor(
                     const dominantColor = colorThief.getColor(img);
                     resolve(dominantColor);
                } catch (error) {
-                    console.error("Error getting dominant color:", error);
+                    logger.error("Getting dominant color:", error);
                     reject(error);
                }
           };
           img.onerror = (error) => {
-               console.error("Error loading image for color thief:", error);
+               logger.error("Loading image for color thief:", error);
                reject(error);
           };
           img.src = base64String;

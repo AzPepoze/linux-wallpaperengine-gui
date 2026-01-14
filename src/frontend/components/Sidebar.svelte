@@ -1,7 +1,7 @@
 <script lang="ts">
      import type { Wallpaper } from "../../shared/types";
      import MarkdownIt from "markdown-it";
-     import { getDominantColor, isLight } from "../../backend/colorHelper";
+     import { getDominantColor, isLight } from "../utils/colorHelper";
      import { sidebarWidth } from "../scripts/ui";
      import { onDestroy } from "svelte";
 

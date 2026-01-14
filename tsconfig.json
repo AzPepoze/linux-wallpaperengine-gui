@@ -1,39 +1,36 @@
 {
-	"compilerOptions": {
-		"target": "ESNext",
-		"useDefineForClassFields": true,
-		"module": "ESNext",
-		"resolveJsonModule": true,
-		"allowJs": true,
-		"checkJs": true,
-		"isolatedModules": true,
-		"moduleDetection": "force",
-		"noEmit": true,
+     "compilerOptions": {
+          "target": "ESNext",
+          "useDefineForClassFields": true,
+          "module": "ESNext",
+          "resolveJsonModule": true,
+          "allowJs": true,
+          "checkJs": true,
+          "isolatedModules": true,
+          "moduleDetection": "force",
+          "noEmit": true,
 
-		/* Bundler mode */
-		"moduleResolution": "bundler",
-		"allowImportingTsExtensions": true,
+          /* Bundler mode */
+          "moduleResolution": "bundler",
+          "allowImportingTsExtensions": true,
 
-		/* Svelte & Electron specific */
-		"lib": ["es2023", "dom", "dom.iterable"], // Added dom libs for frontend
-		"types": ["svelte", "node"], // Added svelte and node types
-		"skipLibCheck": true, // From node config
+          /* Svelte & Electron specific */
+          "lib": ["es2023", "dom", "dom.iterable"], // Added dom libs for frontend
+          "types": ["svelte", "node"], // Added svelte and node types
+          "skipLibCheck": true, // From node config
 
-		/* Linting */
-		"strict": true,
-		"noUnusedLocals": true,
-		"noUnusedParameters": true,
-		"noFallthroughCasesInSwitch": true,
-		"noUncheckedSideEffectImports": true
-	},
-	"include": [
-		"src/frontend/**/*.ts",
-		"src/frontend/**/*.js",
-		"src/frontend/**/*.svelte",
-		"src/backend/**/*.ts",
-		"src/main/**/*.ts",
-		"vite.config.ts",
-		"tsconfig.json"
-	],
-	"exclude": ["node_modules"]
+          /* Linting */
+          "strict": true,
+          "noUnusedLocals": true,
+          "noUnusedParameters": true,
+          "noFallthroughCasesInSwitch": true,
+          "noUncheckedSideEffectImports": true
+     },
+     "include": [
+          "src/**/*.ts",
+          "src/**/*.svelte",
+          "vite.config.ts",
+          "tsconfig.json"
+     ],
+     "exclude": ["node_modules"]
 }

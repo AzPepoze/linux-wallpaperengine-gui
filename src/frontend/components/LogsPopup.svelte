@@ -1,20 +1,23 @@
 <script lang="ts">
-     import { guiLogs, wallpaperLogs, clearLogs } from "../../backend/logger";
+     import {
+          frontendLogs,
+          backendLogs,
+          wallpaperLogs,
+          logger,
+     } from "../scripts/logger";
      import { afterUpdate, onMount, tick } from "svelte";
-     import Fullscreen from "./ui/Fullscreen.svelte";
 
-     export let onClose: () => void = () => {};
-     export let full: boolean = false;
-
-     let guiLogContainer: HTMLDivElement;
+     let frontendLogContainer: HTMLDivElement;
+     let backendLogContainer: HTMLDivElement;
      let wallpaperLogContainer: HTMLDivElement;
 
-     let guiAutoScroll = true;
+     let frontendAutoScroll = true;
+     let backendAutoScroll = true;
      let wallpaperAutoScroll = true;
 
      function isAtBottom(element: HTMLDivElement) {
           if (!element) return false;
-          const threshold = 50; // tolerance in pixels
+          const threshold = 50;
           return (
                element.scrollHeight -
                     element.scrollTop -
@@ -29,9 +32,15 @@
           }
      }
 
-     function handleGuiScroll() {
-          if (guiLogContainer) {
-               guiAutoScroll = isAtBottom(guiLogContainer);
+     function handleFrontendScroll() {
+          if (frontendLogContainer) {
+               frontendAutoScroll = isAtBottom(frontendLogContainer);
+          }
+     }
+
+     function handleBackendScroll() {
+          if (backendLogContainer) {
+               backendAutoScroll = isAtBottom(backendLogContainer);
           }
      }
 
@@ -44,92 +53,66 @@
      // Initial scroll to bottom
      onMount(async () => {
           await tick();
-          scrollToBottom(guiLogContainer);
+          scrollToBottom(frontendLogContainer);
+          scrollToBottom(backendLogContainer);
           scrollToBottom(wallpaperLogContainer);
      });
 
      afterUpdate(() => {
-          if (guiAutoScroll) scrollToBottom(guiLogContainer);
+          if (frontendAutoScroll) scrollToBottom(frontendLogContainer);
+          if (backendAutoScroll) scrollToBottom(backendLogContainer);
           if (wallpaperAutoScroll) scrollToBottom(wallpaperLogContainer);
      });
 </script>
 
-{#if full}
-     <div class="logs-wrapper full">
-          <div class="modal-header">
-               <h2>System Logs</h2>
-               <div class="header-actions">
-                    <button on:click={clearLogs}>Clear Logs</button>
+<div class="logs-wrapper full">
+     <div class="modal-header">
+          <h2>System Logs</h2>
+          <div class="header-actions">
+               <button class="clear-btn" on:click={() => logger.clearAll()}
+                    >Clear Logs</button
+               >
+          </div>
+     </div>
+     <div class="logs-container">
+          <div class="log-section">
+               <h3>UI Logs</h3>
+               <div
+                    class="log-box"
+                    bind:this={frontendLogContainer}
+                    on:scroll={handleFrontendScroll}
+               >
+                    {#each $frontendLogs as log}
+                         <div class="log-entry">{log}</div>
+                    {/each}
                </div>
           </div>
-          <div class="logs-container">
-               <div class="log-section">
-                    <h3>GUI Logs</h3>
-                    <div
-                         class="log-box"
-                         bind:this={guiLogContainer}
-                         on:scroll={handleGuiScroll}
-                    >
-                         {#each $guiLogs as log}
-                              <div class="log-entry">{log}</div>
-                         {/each}
-                    </div>
+          <div class="log-section">
+               <h3>Background Logs</h3>
+               <div
+                    class="log-box"
+                    bind:this={backendLogContainer}
+                    on:scroll={handleBackendScroll}
+               >
+                    {#each $backendLogs as log}
+                         <div class="log-entry">{log}</div>
+                    {/each}
                </div>
-               <div class="log-section">
-                    <h3>Wallpaper Logs</h3>
-                    <div
-                         class="log-box"
-                         bind:this={wallpaperLogContainer}
-                         on:scroll={handleWallpaperScroll}
-                    >
-                         {#each $wallpaperLogs as log}
-                              <div class="log-entry">{log}</div>
-                         {/each}
-                    </div>
+          </div>
+          <div class="log-section">
+               <h3>Wallpaper Logs</h3>
+               <div
+                    class="log-box"
+                    bind:this={wallpaperLogContainer}
+                    on:scroll={handleWallpaperScroll}
+               >
+                    {#each $wallpaperLogs as log}
+                         <div class="log-entry">{log}</div>
+                    {/each}
                </div>
           </div>
      </div>
-{:else}
-     <Fullscreen {onClose}>
-          <div class="logs-wrapper">
-               <div class="modal-header">
-                    <h2>System Logs</h2>
-                    <div class="header-actions">
-                         <button on:click={clearLogs}>Clear Logs</button>
-                         <button class="close-button" on:click={onClose}
-                              >×</button
-                         >
-                    </div>
-               </div>
-               <div class="logs-container">
-                    <div class="log-section">
-                         <h3>GUI Logs</h3>
-                         <div
-                              class="log-box"
-                              bind:this={guiLogContainer}
-                              on:scroll={handleGuiScroll}
-                         >
-                              {#each $guiLogs as log}
-                                   <div class="log-entry">{log}</div>
-                              {/each}
-                         </div>
-                    </div>
-                    <div class="log-section">
-                         <h3>Wallpaper Logs</h3>
-                         <div
-                              class="log-box"
-                              bind:this={wallpaperLogContainer}
-                              on:scroll={handleWallpaperScroll}
-                         >
-                              {#each $wallpaperLogs as log}
-                                   <div class="log-entry">{log}</div>
-                              {/each}
-                         </div>
-                    </div>
-               </div>
-          </div>
-     </Fullscreen>
-{/if}
+</div>
 
 <style lang="scss">
      .logs-wrapper {
@@ -176,19 +159,6 @@
                     background-color: var(--btn-secondary-hover-bg);
                }
           }
-
-          .close-button {
-               background: none;
-               border: none;
-               font-size: 2em;
-               line-height: 1;
-               padding: 0 10px;
-
-               &:hover {
-                    background-color: transparent;
-                    color: var(--error-color);
-               }
-          }
      }
 
      .logs-container {
@@ -221,12 +191,12 @@
           border: 1px solid var(--border-color);
           border-radius: var(--radius-sm);
           padding: 10px;
-          overflow: auto; 
+          overflow: auto;
           font-family: monospace;
           font-size: 0.9em;
           color: var(--text-muted);
-          white-space: pre; 
-          text-align: left; 
+          white-space: pre;
+          text-align: left;
      }
 
      .log-entry {

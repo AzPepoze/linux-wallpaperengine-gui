@@ -1,7 +1,9 @@
 import { writable } from "svelte/store";
 
 export const showDisplayManager = writable(false);
-export const activeView = writable<"wallpapers" | "logs" | "settings">("wallpapers");
+export const activeView = writable<"wallpapers" | "logs" | "settings">(
+     "wallpapers"
+);
 
 const savedWidth = localStorage.getItem("sidebarWidth");
 export const sidebarWidth = writable(savedWidth ? parseInt(savedWidth) : 350);

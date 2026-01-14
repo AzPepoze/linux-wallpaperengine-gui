@@ -1,10 +1,5 @@
 import { writable } from "svelte/store";
 import type { Writable } from "svelte/store";
-import {
-     getConfig,
-     saveConfig,
-     openConfigInEditor,
-} from "../../backend/wallpaperManager";
 import { EXECUTABLE_NAME } from "../../shared/constants";
 
 // Toast Management
@@ -94,7 +89,7 @@ const configFieldMap: Record<string, string> = {
 // Settings Actions
 export async function loadSettings(): Promise<void> {
      try {
-          const config = await getConfig();
+          const config = await window.electronAPI.getConfig();
           if (config.success) {
                const settings: SettingsState = { ...defaultSettings };
 
@@ -123,11 +118,19 @@ export async function saveSettings(settings: SettingsState): Promise<void> {
                configData[configKey] = settings[key];
           }
 
-          const result = await saveConfig(configData);
+          const result = await window.electronAPI.saveConfig(configData);
           if (result.success) {
                showToast("Settings saved successfully!", "success");
           } else {
                showToast(`Error saving settings: ${result.error}`, "error");
+          }
+
+          const applyResult = await window.electronAPI.applyWallpapers();
+          if (!applyResult.success) {
+               showToast(
+                    `Error applying wallpapers: ${applyResult.error}`,
+                    "error"
+               );
           }
      } catch (e) {
           showToast(`Error saving settings: ${getErrorMessage(e)}`, "error");
@@ -136,7 +139,7 @@ export async function saveSettings(settings: SettingsState): Promise<void> {
 
 export async function openConfigFile(): Promise<void> {
      try {
-          const result = await openConfigInEditor();
+          const result = await window.electronAPI.openConfigInEditor();
           if (result.success) {
                showToast("Config file opened!", "success");
           } else {

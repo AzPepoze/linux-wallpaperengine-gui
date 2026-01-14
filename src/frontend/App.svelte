@@ -4,9 +4,7 @@
      import Sidebar from "./components/Sidebar.svelte";
      import WallpaperContainer from "./components/WallpaperContainer.svelte";
      import DisplayManager from "./components/DisplayManager.svelte";
-     import * as wallpaperService from "../backend/wallpaperService";
-     import * as wallpaperManager from "../backend/wallpaperManager";
-     import { logWallpaper, logGui } from "../backend/logger";
+     import { initLogger, logger } from "./scripts/logger";
      import type { WallpaperData } from "../shared/types";
      import { onMount } from "svelte";
      import { quadOut } from "svelte/easing";
@@ -37,27 +35,22 @@
           : null;
 
      async function initialize() {
+          initLogger();
           loading = true;
 
-          if (window.electronAPI) {
-               window.electronAPI.on("wallpaper-log", (message: string) => {
-                    logWallpaper(message);
-               });
-          }
-
           display.initDisplay();
+          logger.log("Application initialized");
 
-          logGui("Application initialized");
-
-          await wallpaperManager.main();
-
-          await wallpaperManager.validateExecutable();
+          // Main process handles init
+          if (window.electronAPI.validateExecutable) {
+               await window.electronAPI.validateExecutable();
+          }
 
           const {
                wallpapers: loadedWallpapers,
                error: loadError,
                selectedWallpaper: initialWallpaper,
-          } = await wallpaperService.loadWallpapers();
+          } = await window.electronAPI.loadWallpapers();
 
           wallpapers = loadedWallpapers;
           error = loadError;
@@ -72,11 +65,11 @@
           loading = false;
 
           for (const folderName in wallpapers) {
-               const wallpaperData = wallpapers[folderName];
-               if (wallpaperData.previewPath) {
+               const wallpaperDataResult = wallpapers[folderName];
+               if (wallpaperDataResult.previewPath) {
                     const previewResult =
-                         await wallpaperManager.getWallpaperPreview(
-                              wallpaperData.previewPath,
+                         await window.electronAPI.getWallpaperPreview(
+                              wallpaperDataResult.previewPath,
                          );
                     if (previewResult.success) {
                          wallpapers[folderName] = {
@@ -84,7 +77,7 @@
                               previewData: previewResult.data,
                          };
                     } else {
-                         console.error(
+                         logger.log(
                               `Failed to get preview for ${folderName}: ${previewResult.error}`,
                          );
                     }
@@ -117,6 +110,7 @@
      }
 
      onMount(async () => {
+          initLogger();
           const initialWallpaper = await initialize();
           await display.refreshScreens();
 
@@ -132,14 +126,17 @@
 
      async function handleSelectWallpaper(folderName: string) {
           if ($selectedScreen) {
-               await wallpaperManager.setWallpaper($selectedScreen, folderName);
+               await window.electronAPI.setWallpaper(
+                    $selectedScreen,
+                    folderName,
+               );
                activeFolderName = folderName;
                screens.update((s) => ({
                     ...s,
                     [$selectedScreen as string]: folderName,
                }));
           } else {
-               console.warn("No screen selected for configuration.");
+               logger.warn("No screen selected for configuration.");
           }
           selectedFolderName = folderName;
      }
@@ -198,7 +195,7 @@
                     in:scale={pageTransitionInParams}
                     out:scale={pageTransitionOutParams}
                >
-                    <LogsPopup full={true} />
+                    <LogsPopup />
                </div>
           {:else if $activeView === "settings"}
                <div

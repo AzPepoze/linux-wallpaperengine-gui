@@ -1,12 +1,12 @@
 <script lang="ts">
      import { onMount } from "svelte";
-     import { clearAllWallpapers } from "../../backend/wallpaperManager";
      import {
           settingsStore,
           loadSettings,
           saveSettings,
           openConfigFile,
           validateBinaryFile,
+          showToast,
      } from "../scripts/settings";
 
      import SettingsSection from "./settings/SettingsSection.svelte";
@@ -94,6 +94,17 @@
      const handleOpenConfig = async () => {
           await openConfigFile();
      };
+
+     const handleClearAll = async () => {
+          if (confirm("Are you sure you want to clear all wallpapers?")) {
+               const result = await window.electronAPI.clearAllWallpapers();
+               if (result.success) {
+                    showToast("All wallpapers cleared", "success");
+               } else {
+                    showToast(`Error: ${result.error}`, "error");
+               }
+          }
+     };
 </script>
 
 <div class="settings-container">
@@ -126,7 +137,7 @@
                <button class="action-btn secondary" on:click={handleOpenConfig}>
                     Open Config
                </button>
-               <button class="action-btn danger" on:click={clearAllWallpapers}>
+               <button class="action-btn danger" on:click={handleClearAll}>
                     Clear All
                </button>
           </div>

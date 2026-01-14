@@ -1,22 +1,19 @@
 import { writable, get } from "svelte/store";
-import * as wallpaperManager from "../../backend/wallpaperManager";
-import { logGui } from "../../backend/logger";
+import { logger } from "./logger";
 
 export const screens = writable<Record<string, string | null>>({});
 export const selectedScreen = writable<string | null>(null);
 export const cloneMode = writable<boolean>(false);
 
 export async function refreshScreens() {
-     logGui("Refreshing screens...");
-     const screensResult = await wallpaperManager.getScreens();
-     let connectedScreens: string[] = [];
-
-     if (screensResult.success && screensResult.screens) {
-          connectedScreens = screensResult.screens;
-     } else if (screensResult.error) {
-          console.error(`Failed to get screens: ${screensResult.error}`);
+     logger.log("Refreshing screens...");
+     const screensResult = await window.electronAPI.getScreens();
+     if ("error" in screensResult) {
+          logger.error(`Failed to get screens: ${screensResult.error}`);
+          return;
      }
 
+     const connectedScreens = screensResult.screens || [];
      let currentScreens = get(screens);
      let nextScreens: Record<string, string | null> = {};
 
@@ -30,7 +27,7 @@ export async function refreshScreens() {
           }
      }
 
-     const configResult = await wallpaperManager.getConfig();
+     const configResult = await window.electronAPI.getConfig();
      if (configResult.success) {
           cloneMode.set(configResult.cloneMode || false);
 
@@ -54,11 +51,11 @@ export async function refreshScreens() {
 
      for (const s of connectedScreens) {
           if (!nextScreens[s] && fallbackWallpaper) {
-               console.log(
-                    `Auto-assigning wallpaper to ${s}: ${fallbackWallpaper}`,
+               logger.log(
+                    `Auto-assigning wallpaper to ${s}: ${fallbackWallpaper}`
                );
                nextScreens[s] = fallbackWallpaper;
-               await wallpaperManager.setWallpaper(s, fallbackWallpaper);
+               await window.electronAPI.setWallpaper(s, fallbackWallpaper);
           }
      }
 
@@ -73,31 +70,18 @@ export async function refreshScreens() {
      }
 }
 
-export async function applyWallpaperToAllDisplays(wallpaperFolderName: string) {
-     const screensResult = await wallpaperManager.getScreens();
-     if (screensResult.success && screensResult.screens) {
-          for (const screenName of screensResult.screens) {
-               await wallpaperManager.setWallpaper(
-                    screenName,
-                    wallpaperFolderName,
-               );
-          }
-          await refreshScreens();
-     }
-}
-
 export async function toggleCloneMode(
      enabled: boolean,
-     currentWallpaper?: string | null,
+     currentWallpaper?: string | null
 ) {
-     await wallpaperManager.toggleCloneMode(enabled, currentWallpaper);
+     await window.electronAPI.toggleCloneMode(enabled, currentWallpaper);
      await refreshScreens();
 }
 
 export function initDisplay() {
      if (window.electronAPI) {
           window.electronAPI.on("screens-changed", () => {
-               logGui("Screens changed detected, refreshing...");
+               logger.log("Screens changed detected, refreshing...");
                refreshScreens();
           });
      }

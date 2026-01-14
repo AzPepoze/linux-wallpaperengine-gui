@@ -1,37 +1,75 @@
-import { writable } from "svelte/store";
+import { BrowserWindow } from "electron";
+import { IPC_LOG_CHANNEL } from "../shared/constants";
+import { cleanLog, addTimestamp } from "../shared/logger";
 
-export const guiLogs = writable<string[]>([]);
-export const wallpaperLogs = writable<string[]>([]);
+let mainWindow: BrowserWindow | null = null;
 
-export function logGui(message: string) {
-     const timestamp = new Date().toLocaleTimeString();
-     const logEntry = `[${timestamp}] ${message}`;
-     console.log(logEntry); // Also log to console
-     guiLogs.update((logs) => {
-          const newLogs = [...logs, logEntry];
-          if (newLogs.length > 500) {
-               return newLogs.slice(newLogs.length - 500);
-          }
-          return newLogs;
-     });
+export function setMainWindow(win: BrowserWindow | null) {
+     mainWindow = win;
 }
 
-export function logWallpaper(message: string) {
-     // message might contain newlines, split them
-     const lines = message.split('\n').filter(line => line.trim() !== '');
-     const timestamp = new Date().toLocaleTimeString();
-     const entries = lines.map(line => `[${timestamp}] ${line}`);
-     
-     wallpaperLogs.update((logs) => {
-          const newLogs = [...logs, ...entries];
-          if (newLogs.length > 500) {
-               return newLogs.slice(newLogs.length - 500);
-          }
-          return newLogs;
-     });
+function log(...args: any[]) {
+     const message = cleanLog(...args);
+     console.log(addTimestamp(message));
 }
 
-export function clearLogs() {
-     guiLogs.set([]);
-     wallpaperLogs.set([]);
+function logToFrontend(
+     {
+          type,
+          showLog,
+          data,
+     }: {
+          type: string;
+          showLog: boolean;
+          [key: string]: any;
+     } = {
+          type: "backend",
+          showLog: true,
+          data: [],
+     }
+) {
+     const message = cleanLog(...data);
+     if (showLog) log(`[${type.toUpperCase()}] ${message}`);
+
+     if (mainWindow && !mainWindow.isDestroyed()) {
+          mainWindow.webContents.send(IPC_LOG_CHANNEL, {
+               type,
+               message,
+          });
+     }
 }
+
+export const logger = {
+     frontend: (...args: any[]) => {
+          const message = cleanLog(...args);
+          log("[Frontend]:", message);
+     },
+
+     backend: (...args: any[]) => {
+          logToFrontend({ type: "backend", showLog: true, data: args });
+     },
+
+     wallpaper: (...args: any[]) => {
+          logToFrontend({ type: "wallpaper", showLog: false, data: args });
+     },
+
+     error: (...args: any[]) => {
+          logToFrontend({
+               type: "backend",
+               showLog: true,
+               data: ["[Backend ERROR]:", ...args],
+          });
+     },
+
+     toFrontend: (type: string, ...args: any[]) => {
+          logToFrontend({ type, showLog: true, data: args });
+     },
+
+     ipcReceived: (channel: string, ...args: any[]) => {
+          logToFrontend({
+               type: "backend",
+               showLog: true,
+               data: [`[IPC_RECEIVED] ${channel}`, ...args],
+          });
+     },
+};
