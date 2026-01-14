@@ -30,7 +30,9 @@ export function registerFileService() {
                dirPath = path.join(app.getPath("home"), dirPath.slice(1));
           }
           try {
-               const entries = await fs.readdir(dirPath, { withFileTypes: true });
+               const entries = await fs.readdir(dirPath, {
+                    withFileTypes: true,
+               });
                return entries.map((e) => ({
                     entry: e.name,
                     type: e.isDirectory() ? "DIRECTORY" : "FILE",
@@ -54,7 +56,10 @@ export function registerFileService() {
           async (_, filePath: string, content: string) => {
                logger.ipcReceived("fs-write-file", filePath);
                if (filePath.startsWith("~")) {
-                    filePath = path.join(app.getPath("home"), filePath.slice(1));
+                    filePath = path.join(
+                         app.getPath("home"),
+                         filePath.slice(1)
+                    );
                }
                await fs.writeFile(filePath, content, "utf-8");
           }

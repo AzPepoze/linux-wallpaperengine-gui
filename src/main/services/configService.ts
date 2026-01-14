@@ -7,8 +7,8 @@ import {
      openConfigInEditor,
      getWallpaperExecutableLocation,
      validateExecutable,
-     AppConfig
 } from "../../backend/config";
+import { AppConfig } from "../../shared/types";
 import { logger } from "../../backend/logger";
 
 export function registerConfigService() {
@@ -22,10 +22,13 @@ export function registerConfigService() {
           return await readConfig();
      });
 
-     ipcMain.handle("save-config", async (_, newConfig: Omit<AppConfig, "screens">) => {
-          logger.ipcReceived("save-config");
-          return await saveConfig(newConfig);
-     });
+     ipcMain.handle(
+          "save-config",
+          async (_, newConfig: Omit<AppConfig, "screens">) => {
+               logger.ipcReceived("save-config");
+               return await saveConfig(newConfig);
+          }
+     );
 
      ipcMain.handle("write-config", async (_, newConfig: AppConfig) => {
           logger.ipcReceived("write-config");

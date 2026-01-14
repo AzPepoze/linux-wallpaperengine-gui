@@ -19,6 +19,7 @@ interface ElectronAPI {
      execCommand: (command: string, args?: string[], show_log?: boolean) => Promise<any>;
      getEnv: (key: string) => Promise<string | undefined>;
      getHomeDir: () => Promise<string>;
+     openExternal: (url: string) => Promise<void>;
 
      // File system operations
      readDirectory: (path: string) => Promise<{ entry: string; type: "DIRECTORY" | "FILE" }[]>;

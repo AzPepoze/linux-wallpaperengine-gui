@@ -47,27 +47,18 @@ export interface SettingsState {
      noFullscreenPause: boolean;
      disableParticles: boolean;
      binaryLocation: string;
+     // New options
+     fullscreenPauseOnlyActive: boolean;
+     fullscreenPauseIgnoreAppIds: string[];
+     screenshot: string;
+     screenshotDelay: number;
+     assetsDir: string;
+     properties: Record<string, string>;
+     dumpStructure: boolean;
+     playlist: string[];
 }
 
-// Default settings values
-const defaultSettings: SettingsState = {
-     fps: 60,
-     silence: false,
-     customArgs: "",
-     customArgsEnabled: false,
-     volume: 100,
-     noAutomute: false,
-     noAudioProcessing: false,
-     scaling: "default",
-     clamping: "clamp",
-     disableMouse: false,
-     disableParallax: false,
-     noFullscreenPause: false,
-     disableParticles: false,
-     binaryLocation: "",
-};
-
-export const settingsStore: Writable<SettingsState> = writable(defaultSettings);
+export const settingsStore: Writable<SettingsState | null> = writable(null);
 
 const configFieldMap: Record<string, string> = {
      fps: "FPS",
@@ -84,6 +75,15 @@ const configFieldMap: Record<string, string> = {
      noFullscreenPause: "noFullscreenPause",
      disableParticles: "disableParticles",
      binaryLocation: "customExecutableLocation",
+     // New options mapping
+     fullscreenPauseOnlyActive: "fullscreenPauseOnlyActive",
+     fullscreenPauseIgnoreAppIds: "fullscreenPauseIgnoreAppIds",
+     screenshot: "screenshot",
+     screenshotDelay: "screenshotDelay",
+     assetsDir: "assetsDir",
+     properties: "properties",
+     dumpStructure: "dumpStructure",
+     playlist: "playlist",
 };
 
 // Settings Actions
@@ -91,7 +91,7 @@ export async function loadSettings(): Promise<void> {
      try {
           const config = await window.electronAPI.getConfig();
           if (config.success) {
-               const settings: SettingsState = { ...defaultSettings };
+               const settings: Partial<SettingsState> = {};
 
                // Map config values to settings
                for (const [key, configKey] of Object.entries(configFieldMap)) {
@@ -101,7 +101,7 @@ export async function loadSettings(): Promise<void> {
                     }
                }
 
-               settingsStore.set(settings);
+               settingsStore.set(settings as SettingsState);
           } else {
                showToast(`Error loading config: ${config.error}`, "error");
           }

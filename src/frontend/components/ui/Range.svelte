@@ -30,7 +30,7 @@
 
           &:hover {
                background: var(--border-color-hover);
-               
+
                &::-webkit-slider-thumb {
                     transform: scale(1.1);
                }

@@ -5,12 +5,11 @@ import {
      readConfig,
      writeConfig,
      getWallpaperExecutableLocation,
-     AppConfig,
 } from "./config";
 import { updateWallpapers } from "./wallpaperController";
 import { getWallpapers } from "./wallpaperData";
 import { getScreens } from "./wallpaperDisplay";
-import type { WallpaperData } from "../shared/types";
+import type { WallpaperData, AppConfig } from "../shared/types";
 
 export const applyWallpapers = async (): Promise<{
      success: boolean;
@@ -53,11 +52,43 @@ export const applyWallpapers = async (): Promise<{
                if (config.noAutomute) args += " --noautomute";
                if (config.noAudioProcessing) args += " --no-audio-processing";
                if (config.scaling) args += ` --scaling ${config.scaling}`;
-               if (config.clamping) args += ` --clamping ${config.clamping}`;
+               if (config.clamping) args += ` --clamp ${config.clamping}`;
                if (config.disableMouse) args += " --disable-mouse";
                if (config.disableParallax) args += " --disable-parallax";
                if (config.noFullscreenPause) args += " --no-fullscreen-pause";
                if (config.disableParticles) args += " --disable-particles";
+
+               if (config.fullscreenPauseOnlyActive)
+                    args += " --fullscreen-pause-only-active";
+
+               if (config.fullscreenPauseIgnoreAppIds) {
+                    config.fullscreenPauseIgnoreAppIds.forEach((id) => {
+                         args += ` --fullscreen-pause-ignore-appid ${id}`;
+                    });
+               }
+
+               if (config.screenshot)
+                    args += ` --screenshot "${config.screenshot}"`;
+               if (config.screenshotDelay !== undefined)
+                    args += ` --screenshot-delay ${config.screenshotDelay}`;
+
+               if (config.assetsDir)
+                    args += ` --assets-dir "${config.assetsDir}"`;
+               if (config.dumpStructure) args += " --dump-structure";
+
+               if (config.playlist) {
+                    config.playlist.forEach((p) => {
+                         args += ` --playlist "${p}"`;
+                    });
+               }
+
+               if (config.properties) {
+                    for (const [key, value] of Object.entries(
+                         config.properties
+                    )) {
+                         args += ` --set-property ${key}=${value}`;
+                    }
+               }
 
                if (customArgsEnabled && customArgs) {
                     args += ` ${customArgs}`;

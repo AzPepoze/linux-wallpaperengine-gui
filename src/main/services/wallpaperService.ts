@@ -18,7 +18,11 @@ export function registerWallpaperService() {
      ipcMain.handle(
           "set-wallpaper",
           async (_, screenName: string, wallpaperFolderName: string | null) => {
-               logger.ipcReceived("set-wallpaper", screenName, wallpaperFolderName);
+               logger.ipcReceived(
+                    "set-wallpaper",
+                    screenName,
+                    wallpaperFolderName
+               );
                return await setWallpaper(screenName, wallpaperFolderName);
           }
      );
@@ -26,7 +30,11 @@ export function registerWallpaperService() {
      ipcMain.handle(
           "toggle-clone-mode",
           async (_, enabled: boolean, globalWallpaper?: string | null) => {
-               logger.ipcReceived("toggle-clone-mode", enabled, globalWallpaper);
+               logger.ipcReceived(
+                    "toggle-clone-mode",
+                    enabled,
+                    globalWallpaper
+               );
                return await toggleCloneMode(enabled, globalWallpaper);
           }
      );

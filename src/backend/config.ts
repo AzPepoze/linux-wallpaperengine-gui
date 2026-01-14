@@ -4,35 +4,39 @@ import fs from "node:fs/promises";
 import { logger } from "./logger";
 import { EXECUTABLE_NAME } from "../shared/constants";
 import { spawn } from "node:child_process";
+import { AppConfig } from "../shared/types";
 
 let homePath: string;
 let configPath: string;
 let wallperBasePath: string;
 
-export interface ScreenConfig {
-     name: string;
-     wallpaper: string | null;
-}
-
-export interface AppConfig {
-     screens?: ScreenConfig[];
-     FPS?: number;
-     SILENCE?: boolean;
-     customArgs?: string;
-     customArgsEnabled?: boolean;
-     volume?: number;
-     noAutomute?: boolean;
-     noAudioProcessing?: boolean;
-     scaling?: string;
-     clamping?: string;
-     disableMouse?: boolean;
-     disableParallax?: boolean;
-     disableParticles?: boolean;
-     noFullscreenPause?: boolean;
-     customExecutableLocation?: string;
-     cloneMode?: boolean;
-     globalWallpaper?: string | null;
-}
+export const DEFAULT_CONFIG: AppConfig = {
+     FPS: 60,
+     SILENCE: false,
+     customArgs: "",
+     customArgsEnabled: false,
+     volume: 100,
+     noAutomute: false,
+     noAudioProcessing: false,
+     scaling: "default",
+     clamping: "clamp",
+     disableMouse: false,
+     disableParallax: false,
+     disableParticles: false,
+     noFullscreenPause: false,
+     customExecutableLocation: "",
+     cloneMode: false,
+     globalWallpaper: null,
+     screens: [],
+     fullscreenPauseOnlyActive: false,
+     fullscreenPauseIgnoreAppIds: [],
+     screenshot: "",
+     screenshotDelay: 5,
+     assetsDir: "",
+     properties: {},
+     dumpStructure: false,
+     playlist: [],
+};
 
 export const ensureInitialized = async () => {
      if (configPath && homePath && wallperBasePath) return;
@@ -42,16 +46,37 @@ export const ensureInitialized = async () => {
           homePath,
           ".config/linux-wallpaperengine-gui/config.json"
      );
-     wallperBasePath = path.join(
-          homePath,
-          ".local",
-          "share",
-          "Steam",
-          "steamapps",
-          "workshop",
-          "content",
-          "431960"
-     );
+
+     const workshopSuffix = "steamapps/workshop/content/431960";
+     const steamPaths = [
+          ".local/share/Steam",
+          ".var/app/com.valvesoftware.Steam/.local/share/Steam",
+          ".steam/steam",
+          ".steam/root",
+     ];
+
+     for (const steamPath of steamPaths) {
+          const fullPath = path.join(homePath, steamPath, workshopSuffix);
+          try {
+               await fs.access(fullPath);
+               wallperBasePath = fullPath;
+               logger.backend(`Found Steam Workshop path: ${wallperBasePath}`);
+               break;
+          } catch {
+               continue;
+          }
+     }
+
+     if (!wallperBasePath) {
+          wallperBasePath = path.join(
+               homePath,
+               ".local/share/Steam",
+               workshopSuffix
+          );
+          logger.backend(
+               `Could not find any existing Steam Workshop path, defaulting to: ${wallperBasePath}`
+          );
+     }
 };
 
 export const getWallpaperBasePath = async () => {
@@ -63,7 +88,8 @@ export const readConfig = async (): Promise<AppConfig> => {
      try {
           await ensureInitialized();
           const configContent = await fs.readFile(configPath, "utf-8");
-          return JSON.parse(configContent);
+          const userConfig = JSON.parse(configContent);
+          return { ...DEFAULT_CONFIG, ...userConfig };
      } catch (err: any) {
           if (err.code !== "ENOENT") {
                logger.error(
@@ -71,7 +97,7 @@ export const readConfig = async (): Promise<AppConfig> => {
                          err
                );
           }
-          return {};
+          return DEFAULT_CONFIG;
      }
 };
 

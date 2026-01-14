@@ -26,7 +26,7 @@
 
      .section-header {
           text-align: left;
-          
+
           h3 {
                margin: 0;
                font-size: 1.25em;

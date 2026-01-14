@@ -16,6 +16,7 @@
      import Select from "./ui/Select.svelte";
      import Range from "./ui/Range.svelte";
      import Browse from "./ui/Browse.svelte";
+     import Button from "./ui/Button.svelte";
      // Icons
      import DisplayIcon from "../icons/DisplayIcon.svelte";
      import AudioIcon from "../icons/AudioIcon.svelte";
@@ -41,7 +42,11 @@
           { id: "audio", label: "Audio", icon: AudioIcon },
           { id: "interaction", label: "Interaction", icon: MouseIcon },
           { id: "advanced", label: "Advanced", icon: SettingIcon },
-          { id: "executable", label: "Executable", icon: FolderIcon },
+          {
+               id: "executable",
+               label: "Linux Wallpaper Engine",
+               icon: FolderIcon,
+          },
      ];
 
      let activeSection = "general";
@@ -82,13 +87,21 @@
 
      const onSelectBinFile = async (path: string) => {
           const isValid = await validateBinaryFile(path);
-          if (!isValid) {
+          if (!isValid && $settingsStore) {
                $settingsStore.binaryLocation = "";
           }
      };
 
+     const onSelectAssetsDir = async (path: string) => {
+          if ($settingsStore) {
+               $settingsStore.assetsDir = path;
+          }
+     };
+
      const handleSaveSettings = async () => {
-          await saveSettings($settingsStore);
+          if ($settingsStore) {
+               await saveSettings($settingsStore);
+          }
      };
 
      const handleOpenConfig = async () => {
@@ -144,236 +157,288 @@
      </aside>
 
      <main class="settings-main" bind:this={contentElement}>
-          <div class="content-wrapper">
-               <SettingsSection
-                    title="General"
-                    id="general"
-                    description="Basic wallpaper engine behavior and performance."
-               >
-                    <SettingItem
-                         label="FPS Limit"
-                         id="fps"
-                         description="Target frames per second for animations."
+          {#if $settingsStore}
+               <div class="content-wrapper">
+                    <SettingsSection
+                         title="General"
+                         id="general"
+                         description="Basic wallpaper engine behavior and performance."
                     >
-                         <Input
-                              type="number"
-                              id="fps"
-                              bind:value={$settingsStore.fps}
-                              min={1}
-                         />
-                    </SettingItem>
-
-                    <SettingItem
-                         label="Scaling Mode"
-                         id="scaling"
-                         description="How the wallpaper fits the screen."
-                    >
-                         <Select
-                              id="scaling"
-                              bind:value={$settingsStore.scaling}
-                              options={scalingOptions}
-                         />
-                    </SettingItem>
-
-                    <SettingItem
-                         label="Clamping Mode"
-                         id="clamping"
-                         description="Texture wrapping behavior."
-                    >
-                         <Select
-                              id="clamping"
-                              bind:value={$settingsStore.clamping}
-                              options={clampingOptions}
-                         />
-                    </SettingItem>
-
-                    <SettingItem
-                         label="No Fullscreen Pause"
-                         id="noFullscreenPause"
-                         description="Keep running when other apps are fullscreen."
-                    >
-                         <Toggle
-                              id="noFullscreenPause"
-                              bind:checked={$settingsStore.noFullscreenPause}
-                         />
-                    </SettingItem>
-
-                    <SettingItem
-                         label="Disable Particles"
-                         id="disableParticles"
-                         description="Turn off particle effects to save resources."
-                    >
-                         <Toggle
-                              id="disableParticles"
-                              bind:checked={$settingsStore.disableParticles}
-                         />
-                    </SettingItem>
-               </SettingsSection>
-
-               <div class="divider"></div>
-
-               <SettingsSection
-                    title="Audio"
-                    id="audio"
-                    description="Control how audio is handled in wallpapers."
-               >
-                    <SettingItem
-                         label="Silence Wallpaper"
-                         id="silence"
-                         description="Mute all audio output."
-                    >
-                         <Toggle
-                              id="silence"
-                              bind:checked={$settingsStore.silence}
-                         />
-                    </SettingItem>
-
-                    {#if !$settingsStore.silence}
                          <SettingItem
-                              label="Volume"
-                              id="volume"
-                              description="Adjust master volume level."
+                              label="FPS Limit"
+                              id="fps"
+                              description="Target frames per second for animations."
                          >
-                              <div class="volume-control">
-                                   <Range
-                                        id="volume"
-                                        bind:value={$settingsStore.volume}
-                                        min={0}
-                                        max={100}
-                                   />
-                                   <div class="volume-input">
-                                        <Input
-                                             type="number"
+                              <Input
+                                   type="number"
+                                   id="fps"
+                                   bind:value={$settingsStore.fps}
+                                   min={1}
+                              />
+                         </SettingItem>
+
+                         <SettingItem
+                              label="Scaling Mode"
+                              id="scaling"
+                              description="How the wallpaper fits the screen."
+                         >
+                              <Select
+                                   id="scaling"
+                                   bind:value={$settingsStore.scaling}
+                                   options={scalingOptions}
+                              />
+                         </SettingItem>
+
+                         <SettingItem
+                              label="Clamping Mode"
+                              id="clamping"
+                              description="Texture wrapping behavior."
+                         >
+                              <Select
+                                   id="clamping"
+                                   bind:value={$settingsStore.clamping}
+                                   options={clampingOptions}
+                              />
+                         </SettingItem>
+
+                         <SettingItem
+                              label="No Fullscreen Pause"
+                              id="noFullscreenPause"
+                              description="Keep running when other apps are fullscreen."
+                         >
+                              <Toggle
+                                   id="noFullscreenPause"
+                                   bind:checked={
+                                        $settingsStore.noFullscreenPause
+                                   }
+                              />
+                         </SettingItem>
+
+                         <SettingItem
+                              label="Disable Particles"
+                              id="disableParticles"
+                              description="Turn off particle effects to save resources."
+                         >
+                              <Toggle
+                                   id="disableParticles"
+                                   bind:checked={
+                                        $settingsStore.disableParticles
+                                   }
+                              />
+                         </SettingItem>
+                    </SettingsSection>
+
+                    <div class="divider"></div>
+
+                    <SettingsSection
+                         title="Audio"
+                         id="audio"
+                         description="Control how audio is handled in wallpapers."
+                    >
+                         <SettingItem
+                              label="Silence Wallpaper"
+                              id="silence"
+                              description="Mute all audio output."
+                         >
+                              <Toggle
+                                   id="silence"
+                                   bind:checked={$settingsStore.silence}
+                              />
+                         </SettingItem>
+
+                         {#if !$settingsStore.silence}
+                              <SettingItem
+                                   label="Volume"
+                                   id="volume"
+                                   description="Adjust master volume level."
+                              >
+                                   <div class="volume-control">
+                                        <Range
+                                             id="volume"
                                              bind:value={$settingsStore.volume}
                                              min={0}
                                              max={100}
                                         />
-                                        <span class="unit">%</span>
+                                        <div class="volume-input">
+                                             <Input
+                                                  type="number"
+                                                  bind:value={
+                                                       $settingsStore.volume
+                                                  }
+                                                  min={0}
+                                                  max={100}
+                                             />
+                                             <span class="unit">%</span>
+                                        </div>
                                    </div>
-                              </div>
-                         </SettingItem>
+                              </SettingItem>
 
+                              <SettingItem
+                                   label="No Automute"
+                                   id="noAutomute"
+                                   description="Prevent automatic muting when not in focus."
+                              >
+                                   <Toggle
+                                        id="noAutomute"
+                                        bind:checked={$settingsStore.noAutomute}
+                                   />
+                              </SettingItem>
+
+                              <SettingItem
+                                   label="No Audio Processing"
+                                   id="noAudioProcessing"
+                                   description="Disable audio analysis features."
+                              >
+                                   <Toggle
+                                        id="noAudioProcessing"
+                                        bind:checked={
+                                             $settingsStore.noAudioProcessing
+                                        }
+                                   />
+                              </SettingItem>
+                         {/if}
+                    </SettingsSection>
+
+                    <div class="divider"></div>
+
+                    <SettingsSection
+                         title="Interaction"
+                         id="interaction"
+                         description="Customize how you interact with wallpapers."
+                    >
                          <SettingItem
-                              label="No Automute"
-                              id="noAutomute"
-                              description="Prevent automatic muting when not in focus."
+                              label="Disable Mouse"
+                              id="disableMouse"
+                              description="Ignore mouse movement and clicks."
                          >
                               <Toggle
-                                   id="noAutomute"
-                                   bind:checked={$settingsStore.noAutomute}
+                                   id="disableMouse"
+                                   bind:checked={$settingsStore.disableMouse}
                               />
                          </SettingItem>
 
                          <SettingItem
-                              label="No Audio Processing"
-                              id="noAudioProcessing"
-                              description="Disable audio analysis features."
+                              label="Disable Parallax"
+                              id="disableParallax"
+                              description="Turn off mouse-following parallax effects."
                          >
                               <Toggle
-                                   id="noAudioProcessing"
+                                   id="disableParallax"
+                                   bind:checked={$settingsStore.disableParallax}
+                              />
+                         </SettingItem>
+                    </SettingsSection>
+
+                    <div class="divider"></div>
+
+                    <SettingsSection
+                         title="Advanced"
+                         id="advanced"
+                         description="Power user options and custom parameters."
+                    >
+                         <SettingItem
+                              label="Enable Custom Arguments"
+                              id="customArgsEnabled"
+                         >
+                              <Toggle
+                                   id="customArgsEnabled"
                                    bind:checked={
-                                        $settingsStore.noAudioProcessing
+                                        $settingsStore.customArgsEnabled
                                    }
                               />
                          </SettingItem>
-                    {/if}
-               </SettingsSection>
 
-               <div class="divider"></div>
-
-               <SettingsSection
-                    title="Interaction"
-                    id="interaction"
-                    description="Customize how you interact with wallpapers."
-               >
-                    <SettingItem
-                         label="Disable Mouse"
-                         id="disableMouse"
-                         description="Ignore mouse movement and clicks."
-                    >
-                         <Toggle
-                              id="disableMouse"
-                              bind:checked={$settingsStore.disableMouse}
-                         />
-                    </SettingItem>
-
-                    <SettingItem
-                         label="Disable Parallax"
-                         id="disableParallax"
-                         description="Turn off mouse-following parallax effects."
-                    >
-                         <Toggle
-                              id="disableParallax"
-                              bind:checked={$settingsStore.disableParallax}
-                         />
-                    </SettingItem>
-               </SettingsSection>
-
-               <div class="divider"></div>
-
-               <SettingsSection
-                    title="Advanced"
-                    id="advanced"
-                    description="Power user options and custom parameters."
-               >
-                    <SettingItem
-                         label="Enable Custom Arguments"
-                         id="customArgsEnabled"
-                    >
-                         <Toggle
-                              id="customArgsEnabled"
-                              bind:checked={$settingsStore.customArgsEnabled}
-                         />
-                    </SettingItem>
-
-                    {#if $settingsStore.customArgsEnabled}
-                         <SettingItem
-                              label="Custom Command Args"
-                              id="customArgs"
-                              vertical
-                              description="Pass raw arguments to the backend."
-                         >
-                              <Input
-                                   type="text"
+                         {#if $settingsStore.customArgsEnabled}
+                              <SettingItem
+                                   label="Custom Command Args"
                                    id="customArgs"
-                                   bind:value={$settingsStore.customArgs}
-                                   placeholder="e.g. --window 1920x1080"
-                              />
-                              <p class="help-text">
-                                   Refer to
-                                   <a
-                                        href="https://github.com/Almamu/linux-wallpaperengine?tab=readme-ov-file#-common-options"
-                                        target="_blank"
-                                        rel="noopener noreferrer"
-                                   >
-                                        linux-wallpaperengine common options
-                                   </a>
-                              </p>
-                         </SettingItem>
-                    {/if}
-               </SettingsSection>
+                                   vertical
+                                   description="Pass raw arguments to the backend."
+                              >
+                                   <Input
+                                        type="text"
+                                        id="customArgs"
+                                        bind:value={$settingsStore.customArgs}
+                                        placeholder="e.g. --window 1920x1080"
+                                   />
+                                   <div class="doc-actions">
+                                        <Button
+                                             variant="ghost"
+                                             on:click={() =>
+                                                  window.electronAPI.openExternal(
+                                                       "https://github.com/Almamu/linux-wallpaperengine?tab=readme-ov-file#-common-options",
+                                                  )}
+                                        >
+                                             <svg
+                                                  width="14"
+                                                  height="14"
+                                                  viewBox="0 0 24 24"
+                                                  fill="none"
+                                                  stroke="currentColor"
+                                                  stroke-width="2"
+                                                  stroke-linecap="round"
+                                                  stroke-linejoin="round"
+                                             >
+                                                  <path
+                                                       d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"
+                                                  />
+                                                  <polyline
+                                                       points="15 3 21 3 21 9"
+                                                  />
+                                                  <line
+                                                       x1="10"
+                                                       y1="14"
+                                                       x2="21"
+                                                       y2="3"
+                                                  />
+                                             </svg>
+                                             Common Options Documentation
+                                        </Button>
+                                   </div>
+                              </SettingItem>
+                         {/if}
+                    </SettingsSection>
 
-               <div class="divider"></div>
+                    <div class="divider"></div>
 
-               <SettingsSection
-                    title="Executable"
-                    id="executable"
-                    description="Set the path to your linux-wallpaperengine binary."
-               >
-                    <SettingItem
-                         label="Binary Location"
-                         id="binary"
-                         vertical
-                         description="Leave empty to use system PATH."
+                    <SettingsSection
+                         title="Linux Wallpaper Engine"
+                         id="executable"
+                         description="Configure system paths and executable locations."
                     >
-                         <Browse
-                              bind:location={$settingsStore.binaryLocation}
-                              onSelect={onSelectBinFile}
-                              placeholder="Path to linux-wallpaperengine binary..."
-                         />
-                    </SettingItem>
-               </SettingsSection>
-          </div>
+                         <SettingItem
+                              label="Binary Location"
+                              id="binary"
+                              vertical
+                              description="Set the path to your linux-wallpaperengine binary. Leave empty to use system PATH."
+                         >
+                              <Browse
+                                   bind:location={$settingsStore.binaryLocation}
+                                   onSelect={onSelectBinFile}
+                                   placeholder="Path to linux-wallpaperengine binary..."
+                              />
+                         </SettingItem>
+
+                         <SettingItem
+                              label="Assets Directory"
+                              id="assetsDir"
+                              vertical
+                              description="Folder where the assets are stored."
+                         >
+                              <Browse
+                                   bind:location={$settingsStore.assetsDir}
+                                   onSelect={onSelectAssetsDir}
+                                   dir={true}
+                                   placeholder="Path to assets directory..."
+                              />
+                         </SettingItem>
+                    </SettingsSection>
+               </div>
+          {:else}
+               <div class="loading-container">
+                    <p>Loading settings...</p>
+               </div>
+          {/if}
      </main>
 </div>
 
@@ -473,6 +538,15 @@
           }
      }
 
+     .loading-container {
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          height: 100%;
+          color: var(--text-muted);
+          font-weight: 500;
+     }
+
      .divider {
           height: 1px;
           background: linear-gradient(
@@ -563,6 +637,28 @@
                &:hover {
                     text-decoration: underline;
                }
+          }
+     }
+
+     .doc-actions {
+          margin-top: 12px;
+          display: flex;
+          justify-content: flex-start;
+     }
+
+     .link-btn {
+          background: none;
+          border: none;
+          padding: 0;
+          color: var(--btn-primary-bg);
+          text-decoration: none;
+          font-family: inherit;
+          font-size: inherit;
+          cursor: pointer;
+          font-weight: 500;
+
+          &:hover {
+               text-decoration: underline;
           }
      }
 </style>
