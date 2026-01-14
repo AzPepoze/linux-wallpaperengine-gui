@@ -5,8 +5,10 @@ import {
      toggleCloneMode,
      clearAllWallpapers,
      loadWallpapers,
+     getWallpaperProperties,
+     saveWallpaperProperty,
 } from "../../backend/wallpaperService";
-import { getWallpaperPreview } from "../../backend/wallpaperData";
+import { getWallpaperPreview, getWallpaperProjectData } from "../../backend/wallpaperData";
 import { logger } from "../../backend/logger";
 
 export function registerWallpaperService() {
@@ -53,4 +55,22 @@ export function registerWallpaperService() {
           logger.ipcReceived("get-wallpaper-preview", path);
           return await getWallpaperPreview(path);
      });
+
+     ipcMain.handle("get-wallpaper-project-data", async (_, id: string) => {
+          logger.ipcReceived("get-wallpaper-project-data", id);
+          return await getWallpaperProjectData(id);
+     });
+
+     ipcMain.handle("get-wallpaper-properties", async (_, id: string) => {
+          logger.ipcReceived("get-wallpaper-properties", id);
+          return await getWallpaperProperties(id);
+     });
+
+     ipcMain.handle(
+          "save-wallpaper-property",
+          async (_, id: string, key: string, value: string) => {
+               logger.ipcReceived("save-wallpaper-property", id, key, value);
+               return await saveWallpaperProperty(id, key, value);
+          }
+     );
 }

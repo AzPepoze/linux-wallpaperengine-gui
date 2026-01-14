@@ -252,25 +252,12 @@
                                    id="volume"
                                    description="Adjust master volume level."
                               >
-                                   <div class="volume-control">
-                                        <Range
-                                             id="volume"
-                                             bind:value={$settingsStore.volume}
-                                             min={0}
-                                             max={100}
-                                        />
-                                        <div class="volume-input">
-                                             <Input
-                                                  type="number"
-                                                  bind:value={
-                                                       $settingsStore.volume
-                                                  }
-                                                  min={0}
-                                                  max={100}
-                                             />
-                                             <span class="unit">%</span>
-                                        </div>
-                                   </div>
+                                   <Range
+                                        id="volume"
+                                        bind:value={$settingsStore.volume}
+                                        min={0}
+                                        max={100}
+                                   />
                               </SettingItem>
 
                               <SettingItem
@@ -555,40 +542,6 @@
                var(--border-color),
                transparent
           );
-     }
-
-     .volume-control {
-          display: flex;
-          align-items: center;
-          flex-wrap: wrap;
-          gap: 16px;
-          width: 100%;
-
-          .volume-input {
-               display: flex;
-               align-items: center;
-               gap: 8px;
-               width: 90px;
-               background: var(--bg-surface);
-               border-radius: var(--radius-sm);
-               padding-right: 12px;
-               border: 1px solid var(--border-color);
-
-               :global(input) {
-                    border: none !important;
-                    background: transparent !important;
-                    padding: 8px 0 8px 12px !important;
-                    text-align: left;
-                    box-shadow: none !important;
-                    width: 50px !important;
-               }
-
-               .unit {
-                    font-size: 0.85em;
-                    color: var(--text-muted);
-                    font-weight: 600;
-               }
-          }
      }
 
      .action-btn {

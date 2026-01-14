@@ -46,6 +46,9 @@ interface ElectronAPI {
      clearAllWallpapers: () => Promise<{ success: boolean; error?: string }>;
      loadWallpapers: () => Promise<{ wallpapers: Record<string, any>; error: string | null; selectedWallpaper: any | null }>;
      getWallpaperPreview: (path: string) => Promise<{ success: boolean; data?: string; error?: string }>;
+     getWallpaperProjectData: (id: string) => Promise<{ success: boolean; properties?: Record<string, any>; error?: string }>;
+     getWallpaperProperties: (id: string) => Promise<any[]>;
+     saveWallpaperProperty: (id: string, key: string, value: string) => Promise<{ success: boolean; error?: string }>;
 }
 
 interface Window {

@@ -12,7 +12,7 @@ export const getWallpapers = async () => {
           const directoryEntries = entries.filter((e) => e.isDirectory());
           const wallpapers: Record<
                string,
-               { previewPath: string | null; projectData: any }
+               { previewPath: string | null; projectData: any; previewData: string | null }
           > = {};
 
           const batchSize = 20;
@@ -25,7 +25,7 @@ export const getWallpapers = async () => {
                     ): Promise<
                          [
                               string,
-                              { previewPath: string | null; projectData: any }
+                              { previewPath: string | null; projectData: any; previewData: string | null }
                          ]
                     > => {
                          const folderName = folder.name;
@@ -35,6 +35,7 @@ export const getWallpapers = async () => {
                               "project.json"
                          );
                          let previewPath = null;
+                         let previewData = null;
                          let projectData: any = {};
 
                          try {
@@ -46,6 +47,9 @@ export const getWallpapers = async () => {
 
                               if (projectData.preview) {
                                    previewPath = `wallpapers/${folderName}/${projectData.preview}`;
+                                   // Directly generate the protocol URL
+                                   const absolutePreviewPath = path.join(basePath, folderName, projectData.preview);
+                                   previewData = `wallpaper://${absolutePreviewPath}`;
                               }
 
                               projectData = {
@@ -62,14 +66,13 @@ export const getWallpapers = async () => {
                                         readError
                               );
                          }
-                         return [folderName, { previewPath, projectData }];
+                         return [folderName, { previewPath, projectData, previewData }];
                     }
                );
 
                const processedBatch = await Promise.all(batchPromises);
                Object.assign(wallpapers, Object.fromEntries(processedBatch));
 
-               // Allow garbage collection between batches (less effective in Node than browser but still okay)
                if (i % 100 === 0 && i > 0) {
                     await new Promise((resolve) => setTimeout(resolve, 10));
                }
@@ -99,5 +102,30 @@ export const getWallpaperPreview = async (wallpaperPath: string) => {
                `Error in getWallpaperPreview for path "${wallpaperPath}": ${error}`
           );
           return { success: false, error };
+     }
+};
+
+export const getWallpaperProjectData = async (folderName: string) => {
+     try {
+          const basePath = await getWallpaperBasePath();
+          const projectJsonPath = path.join(basePath, folderName, "project.json");
+          const content = await fs.readFile(projectJsonPath, "utf-8");
+          const data = JSON.parse(content);
+          
+          const properties = data.general?.properties || data.properties || {};
+          
+          // Ensure schemecolor is included if it exists in the root
+          if (data.schemecolor && !properties.schemecolor) {
+               properties.schemecolor = {
+                    type: "color",
+                    text: "Theme Color",
+                    value: data.schemecolor,
+                    order: -1 // Show at the top
+               };
+          }
+          
+          return { success: true, properties };
+     } catch (err) {
+          return { success: false, error: String(err) };
      }
 };

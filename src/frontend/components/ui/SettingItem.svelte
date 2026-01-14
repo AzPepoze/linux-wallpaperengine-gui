@@ -8,7 +8,13 @@
 
 <div class="setting-item" class:vertical class:align-end={alignEnd}>
      <div class="info">
-          <label for={id}>{label}</label>
+          {#if $$slots.label}
+               <div class="label-slot">
+                    <slot name="label" />
+               </div>
+          {:else}
+               <label for={id}>{label}</label>
+          {/if}
           {#if description}
                <p class="description">{description}</p>
           {/if}

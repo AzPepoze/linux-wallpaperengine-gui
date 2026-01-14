@@ -50,6 +50,20 @@ export interface AppConfig {
      screenshotDelay?: number;
      assetsDir?: string;
      properties?: Record<string, string>;
+     wallpaperProperties?: Record<string, Record<string, string>>;
      dumpStructure?: boolean;
      playlist?: string[];
+}
+
+export type PropertyType = "slider" | "boolean" | "bool" | "combolist" | "combo" | "color" | "text" | "textinput" | "group" | "unknown";
+
+export interface WallpaperProperty {
+     name: string;
+     type: PropertyType;
+     description: string;
+     value: any;
+     min?: number;
+     max?: number;
+     step?: number;
+     options?: Record<string, string>;
 }

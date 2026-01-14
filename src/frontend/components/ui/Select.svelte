@@ -1,12 +1,11 @@
 <script lang="ts">
-     import { onMount, createEventDispatcher } from "svelte";
+     import { onMount } from "svelte";
      import { fly, fade } from "svelte/transition";
 
      export let value: string;
      export let options: { value: string; label: string }[] = [];
      export let id: string = "";
-
-     const dispatch = createEventDispatcher();
+     export let onChange: (value: string) => void = () => {};
 
      let isOpen = false;
      let container: HTMLDivElement;
@@ -21,7 +20,7 @@
      function selectOption(optionValue: string) {
           value = optionValue;
           isOpen = false;
-          dispatch("change", value);
+          onChange(value);
      }
 
      function handleClickOutside(event: MouseEvent) {

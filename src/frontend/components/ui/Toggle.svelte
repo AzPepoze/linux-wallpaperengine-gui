@@ -1,10 +1,18 @@
 <script lang="ts">
      export let checked: boolean = false;
-     export let id: string = "";
+     export let id: string =
+          "toggle-" + Math.random().toString(36).substr(2, 9);
+     export let onChange: (checked: boolean) => void = () => {};
+
+     function handleChange(event: Event) {
+          const target = event.target as HTMLInputElement;
+          checked = target.checked;
+          onChange(checked);
+     }
 </script>
 
 <label class="toggle-switch" for={id}>
-     <input type="checkbox" {id} bind:checked on:change />
+     <input type="checkbox" {id} {checked} on:change={handleChange} />
      <span class="slider"></span>
 </label>
 

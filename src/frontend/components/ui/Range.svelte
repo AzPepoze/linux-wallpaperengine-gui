@@ -2,11 +2,15 @@
      export let value: number;
      export let min: number = 0;
      export let max: number = 100;
+     export let step: number = 1;
      export let id: string = "";
 </script>
 
 <div class="range-wrapper">
-     <input type="range" {id} bind:value {min} {max} on:input />
+     <input type="range" {id} bind:value {min} {max} {step} on:input />
+     <div class="range-input">
+          <input type="number" bind:value {min} {max} {step} />
+     </div>
 </div>
 
 <style lang="scss">
@@ -14,8 +18,36 @@
           flex: 1;
           display: flex;
           align-items: center;
+          gap: 12px;
           width: 100%;
           min-width: 140px;
+     }
+
+     .range-input {
+          display: flex;
+          align-items: center;
+          width: 100px;
+          background: var(--bg-surface);
+          border-radius: var(--radius-sm);
+          border: 1px solid var(--border-color);
+          overflow: hidden;
+
+          input {
+               width: 100%;
+               border: none;
+               background: transparent;
+               padding: 8px 10px;
+               color: var(--text-color);
+               font-size: 0.9em;
+               font-weight: 500;
+               text-align: center;
+               outline: none;
+
+               &::-webkit-inner-spin-button,
+               &::-webkit-outer-spin-button {
+                    opacity: 1;
+               }
+          }
      }
 
      input[type="range"] {

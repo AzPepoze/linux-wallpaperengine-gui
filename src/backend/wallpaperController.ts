@@ -77,7 +77,7 @@ function spawnWallpaper(screen: string, fullCommand: string) {
                command: fullCommand,
           });
           logger.backend(
-               `Started wallpaper for ${screen} with PID ${proc.pid}`
+               `Started wallpaper for ${screen} with PID ${proc.pid} (${fullCommand})`
           );
      } else {
           console.error(`Failed to spawn wallpaper for ${screen}`);

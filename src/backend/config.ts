@@ -34,6 +34,7 @@ export const DEFAULT_CONFIG: AppConfig = {
      screenshotDelay: 5,
      assetsDir: "",
      properties: {},
+     wallpaperProperties: {},
      dumpStructure: false,
      playlist: [],
 };

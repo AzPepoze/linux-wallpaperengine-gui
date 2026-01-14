@@ -53,4 +53,7 @@ contextBridge.exposeInMainWorld("electronAPI", {
      clearAllWallpapers: createInvokeMethod("clear-all-wallpapers"),
      loadWallpapers: createInvokeMethod("load-wallpapers"),
      getWallpaperPreview: createInvokeMethod("get-wallpaper-preview"),
+     getWallpaperProjectData: createInvokeMethod("get-wallpaper-project-data"),
+     getWallpaperProperties: createInvokeMethod("get-wallpaper-properties"),
+     saveWallpaperProperty: createInvokeMethod("save-wallpaper-property"),
 });

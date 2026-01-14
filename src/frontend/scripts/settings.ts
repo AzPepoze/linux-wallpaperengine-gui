@@ -54,6 +54,7 @@ export interface SettingsState {
      screenshotDelay: number;
      assetsDir: string;
      properties: Record<string, string>;
+     wallpaperProperties: Record<string, Record<string, string>>;
      dumpStructure: boolean;
      playlist: string[];
 }
@@ -82,6 +83,7 @@ const configFieldMap: Record<string, string> = {
      screenshotDelay: "screenshotDelay",
      assetsDir: "assetsDir",
      properties: "properties",
+     wallpaperProperties: "wallpaperProperties",
      dumpStructure: "dumpStructure",
      playlist: "playlist",
 };

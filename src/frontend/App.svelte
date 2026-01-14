@@ -62,28 +62,6 @@
                activeFolderName = initialWallpaper.folderName;
           }
 
-          loading = false;
-
-          for (const folderName in wallpapers) {
-               const wallpaperDataResult = wallpapers[folderName];
-               if (wallpaperDataResult.previewPath) {
-                    const previewResult =
-                         await window.electronAPI.getWallpaperPreview(
-                              wallpaperDataResult.previewPath,
-                         );
-                    if (previewResult.success) {
-                         wallpapers[folderName] = {
-                              ...wallpapers[folderName],
-                              previewData: previewResult.data,
-                         };
-                    } else {
-                         logger.log(
-                              `Failed to get preview for ${folderName}: ${previewResult.error}`,
-                         );
-                    }
-               }
-          }
-
           return initialWallpaper;
      }
 
@@ -122,6 +100,26 @@
                     selectedFolderName = initialWallpaper.folderName;
                }
           }
+
+          const handleLinkClick = (e: MouseEvent) => {
+               const target = (e.target as HTMLElement).closest("a");
+               if (target && target.href) {
+                    const url = target.href;
+                    if (
+                         url.startsWith("http") ||
+                         url.startsWith("mailto:") ||
+                         url.startsWith("tel:")
+                    ) {
+                         e.preventDefault();
+                         e.stopPropagation();
+                         setTimeout(() => {
+                              window.electronAPI.openExternal(url);
+                         }, 100);
+                    }
+               }
+          };
+
+          document.addEventListener("click", handleLinkClick, true);
      });
 
      async function handleSelectWallpaper(folderName: string) {

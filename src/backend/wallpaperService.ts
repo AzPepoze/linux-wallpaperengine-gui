@@ -9,7 +9,7 @@ import {
 import { updateWallpapers } from "./wallpaperController";
 import { getWallpapers } from "./wallpaperData";
 import { getScreens } from "./wallpaperDisplay";
-import type { WallpaperData, AppConfig } from "../shared/types";
+import type { WallpaperData, AppConfig, WallpaperProperty, PropertyType } from "../shared/types";
 
 export const applyWallpapers = async (): Promise<{
      success: boolean;
@@ -82,11 +82,17 @@ export const applyWallpapers = async (): Promise<{
                     });
                }
 
-               if (config.properties) {
+               if (config.wallpaperProperties && config.wallpaperProperties[targetWallpaper]) {
+                    for (const [key, value] of Object.entries(
+                         config.wallpaperProperties[targetWallpaper]
+                    )) {
+                         args += ` --set-property ${key}="${value}"`;
+                    }
+               } else if (config.properties) {
                     for (const [key, value] of Object.entries(
                          config.properties
                     )) {
-                         args += ` --set-property ${key}=${value}`;
+                         args += ` --set-property ${key}="${value}"`;
                     }
                }
 
@@ -226,4 +232,112 @@ export async function loadWallpapers() {
 
 export function killAllWallpapers() {
      spawn("killall -e linux-wallpaperengine", { shell: true, detached: true });
+}
+
+export async function getWallpaperProperties(
+     wallpaperId: string
+): Promise<WallpaperProperty[]> {
+     const executable = await getWallpaperExecutableLocation();
+     const child = spawn(executable, ["--list-properties", wallpaperId]);
+
+     return new Promise((resolve) => {
+          let output = "";
+          child.stdout.on("data", (data) => {
+               output += data.toString();
+          });
+
+          child.on("close", () => {
+               const properties: WallpaperProperty[] = [];
+               const sections = output.split(/\n\n/);
+
+               for (const section of sections) {
+                    const lines = section.trim().split("\n");
+                    if (lines.length < 2) continue;
+
+                    const firstLine = lines[0].trim();
+                    const lastDashIndex = firstLine.lastIndexOf(" - ");
+                    if (lastDashIndex === -1) continue;
+
+                    const name = firstLine.substring(0, lastDashIndex).trim();
+                    const typeStr = firstLine.substring(lastDashIndex + 3).trim();
+
+                    const property: WallpaperProperty = {
+                         name,
+                         type: typeStr.toLowerCase() as PropertyType,
+                         description: "",
+                         value: "",
+                    };
+
+                    for (let i = 1; i < lines.length; i++) {
+                         const line = lines[i].trim();
+                         if (line.startsWith("Description:")) {
+                              property.description = line
+                                   .replace("Description:", "")
+                                   .trim();
+                         } else if (line.startsWith("Value:")) {
+                              property.value = line.replace("Value:", "").trim();
+                         } else if (line.startsWith("Minimum value:")) {
+                              property.min = parseFloat(
+                                   line.replace("Minimum value:", "").trim()
+                              );
+                         } else if (line.startsWith("Maximum value:")) {
+                              property.max = parseFloat(
+                                   line.replace("Maximum value:", "").trim()
+                              );
+                         } else if (line.startsWith("Step:")) {
+                              property.step = parseFloat(
+                                   line.replace("Step:", "").trim()
+                              );
+                         } else if (line.startsWith("R:")) {
+                              const rgbaMatch = line.match(
+                                   /R:\s*(.+)\s*G:\s*(.+)\s*B:\s*(.+)\s*A:\s*(.+)/
+                              );
+                              if (rgbaMatch) {
+                                   property.value = `${rgbaMatch[1]} ${rgbaMatch[2]} ${rgbaMatch[3]} ${rgbaMatch[4]}`;
+                              }
+                         } else if (line.includes("Posible values:")) {
+                              property.options = {};
+                              let j = i + 1;
+                              while (j < lines.length) {
+                                   const optLine = lines[j].trim();
+                                   const optMatch = optLine.match(
+                                        /^(.+?)\s*->\s*(.+)$/
+                                   );
+                                   if (optMatch) {
+                                        property.options[optMatch[2].trim()] =
+                                             optMatch[1].trim();
+                                        j++;
+                                   } else {
+                                        break;
+                                   }
+                              }
+                              i = j - 1;
+                         }
+                    }
+                    properties.push(property);
+               }
+               resolve(properties);
+          });
+
+          child.on("error", () => {
+               resolve([]);
+          });
+     });
+}
+
+export async function saveWallpaperProperty(
+     wallpaperId: string,
+     key: string,
+     value: string
+) {
+     const config = await readConfig();
+     if (!config.wallpaperProperties) {
+          config.wallpaperProperties = {};
+     }
+     if (!config.wallpaperProperties[wallpaperId]) {
+          config.wallpaperProperties[wallpaperId] = {};
+     }
+     config.wallpaperProperties[wallpaperId][key] = value;
+     await writeConfig(config);
+     return await applyWallpapers();
 }
