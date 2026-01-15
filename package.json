@@ -7,12 +7,14 @@
           "name": "AzPepoze",
           "email": "azpepoze@gmail.com"
      },
-     "main": "build/electron/main.js",
+     "main": "build/frontend/electron/main.js",
      "scripts": {
-          "dev": "vite",
+          "dev": "npm run build:backend && ./build/backend/linux-wallpaperengine-gui",
+          "dev:frontend": "vite",
           "start": "npm run dev",
-          "build": "vite build && electron-builder --linux --dir",
-          "build:all": "vite build && electron-builder --linux AppImage deb rpm --publish never",
+          "build": "npm run build:backend && vite build && electron-builder --linux --dir",
+          "build:all": "npm run build:backend && vite build && electron-builder --linux AppImage deb rpm --publish never",
+          "build:backend": "mkdir -p build/backend && cd src/backend && go build -o ../../build/backend/linux-wallpaperengine-gui main.go",
           "preview": "vite preview",
           "check": "svelte-check --tsconfig ./tsconfig.json && tsc -p tsconfig.json"
      },
@@ -48,12 +50,25 @@
           "directories": {
                "output": "dist"
           },
+          "extraResources": [
+               {
+                    "from": "build/backend/linux-wallpaperengine-gui",
+                    "to": "linux-wallpaperengine-gui"
+               }
+          ],
           "files": [
-               "build/**/*"
+               "build/frontend/**/*"
           ],
           "linux": {
                "artifactName": "${productName}.${ext}",
+               "executableName": "linux-wallpaperengine-gui-electron",
                "category": "Utility"
-          }
+          },
+          "extraFiles": [
+               {
+                    "from": "src/backend/launcher.sh",
+                    "to": "linux-wallpaperengine-gui"
+               }
+          ]
      }
 }
