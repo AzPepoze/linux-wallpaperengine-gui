@@ -44,6 +44,11 @@
 -    [CONTRIBUTING](#contributing)
 -    [STONKS!](#stonks)
 
+> [!NOTE]
+> This GUI will be compatible with my [linux-wallpaperengine](https://github.com/AzPepoze/linux-wallpaperengine) in the future.
+>
+> It's a [Go](https://go.dev/) implementation of Wallpaper Engine for Linux. It's still in early development. Maybe you want to check it out!
+
 ## FEATURES
 
 -    **Wallpaper Management** – Browse and select wallpapers from your Steam Workshop content with ease.
