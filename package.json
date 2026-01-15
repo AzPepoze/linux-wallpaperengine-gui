@@ -54,6 +54,10 @@
                {
                     "from": "build/backend/linux-wallpaperengine-gui",
                     "to": "linux-wallpaperengine-gui"
+               },
+               {
+                    "from": "build/frontend/icon.png",
+                    "to": "icon.png"
                }
           ],
           "files": [

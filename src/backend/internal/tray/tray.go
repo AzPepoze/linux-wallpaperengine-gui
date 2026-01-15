@@ -32,10 +32,8 @@ func onReady() {
 
 	// Potential icon paths in order of priority
 	iconPaths := []string{
-		filepath.Join(cwd, "src", "public", "icon.png"),          // pnpm dev (root)
-		filepath.Join(appDir, "..", "src", "public", "icon.png"), // relative to binary
-		filepath.Join(appDir, "icon.png"),                        // next to binary
-		filepath.Join(appDir, "..", "icon.png"),                  // one level up
+		filepath.Join(cwd, "src", "public", "icon.png"), // pnpm dev (root)
+		filepath.Join(appDir, "icon.png"),               // next to binary
 		"/usr/share/icons/hicolor/48x48/apps/linux-wallpaperengine-gui.png",
 	}
 
