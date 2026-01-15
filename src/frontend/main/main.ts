@@ -126,7 +126,6 @@ app.whenReady().then(async () => {
           );
      }
 
-     killAllWallpapers();
      registerConfigService();
      registerWallpaperService();
      registerDisplayService();
@@ -165,7 +164,6 @@ app.whenReady().then(async () => {
           return net.fetch(`file://${filePath}`);
      });
 
-     applyWallpapers();
      logger.backend("Is minimized:", isMinimized);
      if (!isMinimized) createWindow();
 });
