@@ -4,7 +4,9 @@
 </h1>
 
 <p align="center">
-  <strong>◈ A graphical user interface for managing wallpapers on Linux, powered by Go (Backend) and Electron (Frontend). The Electron frontend is active only when the UI is visible and is completely destroyed when minimized to the system tray to save resources. ◈</strong>
+  <strong>◈ A graphical user interface for managing wallpapers on Linux ◈</strong>
+  <br>
+  <strong>◈ Powered by Go (Backend) and Electron (Frontend) ◈</strong>
 </p>
 
 <p align="center">
@@ -27,15 +29,20 @@
 
 ## CONTENTS
 
--    [Screenshots](#screenshots)
--    [Features](#features)
--    [Memory Efficiency](#memory-efficiency)
--    [Prerequisites](#prerequisites)
--    [Installation](#installation)
--    [Usage](#usage)
--    [Build from Source](#build-from-source)
--    [Development](#development)
--    [Contributing](#contributing)
+-    [CONTENTS](#contents)
+-    [FEATURES](#features)
+-    [MEMORY EFFICIENCY](#memory-efficiency)
+-    [SCREENSHOTS](#screenshots)
+-    [PREREQUISITES](#prerequisites)
+-    [INSTALLATION](#installation)
+     -    [Arch Linux (AUR)](#arch-linux-aur)
+     -    [Other Distributions](#other-distributions)
+-    [USAGE](#usage)
+     -    [\[Options\]](#options)
+-    [BUILD FROM SOURCE](#build-from-source)
+-    [DEVELOPMENT](#development)
+-    [CONTRIBUTING](#contributing)
+-    [STONKS!](#stonks)
 
 ## FEATURES
 
@@ -50,8 +57,8 @@
 
 I know that many users are scared of Electron applications due to their reputation for being "RAM eaters". This GUI is specifically designed for maximum efficiency to address those concerns:
 
--   **Go Backend:** A lightweight Go process handles the system tray, configuration, and wallpaper management.
--   **Electron Frontend:** The Electron-based UI is only launched when needed. When you minimize the application to the tray, the Electron process is **completely terminated**, freeing up all the memory it was using.
+-    **Go Backend:** A lightweight Go process handles the system tray, configuration, and wallpaper management.
+-    **Electron Frontend:** The Electron-based UI is only launched when needed. When you minimize the application to the tray, the Electron process is **completely terminated**, freeing up all the memory it was using.
 
 ## SCREENSHOTS
 
@@ -114,14 +121,18 @@ linux-wallpaperengine-gui [options]
 -    [Node.js](https://nodejs.org/) & [pnpm](https://pnpm.io/)
 
 1. **Clone & Enter:**
+
      ```bash
      git clone https://github.com/AzPepoze/linux-wallpaperengine-gui
      cd linux-wallpaperengine-gui
      ```
+
 2. **Install Deps:**
+
      ```bash
      pnpm install
      ```
+
 3. **Build:**
 
      ```bash
