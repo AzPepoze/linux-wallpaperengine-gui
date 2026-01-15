@@ -13,9 +13,8 @@ export type WallpaperProjectData = {
 };
 
 export type WallpaperData = {
-     previewPath: string | null;
      projectData: WallpaperProjectData | null;
-     previewData: string | undefined;
+     previewPath: string | undefined;
 };
 
 export type Wallpaper = WallpaperData & { folderName: string };
@@ -49,13 +48,24 @@ export interface AppConfig {
      screenshot?: string;
      screenshotDelay?: number;
      assetsDir?: string;
+     wallpaperEngineDir?: string;
      properties?: Record<string, string>;
      wallpaperProperties?: Record<string, Record<string, string>>;
      dumpStructure?: boolean;
      playlist?: string[];
 }
 
-export type PropertyType = "slider" | "boolean" | "bool" | "combolist" | "combo" | "color" | "text" | "textinput" | "group" | "unknown";
+export type PropertyType =
+     | "slider"
+     | "boolean"
+     | "bool"
+     | "combolist"
+     | "combo"
+     | "color"
+     | "text"
+     | "textinput"
+     | "group"
+     | "unknown";
 
 export interface WallpaperProperty {
      name: string;

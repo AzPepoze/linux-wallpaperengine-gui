@@ -1,5 +1,6 @@
 import { spawn } from "node:child_process";
 import { logger } from "./logger";
+import { Readable } from "node:stream";
 
 interface ActiveWallpaper {
      pid: number;
@@ -69,6 +70,7 @@ function spawnWallpaper(screen: string, fullCommand: string) {
      const proc = spawn(fullCommand, {
           shell: true,
           detached: true,
+          stdio: ["ignore", "pipe", "pipe"],
      });
 
      if (proc.pid) {
@@ -83,14 +85,36 @@ function spawnWallpaper(screen: string, fullCommand: string) {
           console.error(`Failed to spawn wallpaper for ${screen}`);
      }
 
-     proc.stdout.on("data", (msg) => {
-          logger.wallpaper(`${screen}: ${msg.toString().trim()}`);
-     });
-     proc.stderr.on("data", (msg) => {
-          logger.wallpaper(`${screen} (ERROR): ${msg.toString().trim()}`);
-     });
+     const MAX_BUFFER_SIZE: number = 1024 * 10;
+     const attachStreamLogger = (
+          stream: Readable | null,
+          isError: boolean
+     ): void => {
+          if (!stream) return;
 
-     proc.on("error", (err) => {
+          let buffer: string = "";
+
+          stream.on("data", (msg: Buffer | string) => {
+               const chunk: string = msg.toString();
+               buffer += chunk;
+
+               const prefix: string = isError ? `${screen} (ERROR)` : screen;
+
+               if (buffer.length > MAX_BUFFER_SIZE) {
+                    const lines: string[] = buffer.split("\n");
+                    const lastLine: string = lines[lines.length - 1];
+                    logger.wallpaper(`${prefix}: ...${lastLine.trim()}`);
+                    buffer = lastLine;
+               } else {
+                    logger.wallpaper(`${prefix}: ${chunk.trim()}`);
+               }
+          });
+     };
+
+     attachStreamLogger(proc.stdout, false);
+     attachStreamLogger(proc.stderr, true);
+
+     proc.on("error", (err: Error) => {
           console.error(`Error in wallpaper process for ${screen}:`, err);
      });
 }

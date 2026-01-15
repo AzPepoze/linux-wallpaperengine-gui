@@ -98,6 +98,12 @@
           }
      };
 
+     const onSelectWallpaperEngineDir = async (path: string) => {
+          if ($settingsStore) {
+               $settingsStore.wallpaperEngineDir = path;
+          }
+     };
+
      const handleSaveSettings = async () => {
           if ($settingsStore) {
                await saveSettings($settingsStore);
@@ -417,6 +423,22 @@
                                    onSelect={onSelectAssetsDir}
                                    dir={true}
                                    placeholder="Path to assets directory..."
+                              />
+                         </SettingItem>
+
+                         <SettingItem
+                              label="Wallpaper Engine Directory"
+                              id="wallpaperEngineDir"
+                              vertical
+                              description="Path to your Steam Workshop content (e.g. steamapps/workshop/content/431960). Leave empty to use auto-detect."
+                         >
+                              <Browse
+                                   bind:location={
+                                        $settingsStore.wallpaperEngineDir
+                                   }
+                                   onSelect={onSelectWallpaperEngineDir}
+                                   dir={true}
+                                   placeholder="Path to wallpaper engine workshop directory..."
                               />
                          </SettingItem>
                     </SettingsSection>

@@ -25,10 +25,12 @@
                tabindex="0"
           >
                <div class="item-preview">
-                    {#if wallpaper.previewData}
+                    {#if wallpaper.previewPath}
                          <img
-                              src={wallpaper.previewData}
+                              src={wallpaper.previewPath}
                               alt={wallpaper.projectData?.title || folderName}
+                              loading="lazy"
+                              decoding="async"
                          />
                     {:else}
                          <div class="placeholder"></div>

@@ -29,11 +29,13 @@
                style="animation-delay: {10 + index * 50}ms"
           >
                <div class="wallpaper-preview-container">
-                    {#if wallpaper.previewData}
+                    {#if wallpaper.previewPath}
                          <img
-                              src={wallpaper.previewData}
+                              src={wallpaper.previewPath}
                               alt={altText}
                               class="wallpaper-preview"
+                              loading="lazy"
+                              decoding="async"
                               in:fade={{ duration: fadeDuration }}
                          />
                     {:else}

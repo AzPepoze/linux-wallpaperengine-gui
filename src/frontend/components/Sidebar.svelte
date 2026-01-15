@@ -22,8 +22,8 @@
      const md = new MarkdownIt();
 
      $: {
-          if (selectedWallpaper && selectedWallpaper.previewData) {
-               getDominantColor(selectedWallpaper.previewData).then(
+          if (selectedWallpaper && selectedWallpaper.previewPath) {
+               getDominantColor(selectedWallpaper.previewPath).then(
                     (dominantColor) => {
                          if (dominantColor) {
                               backgroundColor = `rgb(${dominantColor.join(",")})`;
@@ -33,7 +33,7 @@
                          }
                     },
                );
-               getPalette(selectedWallpaper.previewData, 8).then((p) => {
+               getPalette(selectedWallpaper.previewPath, 8).then((p) => {
                     if (p) {
                          palette = p;
                     }
@@ -137,9 +137,9 @@
           ></div>
      {/if}
      <div class="sidebar-content" bind:this={sidebarContentElement}>
-          {#if selectedWallpaper?.previewData}
+          {#if selectedWallpaper?.previewPath}
                <img
-                    src={selectedWallpaper.previewData}
+                    src={selectedWallpaper.previewPath}
                     alt="{selectedWallpaper.projectData?.title ||
                          selectedWallpaper.folderName} preview"
                     class="preview-image"

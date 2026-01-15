@@ -6,7 +6,7 @@ export const frontendLogs = writable<string[]>([]);
 export const backendLogs = writable<string[]>([]);
 export const wallpaperLogs = writable<string[]>([]);
 
-const MAX_LOGS = 500;
+const MAX_LOGS = 200;
 
 function updateStore(store: typeof frontendLogs, message: string) {
      const lines = message.split("\n").filter((line) => line.trim() !== "");

@@ -33,6 +33,7 @@ export const DEFAULT_CONFIG: AppConfig = {
      screenshot: "",
      screenshotDelay: 5,
      assetsDir: "",
+     wallpaperEngineDir: "",
      properties: {},
      wallpaperProperties: {},
      dumpStructure: false,
@@ -40,13 +41,26 @@ export const DEFAULT_CONFIG: AppConfig = {
 };
 
 export const ensureInitialized = async () => {
-     if (configPath && homePath && wallperBasePath) return;
+     if (homePath && wallperBasePath) return;
 
      homePath = app.getPath("home");
      configPath = path.join(
           homePath,
           ".config/linux-wallpaperengine-gui/config.json"
      );
+
+     // Try to get from config first
+     try {
+          const configContent = await fs.readFile(configPath, "utf-8");
+          const userConfig = JSON.parse(configContent);
+          if (userConfig.wallpaperEngineDir) {
+               wallperBasePath = userConfig.wallpaperEngineDir;
+               logger.backend(`Using Wallpaper path from config: ${wallperBasePath}`);
+               return;
+          }
+     } catch {
+          // Config might not exist yet, proceed to auto-detect
+     }
 
      const workshopSuffix = "steamapps/workshop/content/431960";
      const steamPaths = [
@@ -81,7 +95,11 @@ export const ensureInitialized = async () => {
 };
 
 export const getWallpaperBasePath = async () => {
-     await ensureInitialized();
+     // Force re-initialization if we want to ensure we have the latest path from config
+     // But for performance, we only do it if wallperBasePath is not set
+     if (!wallperBasePath) {
+          await ensureInitialized();
+     }
      return wallperBasePath;
 };
 
@@ -90,6 +108,12 @@ export const readConfig = async (): Promise<AppConfig> => {
           await ensureInitialized();
           const configContent = await fs.readFile(configPath, "utf-8");
           const userConfig = JSON.parse(configContent);
+          
+          // Update wallperBasePath if it changed in config
+          if (userConfig.wallpaperEngineDir && userConfig.wallpaperEngineDir !== wallperBasePath) {
+               wallperBasePath = userConfig.wallpaperEngineDir;
+          }
+          
           return { ...DEFAULT_CONFIG, ...userConfig };
      } catch (err: any) {
           if (err.code !== "ENOENT") {
@@ -110,6 +134,11 @@ export const writeConfig = async (newConfig: AppConfig): Promise<void> => {
           await fs.access(configDir);
      } catch {
           await fs.mkdir(configDir, { recursive: true });
+     }
+
+     // If wallpaperEngineDir is updated in config, update our local variable too
+     if (newConfig.wallpaperEngineDir) {
+          wallperBasePath = newConfig.wallpaperEngineDir;
      }
 
      await fs.writeFile(

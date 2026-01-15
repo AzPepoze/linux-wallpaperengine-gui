@@ -12,10 +12,13 @@ export const getWallpapers = async () => {
           const directoryEntries = entries.filter((e) => e.isDirectory());
           const wallpapers: Record<
                string,
-               { previewPath: string | null; projectData: any; previewData: string | null }
+               {
+                    projectData: any;
+                    previewPath: string | null;
+               }
           > = {};
 
-          const batchSize = 20;
+          const batchSize = 10;
           for (let i = 0; i < directoryEntries.length; i += batchSize) {
                const batch = directoryEntries.slice(i, i + batchSize);
 
@@ -25,7 +28,10 @@ export const getWallpapers = async () => {
                     ): Promise<
                          [
                               string,
-                              { previewPath: string | null; projectData: any; previewData: string | null }
+                              {
+                                   projectData: any;
+                                   previewPath: string | null;
+                              }
                          ]
                     > => {
                          const folderName = folder.name;
@@ -35,7 +41,6 @@ export const getWallpapers = async () => {
                               "project.json"
                          );
                          let previewPath = null;
-                         let previewData = null;
                          let projectData: any = {};
 
                          try {
@@ -46,10 +51,11 @@ export const getWallpapers = async () => {
                               projectData = JSON.parse(projectJsonContent);
 
                               if (projectData.preview) {
-                                   previewPath = `wallpapers/${folderName}/${projectData.preview}`;
-                                   // Directly generate the protocol URL
-                                   const absolutePreviewPath = path.join(basePath, folderName, projectData.preview);
-                                   previewData = `wallpaper://${absolutePreviewPath}`;
+                                   previewPath = `wallpaper://${path.join(
+                                        basePath,
+                                        folderName,
+                                        projectData.preview
+                                   )}`;
                               }
 
                               projectData = {
@@ -66,15 +72,15 @@ export const getWallpapers = async () => {
                                         readError
                               );
                          }
-                         return [folderName, { previewPath, projectData, previewData }];
+                         return [folderName, { projectData, previewPath }];
                     }
                );
 
                const processedBatch = await Promise.all(batchPromises);
                Object.assign(wallpapers, Object.fromEntries(processedBatch));
 
-               if (i % 100 === 0 && i > 0) {
-                    await new Promise((resolve) => setTimeout(resolve, 10));
+               if (i % 50 === 0 && i > 0) {
+                    await new Promise((resolve) => setTimeout(resolve, 20));
                }
           }
 
@@ -108,22 +114,25 @@ export const getWallpaperPreview = async (wallpaperPath: string) => {
 export const getWallpaperProjectData = async (folderName: string) => {
      try {
           const basePath = await getWallpaperBasePath();
-          const projectJsonPath = path.join(basePath, folderName, "project.json");
+          const projectJsonPath = path.join(
+               basePath,
+               folderName,
+               "project.json"
+          );
           const content = await fs.readFile(projectJsonPath, "utf-8");
           const data = JSON.parse(content);
-          
+
           const properties = data.general?.properties || data.properties || {};
-          
-          // Ensure schemecolor is included if it exists in the root
+
           if (data.schemecolor && !properties.schemecolor) {
                properties.schemecolor = {
                     type: "color",
                     text: "Theme Color",
                     value: data.schemecolor,
-                    order: -1 // Show at the top
+                    order: -1,
                };
           }
-          
+
           return { success: true, properties };
      } catch (err) {
           return { success: false, error: String(err) };

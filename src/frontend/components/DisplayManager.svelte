@@ -51,7 +51,7 @@
                          {#if $screens[screen]}
                               <img
                                    src={wallpapers[$screens[screen]]
-                                        ?.previewData}
+                                        ?.previewPath}
                                    alt={screen}
                               />
                          {:else}

@@ -22,6 +22,7 @@ import {
      applyWallpapers,
      killAllWallpapers,
 } from "../backend/wallpaperService";
+import { getWallpaperBasePath } from "../backend/config";
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
@@ -30,7 +31,6 @@ app.commandLine.appendSwitch(
      "CalculateNativeWinOcclusion"
 );
 app.commandLine.appendSwitch("--js-flags", "--max-old-space-size=512");
-app.commandLine.appendSwitch("--disable-software-rasterizer");
 app.commandLine.appendSwitch("--no-zygote");
 app.commandLine.appendSwitch("--no-sandbox");
 
@@ -65,6 +65,8 @@ function createWindow() {
                nodeIntegration: false,
                backgroundThrottling: true,
                spellcheck: false,
+               offscreen: false,
+               enableWebSQL: false,
           },
           autoHideMenuBar: true,
      });
@@ -150,9 +152,16 @@ app.whenReady().then(() => {
      registerFileService();
      registerSystemService();
 
-     protocol.handle("wallpaper", (request) => {
+     protocol.handle("wallpaper", async (request) => {
           const url = request.url.replace("wallpaper://", "");
           const filePath = decodeURIComponent(url);
+          const basePath = await getWallpaperBasePath();
+
+          if (!filePath.startsWith(basePath)) {
+               logger.backend(`Blocked wallpaper:// access to: ${filePath} (not in ${basePath})`);
+               return new Response("Access Denied", { status: 403 });
+          }
+
           return net.fetch(`file://${filePath}`);
      });
 
