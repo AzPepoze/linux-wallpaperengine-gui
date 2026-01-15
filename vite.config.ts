@@ -7,24 +7,24 @@ export default defineConfig({
      root: ".",
      publicDir: "src/public",
      build: {
-          outDir: "build",
+          outDir: "build/frontend",
      },
      plugins: [
           svelte(),
           electron({
                main: {
-                    entry: "src/main/main.ts",
+                    entry: "src/frontend/main/main.ts",
                     vite: {
                          build: {
-                              outDir: "build/electron",
+                              outDir: "build/frontend/electron",
                          },
                     },
                },
                preload: {
-                    input: "src/main/preload.ts",
+                    input: "src/frontend/main/preload.ts",
                     vite: {
                          build: {
-                              outDir: "build/electron",
+                              outDir: "build/frontend/electron",
                          },
                     },
                },
@@ -33,7 +33,7 @@ export default defineConfig({
      ],
      resolve: {
           alias: {
-               "@": path.resolve(__dirname, "./src/frontend"),
+               "@": path.resolve(__dirname, "./src/frontend/svelte"),
           },
      },
 });
