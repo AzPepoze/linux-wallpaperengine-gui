@@ -42,17 +42,28 @@ var socketPath string
 func main() {
 	socketPath = filepath.Join(os.TempDir(), "linux-wallpaperengine-gui.sock")
 
+	// Handle --minimized
+	minimized := false
+	for _, arg := range os.Args {
+		if arg == "--minimized" {
+			minimized = true
+			break
+		}
+	}
+
 	// Try to connect to existing socket
 	conn, err := net.Dial("unix", socketPath)
 	if err == nil {
-		// Another instance is running
-		fmt.Println("Another instance is already running. Opening UI...")
-		encoder := json.NewEncoder(conn)
-		req := Request{
-			ID:     999,
-			Method: "open-ui",
+		if !minimized {
+			// Another instance is running
+			fmt.Println("Another instance is already running. Opening UI...")
+			encoder := json.NewEncoder(conn)
+			req := Request{
+				ID:     999,
+				Method: "open-ui",
+			}
+			encoder.Encode(req)
 		}
-		encoder.Encode(req)
 		conn.Close()
 		os.Exit(0)
 	}
@@ -68,6 +79,13 @@ func main() {
 
 	// Ensure config is initialized
 	config.EnsureInitialized()
+
+	// Apply wallpapers on startup
+	go func() {
+		if err := wallpaper.ApplyWallpapers(); err != nil {
+			logger.Printf("Failed to apply wallpapers on startup: %v", err)
+		}
+	}()
 
 	// Register tray callbacks
 	tray.RegisterCallbacks(func() {
@@ -97,22 +115,12 @@ func main() {
 	// Start socket server in a goroutine
 	go startSocketServer(cleanup)
 
-	// Handle --minimized flag
-	minimized := false
-	for _, arg := range os.Args {
-		if arg == "--minimized" {
-			minimized = true
-			break
-		}
-	}
-
 	if !minimized {
 		go startElectron()
 	} else {
-		logger.Println("Starting in minimized mode (no UI)")
+		logger.Println("Starting in minimized mode")
 	}
 
-	// Run tray (blocking)
 	tray.Run()
 }
 
