@@ -9,6 +9,7 @@ import (
 	"os/exec"
 	"os/signal"
 	"path/filepath"
+	"sync"
 	"syscall"
 	"time"
 
@@ -38,6 +39,24 @@ type Event struct {
 
 var electronProcess *os.Process
 var socketPath string
+
+var (
+	clients   []chan interface{}
+	clientsMu sync.Mutex
+)
+
+func broadcastEvent(method string, params interface{}) {
+	clientsMu.Lock()
+	defer clientsMu.Unlock()
+	event := Event{Method: method, Params: params}
+	for _, ch := range clients {
+		select {
+		case ch <- event:
+		default:
+			// Drop if channel is full
+		}
+	}
+}
 
 func main() {
 	socketPath = filepath.Join(os.TempDir(), "linux-wallpaperengine-gui.sock")
@@ -79,6 +98,15 @@ func main() {
 
 	// Ensure config is initialized
 	config.EnsureInitialized()
+
+	// Start display watcher
+	display.StartWatcher(func() {
+		logger.Println("Displays changed, broadcasting and re-applying wallpapers...")
+		if err := wallpaper.ApplyWallpapers(); err != nil {
+			logger.Printf("Failed to apply wallpapers on display change: %v", err)
+		}
+		broadcastEvent("screens-changed", nil)
+	})
 
 	// Apply wallpapers on startup
 	go func() {
@@ -197,6 +225,33 @@ func handleConnection(conn net.Conn, cleanup func()) {
 	decoder := json.NewDecoder(conn)
 	encoder := json.NewEncoder(conn)
 
+	// Channel for all outgoing messages to this client
+	outCh := make(chan interface{}, 100)
+
+	clientsMu.Lock()
+	clients = append(clients, outCh)
+	clientsMu.Unlock()
+
+	defer func() {
+		clientsMu.Lock()
+		for i, ch := range clients {
+			if ch == outCh {
+				clients = append(clients[:i], clients[i+1:]...)
+				break
+			}
+		}
+		clientsMu.Unlock()
+	}()
+
+	// Writing goroutine
+	go func() {
+		for msg := range outCh {
+			if err := encoder.Encode(msg); err != nil {
+				return
+			}
+		}
+	}()
+
 	// Subscribe to logs
 	logCh := logger.Subscribe()
 	go func() {
@@ -208,8 +263,9 @@ func handleConnection(conn net.Conn, cleanup func()) {
 					"message": entry.Message,
 				},
 			}
-			if err := encoder.Encode(event); err != nil {
-				return
+			select {
+			case outCh <- event:
+			default:
 			}
 		}
 	}()

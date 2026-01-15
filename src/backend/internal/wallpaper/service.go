@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"linux-wallpaperengine-gui/src/backend/internal/config"
 	"linux-wallpaperengine-gui/src/backend/internal/display"
+	"linux-wallpaperengine-gui/src/backend/internal/logger"
 	"strings"
 )
 
@@ -18,16 +19,50 @@ func ApplyWallpapers() error {
 		return err
 	}
 
-	screens := conf.Screens
-	connectedSet := make(map[string]bool)
-	for _, s := range availableScreens {
-		connectedSet[s] = true
+	// Find a fallback wallpaper from existing config
+	var fallbackWallpaper *string
+	for _, s := range conf.Screens {
+		if s.Wallpaper != nil {
+			fallbackWallpaper = s.Wallpaper
+			break
+		}
 	}
 
-	// Filter connected screens
+	// Update conf.Screens to include all currently connected screens
+	updatedScreens := conf.Screens
+	existingScreens := make(map[string]bool)
+	for _, s := range conf.Screens {
+		existingScreens[s.Name] = true
+	}
+
+	configChanged := false
+	for _, name := range availableScreens {
+		if !existingScreens[name] {
+			// New screen detected
+			newScreen := config.ScreenConfig{Name: name}
+			if fallbackWallpaper != nil {
+				newScreen.Wallpaper = fallbackWallpaper
+				logger.Printf("Auto-assigning wallpaper to new screen %s: %s", name, *fallbackWallpaper)
+			}
+			updatedScreens = append(updatedScreens, newScreen)
+			configChanged = true
+		}
+	}
+
+	if configChanged {
+		conf.Screens = updatedScreens
+		config.WriteConfig(conf)
+	}
+
+	// Only apply to screens that are currently connected
 	var activeScreens []config.ScreenConfig
-	for _, s := range screens {
-		if connectedSet[s.Name] {
+	connectedScreensInConfig := make(map[string]config.ScreenConfig)
+	for _, s := range updatedScreens {
+		connectedScreensInConfig[s.Name] = s
+	}
+
+	for _, name := range availableScreens {
+		if s, ok := connectedScreensInConfig[name]; ok {
 			activeScreens = append(activeScreens, s)
 		}
 	}

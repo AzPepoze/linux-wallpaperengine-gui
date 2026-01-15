@@ -14,18 +14,11 @@ export async function refreshScreens() {
      }
 
      const connectedScreens = screensResult.screens || [];
-     let currentScreens = get(screens);
      let nextScreens: Record<string, string | null> = {};
 
      connectedScreens.forEach((s: string) => {
           nextScreens[s] = null;
      });
-
-     for (const s of connectedScreens) {
-          if (currentScreens[s]) {
-               nextScreens[s] = currentScreens[s];
-          }
-     }
 
      const configResult = await window.electronAPI.getConfig();
      if (configResult.success) {
@@ -40,27 +33,9 @@ export async function refreshScreens() {
           }
      }
 
-     let currentSelected = get(selectedScreen);
-     let fallbackWallpaper: string | null = null;
-     if (currentSelected && currentScreens[currentSelected]) {
-          fallbackWallpaper = currentScreens[currentSelected];
-     } else {
-          const found = Object.values(currentScreens).find((id) => id !== null);
-          if (found) fallbackWallpaper = found;
-     }
-
-     for (const s of connectedScreens) {
-          if (!nextScreens[s] && fallbackWallpaper) {
-               logger.log(
-                    `Auto-assigning wallpaper to ${s}: ${fallbackWallpaper}`
-               );
-               nextScreens[s] = fallbackWallpaper;
-               await window.electronAPI.setWallpaper(s, fallbackWallpaper);
-          }
-     }
-
      screens.set(nextScreens);
 
+     let currentSelected = get(selectedScreen);
      if (connectedScreens.length > 0) {
           if (!currentSelected || !connectedScreens.includes(currentSelected)) {
                selectedScreen.set(connectedScreens[0]);

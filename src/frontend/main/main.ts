@@ -1,13 +1,4 @@
-import {
-     app,
-     BrowserWindow,
-     Tray,
-     Menu,
-     nativeImage,
-     screen,
-     protocol,
-     net,
-} from "electron";
+import { app, BrowserWindow, protocol, net } from "electron";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
 import { socketClient } from "./socket-client";
@@ -15,7 +6,7 @@ import { registerConfigService } from "./services/configService";
 import { registerWallpaperService } from "./services/wallpaperService";
 import { registerDisplayService } from "./services/displayService";
 import { registerLoggerService } from "./services/loggerService";
-import { registerWindowService, quit } from "./services/windowService";
+import { registerWindowService } from "./services/windowService";
 import { registerFileService } from "./services/fileService";
 import { registerSystemService } from "./services/systemService";
 import { setMainWindow, logger } from "./logger";
@@ -38,10 +29,6 @@ async function applyWallpapers() {
      }
 }
 
-app.commandLine.appendSwitch(
-     "--disable-features",
-     "CalculateNativeWinOcclusion"
-);
 app.commandLine.appendSwitch("--js-flags", "--max-old-space-size=512");
 app.commandLine.appendSwitch("--no-zygote");
 app.commandLine.appendSwitch("--no-sandbox");
@@ -118,18 +105,25 @@ app.whenReady().then(async () => {
      try {
           await socketClient.connect();
           logger.backend("Connected to Go backend");
-          
+
           socketClient.onEvent((method, params) => {
                if (method === "log") {
                     const { type, message } = params;
                     logger.toFrontend(type || "backend", message);
+               } else if (method === "screens-changed") {
+                    win?.webContents.send("screens-changed");
                }
           });
 
           // Cache base path immediately to avoid spamming the backend later
-          cachedWallpaperBasePath = await socketClient.send("get-wallpaper-base-path");
+          cachedWallpaperBasePath = await socketClient.send(
+               "get-wallpaper-base-path"
+          );
      } catch (err) {
-          logger.backend("Failed to connect or get base path from Go backend:", err);
+          logger.backend(
+               "Failed to connect or get base path from Go backend:",
+               err
+          );
      }
 
      killAllWallpapers();
@@ -144,29 +138,31 @@ app.whenReady().then(async () => {
      protocol.handle("wallpaper", async (request) => {
           const url = request.url.replace("wallpaper://", "");
           const filePath = decodeURIComponent(url);
-          
+
           if (!cachedWallpaperBasePath) {
                try {
-                    cachedWallpaperBasePath = await socketClient.send("get-wallpaper-base-path");
+                    cachedWallpaperBasePath = await socketClient.send(
+                         "get-wallpaper-base-path"
+                    );
                } catch (err) {
-                    logger.backend("Error getting wallpaper base path in handler:", err);
-                    return new Response("Internal Server Error", { status: 500 });
+                    logger.backend(
+                         "Error getting wallpaper base path in handler:",
+                         err
+                    );
+                    return new Response("Internal Server Error", {
+                         status: 500,
+                    });
                }
           }
 
           if (!filePath.startsWith(cachedWallpaperBasePath)) {
-               logger.backend(`Blocked wallpaper:// access to: ${filePath} (not in ${cachedWallpaperBasePath})`);
+               logger.backend(
+                    `Blocked wallpaper:// access to: ${filePath} (not in ${cachedWallpaperBasePath})`
+               );
                return new Response("Access Denied", { status: 403 });
           }
 
           return net.fetch(`file://${filePath}`);
-     });
-
-     screen.on("display-added", () => {
-          win?.webContents.send("screens-changed");
-     });
-     screen.on("display-removed", () => {
-          win?.webContents.send("screens-changed");
      });
 
      applyWallpapers();
