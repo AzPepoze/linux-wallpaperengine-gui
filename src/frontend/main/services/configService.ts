@@ -36,9 +36,7 @@ export function registerConfigService() {
 
      ipcMain.handle("open-config-editor", async () => {
           logger.ipcReceived("open-config-editor");
-          // This one is easier to keep in Electron for now or move to Go later
-          // For now, let's just let Go handle it if we want, or keep it simple.
-          return { success: false, error: "Not implemented in Go yet" };
+          return await socketClient.send("open-config-editor");
      });
 
      ipcMain.handle("get-wallpaper-executable", async () => {

@@ -3,6 +3,7 @@ package config
 import (
 	"encoding/json"
 	"os"
+	"os/exec"
 	"path/filepath"
 )
 
@@ -110,4 +111,9 @@ func WriteConfig(conf AppConfig) error {
 
 func GetConfig() (AppConfig, error) {
 	return ReadConfig()
+}
+
+func OpenConfigEditor() error {
+	cmd := exec.Command("xdg-open", ConfigPath)
+	return cmd.Start()
 }

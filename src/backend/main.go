@@ -368,6 +368,13 @@ func handleConnection(conn net.Conn, cleanup func()) {
 			} else {
 				res.Result = map[string]string{"status": "already_running"}
 			}
+		case "open-config-editor":
+			err := config.OpenConfigEditor()
+			if err != nil {
+				res.Error = err.Error()
+			} else {
+				res.Result = map[string]bool{"success": true}
+			}
 		default:
 			res.Error = fmt.Sprintf("Unknown method: %s", req.Method)
 		}
