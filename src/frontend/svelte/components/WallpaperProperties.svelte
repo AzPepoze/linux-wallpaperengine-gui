@@ -6,7 +6,7 @@
      import ColorPicker from "./ui/ColorPicker.svelte";
      import { settingsStore } from "../scripts/settings";
      import MarkdownIt from "markdown-it";
-     import { WallpaperProperty, PropertyType } from "../../shared/types";
+     import type { WallpaperProperty, PropertyType } from "../../shared/types";
 
      export let wallpaperId: string;
      export let textColor: string = "#fff";

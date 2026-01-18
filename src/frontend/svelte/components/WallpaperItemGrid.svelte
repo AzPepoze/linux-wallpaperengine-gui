@@ -1,6 +1,6 @@
 <script lang="ts">
      import { fade, fly } from "svelte/transition";
-     import { WallpaperData, Wallpaper } from "../../shared/types";
+     import type { WallpaperData, Wallpaper } from "../../shared/types";
 
      export let wallpapers: Record<string, WallpaperData> = {};
      export let selectedWallpaper: Wallpaper | null = null;

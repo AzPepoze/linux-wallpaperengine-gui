@@ -200,7 +200,7 @@ func LoadWallpapers() (map[string]interface{}, error) {
 					"previewPath": data.PreviewPath,
 					"folderName":  *screen.Wallpaper,
 				}
-			break
+				break
 			}
 		}
 	}
@@ -208,10 +208,10 @@ func LoadWallpapers() (map[string]interface{}, error) {
 	ApplyWallpapers()
 
 	return map[string]interface{}{
-		"wallpapers":        wallpapers,
-		"selectedWallpaper": initialWallpaper,
-	},
-	nil
+			"wallpapers":        wallpapers,
+			"selectedWallpaper": initialWallpaper,
+		},
+		nil
 }
 
 func KillAllWallpapers() {

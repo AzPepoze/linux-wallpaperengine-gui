@@ -14,8 +14,8 @@
      import { screens, selectedScreen } from "./scripts/display";
      import LogsPopup from "./components/LogsPopup.svelte";
      import Toast from "./components/ui/Toast.svelte";
-     import { toastStore } from "./scripts/settings";
-     import { WallpaperData } from "../shared/types";
+     import { toastStore, showToast } from "./scripts/settings";
+     import type { WallpaperData } from "../shared/types";
 
      let wallpapers: Record<string, WallpaperData> = {};
      let error: string | null = null;
@@ -35,7 +35,6 @@
           : null;
 
      async function initialize() {
-          initLogger();
           loading = true;
 
           display.initDisplay();
@@ -88,6 +87,18 @@
      }
 
      onMount(async () => {
+          // Listen for toasts from main process
+          window.electronAPI.on(
+               "show-toast",
+               (data: {
+                    message: string;
+                    type: "success" | "error" | "warn" | "info";
+                    duration?: number;
+               }) => {
+                    showToast(data.message, data.type, data.duration);
+               },
+          );
+
           initLogger();
           const initialWallpaper = await initialize();
           await display.refreshScreens();

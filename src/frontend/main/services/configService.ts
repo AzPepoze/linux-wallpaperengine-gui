@@ -1,7 +1,7 @@
 import { ipcMain } from "electron";
 import { socketClient } from "../socket-client";
 import { logger } from "../logger";
-import { AppConfig } from "../../shared/types";
+import type { AppConfig } from "../../shared/types";
 
 export function registerConfigService() {
      ipcMain.handle("get-config", async () => {
@@ -26,7 +26,7 @@ export function registerConfigService() {
                const currentConfig = await socketClient.send("get-config");
                const updatedConfig = { ...currentConfig, ...newConfig };
                return await socketClient.send("write-config", updatedConfig);
-          }
+          },
      );
 
      ipcMain.handle("write-config", async (_, newConfig: AppConfig) => {

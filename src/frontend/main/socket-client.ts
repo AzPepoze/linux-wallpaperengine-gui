@@ -23,6 +23,7 @@ class SocketClient {
 	private pendingRequests = new Map<number, { resolve: (val: any) => void, reject: (err: any) => void }>();
 	private buffer = "";
 	private eventListener: ((method: string, params: any) => void) | null = null;
+	private retryListener: ((attempt: number, error: string) => void) | null = null;
 
 	constructor() {
 		this.socketPath = path.join(
@@ -35,28 +36,47 @@ class SocketClient {
 		this.eventListener = callback;
 	}
 
-	async connect(): Promise<void> {
-		return new Promise((resolve, reject) => {
-			this.client = net.createConnection(this.socketPath, () => {
-				console.log("Connected to Go backend socket");
-				resolve();
-			});
+	onRetry(callback: (attempt: number, error: string) => void) {
+		this.retryListener = callback;
+	}
 
-			this.client.on("data", (data) => {
-				this.buffer += data.toString();
-				this.processBuffer();
-			});
+	async connect(maxRetries = 10, delay = 500): Promise<void> {
+		for (let i = 0; i < maxRetries; i++) {
+			try {
+				await new Promise<void>((resolve, reject) => {
+					this.client = net.createConnection(this.socketPath, () => {
+						console.log("Connected to Go backend socket");
+						resolve();
+					});
 
-			this.client.on("error", (err) => {
-				console.error("Socket error:", err);
-				reject(err);
-			});
+					this.client.on("data", (data) => {
+						this.buffer += data.toString();
+						this.processBuffer();
+					});
 
-			this.client.on("close", () => {
-				console.log("Socket connection closed");
-				this.client = null;
-			});
-		});
+					this.client.on("error", (err) => {
+						// Only reject if it's the last attempt or not a connection error
+						reject(err);
+					});
+
+					this.client.on("close", () => {
+						console.log("Socket connection closed");
+						this.client = null;
+					});
+				});
+				return; // Connected successfully
+			} catch (err) {
+				const errMsg = err instanceof Error ? err.message : String(err);
+				console.warn(`Socket connection attempt ${i + 1} failed: ${errMsg}. Retrying in ${delay}ms...`);
+				
+				if (this.retryListener) {
+					this.retryListener(i + 1, errMsg);
+				}
+
+				if (i === maxRetries - 1) throw err;
+				await new Promise(r => setTimeout(r, delay));
+			}
+		}
 	}
 
 	private processBuffer() {

@@ -9,7 +9,7 @@
      import { showDisplayManager } from "../scripts/ui";
      import { cloneMode, toggleCloneMode } from "../scripts/display";
      import { fly } from "svelte/transition";
-     import { WallpaperData, Wallpaper } from "../../shared/types";
+     import type { WallpaperData, Wallpaper } from "../../shared/types";
 
      export let wallpapers: Record<string, WallpaperData> = {};
      export let activeWallpaper: Wallpaper | null = null;

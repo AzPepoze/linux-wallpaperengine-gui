@@ -4,6 +4,8 @@ import (
 	"fmt"
 	"log"
 	"sync"
+
+	"linux-wallpaperengine-gui/src/backend/internal/notification"
 )
 
 type LogEntry struct {
@@ -55,16 +57,10 @@ func WallpaperLog(screen, msg string) {
 	broadcast("wallpaper", formatted)
 }
 
-func Fatalf(format string, v ...interface{}) {
+func Error(format string, v ...interface{}) {
 	msg := fmt.Sprintf(format, v...)
 	log.Printf("[BACKEND] FATAL: %s", msg)
 	broadcast("backend", "FATAL: "+msg)
-	log.Fatal("[BACKEND] " + msg)
-}
-
-func Fatal(v ...interface{}) {
-	msg := fmt.Sprint(v...)
-	log.Printf("[BACKEND] FATAL: %s", msg)
-	broadcast("backend", "FATAL: "+msg)
+	notification.Error("Linux Wallpaper Engine GUI [BACKEND] - Fatal Error", msg)
 	log.Fatal("[BACKEND] " + msg)
 }

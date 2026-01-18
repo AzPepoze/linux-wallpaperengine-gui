@@ -8,7 +8,7 @@
      import { sidebarWidth } from "../scripts/ui";
      import { onDestroy } from "svelte";
      import WallpaperProperties from "./WallpaperProperties.svelte";
-     import { Wallpaper } from "../../shared/types";
+     import type { Wallpaper } from "../../shared/types";
 
      export let selectedWallpaper: Wallpaper | null = null;
      export let onClose: () => void = () => {};

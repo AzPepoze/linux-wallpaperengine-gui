@@ -3,13 +3,15 @@
      import { quintOut, quintIn } from "svelte/easing";
 
      export let message: string;
-     export let type: "success" | "error" = "success";
+     export let type: "success" | "error" | "warn" | "info" = "success";
 </script>
 
 <div
      class="toast"
      class:success={type === "success"}
      class:error={type === "error"}
+     class:warn={type === "warn"}
+     class:info={type === "info"}
      in:fly={{ y: 30, duration: 400, easing: quintOut }}
      out:fly={{ y: 20, duration: 300, easing: quintIn, opacity: 0 }}
 >
@@ -46,6 +48,20 @@
                color: var(--error-color);
                border: 1px solid rgba(220, 53, 69, 0.4);
                box-shadow: 0 8px 24px rgba(220, 53, 69, 0.15);
+          }
+
+          &.warn {
+               background: #fff3cd;
+               color: #856404;
+               border: 1px solid rgba(255, 193, 7, 0.4);
+               box-shadow: 0 8px 24px rgba(255, 193, 7, 0.15);
+          }
+
+          &.info {
+               background: #d1ecf1;
+               color: #0c5460;
+               border: 1px solid rgba(23, 162, 184, 0.4);
+               box-shadow: 0 8px 24px rgba(23, 162, 184, 0.15);
           }
      }
 </style>

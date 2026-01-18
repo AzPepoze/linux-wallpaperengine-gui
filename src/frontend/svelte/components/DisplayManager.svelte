@@ -7,7 +7,7 @@
           selectedScreen,
           refreshScreens,
      } from "../scripts/display";
-     import { WallpaperData } from "../../shared/types";
+     import type { WallpaperData } from "../../shared/types";
 
      export let wallpapers: Record<string, WallpaperData> = {};
 

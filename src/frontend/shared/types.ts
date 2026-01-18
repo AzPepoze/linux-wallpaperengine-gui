@@ -24,7 +24,7 @@ export interface ScreenConfig {
      wallpaper: string | null;
 }
 
-export interface AppConfig {
+export type AppConfig = {
      screens?: ScreenConfig[];
      FPS?: number;
      SILENCE?: boolean;
@@ -53,7 +53,7 @@ export interface AppConfig {
      wallpaperProperties?: Record<string, Record<string, string>>;
      dumpStructure?: boolean;
      playlist?: string[];
-}
+};
 
 export type PropertyType =
      | "slider"

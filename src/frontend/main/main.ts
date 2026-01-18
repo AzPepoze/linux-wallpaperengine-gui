@@ -13,22 +13,6 @@ import { setMainWindow, logger } from "./logger";
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
-async function killAllWallpapers() {
-     try {
-          await socketClient.send("kill-all-wallpapers");
-     } catch (err) {
-          logger.backend("Error calling kill-all-wallpapers:", err);
-     }
-}
-
-async function applyWallpapers() {
-     try {
-          await socketClient.send("apply-wallpapers");
-     } catch (err) {
-          logger.backend("Error calling apply-wallpapers:", err);
-     }
-}
-
 app.commandLine.appendSwitch("--js-flags", "--max-old-space-size=512");
 app.commandLine.appendSwitch("--no-zygote");
 app.commandLine.appendSwitch("--no-sandbox");
@@ -75,7 +59,7 @@ function createWindow() {
      win.webContents.on("did-finish-load", () => {
           win?.webContents.send(
                "main-process-message",
-               new Date().toLocaleString()
+               new Date().toLocaleString(),
           );
      });
 
@@ -102,6 +86,18 @@ app.on("activate", () => {
 });
 
 app.whenReady().then(async () => {
+     socketClient.onRetry((attempt, error) => {
+          // Use different levels based on attempt
+          let type: "info" | "warn" | "error" = "info";
+          if (attempt > 7) type = "error";
+          else if (attempt > 3) type = "warn";
+
+          win?.webContents.send("show-toast", {
+               message: `Connecting to backend (Attempt ${attempt}/10)...`,
+               type,
+          });
+     });
+
      try {
           await socketClient.connect();
           logger.backend("Connected to Go backend");
@@ -117,12 +113,12 @@ app.whenReady().then(async () => {
 
           // Cache base path immediately to avoid spamming the backend later
           cachedWallpaperBasePath = await socketClient.send(
-               "get-wallpaper-base-path"
+               "get-wallpaper-base-path",
           );
      } catch (err) {
           logger.backend(
                "Failed to connect or get base path from Go backend:",
-               err
+               err,
           );
      }
 
@@ -141,12 +137,12 @@ app.whenReady().then(async () => {
           if (!cachedWallpaperBasePath) {
                try {
                     cachedWallpaperBasePath = await socketClient.send(
-                         "get-wallpaper-base-path"
+                         "get-wallpaper-base-path",
                     );
                } catch (err) {
                     logger.backend(
                          "Error getting wallpaper base path in handler:",
-                         err
+                         err,
                     );
                     return new Response("Internal Server Error", {
                          status: 500,
@@ -156,7 +152,7 @@ app.whenReady().then(async () => {
 
           if (!filePath.startsWith(cachedWallpaperBasePath)) {
                logger.backend(
-                    `Blocked wallpaper:// access to: ${filePath} (not in ${cachedWallpaperBasePath})`
+                    `Blocked wallpaper:// access to: ${filePath} (not in ${cachedWallpaperBasePath})`,
                );
                return new Response("Access Denied", { status: 403 });
           }

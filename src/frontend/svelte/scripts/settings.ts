@@ -5,15 +5,15 @@ import { EXECUTABLE_NAME } from "../../shared/constants";
 // Toast Management
 export interface ToastMessage {
      message: string;
-     type: "success" | "error";
+     type: "success" | "error" | "warn" | "info";
 }
 
 export const toastStore: Writable<ToastMessage | null> = writable(null);
 
 export function showToast(
      message: string,
-     type: "success" | "error" = "success",
-     duration: number = 3000
+     type: "success" | "error" | "warn" | "info" = "success",
+     duration = 3000,
 ) {
      toastStore.set({ message, type });
      setTimeout(() => {

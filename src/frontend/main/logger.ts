@@ -55,7 +55,7 @@ export const logger = {
 
      error: (...args: any[]) => {
           logToFrontend({
-               type: "electron",
+               type: "error",
                showLog: true,
                data: ["Error:", ...args],
           });

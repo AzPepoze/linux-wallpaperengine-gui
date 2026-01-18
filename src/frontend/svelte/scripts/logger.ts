@@ -33,11 +33,15 @@ export const logger = {
      },
 
      backend: (message: string) => {
-          updateStore(backendLogs, message);
+          updateStore(backendLogs, `[Backend] ${message}`);
+     },
+
+     electron: (message: string) => {
+          updateStore(backendLogs, `[Electron] ${message}`);
      },
 
      wallpaper: (message: string) => {
-          updateStore(wallpaperLogs, message);
+          updateStore(wallpaperLogs, `[Wallpaper] ${message}`);
      },
 
      error: (...args: any[]) => {
@@ -55,13 +59,23 @@ export const logger = {
      },
 };
 
+let isInitialized = false;
+
 export function initLogger() {
+     if (isInitialized) return;
+
      if (window.electronAPI) {
           window.electronAPI.on(
                IPC_LOG_CHANNEL,
                (data: { type: string; message: string }) => {
-                    logger[data.type as keyof typeof logger](data.message);
+                    const method = logger[data.type as keyof typeof logger];
+                    if (typeof method === "function") {
+                         (method as Function)(data.message);
+                    } else {
+                         logger.backend(data.message);
+                    }
                }
           );
+          isInitialized = true;
      }
 }

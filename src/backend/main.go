@@ -16,6 +16,7 @@ import (
 	"linux-wallpaperengine-gui/src/backend/internal/config"
 	"linux-wallpaperengine-gui/src/backend/internal/display"
 	"linux-wallpaperengine-gui/src/backend/internal/logger"
+	"linux-wallpaperengine-gui/src/backend/internal/notification"
 	"linux-wallpaperengine-gui/src/backend/internal/tray"
 	"linux-wallpaperengine-gui/src/backend/internal/wallpaper"
 )
@@ -104,6 +105,7 @@ func main() {
 		logger.Println("Displays changed, broadcasting and re-applying wallpapers...")
 		if err := wallpaper.ApplyWallpapers(); err != nil {
 			logger.Printf("Failed to apply wallpapers on display change: %v", err)
+			notification.Error("Wallpaper Engine Error", "Failed to apply wallpapers on display change: "+err.Error())
 		}
 		broadcastEvent("screens-changed", nil)
 	})
@@ -112,6 +114,7 @@ func main() {
 	go func() {
 		if err := wallpaper.ApplyWallpapers(); err != nil {
 			logger.Printf("Failed to apply wallpapers on startup: %v", err)
+			notification.Error("Wallpaper Engine Error", "Failed to apply wallpapers on startup: "+err.Error())
 		}
 	}()
 
@@ -154,12 +157,14 @@ func main() {
 
 func startSocketServer(cleanup func()) {
 	if _, err := os.Stat(socketPath); err == nil {
-		os.Remove(socketPath)
+		if err := os.Remove(socketPath); err != nil {
+			logger.Error("Failed to remove existing socket file at %s: %v. Please check permissions or delete it manually.", socketPath, err)
+		}
 	}
 
 	listener, err := net.Listen("unix", socketPath)
 	if err != nil {
-		logger.Fatal("Listen error:", err)
+		logger.Error("Failed to create socket listener at %s: %v. This usually happens if another instance is running or the path is not writable.", socketPath, err)
 	}
 	defer listener.Close()
 
@@ -202,7 +207,7 @@ func startElectron() {
 	cmd.Stderr = os.Stderr
 
 	if err := cmd.Start(); err != nil {
-		logger.Fatalf("Failed to start Electron: %v", err)
+		logger.Error("Failed to start Electron: %v", err)
 	}
 
 	electronProcess = cmd.Process
