@@ -117,6 +117,7 @@ linux-wallpaperengine-gui [options]
 ### [Options]
 
 -    `--minimized`: Starts the application minimized in the system tray.
+-    `--debug-mode`: Enables debug mode for the application.
 
 ## BUILD FROM SOURCE
 

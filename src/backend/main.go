@@ -189,18 +189,20 @@ func startElectron() {
 	if filepath.Base(appDir) == "resources" {
 		logger.Println("Production mode detected...")
 
-		// The Electron binary is in: [AppRoot]/linux-wallpaperengine-gui-electron
-		electronPath := filepath.Join(appDir, "..", "linux-wallpaperengine-gui-electron")
+		// The Electron binary is in: [AppRoot]/linux-wallpaperengine-gui
+		electronPath := filepath.Join(appDir, "..", "linux-wallpaperengine-gui")
 
 		if _, err := os.Stat(electronPath); os.IsNotExist(err) {
 			// Try same directory as a fallback
-			electronPath = filepath.Join(appDir, "linux-wallpaperengine-gui-electron")
+			electronPath = filepath.Join(appDir, "linux-wallpaperengine-gui")
 		}
 
 		cmd = exec.Command(electronPath)
+		cmd.Env = append(os.Environ(), "INTERNAL_START=true")
 	} else {
 		logger.Println("Dev mode detected, running via pnpm...")
 		cmd = exec.Command("pnpm", "run", "dev:frontend")
+		cmd.Env = append(os.Environ(), "INTERNAL_START=true")
 	}
 
 	cmd.Stdout = os.Stdout

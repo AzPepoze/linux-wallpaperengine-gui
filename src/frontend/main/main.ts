@@ -1,6 +1,7 @@
 import { app, BrowserWindow, protocol, net } from "electron";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
+import { spawn } from "node:child_process";
 import { socketClient } from "./socket-client";
 import { registerConfigService } from "./services/configService";
 import { registerWallpaperService } from "./services/wallpaperService";
@@ -34,6 +35,7 @@ let cachedWallpaperBasePath = "";
 
 const VITE_DEV_SERVER_URL = process.env["VITE_DEV_SERVER_URL"];
 const isMinimized = process.argv.includes("--minimized");
+const isDebug = process.argv.includes("--debug-mode");
 
 function createWindow() {
      const preloadPath = path.join(__dirname, "preload.mjs");
@@ -86,7 +88,33 @@ app.on("activate", () => {
 });
 
 app.whenReady().then(async () => {
-     socketClient.onRetry((attempt, error) => {
+     if (!process.env.INTERNAL_START && !process.env.VITE_DEV_SERVER_URL) {
+          const isProduction = !process.env.VITE_DEV_SERVER_URL;
+          let backendPath = "";
+
+          if (isProduction) {
+               backendPath = path.join(
+                    process.resourcesPath,
+                    "linux-wallpaperengine-gui",
+               );
+          } else {
+               backendPath = path.join(
+                    __dirname,
+                    "../../../build/backend/linux-wallpaperengine-gui",
+               );
+          }
+
+          logger.backend("Starting Go backend from Electron:", backendPath);
+          spawn(backendPath, {
+               detached: true,
+               stdio: isDebug ? ["ignore", "inherit", "inherit"] : "ignore",
+          }).unref();
+
+          if (!isDebug) app.quit();
+          return;
+     }
+
+     socketClient.onRetry((attempt, _error) => {
           // Use different levels based on attempt
           let type: "info" | "warn" | "error" = "info";
           if (attempt > 7) type = "error";
