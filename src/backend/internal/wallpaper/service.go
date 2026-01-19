@@ -101,7 +101,7 @@ func ApplyWallpapers() error {
 		if conf.Silence {
 			args = append(args, "-s")
 		} else if conf.Volume != nil {
-			args = append(args, fmt.Sprintf("--volume %f", *conf.Volume))
+			args = append(args, fmt.Sprintf("--volume %d", int(*conf.Volume)))
 		}
 
 		if conf.NoAutomute {

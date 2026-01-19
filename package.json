@@ -66,7 +66,10 @@
           "linux": {
                "artifactName": "${productName}.${ext}",
                "executableName": "linux-wallpaperengine-gui-electron",
-               "category": "Utility"
+               "category": "Utility",
+               "desktop": {
+                    "Exec": "linux-wallpaperengine-gui"
+               }
           },
           "extraFiles": [
                {
