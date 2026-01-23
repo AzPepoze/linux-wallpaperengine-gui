@@ -104,8 +104,13 @@ app.whenReady().then(async () => {
                );
           }
 
-          logger.backend("Starting Go backend from Electron:", backendPath);
-          spawn(backendPath, {
+          const args = process.argv.slice(isProduction ? 1 : 2);
+          logger.backend(
+               "Starting Go backend from Electron:",
+               backendPath,
+               args,
+          );
+          spawn(backendPath, args, {
                detached: true,
                stdio: isDebug ? ["ignore", "inherit", "inherit"] : "ignore",
           }).unref();
