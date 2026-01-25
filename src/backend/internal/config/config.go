@@ -79,6 +79,12 @@ func EnsureInitialized() error {
 func ReadConfig() (AppConfig, error) {
 	data, err := os.ReadFile(ConfigPath)
 	if err != nil {
+		if os.IsNotExist(err) {
+			if werr := WriteConfig(DefaultConfig); werr != nil {
+				return DefaultConfig, werr
+			}
+			return DefaultConfig, nil
+		}
 		return DefaultConfig, err
 	}
 
