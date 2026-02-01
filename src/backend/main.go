@@ -9,6 +9,7 @@ import (
 	"os/exec"
 	"os/signal"
 	"path/filepath"
+	"strings"
 	"sync"
 	"syscall"
 	"time"
@@ -59,8 +60,19 @@ func broadcastEvent(method string, params interface{}) {
 	}
 }
 
+func isWaylandSession() bool {
+	sessionType := strings.ToLower(os.Getenv("XDG_SESSION_TYPE"))
+	waylandDisplay := os.Getenv("WAYLAND_DISPLAY")
+	return sessionType == "wayland" || waylandDisplay != ""
+}
+
 func main() {
 	socketPath = filepath.Join(os.TempDir(), "linux-wallpaperengine-gui.sock")
+
+	// Detect and log Wayland session
+	if isWaylandSession() {
+		logger.Println("⚠️  Wayland session detected")
+	}
 
 	// Handle --minimized
 	minimized := false

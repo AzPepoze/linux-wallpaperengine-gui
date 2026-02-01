@@ -1,7 +1,7 @@
-import { ipcMain, dialog, BrowserWindow, app } from "electron";
-import path from "node:path";
+import { ipcMain, dialog, BrowserWindow } from "electron";
 import fs from "node:fs/promises";
 import { logger } from "../logger";
+import { normalizePath } from "../utils/pathHelper";
 
 export function registerFileService() {
      ipcMain.handle("select-dir", async (event) => {
@@ -26,9 +26,7 @@ export function registerFileService() {
 
      ipcMain.handle("fs-read-dir", async (_, dirPath: string) => {
           logger.ipcReceived("fs-read-dir", dirPath);
-          if (dirPath.startsWith("~")) {
-               dirPath = path.join(app.getPath("home"), dirPath.slice(1));
-          }
+          dirPath = normalizePath(dirPath);
           try {
                const entries = await fs.readdir(dirPath, {
                     withFileTypes: true,
@@ -45,9 +43,7 @@ export function registerFileService() {
 
      ipcMain.handle("fs-read-file", async (_, filePath: string) => {
           logger.ipcReceived("fs-read-file", filePath);
-          if (filePath.startsWith("~")) {
-               filePath = path.join(app.getPath("home"), filePath.slice(1));
-          }
+          filePath = normalizePath(filePath);
           return await fs.readFile(filePath, "utf-8");
      });
 
@@ -55,30 +51,21 @@ export function registerFileService() {
           "fs-write-file",
           async (_, filePath: string, content: string) => {
                logger.ipcReceived("fs-write-file", filePath);
-               if (filePath.startsWith("~")) {
-                    filePath = path.join(
-                         app.getPath("home"),
-                         filePath.slice(1)
-                    );
-               }
+               filePath = normalizePath(filePath);
                await fs.writeFile(filePath, content, "utf-8");
-          }
+          },
      );
 
      ipcMain.handle("fs-read-binary", async (_, filePath: string) => {
           logger.ipcReceived("fs-read-binary", filePath);
-          if (filePath.startsWith("~")) {
-               filePath = path.join(app.getPath("home"), filePath.slice(1));
-          }
+          filePath = normalizePath(filePath);
           const buffer = await fs.readFile(filePath);
           return buffer.buffer;
      });
 
      ipcMain.handle("fs-exists", async (_, filePath: string) => {
           logger.ipcReceived("fs-exists", filePath);
-          if (filePath.startsWith("~")) {
-               filePath = path.join(app.getPath("home"), filePath.slice(1));
-          }
+          filePath = normalizePath(filePath);
           try {
                await fs.access(filePath);
                return true;

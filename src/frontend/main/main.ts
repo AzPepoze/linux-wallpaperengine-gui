@@ -11,6 +11,7 @@ import { registerWindowService } from "./services/windowService";
 import { registerFileService } from "./services/fileService";
 import { registerSystemService } from "./services/systemService";
 import { setMainWindow, logger } from "./logger";
+import { getWaylandEnvironment } from "./utils/waylandHelper";
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
@@ -110,9 +111,13 @@ app.whenReady().then(async () => {
                backendPath,
                args,
           );
+
+          // Apply Wayland environment variables to backend process
+          const backendEnv = { ...process.env, ...getWaylandEnvironment() };
           spawn(backendPath, args, {
                detached: true,
                stdio: isDebug ? ["ignore", "inherit", "inherit"] : "ignore",
+               env: backendEnv,
           }).unref();
 
           if (!isDebug) app.quit();

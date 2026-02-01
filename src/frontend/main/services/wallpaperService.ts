@@ -1,6 +1,12 @@
 import { ipcMain } from "electron";
 import { socketClient } from "../socket-client";
 import { logger } from "../logger";
+import {
+     getConfig,
+     updateScreenConfig,
+     updateConfig,
+     updateWallpaperProperties,
+} from "../utils/configHelper";
 
 export function registerWallpaperService() {
      ipcMain.handle("apply-wallpapers", async () => {
@@ -14,26 +20,17 @@ export function registerWallpaperService() {
                logger.ipcReceived(
                     "set-wallpaper",
                     screenName,
-                    wallpaperFolderName
+                    wallpaperFolderName,
                );
-               const config = await socketClient.send("get-config");
-               const screens = config.screens || [];
-               const screenIndex = screens.findIndex((s: any) => s.name === screenName);
-
-               if (screenIndex > -1) {
-                    screens[screenIndex].wallpaper = wallpaperFolderName;
-               } else {
-                    screens.push({ name: screenName, wallpaper: wallpaperFolderName });
-               }
-
-               const updateData: any = { screens };
+               await updateScreenConfig(screenName, wallpaperFolderName);
+               const config = await getConfig();
                if (config.cloneMode) {
-                    updateData.globalWallpaper = wallpaperFolderName;
+                    await updateConfig({
+                         globalWallpaper: wallpaperFolderName,
+                    });
                }
-
-               await socketClient.send("write-config", { ...config, ...updateData });
                return await socketClient.send("apply-wallpapers");
-          }
+          },
      );
 
      ipcMain.handle(
@@ -42,27 +39,20 @@ export function registerWallpaperService() {
                logger.ipcReceived(
                     "toggle-clone-mode",
                     enabled,
-                    globalWallpaper
+                    globalWallpaper,
                );
-               const config = await socketClient.send("get-config");
-               const updateData: any = {
-                    cloneMode: enabled,
-               };
-
+               const updateData: any = { cloneMode: enabled };
                if (globalWallpaper !== undefined) {
                     updateData.globalWallpaper = globalWallpaper;
                }
-
-               await socketClient.send("write-config", { ...config, ...updateData });
+               await updateConfig(updateData);
                return await socketClient.send("apply-wallpapers");
-          }
+          },
      );
 
      ipcMain.handle("clear-all-wallpapers", async () => {
           logger.ipcReceived("clear-all-wallpapers");
-          const currentConfig = await socketClient.send("get-config");
-          const updatedConfig = { ...currentConfig, screens: [] };
-          await socketClient.send("write-config", updatedConfig);
+          await updateConfig({ screens: [] });
           return await socketClient.send("apply-wallpapers");
      });
 
@@ -91,16 +81,8 @@ export function registerWallpaperService() {
           "save-wallpaper-property",
           async (_, id: string, key: string, value: string) => {
                logger.ipcReceived("save-wallpaper-property", id, key, value);
-               const config = await socketClient.send("get-config");
-               if (!config.wallpaperProperties) {
-                    config.wallpaperProperties = {};
-               }
-               if (!config.wallpaperProperties[id]) {
-                    config.wallpaperProperties[id] = {};
-               }
-               config.wallpaperProperties[id][key] = value;
-               await socketClient.send("write-config", config);
+               await updateWallpaperProperties(id, key, value);
                return await socketClient.send("apply-wallpapers");
-          }
+          },
      );
 }

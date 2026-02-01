@@ -602,38 +602,9 @@
           }
      }
 
-     .help-text {
-          font-size: 0.8em;
-          margin-top: 8px;
-          color: var(--text-muted);
-          a {
-               color: var(--btn-primary-bg);
-               text-decoration: none;
-               &:hover {
-                    text-decoration: underline;
-               }
-          }
-     }
-
      .doc-actions {
           margin-top: 12px;
           display: flex;
           justify-content: flex-start;
-     }
-
-     .link-btn {
-          background: none;
-          border: none;
-          padding: 0;
-          color: var(--btn-primary-bg);
-          text-decoration: none;
-          font-family: inherit;
-          font-size: inherit;
-          cursor: pointer;
-          font-weight: 500;
-
-          &:hover {
-               text-decoration: underline;
-          }
      }
 </style>
