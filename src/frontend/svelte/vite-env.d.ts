@@ -49,6 +49,21 @@ interface ElectronAPI {
      getWallpaperProjectData: (id: string) => Promise<{ success: boolean; properties?: Record<string, any>; error?: string }>;
      getWallpaperProperties: (id: string) => Promise<any[]>;
      saveWallpaperProperty: (id: string, key: string, value: string) => Promise<{ success: boolean; error?: string }>;
+
+     // Workshop services
+     getPublishedFileDetails: (fileIds: string[]) => Promise<any[]>;
+     getCollectionDetails: (collectionIds: string[]) => Promise<any[]>;
+     getUGCFileDetails: (steamApiKey: string, ugcId: string, steamId?: string) => Promise<any | null>;
+     queryWorkshopFiles: (steamApiKey: string, options: {
+          query_type?: number;
+          page?: number;
+          cursor?: string;
+          numperpage?: number;
+          requiredtags?: string[];
+          excludedtags?: string[];
+          match_all_tags?: boolean;
+          search_text?: string;
+     }) => Promise<{ items: any[]; total: number; nextCursor?: string }>;
 }
 
 interface Window {

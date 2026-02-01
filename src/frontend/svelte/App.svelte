@@ -4,6 +4,7 @@
      import Sidebar from "./components/Sidebar.svelte";
      import WallpaperContainer from "./components/WallpaperContainer.svelte";
      import DisplayManager from "./components/DisplayManager.svelte";
+     import Workshop from "./components/Workshop.svelte";
      import { initLogger, logger } from "./scripts/logger";
      import { onMount } from "svelte";
      import { quadOut } from "svelte/easing";
@@ -14,7 +15,7 @@
      import { screens, selectedScreen } from "./scripts/display";
      import LogsPopup from "./components/LogsPopup.svelte";
      import Toast from "./components/ui/Toast.svelte";
-     import { toastStore, showToast } from "./scripts/settings";
+     import { toastStore, showToast, loadSettings } from "./scripts/settings";
      import type { WallpaperData } from "../shared/types";
 
      let wallpapers: Record<string, WallpaperData> = {};
@@ -100,6 +101,7 @@
           );
 
           initLogger();
+          await loadSettings();
           const initialWallpaper = await initialize();
           await display.refreshScreens();
 
@@ -197,6 +199,14 @@
                          {selectedWallpaper}
                          onClose={() => (selectedFolderName = null)}
                     />
+               </div>
+          {:else if $activeView === "workshop"}
+               <div
+                    class="view-container"
+                    in:scale={pageTransitionInParams}
+                    out:scale={pageTransitionOutParams}
+               >
+                    <Workshop />
                </div>
           {:else if $activeView === "logs"}
                <div

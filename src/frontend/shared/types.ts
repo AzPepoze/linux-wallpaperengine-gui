@@ -53,6 +53,7 @@ export type AppConfig = {
      wallpaperProperties?: Record<string, Record<string, string>>;
      dumpStructure?: boolean;
      playlist?: string[];
+     steamApiKey?: string;
 };
 
 export type PropertyType =

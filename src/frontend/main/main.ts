@@ -12,6 +12,7 @@ import { registerFileService } from "./services/fileService";
 import { registerSystemService } from "./services/systemService";
 import { setMainWindow, logger } from "./logger";
 import { getWaylandEnvironment } from "./utils/waylandHelper";
+import { registerWorkshopService } from "./services/workshopService";
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
@@ -167,6 +168,7 @@ app.whenReady().then(async () => {
      registerWindowService();
      registerFileService();
      registerSystemService();
+     registerWorkshopService();
 
      protocol.handle("wallpaper", async (request) => {
           const url = request.url.replace("wallpaper://", "");

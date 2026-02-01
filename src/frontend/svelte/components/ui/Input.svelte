@@ -1,6 +1,6 @@
 <script lang="ts">
      export let value: string | number;
-     export let type: "text" | "number" = "text";
+     export let type: "text" | "number" | "password" = "text";
      export let id: string = "";
      export let placeholder: string = "";
      export let min: number | undefined = undefined;

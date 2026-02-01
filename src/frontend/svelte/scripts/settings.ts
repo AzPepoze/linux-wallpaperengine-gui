@@ -58,6 +58,7 @@ export interface SettingsState {
      wallpaperProperties: Record<string, Record<string, string>>;
      dumpStructure: boolean;
      playlist: string[];
+     steamApiKey: string;
 }
 
 export const settingsStore: Writable<SettingsState | null> = writable(null);
@@ -88,6 +89,7 @@ const configFieldMap: Record<string, string> = {
      wallpaperProperties: "wallpaperProperties",
      dumpStructure: "dumpStructure",
      playlist: "playlist",
+     steamApiKey: "steamApiKey",
 };
 
 // Settings Actions
@@ -133,7 +135,7 @@ export async function saveSettings(settings: SettingsState): Promise<void> {
           if (!applyResult.success) {
                showToast(
                     `Error applying wallpapers: ${applyResult.error}`,
-                    "error"
+                    "error",
                );
           }
      } catch (e) {
@@ -149,13 +151,13 @@ export async function openConfigFile(): Promise<void> {
           } else {
                showToast(
                     `Failed to open config file: ${result.error}`,
-                    "error"
+                    "error",
                );
           }
      } catch (e) {
           showToast(
                `Failed to open config file: ${getErrorMessage(e)}`,
-               "error"
+               "error",
           );
      }
 }
@@ -172,7 +174,7 @@ export async function validateBinaryFile(path: string): Promise<boolean> {
      const fileName = path.split("/").pop();
      if (fileName !== EXECUTABLE_NAME) {
           const confirmSelection = confirm(
-               `The selected file "${fileName}" does not match the expected name "${EXECUTABLE_NAME}". Are you sure you want to use this file?`
+               `The selected file "${fileName}" does not match the expected name "${EXECUTABLE_NAME}". Are you sure you want to use this file?`,
           );
           return confirmSelection;
      }

@@ -76,16 +76,18 @@
 
           try {
                // Try to fetch detailed project data (from project.json) first
-               const result = await (
-                    window as any
-               ).electronAPI.getWallpaperProjectData(wallpaperId);
+               const result =
+                    await window.electronAPI.getWallpaperProjectData(
+                         wallpaperId,
+                    );
                if (result.success && result.properties) {
                     properties = parseProperties(result.properties);
                } else {
                     // Fallback to CLI parsing if needed
-                    properties = await (
-                         window as any
-                    ).electronAPI.getWallpaperProperties(wallpaperId);
+                    properties =
+                         await window.electronAPI.getWallpaperProperties(
+                              wallpaperId,
+                         );
                }
           } catch (e) {
                console.error("Failed to load properties:", e);
@@ -114,7 +116,7 @@
                return newS;
           });
 
-          await (window as any).electronAPI.saveWallpaperProperty(
+          await window.electronAPI.saveWallpaperProperty(
                wallpaperId,
                name,
                stringValue,

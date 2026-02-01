@@ -13,6 +13,7 @@
           /* Bundler mode */
           "moduleResolution": "bundler",
           "allowImportingTsExtensions": true,
+          "allowArbitraryExtensions": true,
 
           /* Svelte & Electron specific */
           "lib": ["es2023", "dom", "dom.iterable"], // Added dom libs for frontend

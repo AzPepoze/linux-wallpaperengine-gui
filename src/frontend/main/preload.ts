@@ -42,7 +42,7 @@ contextBridge.exposeInMainWorld("electronAPI", {
      writeConfig: createInvokeMethod("write-config"),
      openConfigInEditor: createInvokeMethod("open-config-editor"),
      getWallpaperExecutableLocation: createInvokeMethod(
-          "get-wallpaper-executable"
+          "get-wallpaper-executable",
      ),
      validateExecutable: createInvokeMethod("validate-executable"),
 
@@ -56,4 +56,10 @@ contextBridge.exposeInMainWorld("electronAPI", {
      getWallpaperProjectData: createInvokeMethod("get-wallpaper-project-data"),
      getWallpaperProperties: createInvokeMethod("get-wallpaper-properties"),
      saveWallpaperProperty: createInvokeMethod("save-wallpaper-property"),
+
+     // Workshop services
+     getPublishedFileDetails: createInvokeMethod("get-published-file-details"),
+     getCollectionDetails: createInvokeMethod("get-collection-details"),
+     getUGCFileDetails: createInvokeMethod("get-ugc-file-details"),
+     queryWorkshopFiles: createInvokeMethod("query-workshop-files"),
 });

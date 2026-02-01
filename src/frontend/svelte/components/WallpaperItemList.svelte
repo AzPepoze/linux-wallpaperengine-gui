@@ -40,7 +40,25 @@
                     <div class="item-title">
                          {wallpaper.projectData?.title || folderName}
                     </div>
-                    {#if wallpaper.projectData?.type}
+                    {#if wallpaper.projectData?.isWorkshop}
+                         <div class="item-desc">
+                              <p class="item-views">
+                                   Views: <span class="stat-value"
+                                        >{(
+                                             wallpaper.projectData?.views || 0
+                                        ).toLocaleString()}</span
+                                   >
+                              </p>
+                              <p class="item-subs">
+                                   Subscriptions: <span class="stat-value"
+                                        >{(
+                                             wallpaper.projectData
+                                                  ?.subscriptions || 0
+                                        ).toLocaleString()}</span
+                                   >
+                              </p>
+                         </div>
+                    {:else if wallpaper.projectData?.type}
                          <div class="item-desc">
                               <p class="item-type">
                                    Type : {wallpaper.projectData.type}
@@ -109,6 +127,7 @@
                          width: 100%;
                          height: 100%;
                          object-fit: cover;
+                         border-radius: 8px;
                     }
 
                     .placeholder {
@@ -152,6 +171,14 @@
                          }
                          .item-folder {
                               color: #86efac;
+                         }
+
+                         .item-views {
+                              color: #60a5fa;
+                         }
+
+                         .item-subs {
+                              color: #a78bfa;
                          }
                     }
                }

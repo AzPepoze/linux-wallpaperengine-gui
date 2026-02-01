@@ -58,7 +58,12 @@
           const { projectData, folderName } = wallpaper;
 
           let content = `### ${projectData?.title || folderName}\n\n`;
-          content += `*Folder: ${folderName}*\n\n`;
+          if (projectData?.isWorkshop) {
+               content += `**Views:** ${(projectData.views || 0).toLocaleString()}\n\n`;
+               content += `**Subscriptions:** ${(projectData.subscriptions || 0).toLocaleString()}\n\n`;
+          } else {
+               content += `*Folder: ${folderName}*\n\n`;
+          }
           if (projectData?.type) content += `*Type: ${projectData.type}*\n\n`;
           if (projectData?.description)
                content += `***\n#### Description:\n${projectData.description}\n\n`;
@@ -146,7 +151,7 @@
                />
           {/if}
           {@html getSidebarContent(selectedWallpaper)}
-          {#if selectedWallpaper}
+          {#if selectedWallpaper && !selectedWallpaper.projectData?.isWorkshop}
                <WallpaperProperties
                     wallpaperId={selectedWallpaper.folderName}
                     {textColor}
@@ -240,7 +245,7 @@
                     width: 500px;
                     max-width: 100%;
                     aspect-ratio: 1 / 1;
-                    border-radius: var(--radius-md);
+                    border-radius: 20px;
                     margin: 20px auto 15px auto;
                     display: block;
                     object-fit: cover;

@@ -3,9 +3,10 @@
      import LogsIcon from "../icons/LogsIcon.svelte";
      import SettingIcon from "../icons/SettingIcon.svelte";
      import HomeIcon from "../icons/HomeIcon.svelte";
+     import WorkshopIcon from "../icons/WorkshopIcon.svelte";
      import { activeView } from "../scripts/ui";
 
-     function setView(view: "wallpapers" | "logs" | "settings") {
+     function setView(view: "wallpapers" | "logs" | "settings" | "workshop") {
           activeView.set(view);
      }
 </script>
@@ -19,6 +20,15 @@
           >
                <HomeIcon width="20" height="20" />
                <span>Home</span>
+          </Button>
+
+          <Button
+               variant={$activeView === "workshop" ? "primary" : "secondary"}
+               on:click={() => setView("workshop")}
+               title="Workshop"
+          >
+               <WorkshopIcon width="20" height="20" />
+               <span>Workshop</span>
           </Button>
 
           <Button
