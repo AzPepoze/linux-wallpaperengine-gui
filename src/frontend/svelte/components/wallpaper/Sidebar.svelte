@@ -1,14 +1,14 @@
 <script lang="ts">
-     import MarkdownIt from "markdown-it";
      import {
           getDominantColor,
           isLight,
           getPalette,
-     } from "../utils/colorHelper";
-     import { sidebarWidth } from "../scripts/ui";
+     } from "../../utils/colorHelper";
+     import { sidebarWidth } from "../../scripts/ui";
      import { onDestroy } from "svelte";
-     import WallpaperProperties from "./WallpaperProperties.svelte";
-     import type { Wallpaper } from "../../shared/types";
+     import WorkshopItemSidebar from "./WorkshopItemSidebar.svelte";
+     import LocalWallpaperSidebar from "./LocalWallpaperSidebar.svelte";
+     import type { Wallpaper } from "../../../shared/types";
 
      export let selectedWallpaper: Wallpaper | null = null;
      export let onClose: () => void = () => {};
@@ -18,8 +18,6 @@
      let textColor = "#fff";
      let palette: [number, number, number][] = [];
      let isResizing = false;
-
-     const md = new MarkdownIt();
 
      $: {
           if (selectedWallpaper && selectedWallpaper.previewPath) {
@@ -51,33 +49,6 @@
                sidebarContentElement.scrollTop = 0;
                lastWallpaperId = selectedWallpaper.folderName;
           }
-     }
-
-     function getSidebarContent(wallpaper: Wallpaper | null) {
-          if (!wallpaper) return "";
-          const { projectData, folderName } = wallpaper;
-
-          let content = `### ${projectData?.title || folderName}\n\n`;
-          if (projectData?.isWorkshop) {
-               content += `**Views:** ${(projectData.views || 0).toLocaleString()}\n\n`;
-               content += `**Subscriptions:** ${(projectData.subscriptions || 0).toLocaleString()}\n\n`;
-          } else {
-               content += `*Folder: ${folderName}*\n\n`;
-          }
-          if (projectData?.type) content += `*Type: ${projectData.type}*\n\n`;
-          if (projectData?.description)
-               content += `***\n#### Description:\n${projectData.description}\n\n`;
-          if (projectData?.contentrating)
-               content += `**Content Rating:** ${projectData.contentrating}\n\n`;
-          if (projectData?.tags?.length)
-               content += `**Tags:** ${projectData.tags.join(", ")}\n\n`;
-          if (projectData?.version)
-               content += `**Version:** ${projectData.version}\n\n`;
-          content += `***\n[Workshop URL](steam://url/CommunityFilePage/${folderName})
-
-`;
-
-          return md.render(content);
      }
 
      function close() {
@@ -150,13 +121,31 @@
                     class="preview-image"
                />
           {/if}
-          {@html getSidebarContent(selectedWallpaper)}
-          {#if selectedWallpaper && !selectedWallpaper.projectData?.isWorkshop}
-               <WallpaperProperties
-                    wallpaperId={selectedWallpaper.folderName}
-                    {textColor}
-                    {palette}
-               />
+
+          <button
+               type="button"
+               class="workshop-btn"
+               on:click={() => {
+                    const url = `steam://url/CommunityFilePage/${selectedWallpaper?.folderName}`;
+                    if (url) {
+                         window.electronAPI.openExternal(url);
+                         console.log("Opening URL:", url);
+                    }
+               }}
+          >
+               View on Workshop
+          </button>
+
+          {#if selectedWallpaper}
+               {#if selectedWallpaper.projectData?.isWorkshop}
+                    <WorkshopItemSidebar wallpaper={selectedWallpaper} />
+               {:else}
+                    <LocalWallpaperSidebar
+                         wallpaper={selectedWallpaper}
+                         {textColor}
+                         {palette}
+                    />
+               {/if}
           {/if}
      </div>
      <div class="sidebar-footer">
@@ -262,7 +251,8 @@
                z-index: 5;
           }
 
-          .close-btn {
+          .close-btn,
+          .workshop-btn {
                background-color: var(--btn-primary-bg);
                border: none;
                font-size: 1em;
@@ -275,11 +265,15 @@
                display: flex;
                justify-content: center;
                align-items: center;
-               transition: background-color 0.3s ease;
+               transition: all 0.3s ease;
 
                &:hover {
-                    background-color: var(--btn-primary-hover-bg);
+                    filter: brightness(1.5);
                }
+          }
+
+          .workshop-btn {
+               margin-block: 10px;
           }
 
           &.open {
@@ -302,17 +296,51 @@
                }
           }
 
+          :global(p) {
+               margin: 0 0 12px 0;
+               font-size: 0.95em;
+               line-height: 1.5;
+          }
+
+          :global(h3) {
+               margin: 0 0 16px 0;
+               font-size: 1.3em;
+               font-weight: 600;
+          }
+
+          :global(strong) {
+               font-weight: 600;
+               color: var(--sidebar-text);
+          }
+
+          :global(hr) {
+               border: none;
+               border-top: 1px solid
+                    color-mix(in srgb, var(--sidebar-text), transparent 70%);
+               margin: 16px 0;
+          }
+
           :global(a) {
                display: inline-block;
-               background-color: var(--btn-primary-bg);
-               padding: 10px 15px;
-               border-radius: 25px;
+               background: color-mix(
+                    in srgb,
+                    var(--sidebar-text),
+                    transparent 80%
+               );
+               color: var(--sidebar-text);
+               padding: 8px 16px;
+               border-radius: 6px;
                text-decoration: none;
-               transition: background-color 0.3s ease;
-               color: var(--sidebar-btn-text-final);
+               font-weight: 500;
+               transition: all 0.3s ease;
 
                &:hover {
-                    background-color: var(--btn-primary-hover-bg);
+                    background: color-mix(
+                         in srgb,
+                         var(--sidebar-text),
+                         transparent 60%
+                    );
+                    transform: translateY(-2px);
                }
           }
      }

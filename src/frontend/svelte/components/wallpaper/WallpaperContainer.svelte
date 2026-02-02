@@ -1,15 +1,15 @@
 <script lang="ts">
-     import GridIcon from "../icons/GridIcon.svelte";
-     import ListIcon from "../icons/ListIcon.svelte";
-     import DisplayIcon from "../icons/DisplayIcon.svelte";
-     import ApplyAllIcon from "../icons/ApplyAllIcon.svelte";
-     import Button from "./ui/Button.svelte";
+     import DisplayIcon from "../../icons/DisplayIcon.svelte";
+     import ApplyAllIcon from "../../icons/ApplyAllIcon.svelte";
+     import Button from "../ui/Button.svelte";
+     import ViewToggle from "../ui/ViewToggle.svelte";
+
+     import { showDisplayManager } from "../../scripts/ui";
+     import { cloneMode, toggleCloneMode } from "../../scripts/display";
+     import { fly } from "svelte/transition";
+     import type { WallpaperData, Wallpaper } from "../../../shared/types";
      import WallpaperItemGrid from "./WallpaperItemGrid.svelte";
      import WallpaperItemList from "./WallpaperItemList.svelte";
-     import { showDisplayManager } from "../scripts/ui";
-     import { cloneMode, toggleCloneMode } from "../scripts/display";
-     import { fly } from "svelte/transition";
-     import type { WallpaperData, Wallpaper } from "../../shared/types";
 
      export let wallpapers: Record<string, WallpaperData> = {};
      export let activeWallpaper: Wallpaper | null = null;
@@ -22,7 +22,7 @@
           wallpaper: WallpaperData,
      ) => void = () => {};
 
-     let viewMode: "grid" | "detail" = "grid";
+     let viewMode: "grid" | "list" | "detail" = "grid";
 
      function selectWallpaper(folderName: string, wallpaper: WallpaperData) {
           onSelect(folderName, wallpaper);
@@ -88,22 +88,7 @@
           </div>
 
           <div class="mode-toggles">
-               <Button
-                    variant={viewMode === "grid" ? "primary" : "secondary"}
-                    on:click={() => (viewMode = "grid")}
-                    title="Grid View"
-               >
-                    <GridIcon />
-                    <span>Grid</span>
-               </Button>
-               <Button
-                    variant={viewMode === "detail" ? "primary" : "secondary"}
-                    on:click={() => (viewMode = "detail")}
-                    title="Detail View"
-               >
-                    <ListIcon />
-                    <span>List</span>
-               </Button>
+               <ViewToggle bind:viewMode />
           </div>
      </div>
 

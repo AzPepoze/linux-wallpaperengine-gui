@@ -4,23 +4,37 @@ import { logger } from "../scripts/logger";
 export function getDominantColor(
      base64String: string
 ): Promise<[number, number, number] | null> {
-     return new Promise((resolve, reject) => {
-          const img = new Image();
-          img.onload = () => {
-               try {
-                    const colorThief = new ColorThief();
-                    const dominantColor = colorThief.getColor(img);
-                    resolve(dominantColor);
-               } catch (error) {
-                    logger.error("Getting dominant color:", error);
-                    reject(error);
+     return new Promise(async (resolve, reject) => {
+          try {
+               let src = base64String;
+               if (src.startsWith("http")) {
+                    try {
+                         src = await window.electronAPI.fetchImage(src);
+                    } catch (e) {
+                         console.warn("Failed to fetch image via backend, trying direct load", e);
+                    }
                }
-          };
-          img.onerror = (error) => {
-               logger.error("Loading image for color thief:", error);
+
+               const img = new Image();
+               img.crossOrigin = "Anonymous";
+               img.onload = () => {
+                    try {
+                         const colorThief = new ColorThief();
+                         const dominantColor = colorThief.getColor(img);
+                         resolve(dominantColor);
+                    } catch (error) {
+                         logger.error("Getting dominant color:", error);
+                         reject(error);
+                    }
+               };
+               img.onerror = (error) => {
+                    logger.error("Loading image for color thief:", error);
+                    reject(error);
+               };
+               img.src = src;
+          } catch (error) {
                reject(error);
-          };
-          img.src = base64String;
+          }
      });
 }
 
@@ -34,23 +48,37 @@ export function getPalette(
      base64String: string,
      colorCount: number = 6
 ): Promise<[number, number, number][] | null> {
-     return new Promise((resolve, reject) => {
-          const img = new Image();
-          img.onload = () => {
-               try {
-                    const colorThief = new ColorThief();
-                    const palette = colorThief.getPalette(img, colorCount);
-                    resolve(palette);
-               } catch (error) {
-                    logger.error("Getting color palette:", error);
-                    reject(error);
+     return new Promise(async (resolve, reject) => {
+          try {
+               let src = base64String;
+               if (src.startsWith("http")) {
+                    try {
+                         src = await window.electronAPI.fetchImage(src);
+                    } catch (e) {
+                         console.warn("Failed to fetch image via backend, trying direct load", e);
+                    }
                }
-          };
-          img.onerror = (error) => {
-               logger.error("Loading image for color thief:", error);
+
+               const img = new Image();
+               img.crossOrigin = "Anonymous";
+               img.onload = () => {
+                    try {
+                         const colorThief = new ColorThief();
+                         const palette = colorThief.getPalette(img, colorCount);
+                         resolve(palette);
+                    } catch (error) {
+                         logger.error("Getting color palette:", error);
+                         reject(error);
+                    }
+               };
+               img.onerror = (error) => {
+                    logger.error("Loading image for color thief:", error);
+                    reject(error);
+               };
+               img.src = src;
+          } catch (error) {
                reject(error);
-          };
-          img.src = base64String;
+          }
      });
 }
 

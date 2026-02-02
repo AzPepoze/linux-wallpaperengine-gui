@@ -62,4 +62,5 @@ contextBridge.exposeInMainWorld("electronAPI", {
      getCollectionDetails: createInvokeMethod("get-collection-details"),
      getUGCFileDetails: createInvokeMethod("get-ugc-file-details"),
      queryWorkshopFiles: createInvokeMethod("query-workshop-files"),
+     fetchImage: createInvokeMethod("fetch-image"),
 });

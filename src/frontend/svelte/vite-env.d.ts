@@ -64,6 +64,7 @@ interface ElectronAPI {
           match_all_tags?: boolean;
           search_text?: string;
      }) => Promise<{ items: any[]; total: number; nextCursor?: string }>;
+     fetchImage: (url: string) => Promise<string>;
 }
 
 interface Window {

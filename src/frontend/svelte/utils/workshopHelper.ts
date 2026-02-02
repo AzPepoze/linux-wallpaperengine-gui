@@ -33,6 +33,12 @@ export interface WorkshopItem {
      subscriptions: number;
      views: number;
      tags: string[];
+     fileSize?: number;
+     timeCreated?: number;
+     timeUpdated?: number;
+     voteScore?: number;
+     // Raw API data - store everything for sidebar display
+     [key: string]: any;
 }
 
 export function formatWorkshopItem(file: PublishedFileDetails): WorkshopItem {
@@ -49,7 +55,10 @@ export function formatWorkshopItem(file: PublishedFileDetails): WorkshopItem {
           });
      }
 
-     return {
+     // Create workshop item with all API response data
+     // Spread file data first, then override with formatted values
+     const item: WorkshopItem = {
+          ...file,
           publishedFileId: file.publishedfileid,
           title: file.title || "Unknown",
           description: file.description || "",
@@ -58,7 +67,13 @@ export function formatWorkshopItem(file: PublishedFileDetails): WorkshopItem {
           subscriptions: file.subscriptions || 0,
           views: file.views || 0,
           tags: formattedTags,
+          fileSize: file.file_size,
+          timeCreated: file.time_created,
+          timeUpdated: file.time_updated,
+          voteScore: file.vote_score,
      };
+
+     return item;
 }
 
 export function isValidWorkshopItem(file: PublishedFileDetails): boolean {

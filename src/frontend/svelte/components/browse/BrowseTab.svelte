@@ -1,14 +1,15 @@
 <script lang="ts">
      import { onMount } from "svelte";
-     import type { WorkshopItem } from "../utils/workshopHelper";
-     import type { WallpaperData, Wallpaper } from "../../shared/types";
-     import { fade, fly, scale } from "svelte/transition";
-     import { convertWorkshopItemsToWallpaperRecord } from "../utils/browse";
-     import { BrowseFilters, BrowsePagination } from "./browse";
-     import ViewToggle from "./ui/ViewToggle.svelte";
-     import Sidebar from "./wallpaper/Sidebar.svelte";
-     import WallpaperItemGrid from "./wallpaper/WallpaperItemGrid.svelte";
-     import WallpaperItemList from "./wallpaper/WallpaperItemList.svelte";
+     import Sidebar from "../wallpaper/Sidebar.svelte";
+     import BrowseFilters from "./BrowseFilters.svelte";
+     import BrowsePagination from "./BrowsePagination.svelte";
+     import ViewToggle from "../ui/ViewToggle.svelte";
+     import { fade, scale, fly } from "svelte/transition";
+     import { convertWorkshopItemsToWallpaperRecord } from "../../utils/browse/browseTabUtils";
+     import type { WorkshopItem } from "../../utils/workshopHelper";
+     import type { WallpaperData, Wallpaper } from "../../../shared/types";
+     import WallpaperItemGrid from "../wallpaper/WallpaperItemGrid.svelte";
+     import WallpaperItemList from "../wallpaper/WallpaperItemList.svelte";
 
      export let genres: string[] = [];
      export let tags: string[] = [];

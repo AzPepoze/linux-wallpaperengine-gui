@@ -1,9 +1,10 @@
 <script lang="ts">
-     import { onMount } from "svelte";
+     import { onMount, tick } from "svelte";
+     import { activeView } from "../scripts/ui";
      import { settingsStore, showToast } from "../scripts/settings";
      import Input from "./ui/Input.svelte";
      import Button from "./ui/Button.svelte";
-     import BrowseTab from "./BrowseTab.svelte";
+     import BrowseTab from "./browse/BrowseTab.svelte";
      import {
           formatWorkshopItem,
           isValidWorkshopItem,
@@ -51,7 +52,6 @@
      let browseLoading = false;
      let browseCursor: string | null = null;
      let totalItems = 0; // Total items available
-     let currentPageNum = 0; // For display
      let pageCursors: Map<number, string> = new Map([[0, "*"]]); // page -> cursor mapping
 
      onMount(async () => {
@@ -83,7 +83,8 @@
                          formatWorkshopItem(details),
                     );
 
-               showToast(`Found ${validItems.length} item(s)`, "success");
+               browseItems = validItems;
+               totalItems = validItems.length;
           } catch (error) {
                console.error("Error searching:", error);
                const errorMsg =
@@ -114,7 +115,8 @@
                          formatWorkshopItem(details),
                     );
 
-               showToast(`Loaded ${validItems.length} item(s)`, "success");
+               browseItems = validItems;
+               totalItems = validItems.length;
           } catch (error) {
                console.error("Error loading collection:", error);
                const errorMsg =
@@ -207,7 +209,6 @@
                // Always replace items (don't accumulate across pages)
                browseItems = validItems;
                totalItems = result?.total || 0;
-               currentPageNum = pageNum;
                const firstItem =
                     validItems.length > 0 ? validItems[0].title : "none";
                console.log(
@@ -231,11 +232,6 @@
 
                if (browseItems.length === 0) {
                     showToast("No items found", "info");
-               } else {
-                    showToast(
-                         `Loaded ${browseItems.length} item(s) (${result?.total || 0} total)`,
-                         "success",
-                    );
                }
           } catch (error) {
                console.error("Error browsing workshop:", error);
@@ -260,7 +256,9 @@
           window.electronAPI.openExternal(url);
      }
 
-     function setupSteamApiKey() {
+     async function setupSteamApiKey() {
+          activeView.set("settings");
+          await tick();
           const settingsSection = document.querySelector(
                '[data-section="steam-api-key"]',
           );

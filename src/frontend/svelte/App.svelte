@@ -1,8 +1,8 @@
 <script lang="ts">
      import Topbar from "./components/Topbar.svelte";
      import Settings from "./components/Settings.svelte";
-     import Sidebar from "./components/Sidebar.svelte";
-     import WallpaperContainer from "./components/WallpaperContainer.svelte";
+     import Sidebar from "./components/wallpaper/Sidebar.svelte";
+     import WallpaperContainer from "./components/wallpaper/WallpaperContainer.svelte";
      import DisplayManager from "./components/DisplayManager.svelte";
      import Workshop from "./components/Workshop.svelte";
      import { initLogger, logger } from "./scripts/logger";

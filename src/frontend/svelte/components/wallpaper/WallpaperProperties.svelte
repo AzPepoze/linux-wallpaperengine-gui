@@ -1,12 +1,15 @@
 <script lang="ts">
-     import Range from "./ui/Range.svelte";
-     import Toggle from "./ui/Toggle.svelte";
-     import Select from "./ui/Select.svelte";
-     import SettingItem from "./ui/SettingItem.svelte";
-     import ColorPicker from "./ui/ColorPicker.svelte";
-     import { settingsStore } from "../scripts/settings";
      import MarkdownIt from "markdown-it";
-     import type { WallpaperProperty, PropertyType } from "../../shared/types";
+     import type {
+          WallpaperProperty,
+          PropertyType,
+     } from "../../../shared/types";
+     import { settingsStore } from "../../scripts/settings";
+     import ColorPicker from "../ui/ColorPicker.svelte";
+     import Select from "../ui/Select.svelte";
+     import SettingItem from "../ui/SettingItem.svelte";
+     import Toggle from "../ui/Toggle.svelte";
+     import Range from "../ui/Range.svelte";
 
      export let wallpaperId: string;
      export let textColor: string = "#fff";
