@@ -53,7 +53,7 @@
 
                     .collapse-icon {
                          font-size: 0.7em;
-                         color: var(--btn-primary-bg);
+                         color: #92deff;
                          transition: transform 0.2s ease;
                          flex-shrink: 0;
                     }
@@ -66,8 +66,8 @@
                          color: var(--text-color);
                          background: linear-gradient(
                               135deg,
-                              var(--btn-primary-bg) 0%,
-                              #00b4ff 100%
+                              #92deff 0%,
+                              #b4e8ff 100%
                          );
                          background-clip: text;
                          -webkit-background-clip: text;

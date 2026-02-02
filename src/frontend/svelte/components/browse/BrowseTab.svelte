@@ -72,6 +72,8 @@
      function handlePageChange(page: number) {
           currentPageNum = page;
           onLoadBrowseItems(page);
+          selectedWorkshopData = null;
+          selectedItemId = null;
      }
 
      $: selectedWallpaper =
@@ -128,7 +130,7 @@
                          <div
                               class="loading"
                               in:fade={{ duration: 200 }}
-                              style="position: absolute; inset: 0; z-index: 50; background: var(--bg-surface); display: flex; flex-direction: column; align-items: center; justify-content: center; color: var(--text-muted); gap: 16px;"
+                              out:fade={{ duration: 200 }}
                          >
                               <div class="spinner"></div>
                               <p>Page {currentPageNum + 1}</p>
@@ -181,11 +183,22 @@
 <style lang="scss">
      .browse-tab {
           padding: 0;
-          background: var(--bg-surface);
           border-bottom: 1px solid var(--border-color);
           flex: 1;
           display: flex;
           overflow: hidden;
+
+          .loading {
+               position: absolute;
+               inset: 0;
+               z-index: 50;
+               display: flex;
+               flex-direction: column;
+               align-items: center;
+               justify-content: center;
+               color: var(--text-muted);
+               gap: 16px;
+          }
 
           .browse-layout {
                display: flex;
@@ -240,7 +253,6 @@
                               position: absolute;
                               inset: 0;
                               z-index: 50;
-                              background: var(--bg-surface);
                               display: flex;
                               flex-direction: column;
                               align-items: center;
