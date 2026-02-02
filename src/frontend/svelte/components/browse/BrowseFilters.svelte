@@ -2,6 +2,7 @@
      import ActionToggle from "../ActionToggle.svelte";
      import FilterItem from "./FilterItem.svelte";
      import Collapse from "./Collapse.svelte";
+     import ResizeHandle from "../ui/ResizeHandle.svelte";
 
      interface FilterCategory {
           name: string;
@@ -16,6 +17,7 @@
      export let isLoading: boolean = false;
 
      let expandedCategories: Record<string, boolean> = {};
+     let sidebarWidth = 280;
 
      function handleToggleFilter(category: string, filter: string) {
           onToggleFilter(category, filter);
@@ -24,12 +26,15 @@
      function isFilterActive(category: string, filter: string): boolean {
           return selectedFilters.get(category)?.has(filter) || false;
      }
+
+     function handleResize(newWidth: number) {
+          sidebarWidth = newWidth;
+     }
 </script>
 
-<div class="filter-sidebar">
+<div class="filter-sidebar" style="width: {sidebarWidth}px;">
      <div class="sidebar-header">
           <h2>Filters</h2>
-          <p>Refine your search</p>
      </div>
 
      <div class="filter-content">
@@ -58,58 +63,28 @@
      <div class="sidebar-footer">
           <ActionToggle {isLoading} {onLoadItems} {onOpenInBrowser} />
      </div>
+
+     <ResizeHandle bind:width={sidebarWidth} onResize={handleResize} />
 </div>
 
 <style lang="scss">
      .filter-sidebar {
-          width: 280px;
           background: rgba(20, 20, 20, 0.6);
           border-right: 1px solid var(--border-color);
           display: flex;
           flex-direction: column;
-          padding: 32px 0;
+          position: relative;
+          overflow: hidden;
 
           .sidebar-header {
-               padding: 0 20px 24px;
                border-bottom: 1px solid var(--border-color);
-               margin-bottom: 20px;
-
-               h2 {
-                    margin: 0;
-                    font-size: 1.5em;
-                    font-weight: 800;
-                    background: linear-gradient(135deg, #fff 0%, #aaa 100%);
-                    background-clip: text;
-                    -webkit-background-clip: text;
-                    -webkit-text-fill-color: transparent;
-               }
-
-               p {
-                    margin: 4px 0 0;
-                    font-size: 0.85em;
-                    color: var(--text-muted);
-               }
+               font-weight: 800;
           }
 
           .filter-content {
                flex: 1;
                overflow-y: auto;
-               padding: 0 20px;
-
-               &::-webkit-scrollbar {
-                    width: 6px;
-               }
-               &::-webkit-scrollbar-track {
-                    background: transparent;
-               }
-               &::-webkit-scrollbar-thumb {
-                    background: var(--border-color);
-                    border-radius: 3px;
-
-                    &:hover {
-                         background: var(--text-muted);
-                    }
-               }
+               padding: 20px 20px;
 
                :global(.collapse-container) {
                     margin-bottom: 20px;

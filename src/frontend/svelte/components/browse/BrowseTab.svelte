@@ -1,15 +1,15 @@
 <script lang="ts">
      import { onMount } from "svelte";
      import Sidebar from "../wallpaper/Sidebar.svelte";
-     import BrowseFilters from "./BrowseFilters.svelte";
      import BrowsePagination from "./BrowsePagination.svelte";
      import ViewToggle from "../ui/ViewToggle.svelte";
-     import { fade, scale, fly } from "svelte/transition";
+     import { fade, fly } from "svelte/transition";
      import { convertWorkshopItemsToWallpaperRecord } from "../../utils/browse/browseTabUtils";
      import type { WorkshopItem } from "../../utils/workshopHelper";
      import type { WallpaperData, Wallpaper } from "../../../shared/types";
      import WallpaperItemGrid from "../wallpaper/WallpaperItemGrid.svelte";
      import WallpaperItemList from "../wallpaper/WallpaperItemList.svelte";
+     import BrowseFilters from "./BrowseFilters.svelte";
 
      interface FilterCategory {
           name: string;
@@ -142,49 +142,21 @@
                               out:fly={{ y: -20, duration: 200 }}
                          >
                               {#if viewMode === "grid"}
-                                   {#key viewMode}
-                                        <div
-                                             in:scale={{
-                                                  duration: 300,
-                                                  start: 0.95,
-                                             }}
-                                             out:scale={{
-                                                  duration: 200,
-                                                  start: 0.95,
-                                             }}
-                                             style="position: absolute; width: 100%;"
-                                        >
-                                             <WallpaperItemGrid
-                                                  wallpapers={convertWorkshopItemsToWallpaperRecord(
-                                                       browseItems,
-                                                  )}
-                                                  {selectedWallpaper}
-                                                  onSelect={handleItemSelect}
-                                             />
-                                        </div>
-                                   {/key}
+                                   <WallpaperItemGrid
+                                        wallpapers={convertWorkshopItemsToWallpaperRecord(
+                                             browseItems,
+                                        )}
+                                        {selectedWallpaper}
+                                        onSelect={handleItemSelect}
+                                   />
                               {:else}
-                                   {#key viewMode}
-                                        <div
-                                             in:scale={{
-                                                  duration: 300,
-                                                  start: 0.95,
-                                             }}
-                                             out:scale={{
-                                                  duration: 200,
-                                                  start: 0.95,
-                                             }}
-                                             style="position: absolute; width: 100%;"
-                                        >
-                                             <WallpaperItemList
-                                                  wallpapers={convertWorkshopItemsToWallpaperRecord(
-                                                       browseItems,
-                                                  )}
-                                                  {selectedWallpaper}
-                                                  onSelect={handleItemSelect}
-                                             />
-                                        </div>
-                                   {/key}
+                                   <WallpaperItemList
+                                        wallpapers={convertWorkshopItemsToWallpaperRecord(
+                                             browseItems,
+                                        )}
+                                        {selectedWallpaper}
+                                        onSelect={handleItemSelect}
+                                   />
                               {/if}
                          </div>
                     {/if}

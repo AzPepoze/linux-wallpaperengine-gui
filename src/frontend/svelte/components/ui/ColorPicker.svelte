@@ -159,22 +159,6 @@
           border: 1px solid var(--border-color);
           max-height: 120px;
           overflow-y: auto;
-
-          &.custom-scrollbar {
-               &::-webkit-scrollbar {
-                    width: 4px;
-               }
-               &::-webkit-scrollbar-track {
-                    background: transparent;
-               }
-               &::-webkit-scrollbar-thumb {
-                    background: var(--text-muted);
-                    border-radius: var(--radius-full);
-                    &:hover {
-                         background: var(--text-color);
-                    }
-               }
-          }
      }
 
      /* CSS Container Query to hide palette when width is too small */

@@ -18,7 +18,7 @@
      }
 
      let searching = false;
-     let selectedFileIds = "";
+     let searchText = "";
      let steamApiKey = "";
      let hasApiKey = false;
 
@@ -112,7 +112,9 @@
           },
      ];
 
-     let selectedFilters = new Map<string, Set<string>>();
+     let selectedFilters = new Map<string, Set<string>>([
+          ["Age Rating", new Set(["Everyone"])],
+     ]);
      let browseItems: WorkshopItem[] = [];
      let browseLoading = false;
      let browseCursor: string | null = null;
@@ -126,67 +128,55 @@
           }
      });
 
-     async function handleSearchByIds() {
-          if (!selectedFileIds.trim()) {
-               showToast("Please enter file IDs", "info");
+     async function handleSearch() {
+          if (!searchText.trim()) {
+               showToast("Please enter a search term", "info");
                return;
           }
 
           searching = true;
           try {
-               const fileIds = selectedFileIds
-                    .split(",")
-                    .map((id) => id.trim())
-                    .filter((id) => id.length > 0);
+               // Collect all selected filters
+               const allFilters: string[] = [];
+               selectedFilters.forEach((filters) => {
+                    allFilters.push(...Array.from(filters));
+               });
 
-               const result: PublishedFileDetails[] =
-                    await window.electronAPI.getPublishedFileDetails(fileIds);
+               const result = await window.electronAPI.queryWorkshopFiles(
+                    steamApiKey,
+                    {
+                         search_text: searchText,
+                         requiredtags:
+                              allFilters.length > 0 ? allFilters : undefined,
+                         cursor: "*",
+                         numperpage: 50,
+                    },
+               );
 
-               const validItems = result
+               const validItems = (result?.items || [])
                     .filter(isValidWorkshopItem)
                     .map((details: PublishedFileDetails) =>
                          formatWorkshopItem(details),
                     );
 
                browseItems = validItems;
-               totalItems = validItems.length;
+               totalItems = result?.total || 0;
+               pageCursors = new Map([[0, "*"]]);
+               browseCursor = result?.nextCursor || null;
+
+               if (browseItems.length === 0) {
+                    showToast("No items found", "info");
+               } else {
+                    showToast(
+                         `Found ${totalItems.toLocaleString()} items`,
+                         "success",
+                    );
+               }
           } catch (error) {
                console.error("Error searching:", error);
                const errorMsg =
                     error instanceof Error ? error.message : "Unknown error";
                showToast(`Error searching: ${errorMsg}`, "error");
-          } finally {
-               searching = false;
-          }
-     }
-
-     async function handleSearchByCollection() {
-          if (!selectedFileIds.trim()) {
-               showToast("Please enter a collection ID", "info");
-               return;
-          }
-
-          searching = true;
-          try {
-               const collectionId = selectedFileIds.trim();
-               const result: PublishedFileDetails[] =
-                    await window.electronAPI.getCollectionDetails([
-                         collectionId,
-                    ]);
-
-               const validItems = result
-                    .filter(isValidWorkshopItem)
-                    .map((details: PublishedFileDetails) =>
-                         formatWorkshopItem(details),
-                    );
-
-               browseItems = validItems;
-               totalItems = validItems.length;
-          } catch (error) {
-               console.error("Error loading collection:", error);
-               const errorMsg =
-                    error instanceof Error ? error.message : "Unknown error";
-               showToast(`Error loading collection: ${errorMsg}`, "error");
           } finally {
                searching = false;
           }
@@ -358,26 +348,16 @@
                <div class="search-section">
                     <Input
                          type="text"
-                         placeholder="Search by file ID or collection ID..."
-                         bind:value={selectedFileIds}
+                         placeholder="Search wallpapers, scenes, collections..."
+                         bind:value={searchText}
+                         on:keydown={(e: any) =>
+                              e.key === "Enter" && handleSearch()}
                     />
-                    <Button on:click={handleSearchByIds} disabled={searching}>
+                    <Button on:click={handleSearch} disabled={searching}>
                          {#if searching}
                               Searching...
                          {:else}
-                              Search IDs
-                         {/if}
-                    </Button>
-                    <div class="divider">or</div>
-                    <Button
-                         variant="secondary"
-                         on:click={handleSearchByCollection}
-                         disabled={searching}
-                    >
-                         {#if searching}
-                              Loading...
-                         {:else}
-                              Load Collection
+                              Search
                          {/if}
                     </Button>
                </div>
@@ -446,20 +426,16 @@
           .search-section {
                display: flex;
                gap: 12px;
-               align-items: flex-end;
-               max-width: 600px;
+               align-items: center;
+               width: 100%;
 
                :global(input) {
                     flex: 1;
+                    min-width: 300px;
                }
 
                :global(button) {
                     white-space: nowrap;
-               }
-
-               .divider {
-                    color: var(--text-muted);
-                    font-size: 0.9em;
                }
           }
      }

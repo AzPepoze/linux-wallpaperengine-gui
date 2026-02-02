@@ -125,7 +125,7 @@
                width: 90%;
                opacity: 0;
                border-radius: 10px;
-               font-weight: 100;
+               font-weight: 500;
                transition: all 0.2s;
                border: 2px solid #007bff;
                padding: 5px;

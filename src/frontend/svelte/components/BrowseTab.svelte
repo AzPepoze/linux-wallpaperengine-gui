@@ -4,7 +4,8 @@
      import type { WallpaperData, Wallpaper } from "../../shared/types";
      import { fade, fly, scale } from "svelte/transition";
      import { convertWorkshopItemsToWallpaperRecord } from "../utils/browse";
-     import { BrowseFilters, BrowsePagination } from "./browse";
+     import BrowseFilters from "./browse/BrowseFilters.svelte";
+     import BrowsePagination from "./browse/BrowsePagination.svelte";
      import ViewToggle from "./ui/ViewToggle.svelte";
      import Sidebar from "./wallpaper/Sidebar.svelte";
      import WallpaperItemGrid from "./wallpaper/WallpaperItemGrid.svelte";
