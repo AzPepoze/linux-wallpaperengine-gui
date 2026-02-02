@@ -12,42 +12,107 @@
           type WorkshopItem,
      } from "../utils/workshopHelper";
 
+     interface FilterCategory {
+          name: string;
+          items: string[];
+     }
+
      let searching = false;
      let selectedFileIds = "";
      let steamApiKey = "";
      let hasApiKey = false;
 
-     const genres = [
-          "Anime",
-          "Game",
-          "Landscape",
-          "Music",
-          "Nature",
-          "Sci-Fi",
-          "Technology",
-          "Vehicle",
+     const filterCategories: FilterCategory[] = [
+          {
+               name: "Type",
+               items: ["Scene", "Video", "Application", "Web"],
+          },
+          {
+               name: "Genre",
+               items: [
+                    "Abstract",
+                    "Animal",
+                    "Anime",
+                    "Cartoon",
+                    "CGI",
+                    "Cyberpunk",
+                    "Fantasy",
+                    "Game",
+                    "Girls",
+                    "Guys",
+                    "Landscape",
+                    "Medieval",
+                    "Memes",
+                    "MMD",
+                    "Music",
+                    "Nature",
+                    "Pixel art",
+                    "Relaxing",
+                    "Retro",
+                    "Sci-Fi",
+                    "Sports",
+                    "Technology",
+                    "Television",
+                    "Vehicle",
+                    "Unspecified",
+               ],
+          },
+          {
+               name: "Age Rating",
+               items: ["Everyone", "Questionable", "Mature"],
+          },
+          {
+               name: "Resolution",
+               items: [
+                    "Standard Definition",
+                    "1280 x 720",
+                    "1366 x 768",
+                    "1920 x 1080",
+                    "2560 x 1440",
+                    "3840 x 2160",
+                    "Ultrawide Standard Definition",
+                    "Ultrawide 2560 x 1080",
+                    "Ultrawide 3440 x 1440",
+                    "Dual Standard Definition",
+                    "Dual 3840 x 1080",
+                    "Dual 5120 x 1440",
+                    "Dual 7680 x 2160",
+                    "Triple Standard Definition",
+                    "Triple 4096 x 768",
+                    "Triple 5760 x 1080",
+                    "Triple 7680 x 1440",
+                    "Triple 11520 x 2160",
+                    "Portrait Standard Definition",
+                    "Portrait 720 x 1280",
+                    "Portrait 1080 x 1920",
+                    "Portrait 1440 x 2560",
+                    "Portrait 2160 x 3840",
+                    "Other resolution",
+                    "Dynamic resolution",
+               ],
+          },
+          {
+               name: "Category",
+               items: ["Wallpaper", "Preset", "Asset"],
+          },
+          {
+               name: "Miscellaneous",
+               items: [
+                    "Approved",
+                    "Audio responsive",
+                    "3D",
+                    "Customizable",
+                    "Puppet Warp",
+                    "HDR",
+                    "Media Integration",
+                    "User Shortcut",
+                    "Video Texture",
+                    "Asset Pack",
+               ],
+          },
      ];
 
-     const tags = [
-          "60fps",
-          "Action",
-          "Chill",
-          "Cyberpunk",
-          "Dark",
-          "Fantasy",
-          "Glitch",
-          "Indie",
-          "Neon",
-          "Nostalgia",
-          "Pixel",
-          "Relaxing",
-          "Retro",
-          "Synthwave",
-          "Abstract",
-     ];
-
-     let selectedGenres = new Set<string>();
-     let selectedTags = new Set<string>();
+     let selectedFilters = new Map<string, Set<string>>();
      let browseItems: WorkshopItem[] = [];
      let browseLoading = false;
      let browseCursor: string | null = null;
@@ -127,41 +192,46 @@
           }
      }
 
-     function toggleGenre(genre: string) {
+     function toggleFilter(category: string, filter: string) {
           console.log(
-               "Workshop.toggleGenre called with:",
-               genre,
+               "Workshop.toggleFilter called with:",
+               category,
+               filter,
                "Was selected:",
-               selectedGenres.has(genre),
+               selectedFilters.get(category)?.has(filter),
           );
-          if (selectedGenres.has(genre)) {
-               selectedGenres.delete(genre);
-          } else {
-               selectedGenres.add(genre);
-          }
-          selectedGenres = selectedGenres;
-          console.log(
-               "Workshop.toggleGenre result - selectedGenres now:",
-               selectedGenres,
-          );
-     }
 
-     function toggleTag(tag: string) {
-          if (selectedTags.has(tag)) {
-               selectedTags.delete(tag);
-          } else {
-               selectedTags.add(tag);
+          // Create a new Map to ensure reactivity
+          const newSelectedFilters = new Map(selectedFilters);
+
+          if (!newSelectedFilters.has(category)) {
+               newSelectedFilters.set(category, new Set());
           }
-          selectedTags = selectedTags;
-          console.log("Tag toggled:", tag, "Current tags:", selectedTags);
+
+          const filters = newSelectedFilters.get(category)!;
+          if (filters.has(filter)) {
+               filters.delete(filter);
+          } else {
+               filters.add(filter);
+          }
+
+          // Force reactivity by assigning
+          selectedFilters = newSelectedFilters;
+
+          console.log(
+               "Workshop.toggleFilter result - selectedFilters now:",
+               selectedFilters,
+          );
      }
 
      async function loadBrowseItems(pageNum: number = 0) {
           browseLoading = true;
           try {
-               const tagArray = Array.from(selectedTags);
-               const genreArray = Array.from(selectedGenres);
-               const allFilters = [...tagArray, ...genreArray];
+               // Collect all selected filters
+               const allFilters: string[] = [];
+               selectedFilters.forEach((filters) => {
+                    allFilters.push(...Array.from(filters));
+               });
 
                // Get cursor for this page (default to '*' for first page)
                const cursor =
@@ -174,12 +244,10 @@
                console.log(
                     "loadBrowseItems called: page=" +
                          pageNum +
-                         " tags=" +
-                         tagArray.length +
-                         " genres=" +
-                         genreArray.length +
-                         " selectedGenres=" +
-                         Array.from(selectedGenres).join(","),
+                         " filters=" +
+                         allFilters.length +
+                         " selectedFilters=" +
+                         Array.from(allFilters).join(","),
                );
                const result = await window.electronAPI.queryWorkshopFiles(
                     steamApiKey,
@@ -244,11 +312,14 @@
      }
 
      function openBrowseWithFilters() {
-          const tagParams = Array.from(selectedTags);
+          const allFilters: string[] = [];
+          selectedFilters.forEach((filters) => {
+               allFilters.push(...Array.from(filters));
+          });
           let url: string;
 
-          if (tagParams.length > 0) {
-               url = `https://steamcommunity.com/workshop/browse/?appid=431960&searchtext=&requiredtags[]=${tagParams[0]}`;
+          if (allFilters.length > 0) {
+               url = `https://steamcommunity.com/workshop/browse/?appid=431960&searchtext=&requiredtags[]=${allFilters[0]}`;
           } else {
                url = `https://steamcommunity.com/workshop/browse/?appid=431960`;
           }
@@ -313,16 +384,13 @@
           </div>
 
           <BrowseTab
-               {genres}
-               {tags}
-               {selectedGenres}
-               {selectedTags}
+               {filterCategories}
+               {selectedFilters}
                {browseItems}
                {browseLoading}
                {browseCursor}
                {totalItems}
-               onToggleGenre={toggleGenre}
-               onToggleTag={toggleTag}
+               onToggleFilter={toggleFilter}
                onLoadBrowseItems={loadBrowseItems}
                onOpenBrowseWithFilters={openBrowseWithFilters}
           />

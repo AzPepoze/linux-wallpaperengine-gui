@@ -10,16 +10,18 @@
      import WallpaperItemGrid from "./wallpaper/WallpaperItemGrid.svelte";
      import WallpaperItemList from "./wallpaper/WallpaperItemList.svelte";
 
-     export let genres: string[] = [];
-     export let tags: string[] = [];
-     export let selectedGenres: Set<string>;
-     export let selectedTags: Set<string>;
+     interface FilterCategory {
+          name: string;
+          items: string[];
+     }
+
+     export let filterCategories: FilterCategory[] = [];
+     export let selectedFilters: Map<string, Set<string>> = new Map();
      export let browseItems: WorkshopItem[] = [];
      export let browseLoading: boolean = false;
      export let totalItems: number = 0;
 
-     export let onToggleGenre: (genre: string) => void;
-     export let onToggleTag: (tag: string) => void;
+     export let onToggleFilter: (category: string, filter: string) => void;
      export let onLoadBrowseItems: (page: number) => void;
      export let onOpenBrowseWithFilters: () => void;
      export let browseCursor: string | null = null;
@@ -48,23 +50,13 @@
           selectedItemId = null;
      }
 
-     function handleToggleTag(tag: string) {
-          console.log("BrowseTab: handleToggleTag called with:", tag);
-          onToggleTag(tag);
-          // Reset to first page when filter changes
-          currentPageNum = 0;
-          // Wait for state update before loading
-          setTimeout(() => {
-               console.log(
-                    "BrowseTab: After state update, calling onLoadBrowseItems",
-               );
-               onLoadBrowseItems(0);
-          }, 0);
-     }
-
-     function handleToggleGenre(genre: string) {
-          console.log("BrowseTab: handleToggleGenre called with:", genre);
-          onToggleGenre(genre);
+     function handleToggleFilter(category: string, filter: string) {
+          console.log(
+               "BrowseTab: handleToggleFilter called with:",
+               category,
+               filter,
+          );
+          onToggleFilter(category, filter);
           // Reset to first page when filter changes
           currentPageNum = 0;
           // Wait for state update before loading
@@ -107,12 +99,9 @@
 <div class="browse-tab">
      <div class="browse-layout">
           <BrowseFilters
-               {genres}
-               {tags}
-               {selectedGenres}
-               {selectedTags}
-               onToggleGenre={handleToggleGenre}
-               onToggleTag={handleToggleTag}
+               {filterCategories}
+               {selectedFilters}
+               onToggleFilter={handleToggleFilter}
                onLoadItems={() => {
                     currentPageNum = 0;
                     setTimeout(() => onLoadBrowseItems(0), 0);

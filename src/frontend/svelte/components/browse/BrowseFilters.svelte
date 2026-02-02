@@ -1,23 +1,28 @@
 <script lang="ts">
      import ActionToggle from "../ActionToggle.svelte";
      import FilterItem from "./FilterItem.svelte";
+     import Collapse from "./Collapse.svelte";
 
-     export let genres: string[] = [];
-     export let tags: string[] = [];
-     export let selectedGenres: Set<string>;
-     export let selectedTags: Set<string>;
-     export let onToggleGenre: (genre: string) => void;
-     export let onToggleTag: (tag: string) => void;
+     interface FilterCategory {
+          name: string;
+          items: string[];
+     }
+
+     export let filterCategories: FilterCategory[] = [];
+     export let selectedFilters: Map<string, Set<string>> = new Map();
+     export let onToggleFilter: (category: string, filter: string) => void;
      export let onLoadItems: () => void;
      export let onOpenInBrowser: () => void;
      export let isLoading: boolean = false;
 
-     function handleToggleTag(tag: string) {
-          onToggleTag(tag);
+     let expandedCategories: Record<string, boolean> = {};
+
+     function handleToggleFilter(category: string, filter: string) {
+          onToggleFilter(category, filter);
      }
 
-     function handleToggleGenre(genre: string) {
-          onToggleGenre(genre);
+     function isFilterActive(category: string, filter: string): boolean {
+          return selectedFilters.get(category)?.has(filter) || false;
      }
 </script>
 
@@ -28,31 +33,26 @@
      </div>
 
      <div class="filter-content">
-          <div class="filter-group">
-               <h4>Genres</h4>
-               <div class="filter-list">
-                    {#each genres as genre}
-                         <FilterItem
-                              label={genre}
-                              isActive={selectedGenres.has(genre)}
-                              onClick={() => handleToggleGenre(genre)}
-                         />
-                    {/each}
-               </div>
-          </div>
-
-          <div class="filter-group">
-               <h4>Tags</h4>
-               <div class="filter-list">
-                    {#each tags as tag}
-                         <FilterItem
-                              label={tag}
-                              isActive={selectedTags.has(tag)}
-                              onClick={() => handleToggleTag(tag)}
-                         />
-                    {/each}
-               </div>
-          </div>
+          {#each filterCategories as category (category.name)}
+               <Collapse
+                    title={category.name}
+                    bind:isExpanded={expandedCategories[category.name]}
+               >
+                    <div class="filter-list">
+                         {#each category.items as item (item)}
+                              <FilterItem
+                                   label={item}
+                                   isActive={isFilterActive(
+                                        category.name,
+                                        item,
+                                   )}
+                                   onClick={() =>
+                                        handleToggleFilter(category.name, item)}
+                              />
+                         {/each}
+                    </div>
+               </Collapse>
+          {/each}
      </div>
 
      <div class="sidebar-footer">
@@ -105,26 +105,26 @@
                &::-webkit-scrollbar-thumb {
                     background: var(--border-color);
                     border-radius: 3px;
+
+                    &:hover {
+                         background: var(--text-muted);
+                    }
                }
-          }
 
-          .filter-group {
-               margin-bottom: 32px;
+               :global(.collapse-container) {
+                    margin-bottom: 20px;
+                    border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+                    padding-bottom: 12px;
 
-               h4 {
-                    margin: 0 0 12px;
-                    font-size: 0.8em;
-                    text-transform: uppercase;
-                    letter-spacing: 1px;
-                    font-weight: 700;
-                    color: var(--text-muted);
-                    opacity: 0.8;
+                    &:last-child {
+                         border-bottom: none;
+                    }
                }
 
                .filter-list {
                     display: flex;
                     flex-direction: column;
-                    gap: 6px;
+                    gap: 4px;
                }
           }
 
