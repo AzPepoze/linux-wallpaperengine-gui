@@ -8,6 +8,7 @@
           folderName: string,
           wallpaper: WallpaperData,
      ) => void;
+     export let isWorkshop: boolean = false;
 
      const fadeDuration = 200;
 </script>
@@ -34,7 +35,7 @@
                               src={wallpaper.previewPath}
                               alt={altText}
                               class="wallpaper-preview"
-                              loading="lazy"
+                              loading={isWorkshop ? undefined : "lazy"}
                               decoding="async"
                               in:fade={{ duration: fadeDuration }}
                          />

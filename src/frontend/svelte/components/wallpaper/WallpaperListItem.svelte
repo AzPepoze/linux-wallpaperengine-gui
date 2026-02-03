@@ -9,6 +9,7 @@
           folderName: string,
           wallpaper: WallpaperData,
      ) => void;
+     export let isWorkshop: boolean = false;
 </script>
 
 <!-- svelte-ignore a11y-click-events-have-key-events -->
@@ -24,7 +25,7 @@
                <img
                     src={wallpaper.previewPath}
                     alt={wallpaper.projectData?.title || folderName}
-                    loading="lazy"
+                    loading={isWorkshop ? undefined : "lazy"}
                     decoding="async"
                />
           {:else}
@@ -192,6 +193,7 @@
                          margin-bottom: 4px;
                          display: -webkit-box;
                          -webkit-line-clamp: 2;
+                         line-clamp: 2;
                          -webkit-box-orient: vertical;
                          white-space: normal;
                     }

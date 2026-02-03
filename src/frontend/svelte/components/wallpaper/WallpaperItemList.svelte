@@ -9,6 +9,7 @@
           folderName: string,
           wallpaper: WallpaperData,
      ) => void;
+     export let isWorkshop: boolean = false;
 </script>
 
 <div
@@ -22,6 +23,7 @@
                {wallpaper}
                {selectedWallpaper}
                {onSelect}
+               {isWorkshop}
           />
      {/each}
 </div>
