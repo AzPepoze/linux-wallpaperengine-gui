@@ -29,41 +29,25 @@
 
 ## CONTENTS
 
--    [CONTENTS](#contents)
--    [FEATURES](#features)
--    [MEMORY EFFICIENCY](#memory-efficiency)
--    [SCREENSHOTS](#screenshots)
--    [PREREQUISITES](#prerequisites)
--    [INSTALLATION](#installation)
-     -    [Arch Linux (AUR)](#arch-linux-aur)
-     -    [Other Distributions](#other-distributions)
--    [USAGE](#usage)
-     -    [\[Options\]](#options)
--    [BUILD FROM SOURCE](#build-from-source)
--    [DEVELOPMENT](#development)
--    [CONTRIBUTING](#contributing)
--    [STONKS!](#stonks)
+- [CONTENTS](#contents)
+- [SCREENSHOTS](#screenshots)
+- [FEATURES](#features)
+- [MEMORY EFFICIENCY](#memory-efficiency)
+- [PREREQUISITES](#prerequisites)
+- [INSTALLATION](#installation)
+     - [Arch Linux (AUR)](#arch-linux-aur)
+     - [Other Distributions](#other-distributions)
+- [USAGE](#usage)
+     - [\[Options\]](#options)
+- [BUILD FROM SOURCE](#build-from-source)
+- [DEVELOPMENT](#development)
+- [CONTRIBUTING](#contributing)
+- [STONKS!](#stonks)
 
 > [!NOTE]
 > This GUI will be compatible with my [linux-wallpaperengine](https://github.com/AzPepoze/linux-wallpaperengine) in the future.
 >
 > It's a [Go](https://go.dev/) implementation of Wallpaper Engine for Linux. It's still in early development. Maybe you want to check it out!
-
-## FEATURES
-
--    **Wallpaper Management** – Browse and select wallpapers from your Steam Workshop content with ease.
--    **Wallpaper Properties** – Adjust individual wallpaper settings.
--    **Multi-Monitor Support** – Effortlessly choose which screen to apply wallpapers.
--    **Auto-Save & Auto-Run** – Remembers your last used wallpaper and applies it automatically on startup.
--    **Customizable Settings** – Edit settings for linux-wallpaperengine, or edit raw JSON config.
--    **System Tray** – Minimize to the tray for seamless background operation without cluttering your workspace.
-
-## MEMORY EFFICIENCY
-
-I know that many users are scared of Electron applications due to their reputation for being "RAM eaters". This GUI is specifically designed for maximum efficiency to address those concerns:
-
--    **Go Backend:** A lightweight Go process handles the system tray, configuration, and wallpaper management.
--    **Electron Frontend:** The Electron-based UI is only launched when needed. When you minimize the application to the tray, the Electron process is **completely terminated**, freeing up all the memory it was using.
 
 ## SCREENSHOTS
 
@@ -79,9 +63,29 @@ I know that many users are scared of Electron applications due to their reputati
 | :------------------------------: |
 | ![Details](showcase/display.png) |
 
+| WORKSHOP (Can only search for now) |
+| :--------------------------------: |
+| ![Details](showcase/workshop.png)  |
+
 |                Settings                |
 | :------------------------------------: |
 | ![Select Screen](showcase/setting.png) |
+
+## FEATURES
+
+- **Wallpaper Management** – Browse and select wallpapers from your Steam Workshop content with ease.
+- **Wallpaper Properties** – Adjust individual wallpaper settings.
+- **Multi-Monitor Support** – Effortlessly choose which screen to apply wallpapers.
+- **Auto-Save & Auto-Run** – Remembers your last used wallpaper and applies it automatically on startup.
+- **Customizable Settings** – Edit settings for linux-wallpaperengine, or edit raw JSON config.
+- **System Tray** – Minimize to the tray for seamless background operation without cluttering your workspace.
+
+## MEMORY EFFICIENCY
+
+I know that many users are scared of Electron applications due to their reputation for being "RAM eaters". This GUI is specifically designed for maximum efficiency to address those concerns:
+
+- **Go Backend:** A lightweight Go process handles the system tray, configuration, and wallpaper management.
+- **Electron Frontend:** The Electron-based UI is only launched when needed. When you minimize the application to the tray, the Electron process is **completely terminated**, freeing up all the memory it was using.
 
 ## PREREQUISITES
 
@@ -116,15 +120,15 @@ linux-wallpaperengine-gui [options]
 
 ### [Options]
 
--    `--minimized`: Starts the application minimized in the system tray.
--    `--debug-mode`: Enables debug mode for the application.
+- `--minimized`: Starts the application minimized in the system tray.
+- `--debug-mode`: Enables debug mode for the application.
 
 ## BUILD FROM SOURCE
 
 **Requirements:**
 
--    [Go](https://golang.org/) (1.21+)
--    [Node.js](https://nodejs.org/) & [pnpm](https://pnpm.io/)
+- [Go](https://golang.org/) (1.21+)
+- [Node.js](https://nodejs.org/) & [pnpm](https://pnpm.io/)
 
 1. **Clone & Enter:**
 
