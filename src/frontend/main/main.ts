@@ -37,6 +37,7 @@ let cachedWallpaperBasePath = "";
 
 const VITE_DEV_SERVER_URL = process.env["VITE_DEV_SERVER_URL"];
 const isMinimized = process.argv.includes("--minimized");
+export const isNativeWayland = process.argv.includes("--native-wayland");
 const isDebug = process.argv.includes("--debug-mode");
 
 function createWindow() {
