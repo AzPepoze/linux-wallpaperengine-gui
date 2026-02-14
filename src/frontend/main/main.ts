@@ -11,7 +11,6 @@ import { registerWindowService } from "./services/windowService";
 import { registerFileService } from "./services/fileService";
 import { registerSystemService } from "./services/systemService";
 import { setMainWindow, logger } from "./logger";
-import { getWaylandEnvironment } from "./utils/waylandHelper";
 import { registerWorkshopService } from "./services/workshopService";
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
@@ -37,7 +36,6 @@ let cachedWallpaperBasePath = "";
 
 const VITE_DEV_SERVER_URL = process.env["VITE_DEV_SERVER_URL"];
 const isMinimized = process.argv.includes("--minimized");
-export const isNativeWayland = process.argv.includes("--native-wayland");
 const isDebug = process.argv.includes("--debug-mode");
 
 function createWindow() {
@@ -114,12 +112,10 @@ app.whenReady().then(async () => {
                args,
           );
 
-          // Apply Wayland environment variables to backend process
-          const backendEnv = { ...process.env, ...getWaylandEnvironment() };
           spawn(backendPath, args, {
                detached: true,
                stdio: isDebug ? ["ignore", "inherit", "inherit"] : "ignore",
-               env: backendEnv,
+               env: process.env,
           }).unref();
 
           if (!isDebug) app.quit();

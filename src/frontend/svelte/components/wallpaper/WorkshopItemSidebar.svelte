@@ -371,40 +371,73 @@
 
           /* Lists */
           .metrics-list,
-          .info-list {
+          .info-list,
+          .warnings-list {
                display: flex;
                flex-direction: column;
                gap: 0.75rem;
+          }
 
-               .metric-item,
-               .info-item {
-                    display: flex;
-                    justify-content: space-between;
-                    align-items: center;
-                    padding: 0.75rem;
-                    background: var(--bg-surface-hover);
-                    border-radius: 4px;
-                    border-left: 3px solid var(--btn-primary-bg);
+          .metric-item,
+          .info-item,
+          .warning-item {
+               display: flex;
+               justify-content: space-between;
+               align-items: center;
+               padding: 0.75rem;
+               background: var(--bg-surface-hover);
+               border-radius: 4px;
+               border-left: 3px solid var(--btn-primary-bg);
+          }
 
-                    .metric-label,
-                    .info-label {
-                         font-weight: 600;
-                         color: var(--text-color);
-                         flex: 0 0 auto;
+          .metric-item {
+               .metric-label {
+                    font-weight: 600;
+                    color: var(--text-color);
+                    flex: 0 0 auto;
+               }
+               .metric-value {
+                    text-align: right;
+                    color: var(--text-color);
+                    font-weight: 500;
+                    flex: 1;
+                    padding-left: 1rem;
+               }
+          }
+
+          .info-item {
+               .info-label {
+                    font-weight: 600;
+                    color: var(--text-color);
+                    flex: 0 0 auto;
+               }
+               .info-value {
+                    text-align: right;
+                    color: var(--text-color);
+                    font-weight: 500;
+                    flex: 1;
+                    padding-left: 1rem;
+
+                    &.banned {
+                         color: #ff6b6b;
                     }
+               }
+          }
 
-                    .metric-value,
-                    .info-value {
-                         text-align: right;
-                         color: var(--text-color);
-                         font-weight: 500;
-                         flex: 1;
-                         padding-left: 1rem;
+          .warning-item {
+               border-left-color: #ff9800;
 
-                         &.banned {
-                              color: #ff6b6b;
-                         }
-                    }
+               .info-label {
+                    font-weight: 600;
+                    color: var(--text-color);
+                    flex: 0 0 auto;
+               }
+               .info-value {
+                    text-align: right;
+                    color: var(--text-color);
+                    font-weight: 500;
+                    flex: 1;
+                    padding-left: 1rem;
                }
           }
 
@@ -457,15 +490,6 @@
                          color: #f44336;
                          border: 1px solid #f44336;
                     }
-               }
-
-               .warning-item {
-                    padding: 0.75rem;
-                    background: var(--bg-surface-hover);
-                    border-radius: 4px;
-                    border-left: 3px solid #ff9800;
-                    display: flex;
-                    justify-content: space-between;
                }
           }
 

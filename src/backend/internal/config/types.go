@@ -6,32 +6,51 @@ type ScreenConfig struct {
 }
 
 type AppConfig struct {
-	Screens                     []ScreenConfig               `json:"screens,omitempty"`
-	FPS                         int                          `json:"FPS,omitempty"`
-	Silence                     bool                         `json:"SILENCE,omitempty"`
-	CustomArgs                  string                       `json:"customArgs,omitempty"`
-	CustomArgsEnabled           bool                         `json:"customArgsEnabled,omitempty"`
-	Volume                      *float64                     `json:"volume,omitempty"`
-	NoAutomute                  bool                         `json:"noAutomute,omitempty"`
-	NoAudioProcessing           bool                         `json:"noAudioProcessing,omitempty"`
-	Scaling                     string                       `json:"scaling,omitempty"`
-	Clamping                    string                       `json:"clamping,omitempty"`
-	DisableMouse                bool                         `json:"disableMouse,omitempty"`
-	DisableParallax             bool                         `json:"disableParallax,omitempty"`
-	DisableParticles            bool                         `json:"disableParticles,omitempty"`
-	NoFullscreenPause           bool                         `json:"noFullscreenPause,omitempty"`
-	CustomExecutableLocation    string                       `json:"customExecutableLocation,omitempty"`
-	CloneMode                   bool                         `json:"cloneMode,omitempty"`
-	GlobalWallpaper             *string                      `json:"globalWallpaper,omitempty"`
-	FullscreenPauseOnlyActive   bool                         `json:"fullscreenPauseOnlyActive,omitempty"`
-	FullscreenPauseIgnoreAppIds []string                     `json:"fullscreenPauseIgnoreAppIds,omitempty"`
-	Screenshot                  string                       `json:"screenshot,omitempty"`
-	ScreenshotDelay             int                          `json:"screenshotDelay,omitempty"`
-	AssetsDir                   string                       `json:"assetsDir,omitempty"`
-	WallpaperEngineDir          string                       `json:"wallpaperEngineDir,omitempty"`
-	Properties                  map[string]string            `json:"properties,omitempty"`
-	WallpaperProperties         map[string]map[string]string `json:"wallpaperProperties,omitempty"`
-	DumpStructure               bool                         `json:"dumpStructure,omitempty"`
-	Playlist                    []string                     `json:"playlist,omitempty"`
-	SteamApiKey                 string                       `json:"steamApiKey,omitempty"`
+	// --- Linux Wallpaper Engine Arguments ---
+	// Performance & Basic Behavior
+	FPS                int  `json:"FPS,omitempty"`
+	Silence            bool `json:"SILENCE,omitempty"`
+	NoAutomute         bool `json:"noAutomute,omitempty"`
+	NoAudioProcessing  bool `json:"noAudioProcessing,omitempty"`
+	NoFullscreenPause  bool `json:"noFullscreenPause,omitempty"`
+	DisableParticles   bool `json:"disableParticles,omitempty"`
+	DumpStructure      bool `json:"dumpStructure,omitempty"`
+
+	// Display & Rendering
+	Scaling  string   `json:"scaling,omitempty"`
+	Clamping string   `json:"clamping,omitempty"`
+	Playlist []string `json:"playlist,omitempty"`
+
+	// Audio Settings
+	Volume *float64 `json:"volume,omitempty"`
+
+	// Input & Interaction
+	DisableMouse    bool `json:"disableMouse,omitempty"`
+	DisableParallax bool `json:"disableParallax,omitempty"`
+
+	// Fullscreen Pause Logic
+	FullscreenPauseOnlyActive   bool     `json:"fullscreenPauseOnlyActive,omitempty"`
+	FullscreenPauseIgnoreAppIds []string `json:"fullscreenPauseIgnoreAppIds,omitempty"`
+
+	// Wallpaper Properties
+	Properties          map[string]string            `json:"properties,omitempty"`
+	WallpaperProperties map[string]map[string]string `json:"wallpaperProperties,omitempty"`
+
+	// Custom Arguments
+	CustomArgs        string `json:"customArgs,omitempty"`
+	CustomArgsEnabled bool   `json:"customArgsEnabled,omitempty"`
+
+	// Utilities & Paths
+	Screenshot      string `json:"screenshot,omitempty"`
+	ScreenshotDelay int    `json:"screenshotDelay,omitempty"`
+	AssetsDir       string `json:"assetsDir,omitempty"`
+
+	// --- GUI / Internal Settings ---
+	Screens                  []ScreenConfig `json:"screens,omitempty"`
+	CloneMode                bool           `json:"cloneMode,omitempty"`
+	GlobalWallpaper          *string        `json:"globalWallpaper,omitempty"`
+	CustomExecutableLocation string         `json:"customExecutableLocation,omitempty"`
+	WallpaperEngineDir       string         `json:"wallpaperEngineDir,omitempty"`
+	SteamApiKey              string         `json:"steamApiKey,omitempty"`
+	NativeWayland            bool           `json:"nativeWayland,omitempty"`
 }

@@ -66,9 +66,13 @@ func killWallpaper(screen string) {
 		// Try to kill process group
 		pgid, err := syscall.Getpgid(active.Cmd.Process.Pid)
 		if err == nil {
-			syscall.Kill(-pgid, syscall.SIGTERM)
+			if err := syscall.Kill(-pgid, syscall.SIGTERM); err != nil {
+				logger.Printf("Error killing process group: %v", err)
+			}
 		} else {
-			active.Cmd.Process.Kill()
+			if err := active.Cmd.Process.Kill(); err != nil {
+				logger.Printf("Error killing process: %v", err)
+			}
 		}
 	}
 	delete(activeWallpapers, screen)
@@ -97,7 +101,9 @@ func spawnWallpaper(screen string, fullCommand string) {
 	go captureOutput(screen, stderr)
 
 	go func() {
-		cmd.Wait()
+		if err := cmd.Wait(); err != nil {
+			logger.Printf("Wallpaper process for %s exited with error: %v", screen, err)
+		}
 		mu.Lock()
 		if active, exists := activeWallpapers[screen]; exists && active.Cmd == cmd {
 			delete(activeWallpapers, screen)
@@ -122,5 +128,7 @@ func KillAll() {
 	for screen := range activeWallpapers {
 		killWallpaper(screen)
 	}
-	exec.Command("killall", "-e", "linux-wallpaperengine").Run()
+	if err := exec.Command("killall", "-e", "linux-wallpaperengine").Run(); err != nil {
+		logger.Printf("killall linux-wallpaperengine failed: %v", err)
+	}
 }
