@@ -59,6 +59,7 @@ export interface SettingsState {
      dumpStructure: boolean;
      playlist: string[];
      steamApiKey: string;
+     nativeWayland: boolean;
 }
 
 export const settingsStore: Writable<SettingsState | null> = writable(null);
@@ -90,6 +91,7 @@ const configFieldMap: Record<string, string> = {
      dumpStructure: "dumpStructure",
      playlist: "playlist",
      steamApiKey: "steamApiKey",
+     nativeWayland: "nativeWayland",
 };
 
 // Settings Actions

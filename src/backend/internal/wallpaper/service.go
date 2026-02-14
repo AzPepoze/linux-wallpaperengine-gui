@@ -51,7 +51,9 @@ func ApplyWallpapers() error {
 
 	if configChanged {
 		conf.Screens = updatedScreens
-		config.WriteConfig(conf)
+		if err := config.WriteConfig(conf); err != nil {
+			logger.Printf("Failed to update config with new screens: %v", err)
+		}
 	}
 
 	// Only apply to screens that are currently connected
@@ -205,7 +207,9 @@ func LoadWallpapers() (map[string]interface{}, error) {
 		}
 	}
 
-	ApplyWallpapers()
+	if err := ApplyWallpapers(); err != nil {
+		logger.Printf("Failed to apply wallpapers in LoadWallpapers: %v", err)
+	}
 
 	return map[string]interface{}{
 			"wallpapers":        wallpapers,

@@ -42,7 +42,6 @@ export type AppConfig = {
      customExecutableLocation?: string;
      cloneMode?: boolean;
      globalWallpaper?: string | null;
-     // New options
      fullscreenPauseOnlyActive?: boolean;
      fullscreenPauseIgnoreAppIds?: string[];
      screenshot?: string;
@@ -54,6 +53,7 @@ export type AppConfig = {
      dumpStructure?: boolean;
      playlist?: string[];
      steamApiKey?: string;
+     nativeWayland?: boolean;
 };
 
 export type PropertyType =

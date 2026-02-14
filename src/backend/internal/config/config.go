@@ -8,10 +8,10 @@ import (
 )
 
 var (
-	HomePath        string
-	ConfigPath      string
-	WallpaperPath   string
-	DefaultConfig   AppConfig
+	HomePath      string
+	ConfigPath    string
+	WallpaperPath string
+	DefaultConfig AppConfig
 )
 
 func init() {
@@ -24,19 +24,19 @@ func init() {
 	ConfigPath = filepath.Join(HomePath, ".config/linux-wallpaperengine-gui/config.json")
 
 	DefaultConfig = AppConfig{
-		FPS:               60,
-		Silence:           false,
-		CustomArgs:        "",
-		CustomArgsEnabled: false,
-		Volume:            newFloat(100),
-		NoAutomute:        false,
-		NoAudioProcessing: false,
-		Scaling:           "default",
-		Clamping:          "clamp",
-		ScreenshotDelay:   5,
-		Properties:        make(map[string]string),
+		FPS:                 60,
+		Silence:             false,
+		CustomArgs:          "",
+		CustomArgsEnabled:   false,
+		Volume:              newFloat(100),
+		NoAutomute:          false,
+		NoAudioProcessing:   false,
+		Scaling:             "default",
+		Clamping:            "clamp",
+		ScreenshotDelay:     5,
+		Properties:          make(map[string]string),
 		WallpaperProperties: make(map[string]map[string]string),
-		Playlist:          []string{},
+		Playlist:            []string{},
 	}
 }
 
@@ -104,7 +104,9 @@ func ReadConfig() (AppConfig, error) {
 func WriteConfig(conf AppConfig) error {
 	dir := filepath.Dir(ConfigPath)
 	if _, err := os.Stat(dir); os.IsNotExist(err) {
-		os.MkdirAll(dir, 0755)
+		if err := os.MkdirAll(dir, 0755); err != nil {
+			return err
+		}
 	}
 
 	data, err := json.MarshalIndent(conf, "", "  ")

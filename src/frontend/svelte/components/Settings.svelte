@@ -335,6 +335,17 @@
                          description="Power user options and custom parameters."
                     >
                          <SettingItem
+                              label="Use Native Wayland"
+                              id="nativeWayland"
+                              description="Run the GUI with native Wayland support (requires restart)."
+                         >
+                              <Toggle
+                                   id="nativeWayland"
+                                   bind:checked={$settingsStore.nativeWayland}
+                              />
+                         </SettingItem>
+
+                         <SettingItem
                               label="Enable Custom Arguments"
                               id="customArgsEnabled"
                          >

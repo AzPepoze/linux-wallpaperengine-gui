@@ -1,6 +1,7 @@
 package notification
 
 import (
+	"log"
 	"os/exec"
 )
 
@@ -15,7 +16,9 @@ func Notify(level, title, message string) {
 	case "error", "critical":
 		urgency = "critical"
 	}
-	exec.Command("notify-send", "-u", urgency, "-a", "Linux Wallpaper Engine", title, message).Run()
+	if err := exec.Command("notify-send", "-u", urgency, "-a", "Linux Wallpaper Engine", title, message).Run(); err != nil {
+		log.Printf("Failed to send notification: %v (Title: %s, Message: %s)", err, title, message)
+	}
 }
 
 // Toast sends a low-priority notification
