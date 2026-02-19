@@ -56,6 +56,10 @@ contextBridge.exposeInMainWorld("electronAPI", {
      getWallpaperProjectData: createInvokeMethod("get-wallpaper-project-data"),
      getWallpaperProperties: createInvokeMethod("get-wallpaper-properties"),
      saveWallpaperProperty: createInvokeMethod("save-wallpaper-property"),
+     getPlaylists: createInvokeMethod("get-playlists"),
+     startPlaylist: createInvokeMethod("start-playlist"),
+     stopPlaylist: createInvokeMethod("stop-playlist"),
+     updatePlaylistInterval: createInvokeMethod("update-playlist-interval"),
 
      // Workshop services
      getPublishedFileDetails: createInvokeMethod("get-published-file-details"),

@@ -57,7 +57,8 @@ export interface SettingsState {
      properties: Record<string, string>;
      wallpaperProperties: Record<string, Record<string, string>>;
      dumpStructure: boolean;
-     playlist: string[];
+     playlist: string;
+     playlistInterval: number;
      steamApiKey: string;
      nativeWayland: boolean;
 }
@@ -90,6 +91,7 @@ const configFieldMap: Record<string, string> = {
      wallpaperProperties: "wallpaperProperties",
      dumpStructure: "dumpStructure",
      playlist: "playlist",
+     playlistInterval: "playlistInterval",
      steamApiKey: "steamApiKey",
      nativeWayland: "nativeWayland",
 };

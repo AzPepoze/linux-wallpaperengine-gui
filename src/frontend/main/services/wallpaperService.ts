@@ -71,6 +71,26 @@ export function registerWallpaperService() {
           return await socketClient.send("get-wallpaper-project-data", { id });
      });
 
+     ipcMain.handle("get-playlists", async () => {
+          logger.ipcReceived("get-playlists");
+          return await socketClient.send("get-playlists");
+     });
+
+     ipcMain.handle("start-playlist", async (_, playlistName: string, intervalMinutes: number) => {
+          logger.ipcReceived("start-playlist", playlistName, intervalMinutes);
+          return await socketClient.send("start-playlist", { playlistName, intervalMinutes });
+     });
+
+     ipcMain.handle("stop-playlist", async () => {
+          logger.ipcReceived("stop-playlist");
+          return await socketClient.send("stop-playlist");
+     });
+
+     ipcMain.handle("update-playlist-interval", async (_, intervalMinutes: number) => {
+          logger.ipcReceived("update-playlist-interval", intervalMinutes);
+          return await socketClient.send("update-playlist-interval", { intervalMinutes });
+     });
+
      ipcMain.handle("get-wallpaper-properties", async (_, id: string) => {
           logger.ipcReceived("get-wallpaper-properties", id);
           // For now returning empty as parsing properties output is complex

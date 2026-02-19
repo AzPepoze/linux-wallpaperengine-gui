@@ -8,6 +8,7 @@
           validateBinaryFile,
           showToast,
      } from "../scripts/settings";
+     import { cloneMode, selectedScreen, screens } from "../scripts/display";
 
      import SettingsSection from "./settings/SettingsSection.svelte";
      import SettingItem from "./ui/SettingItem.svelte";

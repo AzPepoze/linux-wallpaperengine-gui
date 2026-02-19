@@ -19,7 +19,8 @@ type AppConfig struct {
 	// Display & Rendering
 	Scaling  string   `json:"scaling,omitempty"`
 	Clamping string   `json:"clamping,omitempty"`
-	Playlist []string `json:"playlist,omitempty"`
+	Playlist string   `json:"playlist,omitempty"`
+	PlaylistInterval int    `json:"playlistInterval,omitempty"`
 
 	// Audio Settings
 	Volume *float64 `json:"volume,omitempty"`

@@ -208,6 +208,73 @@ func handleConnection(conn net.Conn, cleanup func()) {
 			} else {
 				res.Result = config.WallpaperPath
 			}
+		case "get-playlists":
+			playlists, err := wallpaper.GetPlaylists()
+			if err != nil {
+				res.Error = err.Error()
+			} else {
+				res.Result = map[string]interface{}{"success": true, "playlists": playlists}
+			}
+		case "start-playlist":
+			var params struct {
+				PlaylistName    string `json:"playlistName"`
+				IntervalMinutes int    `json:"intervalMinutes"`
+			}
+			if err := json.Unmarshal(req.Params, &params); err != nil {
+				res.Error = err.Error()
+			} else {
+				// Update config with playlist and interval
+				conf, err := config.ReadConfig()
+				if err != nil {
+					res.Error = fmt.Sprintf("failed to read config: %v", err)
+				} else {
+					conf.Playlist = params.PlaylistName
+					conf.PlaylistInterval = params.IntervalMinutes
+					if err := config.WriteConfig(conf); err != nil {
+						res.Error = fmt.Sprintf("failed to write config: %v", err)
+					} else {
+						// Start playlist cycle
+						err := wallpaper.StartPlaylistCycle()
+						if err != nil {
+							res.Error = err.Error()
+						} else {
+							res.Result = map[string]bool{"success": true}
+						}
+					}
+				}
+			}
+		case "stop-playlist":
+			wallpaper.StopPlaylistCycle()
+			res.Result = map[string]bool{"success": true}
+		case "update-playlist-interval":
+			var params struct {
+				IntervalMinutes int `json:"intervalMinutes"`
+			}
+			if err := json.Unmarshal(req.Params, &params); err != nil {
+				res.Error = err.Error()
+			} else {
+				// Update config with new interval
+				conf, err := config.ReadConfig()
+				if err != nil {
+					res.Error = fmt.Sprintf("failed to read config: %v", err)
+				} else {
+					conf.PlaylistInterval = params.IntervalMinutes
+					if err := config.WriteConfig(conf); err != nil {
+						res.Error = fmt.Sprintf("failed to write config: %v", err)
+					} else {
+						// Update the ticker interval without restarting playlist
+						err := wallpaper.UpdatePlaylistInterval(params.IntervalMinutes)
+						if err != nil {
+							res.Error = err.Error()
+						} else {
+							res.Result = map[string]bool{"success": true}
+						}
+					}
+				}
+			}
+		case "get-playlist-status":
+			status := wallpaper.GetPlaylistStatus()
+			res.Result = map[string]interface{}{"success": true, "status": status}
 		case "kill-all-wallpapers":
 			wallpaper.KillAllWallpapers()
 			res.Result = map[string]bool{"success": true}

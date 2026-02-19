@@ -51,7 +51,8 @@ export type AppConfig = {
      properties?: Record<string, string>;
      wallpaperProperties?: Record<string, Record<string, string>>;
      dumpStructure?: boolean;
-     playlist?: string[];
+     playlist?: string;
+     playlistInterval?: number;
      steamApiKey?: string;
      nativeWayland?: boolean;
 };
@@ -77,4 +78,20 @@ export interface WallpaperProperty {
      max?: number;
      step?: number;
      options?: Record<string, string>;
+}
+
+export interface PlaylistSettings {
+     clock: string;
+     delay: number;
+     mode: string;
+     order: string;
+     transition: boolean;
+     updateonpause: boolean;
+     videosequence: boolean;
+}
+
+export interface Playlist {
+     name: string;
+     items: string[];
+     settings: PlaylistSettings;
 }
