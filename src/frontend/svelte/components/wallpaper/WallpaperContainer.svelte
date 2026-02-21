@@ -4,6 +4,7 @@
 	import PlaylistIcon from '../../icons/PlaylistIcon.svelte';
 	import Button from '../ui/Button.svelte';
 	import ViewToggle from '../ui/ViewToggle.svelte';
+	import Refresh from '../ui/Refresh.svelte';
 
 	import { showDisplayManager, showPlaylistManager } from '../../scripts/ui';
 	import { settingsStore } from '../../scripts/settings';
@@ -64,6 +65,12 @@
 
 	export function refreshPlaylists() {
 		loadPlaylists();
+	}
+
+	async function refreshWallpapers() {
+		const { wallpapers: loadedWallpapers } =
+			await window.electronAPI.loadWallpapers();
+		wallpapers = loadedWallpapers;
 	}
 
 	async function handleToggleCloneMode() {
@@ -138,8 +145,11 @@
 			</div>
 		</div>
 
-		<div class="mode-toggles">
-			<ViewToggle bind:viewMode />
+		<div class="refresh-modes-container">
+			<Refresh on:click={refreshWallpapers} />
+			<div class="mode-toggles">
+				<ViewToggle bind:viewMode />
+			</div>
 		</div>
 	</div>
 
@@ -227,10 +237,15 @@
 			}
 		}
 
-		.mode-toggles {
+		.refresh-modes-container {
 			display: flex;
 			flex: 1;
 			justify-content: flex-end;
+			gap: 8px;
+		}
+
+		.mode-toggles {
+			display: flex;
 			gap: 6px;
 		}
 	}
