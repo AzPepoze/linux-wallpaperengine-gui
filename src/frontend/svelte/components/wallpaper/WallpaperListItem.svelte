@@ -49,7 +49,7 @@
 	class="item-container"
 	class:selected
 	class:in-playlist={inPlaylist}
-	class:is-downloaded={isDownloaded}
+	class:is-downloaded={isWorkshop && isDownloaded}
 	on:click={() => onSelect(folderName, wallpaper)}
 	aria-pressed={selected}
 	in:scale={{ start: 0.95, duration: 200, easing: backOut }}

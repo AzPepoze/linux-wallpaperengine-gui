@@ -35,10 +35,10 @@
 - [MEMORY EFFICIENCY](#memory-efficiency)
 - [PREREQUISITES](#prerequisites)
 - [INSTALLATION](#installation)
-     - [Arch Linux (AUR)](#arch-linux-aur)
-     - [Other Distributions](#other-distributions)
+  - [Arch Linux (AUR)](#arch-linux-aur)
+  - [Other Distributions](#other-distributions)
 - [USAGE](#usage)
-     - [\[Options\]](#options)
+  - [\[Options\]](#options)
 - [BUILD FROM SOURCE](#build-from-source)
 - [DEVELOPMENT](#development)
 - [CONTRIBUTING](#contributing)
@@ -51,30 +51,42 @@
 
 ## SCREENSHOTS
 
-|            Main Window            |
-| :-------------------------------: |
+|           Main Window           |
+| :-----------------------------: |
 | ![Main Window](showcase/main.png) |
 
-|           Main Window (List)           |
-| :------------------------------------: |
+|          Main Window (List)          |
+| :----------------------------------: |
 | ![Main Window](showcase/main-list.png) |
 
-|         Display Settings         |
-| :------------------------------: |
+|        Display Settings        |
+| :----------------------------: |
 | ![Details](showcase/display.png) |
 
-| WORKSHOP (Can only search for now) |
-| :--------------------------------: |
-| ![Details](showcase/workshop.png)  |
+|            WORKSHOP            |
+| :-----------------------------: |
+| ![Details](showcase/workshop.png) |
 
-|                Settings                |
-| :------------------------------------: |
+|          PLAYLIST          |
+| :--------------------------------------: |
+| ![Details](showcase/playlist.png) |
+
+|          PLAYLIST - SETTING          |
+| :--------------------------------------: |
+| ![Details](showcase/playlist-setting.png) |
+
+|          WORKSHOP - DOWNLOADING          |
+| :--------------------------------------: |
+| ![Details](showcase/workshop-download.jpg) |
+
+|               Settings               |
+| :----------------------------------: |
 | ![Select Screen](showcase/setting.png) |
 
 ## FEATURES
 
 - **Wallpaper Management** – Browse and select wallpapers from your Steam Workshop content with ease.
-- **Steam Workshop Integration** – Search for new wallpapers directly from the Steam Workshop (requires a Steam API Key).
+- **Steam Workshop Integration** – Search and download wallpapers directly from the Steam Workshop (requires steam running on background).
 - **Playlist Support** – Create and manage playlists, including a dynamic "Random All" playlist that automatically includes all your wallpapers.
 - **Wallpaper Properties** – Adjust individual wallpaper settings.
 - **Multi-Monitor Support** – Effortlessly choose which screen to apply wallpapers.
@@ -136,24 +148,22 @@ linux-wallpaperengine-gui [options]
 
 1. **Clone & Enter:**
 
-     ```bash
-     git clone https://github.com/AzPepoze/linux-wallpaperengine-gui
-     cd linux-wallpaperengine-gui
-     ```
-
+   ```bash
+   git clone https://github.com/AzPepoze/linux-wallpaperengine-gui
+   cd linux-wallpaperengine-gui
+   ```
 2. **Install Deps:**
 
-     ```bash
-     pnpm install
-     ```
-
+   ```bash
+   pnpm install
+   ```
 3. **Build:**
 
-     ```bash
-     pnpm run build
-     ```
+   ```bash
+   pnpm run build
+   ```
 
-     The output will be in the `dist` directory.
+   The output will be in the `dist` directory.
 
 ## DEVELOPMENT
 

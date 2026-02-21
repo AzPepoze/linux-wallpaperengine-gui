@@ -59,7 +59,7 @@
 	class="wallpaper-item"
 	class:selected
 	class:in-playlist={inPlaylist}
-	class:is-downloaded={isDownloaded}
+	class:is-downloaded={isWorkshop && isDownloaded}
 	aria-pressed={selected}
 	on:click={() => onSelect(folderName, wallpaper)}
 	style="animation-delay: {10 + index * 50}ms"
