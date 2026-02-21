@@ -1,67 +1,66 @@
 <script lang="ts">
-     import { fly } from "svelte/transition";
-     import { quintOut, quintIn } from "svelte/easing";
+	import { fly } from 'svelte/transition';
+	import { quintOut, quintIn } from 'svelte/easing';
 
-     export let message: string;
-     export let type: "success" | "error" | "warn" | "info" = "success";
+	export let message: string;
+	export let type: 'success' | 'error' | 'warn' | 'info' = 'success';
 </script>
 
 <div
-     class="toast"
-     class:success={type === "success"}
-     class:error={type === "error"}
-     class:warn={type === "warn"}
-     class:info={type === "info"}
-     in:fly={{ y: 30, duration: 400, easing: quintOut }}
-     out:fly={{ y: 20, duration: 300, easing: quintIn, opacity: 0 }}
+	class="toast"
+	class:success={type === 'success'}
+	class:error={type === 'error'}
+	class:warn={type === 'warn'}
+	class:info={type === 'info'}
+	in:fly={{ y: 30, duration: 400, easing: quintOut }}
+	out:fly={{ y: 20, duration: 300, easing: quintIn, opacity: 0 }}
 >
-     {message}
+	{message}
 </div>
 
 <style lang="scss">
-     .toast {
-          position: fixed;
-          bottom: 32px;
-          right: 32px;
-          padding: 14px 28px;
-          border-radius: var(--radius-lg);
-          font-weight: 600;
-          font-size: 0.95em;
-          backdrop-filter: blur(10px);
-          z-index: 1000;
-          box-shadow: var(--shadow-md);
-          transition: var(--transition-base);
+	.toast {
+		position: fixed;
+		bottom: 32px;
+		right: 32px;
+		padding: 14px 28px;
+		border-radius: var(--radius-lg);
+		font-weight: 600;
+		font-size: 0.95em;
+		z-index: 1000;
+		box-shadow: var(--shadow-md);
+		transition: var(--transition-base);
 
-          &:hover {
-               transform: translateY(-2px);
-          }
+		&:hover {
+			transform: translateY(-2px);
+		}
 
-          &.success {
-               background: var(--success-bg);
-               color: var(--success-color);
-               border: 1px solid rgba(40, 167, 69, 0.4);
-               box-shadow: 0 8px 24px rgba(40, 167, 69, 0.15);
-          }
+		&.success {
+			background: var(--success-bg);
+			color: var(--success-color);
+			border: 1px solid #1e7e34;
+			box-shadow: 0 8px 24px rgba(0, 0, 0, 0.4);
+		}
 
-          &.error {
-               background: var(--error-bg);
-               color: var(--error-color);
-               border: 1px solid rgba(220, 53, 69, 0.4);
-               box-shadow: 0 8px 24px rgba(220, 53, 69, 0.15);
-          }
+		&.error {
+			background: var(--error-bg);
+			color: var(--error-color);
+			border: 1px solid #bd2130;
+			box-shadow: 0 8px 24px rgba(0, 0, 0, 0.4);
+		}
 
-          &.warn {
-               background: #fff3cd;
-               color: #856404;
-               border: 1px solid rgba(255, 193, 7, 0.4);
-               box-shadow: 0 8px 24px rgba(255, 193, 7, 0.15);
-          }
+		&.warn {
+			background: #ffc107;
+			color: #000000;
+			border: 1px solid #d39e00;
+			box-shadow: 0 8px 24px rgba(0, 0, 0, 0.4);
+		}
 
-          &.info {
-               background: #d1ecf1;
-               color: #0c5460;
-               border: 1px solid rgba(23, 162, 184, 0.4);
-               box-shadow: 0 8px 24px rgba(23, 162, 184, 0.15);
-          }
-     }
+		&.info {
+			background: #17a2b8;
+			color: #ffffff;
+			border: 1px solid #117a8b;
+			box-shadow: 0 8px 24px rgba(0, 0, 0, 0.4);
+		}
+	}
 </style>

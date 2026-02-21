@@ -36,7 +36,7 @@ func init() {
 		ScreenshotDelay:     5,
 		Properties:          make(map[string]string),
 		WallpaperProperties: make(map[string]map[string]string),
-		Playlist:            []string{},
+		Playlist:            "",
 	}
 }
 

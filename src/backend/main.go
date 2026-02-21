@@ -13,6 +13,7 @@ import (
 	"linux-wallpaperengine-gui/src/backend/internal/config"
 	"linux-wallpaperengine-gui/src/backend/internal/display"
 	"linux-wallpaperengine-gui/src/backend/internal/electron"
+	"linux-wallpaperengine-gui/src/backend/internal/fullscreen"
 	"linux-wallpaperengine-gui/src/backend/internal/logger"
 	"linux-wallpaperengine-gui/src/backend/internal/notification"
 	"linux-wallpaperengine-gui/src/backend/internal/tray"
@@ -61,6 +62,7 @@ func main() {
 
 	cleanup := func() {
 		wallpaper.KillAll()
+		fullscreen.StopDetector()
 		electron.Stop()
 		if _, err := os.Stat(socketPath); err == nil {
 			if err := os.Remove(socketPath); err != nil {
@@ -83,6 +85,15 @@ func main() {
 			notification.Error("Wallpaper Engine Error", "Failed to apply wallpapers on display change: "+err.Error())
 		}
 		api.BroadcastEvent("screens-changed", nil)
+	})
+
+	// Start fullscreen detector to pause/resume playlist cycling
+	fullscreen.StartDetector(func(isFullscreen bool) {
+		if isFullscreen {
+			wallpaper.PausePlaylistCycle()
+		} else {
+			wallpaper.ResumePlaylistCycle()
+		}
 	})
 
 	// Apply wallpapers on startup

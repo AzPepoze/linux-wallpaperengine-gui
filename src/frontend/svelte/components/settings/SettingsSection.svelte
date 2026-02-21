@@ -1,61 +1,61 @@
 <script lang="ts">
-     export let title: string;
-     export let description: string = "";
+	export let title: string;
+	export let description: string = '';
 </script>
 
 <section class="settings-section" {...$$restProps}>
-     <div class="section-header">
-          <h3>{title}</h3>
-          {#if description}
-               <p>{description}</p>
-          {/if}
-     </div>
-     <div class="section-content">
-          <slot />
-     </div>
+	<div class="section-header">
+		<h3>{title}</h3>
+		{#if description}
+			<p>{description}</p>
+		{/if}
+	</div>
+	<div class="section-content">
+		<slot />
+	</div>
 </section>
 
 <style lang="scss">
-     .settings-section {
-          width: 100%;
-          display: flex;
-          flex-direction: column;
-          gap: 20px;
-          animation: fade-in 0.3s ease-out;
-     }
+	.settings-section {
+		width: 100%;
+		display: flex;
+		flex-direction: column;
+		gap: 20px;
+		animation: fade-in 0.3s ease-out;
+	}
 
-     .section-header {
-          text-align: left;
+	.section-header {
+		text-align: left;
 
-          h3 {
-               margin: 0;
-               font-size: 1.25em;
-               font-weight: 700;
-               color: var(--text-color);
-               letter-spacing: -0.01em;
-          }
+		h3 {
+			margin: 0;
+			font-size: 1.25em;
+			font-weight: 700;
+			color: var(--text-color);
+			letter-spacing: -0.01em;
+		}
 
-          p {
-               margin: 6px 0 0 0;
-               font-size: 0.9em;
-               color: var(--text-muted);
-          }
-     }
+		p {
+			margin: 6px 0 0 0;
+			font-size: 0.9em;
+			color: var(--text-muted);
+		}
+	}
 
-     .section-content {
-          display: flex;
-          flex-direction: column;
-          gap: 12px;
-     }
+	.section-content {
+		display: flex;
+		flex-direction: column;
+		gap: 12px;
+	}
 
-     @keyframes fade-in {
-          from {
-               opacity: 0;
-               transform: translateY(10px);
-          }
-          to {
-               opacity: 1;
-               transform: translateY(0);
-          }
-     }
+	@keyframes fade-in {
+		from {
+			opacity: 0;
+			transform: translateY(10px);
+		}
+		to {
+			opacity: 1;
+			transform: translateY(0);
+		}
+	}
 </style>
