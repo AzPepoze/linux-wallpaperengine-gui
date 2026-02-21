@@ -1,278 +1,314 @@
 <script lang="ts">
-     import Topbar from "./components/Topbar.svelte";
-     import Settings from "./components/Settings.svelte";
-     import Sidebar from "./components/wallpaper/Sidebar.svelte";
-     import WallpaperContainer from "./components/wallpaper/WallpaperContainer.svelte";
-     import DisplayManager from "./components/DisplayManager.svelte";
-     import Workshop from "./components/Workshop.svelte";
-     import { initLogger, logger } from "./scripts/logger";
-     import { onMount } from "svelte";
-     import { quadOut } from "svelte/easing";
-     import { scale } from "svelte/transition";
-     import type { TransitionConfig } from "svelte/transition";
-     import { showDisplayManager, activeView } from "./scripts/ui";
-     import * as display from "./scripts/display";
-     import { screens, selectedScreen } from "./scripts/display";
-     import LogsPopup from "./components/LogsPopup.svelte";
-     import Toast from "./components/ui/Toast.svelte";
-     import { toastStore, showToast, loadSettings } from "./scripts/settings";
-     import type { WallpaperData } from "../shared/types";
+	import Topbar from './components/Topbar.svelte';
+	import Settings from './components/Settings.svelte';
+	import Sidebar from './components/wallpaper/Sidebar.svelte';
+	import WallpaperContainer from './components/wallpaper/WallpaperContainer.svelte';
+	import DisplayManager from './components/DisplayManager.svelte';
+	import PlaylistManager from './components/wallpaper/PlaylistManager.svelte';
+	import Workshop from './components/Workshop.svelte';
+	import { initLogger, logger } from './scripts/logger';
+	import { onMount } from 'svelte';
+	import { quadOut } from 'svelte/easing';
+	import { scale } from 'svelte/transition';
+	import type { TransitionConfig } from 'svelte/transition';
+	import {
+		showDisplayManager,
+		showPlaylistManager,
+		activeView
+	} from './scripts/ui';
 
-     let wallpapers: Record<string, WallpaperData> = {};
-     let error: string | null = null;
-     let loading = true;
-     let selectedFolderName: string | null = null;
-     let activeFolderName: string | null = null;
+	import {
+		screens,
+		selectedScreen,
+		cloneMode,
+		initDisplay,
+		refreshScreens
+	} from './scripts/display';
+	import LogsPopup from './components/LogsPopup.svelte';
+	import Toast from './components/ui/Toast.svelte';
+	import { toastStore, showToast, loadSettings } from './scripts/settings';
+	import type { WallpaperData } from '../shared/types';
 
-     $: selectedWallpaper = selectedFolderName
-          ? {
-                 ...wallpapers[selectedFolderName],
-                 folderName: selectedFolderName,
-            }
-          : null;
+	let wallpapers: Record<string, WallpaperData> = {};
+	let error: string | null = null;
+	let loading = true;
+	let selectedFolderName: string | null = null;
+	let activeFolderName: string | null = null;
+	let playlistManagerComponent: any;
+	let wallpaperContainerComponent: any;
 
-     $: activeWallpaper = activeFolderName
-          ? { ...wallpapers[activeFolderName], folderName: activeFolderName }
-          : null;
+	$: selectedWallpaper = selectedFolderName
+		? {
+				...wallpapers[selectedFolderName],
+				folderName: selectedFolderName
+			}
+		: null;
 
-     async function initialize() {
-          loading = true;
+	$: activeWallpaper = activeFolderName
+		? { ...wallpapers[activeFolderName], folderName: activeFolderName }
+		: null;
 
-          display.initDisplay();
-          logger.log("Application initialized");
+	async function initialize() {
+		loading = true;
 
-          // Main process handles init
-          if (window.electronAPI.validateExecutable) {
-               await window.electronAPI.validateExecutable();
-          }
+		initDisplay();
+		logger.log('Application initialized');
 
-          const {
-               wallpapers: loadedWallpapers,
-               error: loadError,
-               selectedWallpaper: initialWallpaper,
-          } = await window.electronAPI.loadWallpapers();
+		// Main process handles init
+		if (window.electronAPI.validateExecutable) {
+			await window.electronAPI.validateExecutable();
+		}
 
-          wallpapers = loadedWallpapers;
-          error = loadError;
+		const {
+			wallpapers: loadedWallpapers,
+			error: loadError,
+			selectedWallpaper: initialWallpaper
+		} = await window.electronAPI.loadWallpapers();
 
-          loading = false;
+		wallpapers = loadedWallpapers;
+		error = loadError;
 
-          if (initialWallpaper) {
-               selectedFolderName = initialWallpaper.folderName;
-               activeFolderName = initialWallpaper.folderName;
-          }
+		loading = false;
 
-          return initialWallpaper;
-     }
+		if (initialWallpaper) {
+			selectedFolderName = initialWallpaper.folderName;
+			activeFolderName = initialWallpaper.folderName;
+		}
 
-     function customSlide(
-          node: HTMLElement,
-          { delay = 0, duration = 400, easing = quadOut } = {},
-     ): TransitionConfig {
-          const style = getComputedStyle(node);
-          const opacity = +style.opacity;
-          const height = node.offsetHeight;
+		return initialWallpaper;
+	}
 
-          return {
-               delay,
-               duration,
-               easing,
-               css: (t: number) => {
-                    const eased = easing(t);
-                    return `
+	function customSlide(
+		node: HTMLElement,
+		{ delay = 0, duration = 400, easing = quadOut } = {}
+	): TransitionConfig {
+		const style = getComputedStyle(node);
+		const opacity = +style.opacity;
+		const height = node.offsetHeight;
+
+		return {
+			delay,
+			duration,
+			easing,
+			css: (t: number) => {
+				const eased = easing(t);
+				return `
                          height: ${eased * height}px;
                          opacity: ${Math.min(t * 2, 1) * opacity};
                     `;
-               },
-          };
-     }
+			}
+		};
+	}
 
-     onMount(async () => {
-          // Listen for toasts from main process
-          window.electronAPI.on(
-               "show-toast",
-               (data: {
-                    message: string;
-                    type: "success" | "error" | "warn" | "info";
-                    duration?: number;
-               }) => {
-                    showToast(data.message, data.type, data.duration);
-               },
-          );
+	onMount(async () => {
+		// Listen for toasts from main process
+		window.electronAPI.on(
+			'show-toast',
+			(data: {
+				message: string;
+				type: 'success' | 'error' | 'warn' | 'info';
+				duration?: number;
+			}) => {
+				showToast(data.message, data.type, data.duration);
+			}
+		);
 
-          initLogger();
-          await loadSettings();
-          const initialWallpaper = await initialize();
-          await display.refreshScreens();
+		initLogger();
+		await loadSettings();
+		const initialWallpaper = await initialize();
+		await refreshScreens();
 
-          if (!selectedFolderName) {
-               if ($selectedScreen && $screens[$selectedScreen]) {
-                    activeFolderName = $screens[$selectedScreen];
-                    selectedFolderName = activeFolderName;
-               } else if (initialWallpaper) {
-                    selectedFolderName = initialWallpaper.folderName;
-               }
-          }
+		if (!selectedFolderName) {
+			if ($selectedScreen && $screens[$selectedScreen]) {
+				activeFolderName = $screens[$selectedScreen];
+				selectedFolderName = activeFolderName;
+			} else if (initialWallpaper) {
+				selectedFolderName = initialWallpaper.folderName;
+			}
+		}
 
-          const handleLinkClick = (e: MouseEvent) => {
-               const target = (e.target as HTMLElement).closest("a");
-               if (target && target.href) {
-                    const url = target.href;
-                    if (
-                         url.startsWith("http") ||
-                         url.startsWith("mailto:") ||
-                         url.startsWith("tel:")
-                    ) {
-                         e.preventDefault();
-                         e.stopPropagation();
-                         setTimeout(() => {
-                              window.electronAPI.openExternal(url);
-                         }, 100);
-                    }
-               }
-          };
+		const handleLinkClick = (e: MouseEvent) => {
+			const target = (e.target as HTMLElement).closest('a');
+			if (target && target.href) {
+				const url = target.href;
+				if (
+					url.startsWith('http') ||
+					url.startsWith('mailto:') ||
+					url.startsWith('tel:')
+				) {
+					e.preventDefault();
+					e.stopPropagation();
+					setTimeout(() => {
+						window.electronAPI.openExternal(url);
+					}, 100);
+				}
+			}
+		};
 
-          document.addEventListener("click", handleLinkClick, true);
-     });
+		document.addEventListener('click', handleLinkClick, true);
+	});
 
-     async function handleSelectWallpaper(folderName: string) {
-          if ($selectedScreen) {
-               await window.electronAPI.setWallpaper(
-                    $selectedScreen,
-                    folderName,
-               );
-               activeFolderName = folderName;
-               screens.update((s) => ({
-                    ...s,
-                    [$selectedScreen as string]: folderName,
-               }));
-          } else {
-               logger.warn("No screen selected for configuration.");
-          }
-          selectedFolderName = folderName;
-     }
+	async function handleSelectWallpaper(folderName: string) {
+		if ($selectedScreen) {
+			await window.electronAPI.setWallpaper(
+				$selectedScreen,
+				folderName
+			);
+			activeFolderName = folderName;
+			screens.update((s) => ({
+				...s,
+				[$selectedScreen as string]: folderName
+			}));
+		} else {
+			logger.warn('No screen selected for configuration.');
+		}
+		selectedFolderName = folderName;
+	}
 
-     const pageTransitionInParams = {
-          duration: 200,
-          delay: 200,
-          start: 0.99,
-     };
+	const pageTransitionInParams = {
+		duration: 200,
+		delay: 200,
+		start: 0.99
+	};
 
-     const pageTransitionOutParams = {
-          duration: 200,
-          start: 0.99,
-     };
+	const pageTransitionOutParams = {
+		duration: 200,
+		start: 0.99
+	};
 </script>
 
 <div class="app-container">
-     <Topbar />
+	<Topbar />
 
-     <div class="content">
-          {#if $activeView === "wallpapers"}
-               <div
-                    class="view-container wallpapers-layout"
-                    in:scale={pageTransitionInParams}
-                    out:scale={pageTransitionOutParams}
-               >
-                    <div class="workspace">
-                         {#if $showDisplayManager}
-                              <div
-                                   class="display-manager-wrapper"
-                                   transition:customSlide={{ duration: 400 }}
-                              >
-                                   <DisplayManager {wallpapers} />
-                              </div>
-                         {/if}
+	<div class="content">
+		{#if $activeView === 'wallpapers'}
+			<div
+				class="view-container wallpapers-layout"
+				in:scale={pageTransitionInParams}
+				out:scale={pageTransitionOutParams}
+			>
+				<div class="workspace">
+					{#if $showDisplayManager}
+						<div
+							class="display-manager-wrapper"
+							transition:customSlide={{ duration: 400 }}
+						>
+							<DisplayManager {wallpapers} />
+						</div>
+					{/if}
 
-                         <WallpaperContainer
-                              {wallpapers}
-                              {activeWallpaper}
-                              {selectedWallpaper}
-                              selectedScreen={$selectedScreen}
-                              {loading}
-                              {error}
-                              onSelect={handleSelectWallpaper}
-                         />
-                    </div>
+					{#if $showPlaylistManager}
+						<div
+							class="display-manager-wrapper"
+							transition:customSlide={{ duration: 400 }}
+						>
+							<PlaylistManager
+								{wallpapers}
+								onSelect={handleSelectWallpaper}
+								bind:this={playlistManagerComponent}
+								selectedWallpaperFolder={selectedFolderName}
+								selectedScreen={$selectedScreen}
+								cloneMode={$cloneMode}
+								onPlaylistChange={() => {
+									if (wallpaperContainerComponent) {
+										wallpaperContainerComponent.refreshPlaylists();
+									}
+								}}
+							/>
+						</div>
+					{/if}
 
-                    <Sidebar
-                         {selectedWallpaper}
-                         onClose={() => (selectedFolderName = null)}
-                    />
-               </div>
-          {:else if $activeView === "workshop"}
-               <div
-                    class="view-container"
-                    in:scale={pageTransitionInParams}
-                    out:scale={pageTransitionOutParams}
-               >
-                    <Workshop />
-               </div>
-          {:else if $activeView === "logs"}
-               <div
-                    class="view-container"
-                    in:scale={pageTransitionInParams}
-                    out:scale={pageTransitionOutParams}
-               >
-                    <LogsPopup />
-               </div>
-          {:else if $activeView === "settings"}
-               <div
-                    class="view-container"
-                    in:scale={pageTransitionInParams}
-                    out:scale={pageTransitionOutParams}
-               >
-                    <Settings />
-               </div>
-          {/if}
-     </div>
+					<WallpaperContainer
+						{wallpapers}
+						{activeWallpaper}
+						{selectedWallpaper}
+						selectedScreen={$selectedScreen}
+						{loading}
+						{error}
+						playlistManager={playlistManagerComponent}
+						onSelect={handleSelectWallpaper}
+						bind:this={wallpaperContainerComponent}
+					/>
+				</div>
+
+				<Sidebar
+					{selectedWallpaper}
+					onClose={() => (selectedFolderName = null)}
+				/>
+			</div>
+		{:else if $activeView === 'workshop'}
+			<div
+				class="view-container"
+				in:scale={pageTransitionInParams}
+				out:scale={pageTransitionOutParams}
+			>
+				<Workshop />
+			</div>
+		{:else if $activeView === 'logs'}
+			<div
+				class="view-container"
+				in:scale={pageTransitionInParams}
+				out:scale={pageTransitionOutParams}
+			>
+				<LogsPopup />
+			</div>
+		{:else if $activeView === 'settings'}
+			<div
+				class="view-container"
+				in:scale={pageTransitionInParams}
+				out:scale={pageTransitionOutParams}
+			>
+				<Settings />
+			</div>
+		{/if}
+	</div>
 </div>
 
 {#if $toastStore}
-     <Toast message={$toastStore.message} type={$toastStore.type} />
+	<Toast message={$toastStore.message} type={$toastStore.type} />
 {/if}
 
 <style lang="scss">
-     .view-container {
-          display: flex;
-          flex-direction: column;
-          flex-grow: 1;
-          height: 100%;
-          width: 100%;
-          position: absolute;
-          top: 0;
-          left: 0;
-          box-sizing: border-box;
-          padding: 20px;
-     }
+	.view-container {
+		display: flex;
+		flex-direction: column;
+		flex-grow: 1;
+		height: 100%;
+		width: 100%;
+		position: absolute;
+		top: 0;
+		left: 0;
+		box-sizing: border-box;
+		padding: 20px;
+	}
 
-     .wallpapers-layout {
-          flex-direction: row;
-     }
+	.wallpapers-layout {
+		flex-direction: row;
+	}
 
-     .workspace {
-          display: flex;
-          flex-direction: column;
-          flex-grow: 1;
-          min-width: 0;
-     }
+	.workspace {
+		display: flex;
+		flex-direction: column;
+		flex-grow: 1;
+		min-width: 0;
+	}
 
-     .app-container {
-          display: flex;
-          flex-direction: column;
-          height: 100vh;
-     }
+	.app-container {
+		display: flex;
+		flex-direction: column;
+		height: 100vh;
+	}
 
-     .content {
-          display: flex;
-          min-height: 0;
-          max-width: 100%;
-          flex-grow: 1;
-          padding: 10px;
-          position: relative;
-     }
+	.content {
+		display: flex;
+		min-height: 0;
+		max-width: 100%;
+		flex-grow: 1;
+		padding: 10px;
+		position: relative;
+	}
 
-     .display-manager-wrapper {
-          width: 100%;
-     }
+	.display-manager-wrapper {
+		width: 100%;
+	}
 </style>

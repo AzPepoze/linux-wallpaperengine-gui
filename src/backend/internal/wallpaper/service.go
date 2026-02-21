@@ -151,10 +151,6 @@ func ApplyWallpapers() error {
 			args = append(args, "--dump-structure")
 		}
 
-		for _, p := range conf.Playlist {
-			args = append(args, fmt.Sprintf("--playlist \"%s\"", p))
-		}
-
 		// Properties
 		props, ok := conf.WallpaperProperties[targetWallpaper]
 		if !ok {

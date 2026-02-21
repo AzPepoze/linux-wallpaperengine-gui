@@ -1,5 +1,10 @@
 package wallpaper
 
+import (
+	"encoding/json"
+	"strings"
+)
+
 type WallpaperProjectData struct {
 	Title       string                 `json:"title"`
 	Description string                 `json:"description,omitempty"`
@@ -45,4 +50,67 @@ type WallpaperProperty struct {
 	Max         *float64          `json:"max,omitempty"`
 	Step        *float64          `json:"step,omitempty"`
 	Options     map[string]string `json:"options,omitempty"`
+}
+
+type PlaylistSettings struct {
+	Clock         string `json:"clock"`
+	Delay         int    `json:"delay"`
+	Mode          string `json:"mode"`
+	Order         string `json:"order"`
+	Transition    bool   `json:"transition"`
+	UpdateOnPause bool   `json:"updateonpause"`
+	VideoSequence bool   `json:"videosequence"`
+}
+
+// UnmarshalJSON custom unmarshaler for PlaylistSettings to handle string-to-bool conversion
+func (ps *PlaylistSettings) UnmarshalJSON(data []byte) error {
+	type Alias PlaylistSettings
+	aux := &struct {
+		Transition    interface{} `json:"transition"`
+		UpdateOnPause interface{} `json:"updateonpause"`
+		VideoSequence interface{} `json:"videosequence"`
+		*Alias
+	}{
+		Alias: (*Alias)(ps),
+	}
+
+	if err := json.Unmarshal(data, &aux); err != nil {
+		return err
+	}
+
+	ps.Transition = toBool(aux.Transition)
+	ps.UpdateOnPause = toBool(aux.UpdateOnPause)
+	ps.VideoSequence = toBool(aux.VideoSequence)
+
+	return nil
+}
+
+// toBool converts various types to bool
+func toBool(v interface{}) bool {
+	if v == nil {
+		return false
+	}
+	switch val := v.(type) {
+	case bool:
+		return val
+	case string:
+		return strings.ToLower(strings.TrimSpace(val)) != "false"
+	case float64:
+		return val != 0
+	}
+	return false
+}
+
+type Playlist struct {
+	Name     string           `json:"name"`
+	Items    []string         `json:"items"`
+	Settings PlaylistSettings `json:"settings"`
+}
+
+type WallpaperEngineConfig struct {
+	SteamUser struct {
+		General struct {
+			Playlists []Playlist `json:"playlists"`
+		} `json:"general"`
+	} `json:"steamuser"`
 }

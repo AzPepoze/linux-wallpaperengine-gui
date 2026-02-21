@@ -27,9 +27,9 @@ class SocketClient {
 
 	constructor() {
 		this.socketPath = path.join(
-               os.tmpdir(),
-               "linux-wallpaperengine-gui.sock"
-          );
+			os.tmpdir(),
+			"linux-wallpaperengine-gui.sock"
+		);
 	}
 
 	onEvent(callback: (method: string, params: any) => void) {
@@ -68,7 +68,7 @@ class SocketClient {
 			} catch (err) {
 				const errMsg = err instanceof Error ? err.message : String(err);
 				console.warn(`Socket connection attempt ${i + 1} failed: ${errMsg}. Retrying in ${delay}ms...`);
-				
+
 				if (this.retryListener) {
 					this.retryListener(i + 1, errMsg);
 				}
@@ -87,7 +87,7 @@ class SocketClient {
 			if (!line.trim()) continue;
 			try {
 				const response: Response = JSON.parse(line);
-				
+
 				if (response.id === undefined) {
 					// This is an event
 					if (this.eventListener && response.method) {
