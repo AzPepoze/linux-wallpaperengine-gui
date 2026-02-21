@@ -107,11 +107,17 @@
 		<div class="actions">
 			<!-- svelte-ignore a11y-click-events-have-key-events -->
 			<!-- svelte-ignore a11y-no-static-element-interactions -->
-			<div class="download-badge" title="Download" on:click|stopPropagation={() => {
-				if (wallpaper.projectData?.publishedfileid) {
-					window.electronAPI.openExternal(`steam://url/CommunityFilePage/${wallpaper.projectData.publishedfileid}`);
-				}
-			}}>
+			<div
+				class="download-badge"
+				title="Download"
+				on:click|stopPropagation={() => {
+					if (wallpaper.projectData?.publishedfileid) {
+						window.electronAPI.openExternal(
+							`steam://url/CommunityFilePage/${wallpaper.projectData.publishedfileid}`
+						);
+					}
+				}}
+			>
 				<DownloadIcon width="20" height="20" />
 			</div>
 		</div>
@@ -153,7 +159,7 @@
 
 		&.selected {
 			border-color: var(--btn-primary-bg);
-			background: rgba(0, 123, 255, 0.1);
+			background: var(--bg-primary-translucent);
 			box-shadow: var(--shadow-sm);
 		}
 
@@ -238,21 +244,21 @@
 				}
 
 				.item-type {
-					color: #7dd3fc;
+					color: var(--stat-type);
 				}
 				.item-tags {
-					color: #fbbf24;
+					color: var(--stat-tag);
 				}
 				.item-folder {
-					color: #86efac;
+					color: var(--stat-folder);
 				}
 
 				.item-views {
-					color: #60a5fa;
+					color: var(--stat-views);
 				}
 
 				.item-subs {
-					color: #a78bfa;
+					color: var(--stat-subs);
 				}
 
 				.item-description {
@@ -278,11 +284,13 @@
 				}
 
 				.item-size {
-					color: #fbbf24;
+					color: var(
+						--stat-tag
+					); /* Reusing stat-tag for yellow */
 				}
 
 				.item-date {
-					color: #94a3b8;
+					color: var(--stat-date);
 				}
 			}
 		}
@@ -300,13 +308,13 @@
 				display: flex;
 				align-items: center;
 				justify-content: center;
-				background: rgba(0, 0, 0, 0.4);
-				color: #fff;
+				background: var(--badge-bg);
+				color: var(--text-color);
 				transition: all 0.2s;
 				pointer-events: auto;
 
 				&:hover {
-					background: #007bff;
+					background: var(--btn-primary-bg);
 					transform: scale(1.1);
 				}
 			}

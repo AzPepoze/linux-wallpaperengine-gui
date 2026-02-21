@@ -77,6 +77,7 @@
 		flex-direction: column;
 		gap: 12px;
 		width: 100%;
+		min-width: 200px;
 		color: var(--text-color);
 	}
 

@@ -38,13 +38,15 @@ const VITE_DEV_SERVER_URL = process.env["VITE_DEV_SERVER_URL"];
 const isMinimized = process.argv.includes("--minimized");
 const isDebug = process.argv.includes("--debug-mode");
 
-function createWindow() {
+function createWindow(transparentUi = true) {
 	const preloadPath = path.join(__dirname, "preload.mjs");
 	logger.backend("Preload path:", preloadPath);
 	win = new BrowserWindow({
 		icon: path.join(process.env.VITE_PUBLIC || "", "icon.png"),
 		width: 1200,
 		height: 800,
+		transparent: transparentUi,
+		backgroundColor: transparentUi ? '#00000000' : '#1d1d1d',
 		webPreferences: {
 			preload: preloadPath,
 			contextIsolation: true,
@@ -57,7 +59,7 @@ function createWindow() {
 		autoHideMenuBar: true,
 	});
 	setMainWindow(win);
-	logger.backend("Window created");
+	logger.backend("Window created with transparent:", transparentUi);
 
 	win.webContents.on("did-finish-load", () => {
 		win?.webContents.send(
@@ -158,6 +160,16 @@ app.whenReady().then(async () => {
 		);
 	}
 
+	let transparentUi = true;
+	try {
+		const configResult = await socketClient.send("get-config");
+		if (configResult && configResult.transparentUi !== undefined) {
+			transparentUi = configResult.transparentUi;
+		}
+	} catch (err) {
+		logger.backend("Error getting config in Electron main process:", err);
+	}
+
 	registerConfigService();
 	registerWallpaperService();
 	registerDisplayService();
@@ -198,5 +210,5 @@ app.whenReady().then(async () => {
 	});
 
 	logger.backend("Is minimized:", isMinimized);
-	if (!isMinimized) createWindow();
+	if (!isMinimized) createWindow(transparentUi);
 });

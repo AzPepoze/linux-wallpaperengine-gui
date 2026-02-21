@@ -77,7 +77,7 @@
 			cursor: pointer;
 			transition: var(--transition-base);
 			box-shadow: var(--shadow-sm);
-			border: 2px solid #fff;
+			border: 2px solid var(--text-on-primary);
 		}
 
 		&::-moz-range-thumb {
@@ -88,7 +88,7 @@
 			cursor: pointer;
 			transition: var(--transition-base);
 			box-shadow: var(--shadow-sm);
-			border: 2px solid #fff;
+			border: 2px solid var(--text-on-primary);
 		}
 	}
 </style>

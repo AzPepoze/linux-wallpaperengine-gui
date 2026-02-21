@@ -19,6 +19,7 @@ contextBridge.exposeInMainWorld("electronAPI", {
 	minimize: createInvokeMethod("window-minimize"),
 	maximize: createInvokeMethod("window-maximize"),
 	hide: createInvokeMethod("window-hide"),
+	restartUI: createInvokeMethod("restart-ui"),
 
 	// System
 	getScreens: createInvokeMethod("get-screens"),

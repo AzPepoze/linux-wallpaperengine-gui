@@ -76,7 +76,7 @@
 
 		&:focus-within {
 			border-color: var(--btn-primary-bg);
-			box-shadow: 0 0 0 3px rgba(0, 123, 255, 0.15);
+			box-shadow: 0 0 0 3px var(--focus-ring-light);
 			background-color: var(--bg-surface-active);
 		}
 	}
@@ -118,7 +118,7 @@
 
 		&:hover {
 			background-color: var(--btn-primary-bg);
-			color: #fff;
+			color: var(--text-color);
 		}
 
 		&:active {

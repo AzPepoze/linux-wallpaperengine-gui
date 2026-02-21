@@ -40,4 +40,10 @@ export function registerWindowService() {
 		const win = BrowserWindow.fromWebContents(event.sender);
 		win?.close();
 	});
+
+	ipcMain.handle("restart-ui", async () => {
+		logger.ipcReceived("restart-ui");
+		await socketClient.send("restart-ui");
+		app.quit();
+	});
 }

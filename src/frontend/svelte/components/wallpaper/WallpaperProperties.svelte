@@ -12,7 +12,7 @@
 	import Range from '../ui/Range.svelte';
 
 	export let wallpaperId: string;
-	export let textColor: string = '#fff';
+	export let textColor: string = 'var(--text-color)';
 	export let palette: [number, number, number][] = [];
 
 	let properties: WallpaperProperty[] = [];

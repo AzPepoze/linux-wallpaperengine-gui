@@ -31,6 +31,18 @@ func HandleSystem(req models.Request, encoder *json.Encoder, cleanup func()) mod
 		} else {
 			res.Result = map[string]string{"status": "already_running"}
 		}
+	case "restart-ui":
+		res.Result = "ok"
+		if err := encoder.Encode(res); err != nil {
+			logger.Println("Encode error during restart-ui:", err)
+		}
+		go func() {
+			// Give the frontend time to exit gracefully, or kill it if it doesn't
+			time.Sleep(500 * time.Millisecond)
+			electron.Stop()
+			time.Sleep(500 * time.Millisecond)
+			electron.Start()
+		}()
 	}
 
 	return res

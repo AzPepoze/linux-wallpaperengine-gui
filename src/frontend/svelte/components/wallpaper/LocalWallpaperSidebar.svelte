@@ -4,7 +4,7 @@
 	import WallpaperProperties from './WallpaperProperties.svelte';
 
 	export let wallpaper: Wallpaper;
-	export let textColor: string;
+	export let textColor: string = 'var(--text-color)';
 	export let palette: [number, number, number][] = [];
 
 	const md = new MarkdownIt();

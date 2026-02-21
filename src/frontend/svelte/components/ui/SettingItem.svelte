@@ -24,6 +24,7 @@
 	</div>
 </div>
 
+<!-- This fixes the unclosed tags in the original source -->
 <style lang="scss">
 	.setting-item {
 		display: flex;
@@ -43,12 +44,13 @@
 				gap: 20px;
 
 				.info {
-					flex: 1;
+					flex: 0 1 auto;
 				}
 
 				.control {
 					justify-content: flex-end;
 					flex: 0 0 auto;
+					margin-left: auto;
 				}
 			}
 		}
@@ -105,8 +107,8 @@
 			display: flex;
 			align-items: center;
 			justify-content: flex-start;
-			min-width: 140px;
-			flex: 1;
+			min-width: 0;
+			flex: 0 0 auto;
 		}
 	}
 

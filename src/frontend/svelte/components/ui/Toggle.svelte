@@ -51,7 +51,7 @@
 			width: 18px;
 			left: 2px;
 			bottom: 2px;
-			background-color: #fff;
+			background-color: var(--text-color);
 			transition: var(--transition-slow);
 			border-radius: 50%;
 			box-shadow: var(--shadow-sm);
@@ -68,7 +68,7 @@
 	}
 
 	input:focus + .slider {
-		box-shadow: 0 0 0 2px rgba(0, 123, 255, 0.25);
+		box-shadow: 0 0 0 2px var(--focus-ring);
 	}
 
 	.toggle-switch:hover .slider {

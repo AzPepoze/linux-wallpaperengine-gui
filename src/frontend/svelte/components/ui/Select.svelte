@@ -128,7 +128,7 @@
 		&.active {
 			border-color: var(--btn-primary-bg);
 			background-color: var(--bg-surface-active);
-			box-shadow: 0 0 0 3px rgba(0, 123, 255, 0.15);
+			box-shadow: 0 0 0 3px var(--focus-ring-light);
 		}
 
 		.label {
@@ -192,7 +192,7 @@
 		}
 
 		&.selected {
-			background: rgba(0, 123, 255, 0.1);
+			background: var(--bg-primary-translucent);
 			color: var(--btn-primary-bg);
 			opacity: 1;
 			font-weight: 600;

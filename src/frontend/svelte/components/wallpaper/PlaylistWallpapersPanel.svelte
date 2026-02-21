@@ -194,8 +194,8 @@
 					border: 2px solid var(--playlist-highlight-border);
 					padding: 5px;
 					text-align: center;
-					color: #fff;
-					background-color: black;
+					color: var(--text-color);
+					background-color: var(--text-inverse);
 					font-size: 0.8em;
 					white-space: nowrap;
 					overflow: hidden;
@@ -212,8 +212,8 @@
 				position: absolute;
 				top: 4px;
 				right: 4px;
-				background: rgba(0, 0, 0, 0.6);
-				color: white;
+				background: var(--badge-bg);
+				color: var(--text-color);
 				border: none;
 				border-radius: 50%;
 				width: 24px;
@@ -227,7 +227,7 @@
 
 				&:hover {
 					opacity: 1;
-					background: #ff4c4c;
+					background: var(--error-bg);
 					transform: scale(1.1);
 				}
 			}
