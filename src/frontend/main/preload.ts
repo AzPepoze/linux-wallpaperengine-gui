@@ -35,6 +35,7 @@ contextBridge.exposeInMainWorld("electronAPI", {
 	writeFile: createInvokeMethod("fs-write-file"),
 	readBinaryFile: createInvokeMethod("fs-read-binary"),
 	fsExists: createInvokeMethod("fs-exists"),
+	getDirectorySize: createInvokeMethod("get-directory-size"),
 
 	// Config services
 	getConfig: createInvokeMethod("get-config"),
@@ -73,6 +74,15 @@ contextBridge.exposeInMainWorld("electronAPI", {
 	getUGCFileDetails: createInvokeMethod("get-ugc-file-details"),
 	queryWorkshopFiles: createInvokeMethod("query-workshop-files"),
 	fetchImage: createInvokeMethod("fetch-image"),
+	subscribeWorkshopItem: createInvokeMethod("subscribe-workshop-item"),
+	unsubscribeWorkshopItem: createInvokeMethod("unsubscribe-workshop-item"),
+	getWorkshopItemDownloadInfo: createInvokeMethod(
+		"get-workshop-item-download-info",
+	),
+	getWorkshopItemInstallInfo: createInvokeMethod(
+		"get-workshop-item-install-info",
+	),
+	isSteamRunning: createInvokeMethod("is-steam-running"),
 
 	// Filter services
 	getInstalledFilters: createInvokeMethod("get-installed-filters"),

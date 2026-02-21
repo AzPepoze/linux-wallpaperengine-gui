@@ -57,7 +57,6 @@ export type AppConfig = {
 	dumpStructure?: boolean;
 	playlist?: string;
 	playlistInterval?: number;
-	steamApiKey?: string;
 	nativeWayland?: boolean;
 	dynamicUiTheme?: boolean;
 	dynamicSidebarTheme?: boolean;
@@ -115,4 +114,19 @@ export interface FilterConfig {
 	type: string;
 	typetags: Record<string, boolean>;
 	utilitytags: Record<string, boolean>;
+}
+
+export interface WorkshopQueryOptions {
+	query_type?: number;
+	page?: number;
+	cursor?: string;
+	numperpage?: number;
+	requiredtags?: string[];
+	excludedtags?: string[];
+	match_all_tags?: boolean;
+	search_text?: string;
+	return_details?: boolean;
+	return_tags?: boolean;
+	return_previews?: boolean;
+	item_type?: number;
 }

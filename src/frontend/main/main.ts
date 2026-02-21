@@ -12,6 +12,7 @@ import { registerFileService } from "./services/fileService";
 import { registerSystemService } from "./services/systemService";
 import { setMainWindow, logger } from "./logger";
 import { registerWorkshopService } from "./services/workshopService";
+import { registerImageService } from "./services/imageService";
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
@@ -178,6 +179,7 @@ app.whenReady().then(async () => {
 	registerFileService();
 	registerSystemService();
 	registerWorkshopService();
+	registerImageService();
 
 	protocol.handle("wallpaper", async (request) => {
 		const url = request.url.replace("wallpaper://", "");

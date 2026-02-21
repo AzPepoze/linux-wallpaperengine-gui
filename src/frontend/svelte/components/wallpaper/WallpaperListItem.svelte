@@ -6,6 +6,14 @@
 	} from '../../../shared/types';
 	import { formatBytes, formatDate } from '../../utils/formatHelper';
 	import DownloadIcon from '../../icons/DownloadIcon.svelte';
+	import CheckIcon from '../../icons/CheckIcon.svelte';
+	import {
+		downloadStatus,
+		downloadProgress,
+		subscribe
+	} from '../../scripts/workshop';
+	import { fade, scale } from 'svelte/transition';
+	import { backOut } from 'svelte/easing';
 
 	export let folderName: string;
 	export let wallpaper: WallpaperData;
@@ -22,6 +30,17 @@
 	$: inPlaylist =
 		activePlaylist?.items.some((item) => item.includes(folderName)) ||
 		false;
+
+	$: isDownloaded = $downloadStatus[folderName];
+	$: progress = $downloadProgress[folderName];
+	$: isDownloading = !!progress;
+	$: percent =
+		progress && progress.total > 0
+			? Math.round(
+					(Number(progress.current) / Number(progress.total)) *
+						100
+				)
+			: 0;
 </script>
 
 <!-- svelte-ignore a11y-click-events-have-key-events -->
@@ -30,8 +49,11 @@
 	class="item-container"
 	class:selected
 	class:in-playlist={inPlaylist}
+	class:is-downloaded={isWorkshop && isDownloaded}
 	on:click={() => onSelect(folderName, wallpaper)}
 	aria-pressed={selected}
+	in:scale={{ start: 0.95, duration: 200, easing: backOut }}
+	out:scale={{ start: 0.95, duration: 200, easing: backOut }}
 >
 	<div class="item-preview">
 		{#if wallpaper.previewPath}
@@ -43,6 +65,14 @@
 			/>
 		{:else}
 			<div class="placeholder"></div>
+		{/if}
+
+		{#if isWorkshop && isDownloaded}
+			<div class="downloaded-badge-overlay" in:fade>
+				<div class="badge-circle">
+					<CheckIcon width="14" height="14" strokeWidth="3" />
+				</div>
+			</div>
 		{/if}
 	</div>
 	<div class="item-info">
@@ -105,21 +135,62 @@
 	</div>
 	{#if isWorkshop}
 		<div class="actions">
-			<!-- svelte-ignore a11y-click-events-have-key-events -->
-			<!-- svelte-ignore a11y-no-static-element-interactions -->
-			<div
-				class="download-badge"
-				title="Download"
-				on:click|stopPropagation={() => {
-					if (wallpaper.projectData?.publishedfileid) {
-						window.electronAPI.openExternal(
-							`steam://url/CommunityFilePage/${wallpaper.projectData.publishedfileid}`
-						);
-					}
-				}}
-			>
-				<DownloadIcon width="20" height="20" />
-			</div>
+			{#if isDownloading && !isDownloaded}
+				<div
+					class="full-row-progress"
+					in:fade={{ duration: 300 }}
+					out:fade={{ duration: 300 }}
+				>
+					<div
+						class="progress-wave-bg"
+						style="height: {percent}%"
+					></div>
+					<div
+						class="center-pct"
+						in:scale={{
+							start: 0.8,
+							duration: 400,
+							delay: 100,
+							easing: backOut
+						}}
+						out:fade={{ duration: 300 }}
+					>
+						<span class="pct">{percent}%</span>
+						<span class="label">Downloading</span>
+					</div>
+					<div class="progress-overlay"></div>
+				</div>
+			{:else if isDownloaded}
+				<div
+					class="downloaded-check"
+					in:scale={{
+						start: 0.8,
+						duration: 300,
+						easing: backOut
+					}}
+				>
+					<CheckIcon width="20" height="20" strokeWidth="3" />
+				</div>
+			{:else}
+				<div
+					role="button"
+					tabindex="0"
+					class="download-badge"
+					title="Download"
+					on:click|stopPropagation={async () => {
+						try {
+							await subscribe(folderName);
+						} catch (e) {}
+					}}
+					on:keydown|stopPropagation={(e) => {
+						if (e.key === 'Enter' || e.key === ' ') {
+							subscribe(folderName);
+						}
+					}}
+				>
+					<DownloadIcon width="20" height="20" />
+				</div>
+			{/if}
 		</div>
 	{/if}
 </button>
@@ -157,10 +228,19 @@
 			border-color: var(--border-color-hover);
 		}
 
+		&:active {
+			transform: scale(0.98) translateX(4px);
+		}
+
 		&.selected {
 			border-color: var(--btn-primary-bg);
 			background: var(--bg-primary-translucent);
 			box-shadow: var(--shadow-sm);
+		}
+
+		&.is-downloaded {
+			border-color: #4caf50;
+			box-shadow: 0 0 10px rgba(76, 175, 80, 0.3);
 		}
 
 		&.in-playlist {
@@ -317,6 +397,119 @@
 					background: var(--btn-primary-bg);
 					transform: scale(1.1);
 				}
+			}
+
+			.full-row-progress {
+				position: absolute;
+				inset: 0;
+				z-index: 3;
+				pointer-events: none;
+				border-radius: var(--radius-lg);
+				overflow: hidden;
+				display: flex;
+				align-items: center;
+				justify-content: center;
+
+				.progress-wave-bg {
+					position: absolute;
+					bottom: 0;
+					left: 0;
+					width: 100%;
+					background: var(--btn-primary-bg);
+					opacity: 0.85;
+					transition: height 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+					z-index: 1;
+
+					&::before {
+						content: '';
+						position: absolute;
+						top: -15px;
+						left: 0;
+						width: 200%;
+						height: 20px;
+						background: var(--btn-primary-bg);
+						opacity: 1;
+						mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 1200 120' preserveAspectRatio='none'%3E%3Cpath d='M321.39,56.44c58-10.79,114.16-30.13,172-41.86,82.39-16.72,168.19-17.73,250.45-.39C823.78,31,906.67,72,985.66,92.83c70.05,18.48,146.53,26.09,214.34,3V0H0V27.35A600.21,600.21,0,0,0,321.39,56.44Z'/%3E%3C/svg%3E");
+						mask-size: 100% 100%;
+						animation: wave-anim-list 3s linear infinite;
+						transform: scaleY(
+							-1
+						); // Re-applied flip for "upside down" peaks
+					}
+				}
+
+				.center-pct {
+					position: relative;
+					z-index: 4;
+					display: flex;
+					flex-direction: column;
+					align-items: center;
+					gap: 2px;
+					color: white;
+					text-shadow: 0 2px 8px rgba(0, 0, 0, 0.8);
+
+					.pct {
+						font-size: 1.5rem;
+						font-weight: 900;
+						line-height: 1;
+					}
+
+					.label {
+						font-size: 0.6rem;
+						text-transform: uppercase;
+						letter-spacing: 1px;
+						font-weight: 700;
+						opacity: 0.9;
+					}
+				}
+
+				.progress-overlay {
+					position: absolute;
+					inset: 0;
+					background: linear-gradient(
+						to right,
+						rgba(0, 0, 0, 0.3) 0%,
+						transparent 100%
+					);
+					z-index: 2;
+				}
+			}
+
+			.downloaded-check {
+				color: #4caf50;
+				display: flex;
+				align-items: center;
+				justify-content: center;
+				padding: 8px;
+			}
+		}
+
+		.downloaded-badge-overlay {
+			position: absolute;
+			top: 4px;
+			right: 4px;
+			z-index: 5;
+
+			.badge-circle {
+				width: 22px;
+				height: 22px;
+				border-radius: 50%;
+				background: #4caf50;
+				color: white;
+				display: flex;
+				align-items: center;
+				justify-content: center;
+				box-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+				border: 1.5px solid white;
+			}
+		}
+
+		@keyframes wave-anim-list {
+			from {
+				transform: translateX(0);
+			}
+			to {
+				transform: translateX(-50%);
 			}
 		}
 	}

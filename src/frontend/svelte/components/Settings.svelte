@@ -8,6 +8,7 @@
 		validateBinaryFile,
 		showToast
 	} from '../scripts/settings';
+	import { WORKSHOP_CONTENT_SUFFIX } from '../../shared/constants';
 
 	import SettingsSection from './settings/SettingsSection.svelte';
 	import SettingItem from './ui/SettingItem.svelte';
@@ -46,11 +47,6 @@
 			id: 'executable',
 			label: 'Linux Wallpaper Engine',
 			icon: FolderIcon
-		},
-		{
-			id: 'steam',
-			label: 'Steam Workshop',
-			icon: SettingIcon
 		}
 	];
 
@@ -532,7 +528,7 @@
 						label="Wallpaper Engine Directory"
 						id="wallpaperEngineDir"
 						vertical
-						description="Path to your Steam Workshop content (e.g. steamapps/workshop/content/431960). Leave empty to use auto-detect."
+						description="Path to your Steam Workshop content (e.g. {WORKSHOP_CONTENT_SUFFIX}). Leave empty to use auto-detect."
 					>
 						<Browse
 							bind:location={
@@ -543,64 +539,6 @@
 							placeholder="Path to wallpaper engine workshop directory..."
 						/>
 					</SettingItem>
-				</SettingsSection>
-
-				<div class="divider"></div>
-
-				<SettingsSection
-					title="Steam Workshop"
-					id="steam"
-					description="Configure Steam Workshop access for the wallpaper browser."
-				>
-					<div data-section="steam-api-key">
-						<SettingItem
-							label="Steam API Key"
-							id="steamApiKey"
-							vertical
-							description="Your Steam Web API key for accessing workshop content. Get one at https://steamcommunity.com/dev/registerkey"
-						>
-							<Input
-								type="password"
-								id="steamApiKey"
-								bind:value={$settingsStore.steamApiKey}
-								placeholder="Enter your Steam API key..."
-							/>
-							<div class="doc-actions">
-								<Button
-									variant="ghost"
-									on:click={() =>
-										window.electronAPI.openExternal(
-											'https://steamcommunity.com/dev/registerkey'
-										)}
-								>
-									<svg
-										width="14"
-										height="14"
-										viewBox="0 0 24 24"
-										fill="none"
-										stroke="currentColor"
-										stroke-width="2"
-										stroke-linecap="round"
-										stroke-linejoin="round"
-									>
-										<path
-											d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"
-										/>
-										<polyline
-											points="15 3 21 3 21 9"
-										/>
-										<line
-											x1="10"
-											y1="14"
-											x2="21"
-											y2="3"
-										/>
-									</svg>
-									Get Steam API Key
-								</Button>
-							</div>
-						</SettingItem>
-					</div>
 				</SettingsSection>
 			</div>
 		{:else}
@@ -739,14 +677,6 @@
 		font-size: 0.9em;
 		cursor: pointer;
 		transition: var(--transition-base);
-
-		&.primary {
-			background: var(--btn-primary-bg);
-			color: var(--text-color);
-			&:hover {
-				filter: brightness(1.1);
-			}
-		}
 
 		&.secondary {
 			background: var(--bg-surface);

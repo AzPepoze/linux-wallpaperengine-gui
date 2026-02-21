@@ -20,7 +20,7 @@
      --bg-surface-active: rgba(255, 255, 255, 0.08);
 
      /* Overlays & Modals */
-     --bg-dropdown: #1e1e1e;
+     --bg-dropdown: color-mix(in srgb, var(--bg-app), black 20%);
      --bg-modal: rgba(20, 20, 20, 0.5);
      --top-bar-bg: rgba(0, 0, 0, 0.3);
 

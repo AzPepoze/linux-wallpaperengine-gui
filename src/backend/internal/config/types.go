@@ -54,7 +54,6 @@ type AppConfig struct {
 	GlobalWallpaper          *string        `json:"globalWallpaper,omitempty"`
 	CustomExecutableLocation string         `json:"customExecutableLocation,omitempty"`
 	WallpaperEngineDir       string         `json:"wallpaperEngineDir,omitempty"`
-	SteamApiKey              string         `json:"steamApiKey,omitempty"`
 	NativeWayland            bool           `json:"nativeWayland,omitempty"`
 	DynamicUiTheme           bool           `json:"dynamicUiTheme"`
 	DynamicSidebarTheme      bool           `json:"dynamicSidebarTheme"`

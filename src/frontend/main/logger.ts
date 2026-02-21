@@ -53,6 +53,14 @@ export const logger = {
 		logToFrontend({ type: "wallpaper", showLog: false, data: args });
 	},
 
+	warn: (...args: any[]) => {
+		logToFrontend({
+			type: "electron",
+			showLog: true,
+			data: ["Warning:", ...args],
+		});
+	},
+
 	error: (...args: any[]) => {
 		logToFrontend({
 			type: "error",

@@ -18,12 +18,15 @@
 	export const onOpenBrowseWithFilters: () => void = () => {};
 	export let autoLoad: boolean = true;
 	export let browseCursor: string | null = null;
+	export let infiniteScroll: boolean = false;
 
 	let viewMode: 'grid' | 'list' = 'grid';
 	let contentElement: HTMLElement;
 	let selectedWorkshopData: WallpaperData | null = null;
 	let selectedItemId: string | null = null;
 	let currentPageNum: number = 0;
+	let observer: IntersectionObserver;
+	let sentinel: HTMLElement;
 
 	function handleItemSelect(
 		folderName: string,
@@ -43,12 +46,45 @@
 		selectedItemId = null;
 	}
 
-
 	function handlePageChange(page: number) {
 		currentPageNum = page;
 		onLoadBrowseItems(page);
-		selectedWorkshopData = null;
-		selectedItemId = null;
+		if (!infiniteScroll) {
+			selectedWorkshopData = null;
+			selectedItemId = null;
+		}
+	}
+
+	function setupObserver() {
+		if (observer) observer.disconnect();
+		if (!sentinel || !contentElement || !infiniteScroll) return;
+
+		observer = new IntersectionObserver(
+			(entries) => {
+				if (
+					entries[0].isIntersecting &&
+					!browseLoading &&
+					browseItems.length > 0 &&
+					browseItems.length < totalItems
+				) {
+					handlePageChange(currentPageNum + 1);
+				}
+			},
+			{
+				root: contentElement,
+				rootMargin: '200px',
+				threshold: 0
+			}
+		);
+		observer.observe(sentinel);
+	}
+
+	$: if (sentinel && contentElement && infiniteScroll) {
+		setupObserver();
+	}
+
+	$: if (!infiniteScroll && observer) {
+		observer.disconnect();
 	}
 
 	$: selectedWallpaper =
@@ -64,9 +100,26 @@
 		closeSidebar();
 	}
 
-	// Scroll to top when items finish loading
-	$: if (!browseLoading && browseItems.length > 0) {
-		if (contentElement) {
+	let lastScrollTop = 0;
+	let isAppending = false;
+
+	// Capture scroll before items are appended
+	$: if (browseLoading && infiniteScroll && contentElement) {
+		lastScrollTop = contentElement.scrollTop;
+		isAppending = true;
+	}
+
+	// Restore scroll after items finish loading
+	$: if (!browseLoading && isAppending && contentElement) {
+		requestAnimationFrame(() => {
+			contentElement.scrollTop = lastScrollTop;
+			isAppending = false;
+		});
+	}
+
+	// Scroll to top when items finish loading (only if NOT infinite scroll OR first page)
+	$: if (!browseLoading && browseItems.length > 0 && !isAppending) {
+		if (contentElement && (!infiniteScroll || currentPageNum === 0)) {
 			contentElement.scrollTop = 0;
 		}
 	}
@@ -78,11 +131,17 @@
 			onLoadBrowseItems(0);
 		}
 	});
+
+	$: transitionIn = infiniteScroll
+		? { duration: 0 }
+		: { y: 20, duration: 400, delay: 100 };
+	$: transitionOut = infiniteScroll
+		? { duration: 0 }
+		: { y: -20, duration: 200 };
 </script>
 
 <div class="browse-tab">
 	<div class="browse-layout">
-
 		<div class="browse-content">
 			<div class="toolbar">
 				<div class="left-actions">
@@ -96,22 +155,26 @@
 			</div>
 
 			<div class="scroll-container" bind:this={contentElement}>
-				{#if browseLoading}
+				{#if browseLoading && (browseItems.length === 0 || !infiniteScroll)}
 					<div
 						class="loading"
 						in:fade={{ duration: 200 }}
 						out:fade={{ duration: 200 }}
 					>
 						<div class="spinner"></div>
-						<p>Page {currentPageNum + 1}</p>
+						<p>
+							{browseItems.length === 0
+								? 'Searching Workshop...'
+								: `Loading Page ${currentPageNum + 1}...`}
+						</p>
 					</div>
 				{/if}
 
-				{#if !browseLoading && browseItems.length > 0}
+				{#if browseItems.length > 0 && (!browseLoading || infiniteScroll)}
 					<div
 						class="results-container"
-						in:fly={{ y: 20, duration: 400, delay: 100 }}
-						out:fly={{ y: -20, duration: 200 }}
+						in:fly={transitionIn}
+						out:fly={transitionOut}
 					>
 						{#if viewMode === 'grid'}
 							<WallpaperItemGrid
@@ -132,11 +195,22 @@
 								isWorkshop={true}
 							/>
 						{/if}
+
+						{#if infiniteScroll}
+							<div bind:this={sentinel} class="sentinel">
+								{#if browseLoading}
+									<div class="mini-spinner"></div>
+									<span class="loading-text"
+										>Loading more...</span
+									>
+								{/if}
+							</div>
+						{/if}
 					</div>
 				{/if}
 			</div>
 
-			{#if browseItems.length > 0}
+			{#if browseItems.length > 0 && !infiniteScroll}
 				<BrowsePagination
 					currentPage={currentPageNum}
 					{totalItems}
@@ -258,6 +332,27 @@
 						flex: 1;
 						display: flex;
 						flex-direction: column;
+
+						.sentinel {
+							height: 60px;
+							display: flex;
+							align-items: center;
+							justify-content: center;
+							width: 100%;
+							margin-top: 10px;
+							gap: 12px;
+							color: var(--text-muted);
+							font-size: 0.9rem;
+
+							.mini-spinner {
+								width: 20px;
+								height: 20px;
+								border: 2px solid var(--border-color);
+								border-top-color: var(--btn-primary-bg);
+								border-radius: 50%;
+								animation: spin 0.8s linear infinite;
+							}
+						}
 					}
 				}
 			}

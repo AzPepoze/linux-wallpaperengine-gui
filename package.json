@@ -21,25 +21,26 @@
           "check:backend": "tsx utils/check.ts --backend"
      },
      "devDependencies": {
-          "@sveltejs/vite-plugin-svelte": "^6.2.4",
-          "@tsconfig/svelte": "^5.0.7",
-          "@types/colorthief": "^2.6.1",
-          "@types/markdown-it": "^14.1.2",
-          "@types/node": "^25.2.3",
-          "electron": "^40.4.1",
-          "electron-builder": "^26.7.0",
-          "markdown-it": "^14.1.1",
-          "sass": "^1.97.3",
-          "svelte": "^5.51.0",
-          "svelte-check": "^4.4.0",
-          "tsx": "^4.21.0",
-          "typescript": "~5.9.3",
-          "vite": "^7.3.1",
-          "vite-plugin-electron": "^0.29.0",
-          "vite-plugin-electron-renderer": "^0.14.6"
-     },
+           "@sveltejs/vite-plugin-svelte": "^6.2.4",
+           "@tsconfig/svelte": "^5.0.7",
+           "@types/colorthief": "^2.6.1",
+           "@types/markdown-it": "^14.1.2",
+           "@types/node": "^25.2.3",
+           "electron": "^40.4.1",
+           "electron-builder": "^26.7.0",
+           "markdown-it": "^14.1.1",
+           "sass": "^1.97.3",
+           "svelte": "^5.51.0",
+           "svelte-check": "^4.4.0",
+           "tsx": "^4.21.0",
+           "typescript": "~5.9.3",
+           "vite": "^7.3.1",
+           "vite-plugin-electron": "^0.29.0",
+           "vite-plugin-electron-renderer": "^0.14.6"
+      },
      "dependencies": {
-          "colorthief": "^2.6.0"
+          "colorthief": "^2.6.0",
+          "steamworks.js": "^0.4.0"
      },
      "pnpm": {
           "onlyBuiltDependencies": [

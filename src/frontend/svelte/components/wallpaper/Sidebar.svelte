@@ -8,11 +8,19 @@
 	import { settingsStore } from '../../scripts/settings';
 	import { sidebarWidth } from '../../scripts/ui';
 	import { onDestroy } from 'svelte';
+	import { logger } from '../../scripts/logger';
 	import WorkshopItemSidebar from './WorkshopItemSidebar.svelte';
 	import LocalWallpaperSidebar from './LocalWallpaperSidebar.svelte';
 	import type { Wallpaper } from '../../../shared/types';
 	import DownloadIcon from '../../icons/DownloadIcon.svelte';
 	import WorkshopIcon from '../../icons/WorkshopIcon.svelte';
+	import {
+		isDownloaded as checkIsDownloaded,
+		subscribe,
+		unsubscribe,
+		downloadProgress,
+		downloadStatus
+	} from '../../scripts/workshop';
 
 	export let selectedWallpaper: Wallpaper | null = null;
 	export let onClose: () => void = () => {};
@@ -26,6 +34,8 @@
 	let btnPrimaryTextColor = 'rgba(255, 255, 255, 0.87)';
 	let dominantColorArray: [number, number, number] | null = null;
 	let accentColor: [number, number, number] | null = null;
+	$: isDownloaded =
+		selectedWallpaper && $downloadStatus[selectedWallpaper.folderName];
 
 	$: {
 		if (
@@ -94,13 +104,53 @@
 	}
 
 	let lastWallpaperId: string | null = null;
+	let calculatedFileSize: number | null = null;
+
+	async function resolveFileSize(wallpaper: Wallpaper) {
+		const isWorkshop = wallpaper.projectData?.isWorkshop;
+		try {
+			if (!isWorkshop) {
+				const basePath =
+					await window.electronAPI.getWallpaperBasePath();
+				if (basePath) {
+					calculatedFileSize =
+						await window.electronAPI.getDirectorySize(
+							`${basePath}/${wallpaper.folderName}`
+						);
+				}
+			} else {
+				// Try Steam install info first (accurate for downloaded)
+				const info =
+					await window.electronAPI.getWorkshopItemInstallInfo(
+						wallpaper.folderName
+					);
+				if (info && info.sizeOnDisk) {
+					calculatedFileSize = Number(info.sizeOnDisk);
+				} else {
+					// Fallback to metadata
+					const it = wallpaper as any;
+					calculatedFileSize =
+						it.fileSize || it.file_size || null;
+				}
+			}
+		} catch (e) {
+			calculatedFileSize = null;
+		}
+	}
+
 	$: if (sidebarContentElement && selectedWallpaper) {
 		if (selectedWallpaper.folderName !== lastWallpaperId) {
 			sidebarContentElement.scrollTop = 0;
 			lastWallpaperId = selectedWallpaper.folderName;
+			calculatedFileSize = null; // Reset
+			resolveFileSize(selectedWallpaper);
+
+			// Trigger a background check to populate the store if missing
+			if (selectedWallpaper.projectData?.isWorkshop) {
+				checkIsDownloaded(selectedWallpaper.folderName);
+			}
 		}
 	}
-
 	function close() {
 		onClose();
 	}
@@ -175,29 +225,109 @@
 			class="workshop-btn"
 			on:click={() => {
 				const url = `steam://url/CommunityFilePage/${selectedWallpaper?.folderName}`;
-				if (url) {
-					window.electronAPI.openExternal(url);
-					console.log('Opening URL:', url);
-				}
+				window.electronAPI.openExternal(url);
 			}}
 		>
-			{#if selectedWallpaper?.projectData?.workshop_accepted === false}
-				<DownloadIcon width="18" height="18" />
-				Subscribe
-			{:else}
-				<WorkshopIcon width="18" height="18" />
-				View on Workshop
-			{/if}
+			<WorkshopIcon width="18" height="18" />
+			View on Workshop
 		</button>
 
 		{#if selectedWallpaper}
+			{#if !selectedWallpaper.projectData?.isWorkshop || (isDownloaded && !$downloadProgress[selectedWallpaper?.folderName || ''])}
+				<div class="workshop-actions">
+					<button
+						type="button"
+						class="workshop-btn unsubscribe-btn"
+						on:click={async () => {
+							try {
+								await unsubscribe(
+									selectedWallpaper?.folderName || ''
+								);
+							} catch (e: any) {
+								logger.error(
+									'Unsubscription failed:',
+									e
+								);
+							}
+						}}
+					>
+						<DownloadIcon width="18" height="18" />
+						Unsubscribe
+					</button>
+				</div>
+			{/if}
+
 			{#if selectedWallpaper.projectData?.isWorkshop}
-				<WorkshopItemSidebar wallpaper={selectedWallpaper} />
+				<div class="workshop-actions">
+					{#if !isDownloaded || $downloadProgress[selectedWallpaper?.folderName || '']}
+						<button
+							type="button"
+							class="workshop-btn"
+							class:downloading={$downloadProgress[
+								selectedWallpaper?.folderName || ''
+							]}
+							on:click={async () => {
+								try {
+									await subscribe(
+										selectedWallpaper?.folderName ||
+											''
+									);
+								} catch (e: any) {
+									logger.error(
+										'Subscription failed:',
+										e
+									);
+								}
+							}}
+						>
+							{#if $downloadProgress[selectedWallpaper?.folderName || '']}
+								{@const progress =
+									$downloadProgress[
+										selectedWallpaper?.folderName ||
+											''
+									]}
+								{@const percent =
+									progress.total > 0
+										? Math.round(
+												(Number(
+													progress.current
+												) /
+													Number(
+														progress.total
+													)) *
+													100
+											)
+										: 0}
+								<div
+									class="progress-cool"
+									style="width: {percent}%"
+								>
+									<div class="progress-glow"></div>
+									<div
+										class="progress-shimmer"
+									></div>
+								</div>
+								<span class="progress-text"
+									>Downloading {percent}%</span
+								>
+							{:else}
+								<DownloadIcon width="18" height="18" />
+								Subscribe
+							{/if}
+						</button>
+					{/if}
+				</div>
+
+				<WorkshopItemSidebar
+					wallpaper={selectedWallpaper}
+					fileSize={calculatedFileSize}
+				/>
 			{:else}
 				<LocalWallpaperSidebar
 					wallpaper={selectedWallpaper}
 					{textColor}
 					{palette}
+					fileSize={calculatedFileSize}
 				/>
 			{/if}
 		{/if}
@@ -368,8 +498,73 @@
 			}
 		}
 
-		.workshop-btn {
+		.workshop-actions {
+			display: flex;
+			flex-direction: column;
+			gap: 8px;
 			margin-block: 10px;
+			width: 100%;
+
+			.workshop-btn {
+				margin-block: 0;
+				width: 100%;
+				position: relative;
+				overflow: hidden;
+
+				&.downloading {
+					background-color: var(--btn-secondary-bg);
+					cursor: wait;
+				}
+
+				.progress-cool {
+					position: absolute;
+					left: 0;
+					top: 0;
+					bottom: 0;
+					background-color: var(--btn-primary-bg);
+					transition: width 0.4s cubic-bezier(0.1, 0.7, 1, 0.1);
+					z-index: 1;
+					box-shadow: 2px 0 10px var(--btn-primary-bg);
+
+					.progress-glow {
+						position: absolute;
+						right: -2px;
+						top: 0;
+						bottom: 0;
+						width: 4px;
+						background: white;
+						box-shadow:
+							0 0 15px white,
+							0 0 5px white;
+						opacity: 0.8;
+					}
+
+					.progress-shimmer {
+						position: absolute;
+						inset: 0;
+						background: linear-gradient(
+							90deg,
+							transparent,
+							rgba(255, 255, 255, 0.2),
+							transparent
+						);
+						background-size: 200% 100%;
+						animation: shimmer-anim 1.5s infinite linear;
+					}
+				}
+
+				.progress-text {
+					position: relative;
+					z-index: 2;
+					font-weight: 800;
+					text-shadow: 0 1px 3px rgba(0, 0, 0, 0.6);
+				}
+
+				:global(svg) {
+					position: relative;
+					z-index: 2;
+				}
+			}
 		}
 
 		&.open {
@@ -444,6 +639,15 @@
 				);
 				transform: translateY(-2px);
 			}
+		}
+	}
+
+	@keyframes shimmer-anim {
+		from {
+			background-position: -200% 0;
+		}
+		to {
+			background-position: 200% 0;
 		}
 	}
 </style>
