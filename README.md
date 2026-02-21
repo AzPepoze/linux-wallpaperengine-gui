@@ -144,7 +144,7 @@ linux-wallpaperengine-gui [options]
 **Requirements:**
 
 - [Go](https://golang.org/) (1.21+)
-- [Node.js](https://nodejs.org/) & [pnpm](https://pnpm.io/)
+- [bun](https://bun.sh/)
 
 1. **Clone & Enter:**
 
@@ -155,12 +155,12 @@ linux-wallpaperengine-gui [options]
 2. **Install Deps:**
 
    ```bash
-   pnpm install
+   bun install
    ```
 3. **Build:**
 
    ```bash
-   pnpm run build
+   bun run build
    ```
 
    The output will be in the `dist` directory.
@@ -170,7 +170,7 @@ linux-wallpaperengine-gui [options]
 Run with hot-reloading:
 
 ```bash
-pnpm run dev
+bun run dev
 ```
 
 ## CONTRIBUTING
