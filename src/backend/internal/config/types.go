@@ -3,7 +3,7 @@ package config
 type ScreenConfig struct {
 	Name             string  `json:"name"`
 	Wallpaper        *string `json:"wallpaper"`
-	Playlist         string  `json:"playlist,omitempty"`
+	Playlist         string  `json:"playlist"`
 	PlaylistInterval float64 `json:"playlistInterval,omitempty"`
 }
 
@@ -21,7 +21,7 @@ type AppConfig struct {
 	// Display & Rendering
 	Scaling          string  `json:"scaling,omitempty"`
 	Clamping         string  `json:"clamping,omitempty"`
-	Playlist         string  `json:"playlist,omitempty"`
+	Playlist         string  `json:"playlist"`
 	PlaylistInterval float64 `json:"playlistInterval,omitempty"`
 
 	// Audio Settings

@@ -72,4 +72,10 @@ contextBridge.exposeInMainWorld("electronAPI", {
 	getUGCFileDetails: createInvokeMethod("get-ugc-file-details"),
 	queryWorkshopFiles: createInvokeMethod("query-workshop-files"),
 	fetchImage: createInvokeMethod("fetch-image"),
+
+	// Filter services
+	getInstalledFilters: createInvokeMethod("get-installed-filters"),
+	saveInstalledFilters: createInvokeMethod("save-installed-filters"),
+	getWorkshopFilters: createInvokeMethod("get-workshop-filters"),
+	saveWorkshopFilters: createInvokeMethod("save-workshop-filters"),
 });

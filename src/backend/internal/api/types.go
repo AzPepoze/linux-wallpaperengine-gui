@@ -1,20 +1,7 @@
 package api
 
-import "encoding/json"
+import "linux-wallpaperengine-gui/src/backend/internal/api/models"
 
-type Request struct {
-	ID     int             `json:"id"`
-	Method string          `json:"method"`
-	Params json.RawMessage `json:"params"`
-}
-
-type Response struct {
-	ID     int         `json:"id"`
-	Result interface{} `json:"result,omitempty"`
-	Error  string      `json:"error,omitempty"`
-}
-
-type Event struct {
-	Method string      `json:"method"`
-	Params interface{} `json:"params"`
-}
+type Request = models.Request
+type Response = models.Response
+type Event = models.Event

@@ -72,7 +72,7 @@
 	<div class="modal-header">
 		<h2>System Logs</h2>
 		<div class="header-actions">
-			<button class="clear-btn" on:click={() => logger.clearAll()}
+			<button class="clear-btn" onclick={() => logger.clearAll()}
 				>Clear Logs</button
 			>
 		</div>
@@ -83,7 +83,7 @@
 			<div
 				class="log-box"
 				bind:this={frontendLogContainer}
-				on:scroll={handleFrontendScroll}
+				onscroll={handleFrontendScroll}
 			>
 				{#each $frontendLogs as log}
 					<div class="log-entry">{log}</div>
@@ -95,7 +95,7 @@
 			<div
 				class="log-box"
 				bind:this={backendLogContainer}
-				on:scroll={handleBackendScroll}
+				onscroll={handleBackendScroll}
 			>
 				{#each $backendLogs as log}
 					<div class="log-entry">{log}</div>
@@ -107,7 +107,7 @@
 			<div
 				class="log-box"
 				bind:this={wallpaperLogContainer}
-				on:scroll={handleWallpaperScroll}
+				onscroll={handleWallpaperScroll}
 			>
 				{#each $wallpaperLogs as log}
 					<div class="log-entry">{log}</div>

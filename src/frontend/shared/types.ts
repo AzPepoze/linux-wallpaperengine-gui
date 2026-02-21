@@ -6,6 +6,8 @@ export type WallpaperProjectData = {
 	type: string;
 	tags?: string[];
 	workshopid?: string;
+	contentrating?: string;
+	approved?: boolean;
 	general?: {
 		properties?: Record<string, any>;
 	};
@@ -96,4 +98,17 @@ export interface Playlist {
 	name: string;
 	items: string[];
 	settings: PlaylistSettings;
+}
+
+export interface FilterConfig {
+	categorytags: Record<string, boolean>;
+	descending: boolean;
+	ratingtags: Record<string, boolean>;
+	resolutiontags: Record<string, boolean>;
+	sort: string;
+	sourcetags: Record<string, boolean>;
+	tags: Record<string, boolean>;
+	type: string;
+	typetags: Record<string, boolean>;
+	utilitytags: Record<string, boolean>;
 }

@@ -9,22 +9,14 @@
 	import type { WallpaperData, Wallpaper } from '../../../shared/types';
 	import WallpaperItemGrid from '../wallpaper/WallpaperItemGrid.svelte';
 	import WallpaperItemList from '../wallpaper/WallpaperItemList.svelte';
-	import BrowseFilters from './BrowseFilters.svelte';
 
-	interface FilterCategory {
-		name: string;
-		items: string[];
-	}
-
-	export let filterCategories: FilterCategory[] = [];
-	export let selectedFilters: Map<string, Set<string>> = new Map();
 	export let browseItems: WorkshopItem[] = [];
 	export let browseLoading: boolean = false;
 	export let totalItems: number = 0;
 
-	export let onToggleFilter: (category: string, filter: string) => void;
 	export let onLoadBrowseItems: (page: number) => void;
-	export let onOpenBrowseWithFilters: () => void;
+	export const onOpenBrowseWithFilters: () => void = () => {};
+	export let autoLoad: boolean = true;
 	export let browseCursor: string | null = null;
 
 	let viewMode: 'grid' | 'list' = 'grid';
@@ -51,23 +43,6 @@
 		selectedItemId = null;
 	}
 
-	function handleToggleFilter(category: string, filter: string) {
-		console.log(
-			'BrowseTab: handleToggleFilter called with:',
-			category,
-			filter
-		);
-		onToggleFilter(category, filter);
-		// Reset to first page when filter changes
-		currentPageNum = 0;
-		// Wait for state update before loading
-		setTimeout(() => {
-			console.log(
-				'BrowseTab: After state update, calling onLoadBrowseItems'
-			);
-			onLoadBrowseItems(0);
-		}, 0);
-	}
 
 	function handlePageChange(page: number) {
 		currentPageNum = page;
@@ -84,34 +59,29 @@
 				} as Wallpaper)
 			: null;
 
-	// Close sidebar when items finish loading and scroll to top
-	$: if (!browseLoading && browseItems.length > 0) {
+	// Close sidebar when loading starts
+	$: if (browseLoading) {
 		closeSidebar();
+	}
+
+	// Scroll to top when items finish loading
+	$: if (!browseLoading && browseItems.length > 0) {
 		if (contentElement) {
 			contentElement.scrollTop = 0;
 		}
 	}
 
 	onMount(() => {
-		// Load page 0
-		currentPageNum = 0;
-		onLoadBrowseItems(0);
+		if (autoLoad) {
+			// Load page 0
+			currentPageNum = 0;
+			onLoadBrowseItems(0);
+		}
 	});
 </script>
 
 <div class="browse-tab">
 	<div class="browse-layout">
-		<BrowseFilters
-			{filterCategories}
-			{selectedFilters}
-			onToggleFilter={handleToggleFilter}
-			onLoadItems={() => {
-				currentPageNum = 0;
-				setTimeout(() => onLoadBrowseItems(0), 0);
-			}}
-			onOpenInBrowser={onOpenBrowseWithFilters}
-			isLoading={browseLoading}
-		/>
 
 		<div class="browse-content">
 			<div class="toolbar">

@@ -5,6 +5,7 @@
 		Wallpaper,
 		Playlist
 	} from '../../../shared/types';
+	import Trophy from '../../icons/Trophy.svelte';
 
 	export let folderName: string;
 	export let wallpaper: WallpaperData;
@@ -51,6 +52,12 @@
 				out:fade={{ duration: fadeDuration }}
 			>
 				Loading...
+			</div>
+		{/if}
+
+		{#if wallpaper.projectData?.approved}
+			<div class="approved-badge" title="Approved Wallpaper">
+				<Trophy width="18" height="18" />
 			</div>
 		{/if}
 	</div>
@@ -172,6 +179,22 @@
 		&:hover .wallpaper-name {
 			opacity: 1;
 			bottom: 10px;
+		}
+
+		.approved-badge {
+			position: absolute;
+			top: 10px;
+			left: 10px;
+			z-index: 5;
+			background: rgba(0, 0, 0, 0.4);
+			padding: 4px;
+			border-radius: 8px;
+			display: flex;
+			align-items: center;
+			justify-content: center;
+			border: 1px solid rgba(190, 255, 178, 0.3);
+			pointer-events: none;
+			box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
 		}
 	}
 </style>

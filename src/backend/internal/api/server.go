@@ -3,6 +3,8 @@ package api
 import (
 	"encoding/json"
 	"io"
+	"linux-wallpaperengine-gui/src/backend/internal/api/handlers"
+	"linux-wallpaperengine-gui/src/backend/internal/api/models"
 	"linux-wallpaperengine-gui/src/backend/internal/logger"
 	"net"
 	"os"
@@ -18,12 +20,11 @@ var (
 func BroadcastEvent(method string, params interface{}) {
 	clientsMu.Lock()
 	defer clientsMu.Unlock()
-	event := Event{Method: method, Params: params}
+	event := models.Event{Method: method, Params: params}
 	for _, ch := range clients {
 		select {
 		case ch <- event:
 		default:
-			// Drop if channel is full
 		}
 	}
 }
@@ -98,7 +99,7 @@ func handleConnection(conn net.Conn, cleanup func()) {
 	logCh := logger.Subscribe()
 	go func() {
 		for entry := range logCh {
-			event := Event{
+			event := models.Event{
 				Method: "log",
 				Params: map[string]string{
 					"type":    entry.Type,
@@ -113,7 +114,7 @@ func handleConnection(conn net.Conn, cleanup func()) {
 	}()
 
 	for {
-		var req Request
+		var req models.Request
 		if err := decoder.Decode(&req); err != nil {
 			if err != io.EOF {
 				logger.Println("Decode error:", err)
@@ -123,7 +124,7 @@ func handleConnection(conn net.Conn, cleanup func()) {
 
 		logger.Printf("Received: %s (ID: %d)", req.Method, req.ID)
 
-		res := handleIPC(req, encoder, cleanup)
+		res := handlers.HandleIPC(req, encoder, cleanup)
 
 		if err := encoder.Encode(res); err != nil {
 			logger.Println("Encode error:", err)

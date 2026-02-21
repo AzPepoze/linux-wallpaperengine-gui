@@ -6,14 +6,16 @@ import (
 )
 
 type WallpaperProjectData struct {
-	Title       string                 `json:"title"`
-	Description string                 `json:"description,omitempty"`
-	File        string                 `json:"file"`
-	Preview     string                 `json:"preview"`
-	Type        string                 `json:"type"`
-	Tags        []string               `json:"tags,omitempty"`
-	WorkshopID  string                 `json:"workshopid,omitempty"`
-	General     map[string]interface{} `json:"general,omitempty"`
+	Title         string                 `json:"title"`
+	Description   string                 `json:"description,omitempty"`
+	File          string                 `json:"file"`
+	Preview       string                 `json:"preview"`
+	Type          string                 `json:"type"`
+	Tags          []string               `json:"tags,omitempty"`
+	WorkshopID    string                 `json:"workshopid,omitempty"`
+	ContentRating string                 `json:"contentrating,omitempty"`
+	Approved      bool                   `json:"approved,omitempty"`
+	General       map[string]interface{} `json:"general,omitempty"`
 }
 
 type WallpaperData struct {
@@ -107,9 +109,28 @@ type Playlist struct {
 	Settings PlaylistSettings `json:"settings"`
 }
 
+type FilterConfig struct {
+	CategoryTags   map[string]bool `json:"categorytags"`
+	Descending     bool            `json:"descending"`
+	RatingTags     map[string]bool `json:"ratingtags"`
+	ResolutionTags map[string]bool `json:"resolutiontags"`
+	Sort           string          `json:"sort"`
+	SourceTags     map[string]bool `json:"sourcetags"`
+	Tags           map[string]bool `json:"tags"`
+	Type           string          `json:"type"`
+	TypeTags       map[string]bool `json:"typetags"`
+	UtilityTags    map[string]bool `json:"utilitytags"`
+}
+
 type WallpaperEngineConfig struct {
 	SteamUser struct {
 		General struct {
+			Browser struct {
+				FilterInfo struct {
+					Installed FilterConfig `json:"installed"`
+					Workshop  FilterConfig `json:"workshop"`
+				} `json:"filterinfo"`
+			} `json:"browser"`
 			Playlists []Playlist `json:"playlists"`
 		} `json:"general"`
 	} `json:"steamuser"`

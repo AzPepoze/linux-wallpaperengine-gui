@@ -52,7 +52,7 @@ interface ElectronAPI {
 	saveWallpaperProperty: (id: string, key: string, value: string) => Promise<{ success: boolean; error?: string }>;
 
 	// Playlist management
-	getPlaylists: () => Promise<any>;
+	getPlaylists: () => Promise<{ success: boolean; playlists: any[]; error?: string }>;
 	startPlaylist: (playlistName: string, intervalMinutes: number, screenName?: string) => Promise<any>;
 	stopPlaylist: (screenName?: string) => Promise<any>;
 	updatePlaylistInterval: (playlistName: string, intervalMinutes: number, screenName?: string) => Promise<any>;
@@ -61,15 +61,7 @@ interface ElectronAPI {
 	deletePlaylist: (name: string) => Promise<any>;
 	updatePlaylistWallpapers: (name: string, items: string[]) => Promise<any>;
 
-	// Playlist management
-	getPlaylists: () => Promise<any>;
-	startPlaylist: (playlistName: string, intervalMinutes: number, screenName?: string) => Promise<any>;
-	stopPlaylist: (screenName?: string) => Promise<any>;
-	updatePlaylistInterval: (playlistName: string, intervalMinutes: number, screenName?: string) => Promise<any>;
-	createPlaylist: (name: string) => Promise<any>;
-	renamePlaylist: (oldName: string, newName: string) => Promise<any>;
-	deletePlaylist: (name: string) => Promise<any>;
-	updatePlaylistWallpapers: (name: string, items: string[]) => Promise<any>;
+	// Workshop
 	queryWorkshopFiles: (steamApiKey: string, options: {
 		query_type?: number;
 		page?: number;
@@ -81,6 +73,12 @@ interface ElectronAPI {
 		search_text?: string;
 	}) => Promise<{ items: any[]; total: number; nextCursor?: string }>;
 	fetchImage: (url: string) => Promise<string>;
+
+	// Steam Filters
+	getInstalledFilters: () => Promise<{ success: boolean; filters: FilterConfig; error?: string }>;
+	saveInstalledFilters: (filters: FilterConfig) => Promise<{ success: boolean; error?: string }>;
+	getWorkshopFilters: () => Promise<{ success: boolean; filters: FilterConfig; error?: string }>;
+	saveWorkshopFilters: (filters: FilterConfig) => Promise<{ success: boolean; error?: string }>;
 }
 
 interface Window {

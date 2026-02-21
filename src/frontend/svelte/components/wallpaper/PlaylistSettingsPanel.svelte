@@ -48,7 +48,7 @@
 					id="playlist-select"
 					bind:value={$settingsStore.playlist}
 					options={playlistOptions}
-					on:change={onChange}
+					onChange={onChange}
 				/>
 			{/if}
 		</div>

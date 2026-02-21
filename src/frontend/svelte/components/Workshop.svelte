@@ -5,116 +5,26 @@
 	import Input from './ui/Input.svelte';
 	import Button from './ui/Button.svelte';
 	import BrowseTab from './browse/BrowseTab.svelte';
+	import { logger } from '../scripts/logger';
 	import {
 		formatWorkshopItem,
 		isValidWorkshopItem,
 		type PublishedFileDetails,
 		type WorkshopItem
 	} from '../utils/workshopHelper';
+	import type { FilterConfig } from '../../shared/types';
+	import { filterCategories, mapCategoryToInternal } from '../../shared/filterConstants';
+	import FilterPanel from './browse/FilterPanel.svelte';
+	import FilterIcon from '../icons/FilterIcon.svelte';
+	import SearchIcon from '../icons/SearchIcon.svelte';
 
-	interface FilterCategory {
-		name: string;
-		items: string[];
-	}
-
+	let workshopFilters: FilterConfig | null = null;
+	let initialLoadDone = false;
+	let showFilterPanel = false;
 	let searching = false;
 	let searchText = '';
 	let steamApiKey = '';
 	let hasApiKey = false;
-
-	const filterCategories: FilterCategory[] = [
-		{
-			name: 'Type',
-			items: ['Scene', 'Video', 'Application', 'Web']
-		},
-		{
-			name: 'Genre',
-			items: [
-				'Abstract',
-				'Animal',
-				'Anime',
-				'Cartoon',
-				'CGI',
-				'Cyberpunk',
-				'Fantasy',
-				'Game',
-				'Girls',
-				'Guys',
-				'Landscape',
-				'Medieval',
-				'Memes',
-				'MMD',
-				'Music',
-				'Nature',
-				'Pixel art',
-				'Relaxing',
-				'Retro',
-				'Sci-Fi',
-				'Sports',
-				'Technology',
-				'Television',
-				'Vehicle',
-				'Unspecified'
-			]
-		},
-		{
-			name: 'Age Rating',
-			items: ['Everyone', 'Questionable', 'Mature']
-		},
-		{
-			name: 'Resolution',
-			items: [
-				'Standard Definition',
-				'1280 x 720',
-				'1366 x 768',
-				'1920 x 1080',
-				'2560 x 1440',
-				'3840 x 2160',
-				'Ultrawide Standard Definition',
-				'Ultrawide 2560 x 1080',
-				'Ultrawide 3440 x 1440',
-				'Dual Standard Definition',
-				'Dual 3840 x 1080',
-				'Dual 5120 x 1440',
-				'Dual 7680 x 2160',
-				'Triple Standard Definition',
-				'Triple 4096 x 768',
-				'Triple 5760 x 1080',
-				'Triple 7680 x 1440',
-				'Triple 11520 x 2160',
-				'Portrait Standard Definition',
-				'Portrait 720 x 1280',
-				'Portrait 1080 x 1920',
-				'Portrait 1440 x 2560',
-				'Portrait 2160 x 3840',
-				'Other resolution',
-				'Dynamic resolution'
-			]
-		},
-		{
-			name: 'Category',
-			items: ['Wallpaper', 'Preset', 'Asset']
-		},
-		{
-			name: 'Miscellaneous',
-			items: [
-				'Approved',
-				'Audio responsive',
-				'3D',
-				'Customizable',
-				'Puppet Warp',
-				'HDR',
-				'Media Integration',
-				'User Shortcut',
-				'Video Texture',
-				'Asset Pack'
-			]
-		}
-	];
-
-	let selectedFilters = new Map<string, Set<string>>([
-		['Age Rating', new Set(['Everyone'])]
-	]);
 	let browseItems: WorkshopItem[] = [];
 	let browseLoading = false;
 	let browseCursor: string | null = null;
@@ -126,28 +36,120 @@
 			steamApiKey = $settingsStore.steamApiKey;
 			hasApiKey = true;
 		}
+		await loadFilters();
+		// Re-trigger search after filters are loaded if it's the first time
+		if (!initialLoadDone && hasApiKey) {
+			initialLoadDone = true;
+			handleSearch();
+		}
 	});
 
-	async function handleSearch() {
-		if (!searchText.trim()) {
-			showToast('Please enter a search term', 'info');
-			return;
-		}
-
-		searching = true;
+	async function loadFilters() {
 		try {
-			// Collect all selected filters
-			const allFilters: string[] = [];
-			selectedFilters.forEach((filters) => {
-				allFilters.push(...Array.from(filters));
-			});
+			const result = await window.electronAPI.getWorkshopFilters();
+			if (result.success) {
+				workshopFilters = result.filters;
+			}
+		} catch (err) {
+			console.error('Failed to load filters:', err);
+		}
+	}
+
+	async function saveFilters(newConfig: FilterConfig) {
+		logger.log('Workshop: saveFilters called');
+		try {
+			const result = await window.electronAPI.saveWorkshopFilters(newConfig);
+			if (result.success) {
+				workshopFilters = newConfig;
+				showFilterPanel = false;
+				logger.log('Workshop: Filters applied and saved successfully');
+				// Reload items when filters change
+				handleSearch();
+			} else {
+				logger.error('Workshop: Failed to save filters - result was not success');
+			}
+		} catch (err) {
+			console.error('Failed to save filters:', err);
+			logger.error('Workshop: Exception in saveFilters:', err);
+		}
+	}
+
+	async function handleFilterChange(newConfig: FilterConfig) {
+		workshopFilters = newConfig;
+		// Just trigger search, don't save to backend every toggle to avoid excessive disk I/O
+		// We'll save when the user closes or manually hits apply if we kept it
+		// Actually, let's save too, it's just a JSON write.
+		try {
+			await window.electronAPI.saveWorkshopFilters(newConfig);
+			handleSearch();
+		} catch (err) {
+			console.error('Failed to save filters on change:', err);
+		}
+	}
+
+	function getSearchParameters(): { required: string[], excluded: string[] } {
+		if (!workshopFilters) return { required: [], excluded: [] };
+		
+		const required: string[] = [];
+		const excluded: string[] = [];
+		
+		const categoryMap: Record<string, string[]> = {};
+		filterCategories.forEach(cat => {
+			categoryMap[mapCategoryToInternal(cat.name)] = cat.items;
+		});
+
+		const categories = [
+			'tags', 'typetags', 'ratingtags', 'resolutiontags', 
+			'categorytags', 'sourcetags', 'utilitytags'
+		];
+
+		categories.forEach(cat => {
+			const filterTags = workshopFilters![cat as keyof FilterConfig] as Record<string, boolean>;
+			const allPossibleTags = categoryMap[cat] || [];
+			
+			const activeTags = Object.entries(filterTags)
+				.filter(([_, active]) => active)
+				.map(([tagName, _]) => tagName);
+
+			// Optimization: If all tags in a category are selected (and it's not ratingtags), 
+			// it's usually better to send nothing for that category to avoid ANDing every tag.
+			// Steam often ORs them, but sending a huge list is inefficient.
+			// exception for ratingtags where we want explicit inclusion/exclusion.
+			if (cat !== 'ratingtags' && activeTags.length === allPossibleTags.length && allPossibleTags.length > 0) {
+				return; 
+			}
+
+			activeTags.forEach(tag => required.push(tag));
+
+			// Age Rating exclusion logic: if a rating is not active, exclude it.
+			if (cat === 'ratingtags') {
+				allPossibleTags.forEach(tag => {
+					if (!filterTags[tag]) {
+						excluded.push(tag);
+					}
+				});
+			}
+		});
+		
+		return { required, excluded };
+	}
+
+	async function handleSearch() {
+		searching = true;
+		browseLoading = true;
+		try {
+			const { required, excluded } = getSearchParameters();
+			logger.log('Workshop: Starting search with required tags:', required.join(', '));
+			if (excluded.length > 0) {
+				logger.log('Workshop: Excluding tags:', excluded.join(', '));
+			}
 
 			const result = await window.electronAPI.queryWorkshopFiles(
 				steamApiKey,
 				{
 					search_text: searchText,
-					requiredtags:
-						allFilters.length > 0 ? allFilters : undefined,
+					requiredtags: required.length > 0 ? required : undefined,
+					excludedtags: excluded.length > 0 ? excluded : undefined,
 					cursor: '*',
 					numperpage: 50
 				}
@@ -162,6 +164,9 @@
 			browseItems = validItems;
 			totalItems = result?.total || 0;
 			pageCursors = new Map([[0, '*']]);
+			if (result?.nextCursor) {
+				pageCursors.set(1, result.nextCursor);
+			}
 			browseCursor = result?.nextCursor || null;
 
 			if (browseItems.length === 0) {
@@ -179,49 +184,15 @@
 			showToast(`Error searching: ${errorMsg}`, 'error');
 		} finally {
 			searching = false;
+			browseLoading = false;
 		}
 	}
 
-	function toggleFilter(category: string, filter: string) {
-		console.log(
-			'Workshop.toggleFilter called with:',
-			category,
-			filter,
-			'Was selected:',
-			selectedFilters.get(category)?.has(filter)
-		);
-
-		// Create a new Map to ensure reactivity
-		const newSelectedFilters = new Map(selectedFilters);
-
-		if (!newSelectedFilters.has(category)) {
-			newSelectedFilters.set(category, new Set());
-		}
-
-		const filters = newSelectedFilters.get(category)!;
-		if (filters.has(filter)) {
-			filters.delete(filter);
-		} else {
-			filters.add(filter);
-		}
-
-		// Force reactivity by assigning
-		selectedFilters = newSelectedFilters;
-
-		console.log(
-			'Workshop.toggleFilter result - selectedFilters now:',
-			selectedFilters
-		);
-	}
 
 	async function loadBrowseItems(pageNum: number = 0) {
 		browseLoading = true;
 		try {
-			// Collect all selected filters
-			const allFilters: string[] = [];
-			selectedFilters.forEach((filters) => {
-				allFilters.push(...Array.from(filters));
-			});
+			const { required, excluded } = getSearchParameters();
 
 			// Get cursor for this page (default to '*' for first page)
 			const cursor =
@@ -231,26 +202,26 @@
 				return;
 			}
 
-			console.log(
-				'loadBrowseItems called: page=' +
+			logger.log(
+				'Workshop: loadBrowseItems called: page=' +
 					pageNum +
-					' filters=' +
-					allFilters.length +
-					' selectedFilters=' +
-					Array.from(allFilters).join(',')
+					' required=' +
+					required.length +
+					' excluded=' +
+					excluded.length
 			);
 			const result = await window.electronAPI.queryWorkshopFiles(
 				steamApiKey,
 				{
-					requiredtags:
-						allFilters.length > 0 ? allFilters : undefined,
+					requiredtags: required.length > 0 ? required : undefined,
+					excludedtags: excluded.length > 0 ? excluded : undefined,
 					cursor: cursor,
 					numperpage: 50
 				}
 			);
 
-			console.log(
-				'API Response: total=' +
+			logger.log(
+				'Workshop: API Response: total=' +
 					result?.total +
 					' items=' +
 					(result?.items?.length || 0) +
@@ -269,8 +240,8 @@
 			totalItems = result?.total || 0;
 			const firstItem =
 				validItems.length > 0 ? validItems[0].title : 'none';
-			console.log(
-				'Loaded page ' + pageNum + ' | First item: ' + firstItem
+			logger.log(
+				'Workshop: Loaded page ' + pageNum + ' | First item: ' + firstItem
 			);
 
 			// Store the next cursor if available
@@ -281,8 +252,8 @@
 				browseCursor = null; // No more pages
 			}
 
-			console.log(
-				'Loaded ' +
+			logger.log(
+				'Workshop: Loaded ' +
 					validItems.length +
 					' items | Next button: ' +
 					!!browseCursor
@@ -302,14 +273,11 @@
 	}
 
 	function openBrowseWithFilters() {
-		const allFilters: string[] = [];
-		selectedFilters.forEach((filters) => {
-			allFilters.push(...Array.from(filters));
-		});
+		const { required } = getSearchParameters();
 		let url: string;
 
-		if (allFilters.length > 0) {
-			url = `https://steamcommunity.com/workshop/browse/?appid=431960&searchtext=&requiredtags[]=${allFilters[0]}`;
+		if (required.length > 0) {
+			url = `https://steamcommunity.com/workshop/browse/?appid=431960&searchtext=&requiredtags[]=${required[0]}`;
 		} else {
 			url = `https://steamcommunity.com/workshop/browse/?appid=431960`;
 		}
@@ -346,6 +314,13 @@
 	{:else}
 		<div class="workshop-controls">
 			<div class="search-section">
+				<Button
+					variant={showFilterPanel ? 'primary' : 'secondary'}
+					on:click={() => (showFilterPanel = !showFilterPanel)}
+				>
+					<FilterIcon width="18" height="18" />
+					Filter
+				</Button>
 				<Input
 					type="text"
 					placeholder="Search wallpapers, scenes, collections..."
@@ -354,26 +329,32 @@
 						e.key === 'Enter' && handleSearch()}
 				/>
 				<Button on:click={handleSearch} disabled={searching}>
-					{#if searching}
-						Searching...
-					{:else}
-						Search
-					{/if}
+					<SearchIcon width="18" height="18" />
+					Search
 				</Button>
 			</div>
 		</div>
 
-		<BrowseTab
-			{filterCategories}
-			{selectedFilters}
-			{browseItems}
-			{browseLoading}
-			{browseCursor}
-			{totalItems}
-			onToggleFilter={toggleFilter}
-			onLoadBrowseItems={loadBrowseItems}
-			onOpenBrowseWithFilters={openBrowseWithFilters}
-		/>
+		<div class="content-area">
+			{#if showFilterPanel && workshopFilters}
+				<FilterPanel
+					config={workshopFilters}
+					onSave={saveFilters}
+					onChange={handleFilterChange}
+					onClose={() => (showFilterPanel = false)}
+				/>
+			{/if}
+
+			<BrowseTab
+				{browseItems}
+				{browseLoading}
+				{browseCursor}
+				{totalItems}
+				autoLoad={false}
+				onLoadBrowseItems={loadBrowseItems}
+				onOpenBrowseWithFilters={openBrowseWithFilters}
+			/>
+		</div>
 	{/if}
 </div>
 
@@ -385,6 +366,14 @@
 		width: 100%;
 		background: var(--bg-color);
 		border-radius: var(--radius-lg);
+		overflow: hidden;
+	}
+
+	.content-area {
+		display: flex;
+		flex-direction: row;
+		flex: 1;
+		min-height: 0;
 		overflow: hidden;
 	}
 
@@ -436,6 +425,10 @@
 
 			:global(button) {
 				white-space: nowrap;
+				display: flex;
+				align-items: center;
+				gap: 8px;
+				padding: 10px 20px;
 			}
 		}
 	}

@@ -130,4 +130,24 @@ export function registerWallpaperService() {
 		logger.ipcReceived("get-wallpaper-base-path");
 		return await socketClient.send("get-wallpaper-base-path");
 	});
+
+	ipcMain.handle("get-installed-filters", async () => {
+		logger.ipcReceived("get-installed-filters");
+		return await socketClient.send("get-installed-filters");
+	});
+
+	ipcMain.handle("save-installed-filters", async (_, filters: any) => {
+		logger.ipcReceived("save-installed-filters");
+		return await socketClient.send("save-installed-filters", filters);
+	});
+
+	ipcMain.handle("get-workshop-filters", async () => {
+		logger.ipcReceived("get-workshop-filters");
+		return await socketClient.send("get-workshop-filters");
+	});
+
+	ipcMain.handle("save-workshop-filters", async (_, filters: any) => {
+		logger.ipcReceived("save-workshop-filters");
+		return await socketClient.send("save-workshop-filters", filters);
+	});
 }

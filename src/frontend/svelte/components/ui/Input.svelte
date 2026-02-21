@@ -18,6 +18,7 @@
 		{...$$restProps}
 		on:input
 		on:change
+		on:keydown
 	/>
 </div>
 
