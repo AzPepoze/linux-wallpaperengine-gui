@@ -112,3 +112,55 @@ export function rgbFloatToHex(rgbFloat: string): string {
 
 	return "#" + ((1 << 24) + (r << 16) + (g << 8) + b).toString(16).slice(1);
 }
+
+export function adjustBrightness(color: [number, number, number], maxV: number = 0.4): [number, number, number] {
+	const r = color[0] / 255;
+	const g = color[1] / 255;
+	const b = color[2] / 255;
+
+	const max = Math.max(r, g, b);
+	const min = Math.min(r, g, b);
+
+	let h = 0;
+	let s = 0;
+	let v = max;
+
+	const d = max - min;
+	s = max === 0 ? 0 : d / max;
+
+	if (max !== min) {
+		switch (max) {
+			case r: h = (g - b) / d + (g < b ? 6 : 0); break;
+			case g: h = (b - r) / d + 2; break;
+			case b: h = (r - g) / d + 4; break;
+		}
+		h /= 6;
+	}
+
+	// Cap the brightness (value)
+	v = Math.min(v, maxV);
+
+	// Convert back to RGB
+	let nr = 0, ng = 0, nb = 0;
+
+	const i = Math.floor(h * 6);
+	const f = h * 6 - i;
+	const p = v * (1 - s);
+	const q = v * (1 - f * s);
+	const t = v * (1 - (1 - f) * s);
+
+	switch (i % 6) {
+		case 0: nr = v; ng = t; nb = p; break;
+		case 1: nr = q; ng = v; nb = p; break;
+		case 2: nr = p; ng = v; nb = t; break;
+		case 3: nr = p; ng = q; nb = v; break;
+		case 4: nr = t; ng = p; nb = v; break;
+		case 5: nr = v; ng = p; nb = q; break;
+	}
+
+	return [
+		Math.round(nr * 255),
+		Math.round(ng * 255),
+		Math.round(nb * 255)
+	];
+}

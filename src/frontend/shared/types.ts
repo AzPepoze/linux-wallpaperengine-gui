@@ -59,6 +59,10 @@ export type AppConfig = {
 	playlistInterval?: number;
 	steamApiKey?: string;
 	nativeWayland?: boolean;
+	dynamicUiTheme?: boolean;
+	dynamicSidebarTheme?: boolean;
+	transparentUi?: boolean;
+	uiTransparency?: number;
 };
 
 export type PropertyType =

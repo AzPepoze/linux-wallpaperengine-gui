@@ -49,17 +49,24 @@
 		// Extract active tags by category
 		const activeTags: Record<string, string[]> = {};
 		const categories = [
-			'tags', 'typetags', 'ratingtags', 'resolutiontags', 
-			'categorytags', 'sourcetags', 'utilitytags'
+			'tags',
+			'typetags',
+			'ratingtags',
+			'resolutiontags',
+			'categorytags',
+			'sourcetags',
+			'utilitytags'
 		];
 
 		let hasAnyFilter = false;
-		categories.forEach(cat => {
-			const tags = installedFilters![cat as keyof FilterConfig] as Record<string, boolean>;
+		categories.forEach((cat) => {
+			const tags = installedFilters![
+				cat as keyof FilterConfig
+			] as Record<string, boolean>;
 			const active = Object.entries(tags)
 				.filter(([_, val]) => val)
 				.map(([name, _]) => name.toLowerCase());
-			
+
 			if (active.length > 0) {
 				activeTags[cat] = active;
 				hasAnyFilter = true;
@@ -71,7 +78,9 @@
 		const filtered: Record<string, WallpaperData> = {};
 		Object.entries(wallpapers).forEach(([folderName, data]) => {
 			const projectData = data.projectData;
-			const wpTags = (projectData?.tags || []).map(t => t.toLowerCase());
+			const wpTags = (projectData?.tags || []).map((t) =>
+				t.toLowerCase()
+			);
 			const wpType = projectData?.type?.toLowerCase();
 			let wpRating = projectData?.contentrating?.toLowerCase() || '';
 			const wpApproved = projectData?.approved;
@@ -79,7 +88,10 @@
 			// If rating is missing, default to everyone (common for local items)
 			// Also check if 'everyone' or 'age-everyone' is in tags as fallback
 			if (!wpRating) {
-				if (wpTags.includes('everyone') || wpTags.includes('age-everyone')) {
+				if (
+					wpTags.includes('everyone') ||
+					wpTags.includes('age-everyone')
+				) {
 					wpRating = 'everyone';
 				} else {
 					wpRating = 'everyone'; // Safe default
@@ -102,13 +114,15 @@
 					}
 				} else if (cat === 'sourcetags') {
 					// Local wallpapers are either 'workshop' (if they have id) or 'local'
-					const isWorkshop = !!projectData?.workshopid || /^\d+$/.test(folderName);
+					const isWorkshop =
+						!!projectData?.workshopid ||
+						/^\d+$/.test(folderName);
 					const canShowWorkshop = tags.includes('workshop');
 					const canShowLocal = tags.includes('local');
-					
+
 					if (isWorkshop && canShowWorkshop) continue;
 					if (!isWorkshop && canShowLocal) continue;
-					
+
 					matches = false;
 					break;
 				} else if (cat === 'utilitytags') {
@@ -118,11 +132,15 @@
 						matches = false;
 						break;
 					}
-					
+
 					// Other utility tags check current tags
-					const otherUtilityTags = tags.filter(t => t !== 'approved');
+					const otherUtilityTags = tags.filter(
+						(t) => t !== 'approved'
+					);
 					if (otherUtilityTags.length > 0) {
-						const hasTagInCat = otherUtilityTags.some(t => wpTags.includes(t));
+						const hasTagInCat = otherUtilityTags.some((t) =>
+							wpTags.includes(t)
+						);
 						if (!hasTagInCat) {
 							matches = false;
 							break;
@@ -135,7 +153,9 @@
 						continue;
 					} else {
 						// Only fail if user has specific category filters and none match
-						const hasTagInCat = tags.some(t => wpTags.includes(t));
+						const hasTagInCat = tags.some((t) =>
+							wpTags.includes(t)
+						);
 						if (!hasTagInCat) {
 							matches = false;
 							break;
@@ -146,7 +166,9 @@
 					continue;
 				} else {
 					// Check if wallpaper has any of the tags in this category
-					const hasTagInCat = tags.some(t => wpTags.includes(t));
+					const hasTagInCat = tags.some((t) =>
+						wpTags.includes(t)
+					);
 					if (!hasTagInCat) {
 						matches = false;
 						break;
@@ -167,10 +189,7 @@
 	);
 
 	onMount(async () => {
-		await Promise.all([
-			loadPlaylists(),
-			loadFilters()
-		]);
+		await Promise.all([loadPlaylists(), loadFilters()]);
 	});
 
 	async function loadFilters() {
@@ -186,7 +205,8 @@
 
 	async function saveFilters(newConfig: FilterConfig) {
 		try {
-			const result = await window.electronAPI.saveInstalledFilters(newConfig);
+			const result =
+				await window.electronAPI.saveInstalledFilters(newConfig);
 			if (result.success) {
 				installedFilters = newConfig;
 				showFilterPanel = false;
@@ -202,7 +222,7 @@
 		installedFilters = newConfig;
 		// Local filtering is lucky enough to be reactive, so just updating the state is enough
 		// We should also save it so it persists
-		window.electronAPI.saveInstalledFilters(newConfig).catch(err => {
+		window.electronAPI.saveInstalledFilters(newConfig).catch((err) => {
 			console.error('Failed to auto-save home filters:', err);
 		});
 	}
@@ -278,16 +298,28 @@
 		</div>
 
 		<div class="status-info">
-			<div class="status-item">
+			<div class="status-item truncate-item">
 				<span class="label">CURRENTLY USING :</span>
 				{#if activeWallpaper}
-					<span
-						in:fly={{ y: 20, duration: 300 }}
-						out:fly={{ y: -20, duration: 300 }}
-						class="value"
-						>{activeWallpaper.projectData?.title ||
-							activeWallpaper.folderName}</span
-					>
+					<div class="value-container">
+						{#key activeWallpaper.projectData?.title || activeWallpaper.folderName}
+							<span
+								in:fly={{
+									y: 10,
+									duration: 300,
+									delay: 100
+								}}
+								out:fly={{ y: -10, duration: 300 }}
+								class="value truncate-text"
+								title={activeWallpaper.projectData
+									?.title ||
+									activeWallpaper.folderName}
+							>
+								{activeWallpaper.projectData?.title ||
+									activeWallpaper.folderName}
+							</span>
+						{/key}
+					</div>
 				{/if}
 			</div>
 			<div class="status-item">
@@ -333,11 +365,11 @@
 
 	<div class="content-area">
 		{#if showFilterPanel && installedFilters}
-			<FilterPanel 
-				config={installedFilters} 
-				onSave={saveFilters} 
+			<FilterPanel
+				config={installedFilters}
+				onSave={saveFilters}
 				onChange={handleFilterChange}
-				onClose={() => (showFilterPanel = false)} 
+				onClose={() => (showFilterPanel = false)}
 			/>
 		{/if}
 
@@ -347,7 +379,9 @@
 			{:else if error}
 				<div class="status-msg error">{error}</div>
 			{:else if Object.keys(filteredWallpapers).length === 0}
-				<div class="status-msg">No wallpapers found matching filters.</div>
+				<div class="status-msg">
+					No wallpapers found matching filters.
+				</div>
 			{:else if viewMode === 'grid'}
 				<WallpaperItemGrid
 					wallpapers={filteredWallpapers}
@@ -406,10 +440,14 @@
 
 			.status-item {
 				display: flex;
-				flex-wrap: wrap;
+				flex-wrap: nowrap;
 				gap: 10px;
 				align-items: center;
 				justify-content: center;
+
+				&.truncate-item {
+					max-width: 300px;
+				}
 
 				.label {
 					color: var(--text-muted);
@@ -418,10 +456,28 @@
 					font-size: 0.85em;
 				}
 
+				.value-container {
+					display: grid;
+					overflow: hidden;
+					flex: 1;
+
+					> span {
+						grid-area: 1 / 1;
+					}
+				}
+
 				.value {
 					color: var(--btn-primary-bg);
 					font-weight: 700;
 					text-transform: uppercase;
+				}
+
+				.truncate-text {
+					white-space: nowrap;
+					overflow: hidden;
+					text-overflow: ellipsis;
+					display: inline-block;
+					max-width: 100%;
 				}
 			}
 		}

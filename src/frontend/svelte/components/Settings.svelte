@@ -56,6 +56,15 @@
 
 	let activeSection = 'general';
 	let contentElement: HTMLElement;
+	let initialLoad = true;
+	let saveTimeout: ReturnType<typeof setTimeout>;
+
+	$: if ($settingsStore && !initialLoad) {
+		clearTimeout(saveTimeout);
+		saveTimeout = setTimeout(() => {
+			handleSaveSettings();
+		}, 300);
+	}
 
 	function scrollToSection(id: string) {
 		activeSection = id;
@@ -88,6 +97,11 @@
 		}
 
 		await loadSettings();
+
+		// Wait a small bit to ensure reactivity from loadSettings doesn't trigger a save
+		setTimeout(() => {
+			initialLoad = false;
+		}, 500);
 	});
 
 	const onSelectBinFile = async (path: string) => {
@@ -155,9 +169,6 @@
 		</nav>
 
 		<div class="sidebar-actions">
-			<button class="action-btn primary" on:click={handleSaveSettings}>
-				Save Changes
-			</button>
 			<button class="action-btn secondary" on:click={handleOpenConfig}>
 				Open Config
 			</button>
@@ -175,6 +186,70 @@
 					id="general"
 					description="Basic wallpaper engine behavior and performance."
 				>
+					<SettingItem
+						label="Dynamic UI Theme"
+						id="dynamicUiTheme"
+						description="Adapt application colors to match the currently selected wallpaper."
+					>
+						<Toggle
+							id="dynamicUiTheme"
+							bind:checked={$settingsStore.dynamicUiTheme}
+						/>
+					</SettingItem>
+
+					<SettingItem
+						label="Dynamic Sidebar Theme"
+						id="dynamicSidebarTheme"
+						description="Apply wallpaper colors locally to the sidebar directly."
+					>
+						<Toggle
+							id="dynamicSidebarTheme"
+							bind:checked={
+								$settingsStore.dynamicSidebarTheme
+							}
+						/>
+					</SettingItem>
+
+					<SettingItem
+						label="Transparent UI"
+						id="transparentUi"
+						description="Make the window background transparent (requires restart)."
+					>
+						<Toggle
+							id="transparentUi"
+							bind:checked={$settingsStore.transparentUi}
+							onChange={() => {
+								if (
+									confirm(
+										'Changing UI transparency requires a restart. Do you want to restart now?'
+									)
+								) {
+									handleSaveSettings().then(() => {
+										window.electronAPI.restartUI();
+									});
+								}
+							}}
+						/>
+					</SettingItem>
+
+					{#if $settingsStore.transparentUi}
+						<SettingItem
+							label="UI Transparency Level"
+							id="uiTransparency"
+							description="Adjust the opacity of the application."
+						>
+							<Range
+								id="uiTransparency"
+								bind:value={
+									$settingsStore.uiTransparency
+								}
+								min={10}
+								max={100}
+								step={5}
+							/>
+						</SettingItem>
+					{/if}
+
 					<SettingItem
 						label="FPS Limit"
 						id="fps"
@@ -342,6 +417,17 @@
 						<Toggle
 							id="nativeWayland"
 							bind:checked={$settingsStore.nativeWayland}
+							onChange={() => {
+								if (
+									confirm(
+										'Changing Wayland support requires a restart. Do you want to restart now?'
+									)
+								) {
+									handleSaveSettings().then(() => {
+										window.electronAPI.restartUI();
+									});
+								}
+							}}
 						/>
 					</SettingItem>
 
@@ -539,7 +625,7 @@
 
 	.settings-sidebar {
 		width: 280px;
-		background: rgba(20, 20, 20, 0.6);
+		background: var(--bg-modal);
 		border-right: 1px solid var(--border-color);
 		display: flex;
 		flex-direction: column;
@@ -551,7 +637,11 @@
 				margin: 0;
 				font-size: 1.5em;
 				font-weight: 800;
-				background: linear-gradient(135deg, #fff 0%, #aaa 100%);
+				background: linear-gradient(
+					135deg,
+					var(--text-color) 0%,
+					var(--text-muted) 100%
+				);
 				background-clip: text;
 				-webkit-background-clip: text;
 				-webkit-text-fill-color: transparent;
@@ -590,8 +680,8 @@
 
 				&.active {
 					background: var(--btn-primary-bg);
-					color: #fff;
-					box-shadow: 0 4px 12px rgba(0, 123, 255, 0.3);
+					color: var(--text-color);
+					box-shadow: 0 4px 12px var(--shadow-primary);
 				}
 			}
 		}
@@ -652,7 +742,7 @@
 
 		&.primary {
 			background: var(--btn-primary-bg);
-			color: white;
+			color: var(--text-color);
 			&:hover {
 				filter: brightness(1.1);
 			}
@@ -671,7 +761,7 @@
 			background: transparent;
 			color: var(--error-color);
 			&:hover {
-				background: rgba(255, 77, 77, 0.1);
+				background: var(--error-bg-translucent);
 			}
 		}
 	}

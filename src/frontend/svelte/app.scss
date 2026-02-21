@@ -10,6 +10,7 @@
 
      /* Base Text & Background */
      --text-color: rgba(255, 255, 255, 0.87);
+     --text-inverse: rgba(0, 0, 0, 0.87);
      --text-muted: rgba(255, 255, 255, 0.4);
      --bg-app: rgb(29, 29, 29);
 
@@ -24,18 +25,45 @@
      --top-bar-bg: rgba(0, 0, 0, 0.3);
 
      /* Primary Brand Colors */
-     --btn-primary-bg: #007bff;
+     --primary-raw-rgb: 0, 123, 255;
+     --btn-primary-bg: rgb(var(--primary-raw-rgb));
      --btn-primary-hover-bg: #53a6ff;
+     --shadow-primary: rgba(var(--primary-raw-rgb), 0.3);
      --btn-secondary-bg: #2a2a2a;
      --btn-secondary-hover-bg: #464646;
 
      /* Status Colors */
      --success-bg: #28a745;
+     --success-border: #1e7e34;
      --success-color: #ffffff;
      --error-bg: #dc3545;
+     --error-border: #bd2130;
+     --error-bg-translucent: rgba(220, 53, 69, 0.1);
      --error-color: #ffffff;
+     --warn-bg: #ffc107;
+     --warn-border: #d39e00;
+     --warn-color: #000000;
+     --info-bg: #17a2b8;
+     --info-border: #117a8b;
+     --info-color: #ffffff;
      --playlist-highlight: rgba(181, 102, 255, 0.4);
      --playlist-highlight-border: rgba(181, 102, 255, 0.8);
+
+     /* Stats Colors */
+     --stat-type: #7dd3fc;
+     --stat-tag: #fbbf24;
+     --stat-folder: #86efac;
+     --stat-views: #60a5fa;
+     --stat-subs: #a78bfa;
+     --stat-date: #94a3b8;
+
+     /* Translucent Colors */
+     --item-bg-translucent: rgba(66, 66, 66, 0.5);
+     --bg-primary-translucent: rgba(var(--primary-raw-rgb), 0.1);
+     --shadow-primary-glow: rgba(var(--primary-raw-rgb), 0.7);
+     --focus-ring: rgba(var(--primary-raw-rgb), 0.25);
+     --focus-ring-light: rgba(var(--primary-raw-rgb), 0.15);
+     --badge-bg: rgba(0, 0, 0, 0.6);
 
      /* -------------------------------------------------------------------------- */
      /*                                   Assets                                   */
@@ -95,6 +123,7 @@ body {
 
 html {
      background: var(--bg-app);
+     transition: background-color 0.8s ease;
 }
 
 body {
@@ -107,6 +136,10 @@ body {
 * {
      color: var(--text-color);
      box-sizing: border-box;
+}
+
+svg * {
+     color: inherit;
 }
 
 a {

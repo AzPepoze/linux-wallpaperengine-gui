@@ -2,8 +2,10 @@
 	import {
 		getDominantColor,
 		isLight,
-		getPalette
+		getPalette,
+		adjustBrightness
 	} from '../../utils/colorHelper';
+	import { settingsStore } from '../../scripts/settings';
 	import { sidebarWidth } from '../../scripts/ui';
 	import { onDestroy } from 'svelte';
 	import WorkshopItemSidebar from './WorkshopItemSidebar.svelte';
@@ -16,24 +18,35 @@
 	export let onClose: () => void = () => {};
 
 	let sidebarContentElement: HTMLDivElement;
-	let backgroundColor = '#2a2a2a';
-	let textColor = '#fff';
-	let palette: [number, number, number][] = [];
 	let isResizing = false;
-	let btnPrimaryTextColor = '#fff';
+
+	let backgroundColor = 'var(--bg-dropdown)';
+	let textColor = 'rgba(255, 255, 255, 0.87)';
+	let palette: [number, number, number][] = [];
+	let btnPrimaryTextColor = 'rgba(255, 255, 255, 0.87)';
 	let dominantColorArray: [number, number, number] | null = null;
 	let accentColor: [number, number, number] | null = null;
 
 	$: {
-		if (selectedWallpaper && selectedWallpaper.previewPath) {
+		if (
+			$settingsStore?.dynamicSidebarTheme &&
+			selectedWallpaper &&
+			selectedWallpaper.previewPath
+		) {
 			getDominantColor(selectedWallpaper.previewPath).then(
 				(dominantColor) => {
 					if (dominantColor) {
 						dominantColorArray = dominantColor;
-						backgroundColor = `rgb(${dominantColor.join(',')})`;
-						textColor = isLight(dominantColor)
-							? '#000'
-							: '#fff';
+						const cappedBg = adjustBrightness(
+							dominantColor,
+							0.3
+						);
+						backgroundColor = `rgb(${Math.round(cappedBg[0])}, ${Math.round(cappedBg[1])}, ${Math.round(cappedBg[2])})`;
+						textColor = isLight(
+							cappedBg as [number, number, number]
+						)
+							? 'rgba(0, 0, 0, 0.87)'
+							: 'rgba(255, 255, 255, 0.87)';
 					}
 				}
 			);
@@ -45,17 +58,23 @@
 		} else {
 			dominantColorArray = null;
 			accentColor = null;
-			backgroundColor = '#2a2a2a';
-			textColor = '#fff';
+			backgroundColor = 'var(--bg-dropdown)';
+			textColor = 'rgba(255, 255, 255, 0.87)';
 			palette = [];
 		}
 	}
 
 	$: {
-		if (dominantColorArray && palette.length > 0) {
+		if (
+			$settingsStore?.dynamicSidebarTheme &&
+			dominantColorArray &&
+			palette.length > 0
+		) {
 			const targetIsLight = !isLight(dominantColorArray);
-			let contrastingColor = palette.find(c => isLight(c) === targetIsLight);
-			
+			let contrastingColor = palette.find(
+				(c) => isLight(c) === targetIsLight
+			);
+
 			if (contrastingColor) {
 				accentColor = contrastingColor;
 			} else {
@@ -66,7 +85,9 @@
 		}
 
 		if (accentColor) {
-			btnPrimaryTextColor = isLight(accentColor) ? '#000' : '#fff';
+			btnPrimaryTextColor = isLight(accentColor)
+				? 'rgba(0, 0, 0, 0.87)'
+				: 'rgba(255, 255, 255, 0.87)';
 		} else {
 			btnPrimaryTextColor = backgroundColor;
 		}
@@ -116,21 +137,20 @@
 	class="sidebar"
 	class:open={selectedWallpaper}
 	class:resizing={isResizing}
+	class:dynamic-theme={$settingsStore?.dynamicSidebarTheme}
 	style="
-          --sidebar-bg: {backgroundColor};
-          --sidebar-text: {textColor};
-          --btn-text-color: {btnPrimaryTextColor};
-          --palette-primary: {palette.length > 0
-		? `rgb(${palette[0].join(',')})`
-		: 'var(--btn-primary-bg)'};
-          --palette-secondary: {palette.length > 1
-		? `rgb(${palette[1].join(',')})`
-		: 'var(--btn-secondary-bg)'};
-          --palette-track: {accentColor
-		? `rgb(${accentColor.join(',')})`
-		: 'var(--sidebar-text)'};
-          width: {selectedWallpaper ? $sidebarWidth + 'px' : '0'};
-     "
+		{$settingsStore?.dynamicSidebarTheme && selectedWallpaper
+		? `
+          --sidebar-bg: ${backgroundColor};
+          --sidebar-text: ${textColor};
+          --btn-text-color: ${btnPrimaryTextColor};
+          --palette-primary: ${palette.length > 0 ? `rgb(${palette[0].join(',')})` : 'var(--btn-primary-bg)'};
+          --palette-secondary: ${palette.length > 1 ? `rgb(${palette[1].join(',')})` : 'var(--btn-secondary-bg)'};
+          --palette-track: ${accentColor ? `rgb(${accentColor.join(',')})` : 'var(--sidebar-text)'};
+		`
+		: ''}
+		width: {selectedWallpaper ? $sidebarWidth + 'px' : '0'};
+	"
 >
 	{#if selectedWallpaper}
 		<!-- svelte-ignore a11y_no_static_element_interactions -->
@@ -190,31 +210,25 @@
 
 <style lang="scss">
 	.sidebar {
-		/* Dynamic Button Colors from Palette */
-		--btn-primary-bg: var(--palette-track);
-		--btn-primary-hover-bg: var(--sidebar-text);
-		--sidebar-btn-text-final: var(--btn-text-color);
-		--btn-primary-text: var(--btn-text-color);
-		--text-color: var(--sidebar-text);
-		--text-muted: var(--sidebar-text);
-		--border-color: var(--sidebar-text);
-		--border-color-hover: color-mix(
-			in srgb,
-			var(--sidebar-text),
-			transparent 80%
-		);
-		--bg-surface: transparent;
-		--bg-surface-hover: color-mix(
-			in srgb,
-			var(--palette-track),
-			transparent 80%
-		);
-		--bg-surface-active: transparent;
-		--top-bar-bg: color-mix(in srgb, var(--sidebar-bg), black 20%);
-		--bg-dropdown: color-mix(in srgb, var(--sidebar-bg), black 15%);
+		/* Isolate from global Dynamic UI Theme */
+		--btn-primary-bg: #007bff;
+		--btn-primary-hover-bg: #53a6ff;
+		--btn-secondary-bg: #2a2a2a;
+		--btn-secondary-hover-bg: #464646;
+		--text-color: rgba(255, 255, 255, 0.87);
+		--text-inverse: rgba(0, 0, 0, 0.87);
+		--text-muted: rgba(255, 255, 255, 0.4);
+		--bg-surface: rgba(61, 61, 61, 0.4);
+		--bg-surface-hover: rgba(255, 255, 255, 0.15);
+		--bg-surface-active: rgba(255, 255, 255, 0.08);
+		--bg-dropdown: #1e1e1e;
+		--border-color: rgba(255, 255, 255, 0.15);
+		--border-color-hover: rgba(255, 255, 255, 0.3);
+		--top-bar-bg: rgba(0, 0, 0, 0.3);
+		--sidebar-btn-text-final: rgba(255, 255, 255, 0.87);
 
 		width: 0;
-		background-color: var(--sidebar-bg);
+		background-color: var(--bg-dropdown);
 		color: var(--text-color);
 		box-shadow: -5px 0 15px rgba(0, 0, 0, 0.3);
 		transition: var(--transition-slow);
@@ -223,6 +237,42 @@
 		display: flex;
 		flex-direction: column;
 		overflow: hidden;
+
+		&.dynamic-theme {
+			/* Dynamic Button Colors from Palette */
+			--btn-primary-bg: var(--palette-track);
+			--btn-primary-hover-bg: var(--sidebar-text);
+			--sidebar-btn-text-final: var(--btn-text-color);
+			--btn-primary-text: var(--btn-text-color);
+			--text-color: var(--sidebar-text);
+			--text-muted: color-mix(
+				in srgb,
+				var(--sidebar-text),
+				transparent 40%
+			);
+			--border-color: color-mix(
+				in srgb,
+				var(--sidebar-text),
+				transparent 85%
+			);
+			--border-color-hover: color-mix(
+				in srgb,
+				var(--sidebar-text),
+				transparent 70%
+			);
+			--bg-surface: transparent;
+			--bg-surface-hover: color-mix(
+				in srgb,
+				var(--palette-track),
+				transparent 80%
+			);
+			--bg-surface-active: transparent;
+			--top-bar-bg: color-mix(in srgb, var(--sidebar-bg), black 20%);
+			--bg-dropdown: color-mix(in srgb, var(--sidebar-bg), black 15%);
+
+			background-color: var(--sidebar-bg);
+			color: var(--text-color);
+		}
 
 		&.resizing {
 			transition: none;
@@ -242,9 +292,9 @@
 
 			&:hover,
 			&.resizing {
-				background-color: #007bff;
+				background-color: var(--btn-primary-bg);
 				width: 7px;
-				box-shadow: 2px 0 10px #007bff;
+				box-shadow: 2px 0 10px var(--btn-primary-bg);
 			}
 		}
 
@@ -257,8 +307,8 @@
 			border-radius: 15px;
 
 			:global(svg) {
-				color: inherit;
-				filter: invert(1);
+				color: inherit !important;
+				stroke: currentColor;
 			}
 
 			:global(img) {
@@ -311,6 +361,11 @@
 			&:hover {
 				filter: brightness(1.5);
 			}
+
+			:global(svg) {
+				color: var(--sidebar-btn-text-final) !important;
+				stroke: currentColor;
+			}
 		}
 
 		.workshop-btn {
@@ -330,10 +385,16 @@
 		}
 
 		:global(input[type='range']) {
-			background: var(--palette-track) !important;
+			background: var(
+				--palette-track,
+				var(--btn-primary-bg)
+			) !important;
 
 			&:hover {
-				background: var(--palette-track) !important;
+				background: var(
+					--palette-track,
+					var(--btn-primary-hover-bg)
+				) !important;
 			}
 		}
 

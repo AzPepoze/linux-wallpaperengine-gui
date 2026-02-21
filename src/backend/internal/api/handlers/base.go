@@ -9,9 +9,10 @@ import (
 type handlerFn func(req models.Request, encoder *json.Encoder, cleanup func()) models.Response
 
 var dispatchTable = map[string]handlerFn{
-	"ping":    wrapSystem,
-	"quit":    wrapSystem,
-	"open-ui": wrapSystem,
+	"ping":       wrapSystem,
+	"quit":       wrapSystem,
+	"open-ui":    wrapSystem,
+	"restart-ui": wrapSystem,
 
 	"get-config":         wrapConfig,
 	"write-config":       wrapConfig,

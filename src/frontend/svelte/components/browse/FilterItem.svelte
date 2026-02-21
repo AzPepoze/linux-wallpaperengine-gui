@@ -89,10 +89,9 @@
 			left: 0;
 			width: 100%;
 			height: 100%;
-			background: linear-gradient(
-				90deg,
-				transparent 0%,
-				rgba(0, 123, 255, 0.6) 50%,
+			background: radial-gradient(
+				circle max(0px, var(--x) * 1px) at center,
+				rgba(var(--primary-raw-rgb), 0.6) 50%,
 				transparent 100%
 			);
 			animation: slideShineIn 0.6s ease-out;
@@ -137,17 +136,18 @@
 
 		&:hover {
 			color: var(--text-color);
-			background: rgba(0, 123, 255, 0.05);
-			transition: all 0.2s ease;
+			background: rgba(var(--primary-raw-rgb), 0.05);
+			transform: scale(1.02);
+			transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
 
 			.checkbox {
 				border-color: var(--btn-primary-bg);
-				background: rgba(0, 123, 255, 0.05);
+				background: rgba(var(--primary-raw-rgb), 0.05);
 			}
 		}
 
 		&.active {
-			background: rgba(0, 123, 255, 0.15);
+			background: rgba(var(--primary-raw-rgb), 0.15);
 			border-color: var(--btn-primary-bg);
 			color: var(--text-color);
 

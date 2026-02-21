@@ -87,17 +87,16 @@
 			cursor: pointer;
 			transition: all 0.2s ease;
 
-			&:hover:not(:disabled) {
-				background: var(--bg-color);
+			&:hover {
+				background: var(--btn-primary-bg);
+				color: var(--text-inverse);
 				border-color: var(--btn-primary-bg);
-				box-shadow: 0 2px 8px rgba(0, 123, 255, 0.2);
+				box-shadow: 0 2px 8px rgba(var(--primary-raw-rgb), 0.2);
+				transform: translateY(-2px);
 			}
-
-			&:focus {
+			&:focus-visible {
 				outline: none;
-				background: var(--bg-color);
-				border-color: var(--btn-primary-bg);
-				box-shadow: 0 0 0 2px rgba(0, 123, 255, 0.3);
+				box-shadow: 0 0 0 2px rgba(var(--primary-raw-rgb), 0.3);
 			}
 
 			&:disabled {

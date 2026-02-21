@@ -43,32 +43,53 @@ func StartPlaylistCycle(screenName string) error {
 		return fmt.Errorf("no playlist configured")
 	}
 
-	// Get all playlists
-	playlists, err := GetPlaylists()
-	if err != nil {
-		return fmt.Errorf("failed to get playlists: %w", err)
-	}
-
-	// Find the selected playlist
-	var selectedPlaylist *Playlist
-	for i := range playlists {
-		if playlists[i].Name == conf.Playlist {
-			selectedPlaylist = &playlists[i]
-			break
+	var session *PlaylistSession
+	if conf.Playlist == "Random All" {
+		wallpapers, err := GetWallpapers()
+		if err != nil {
+			return fmt.Errorf("failed to get all wallpapers: %w", err)
 		}
-	}
+		var ids []string
+		for id := range wallpapers {
+			ids = append(ids, id)
+		}
+		session = &PlaylistSession{
+			Playlist: &Playlist{
+				Name: "Random All",
+				Settings: PlaylistSettings{
+					Delay: int(conf.PlaylistInterval * 60),
+				},
+			},
+			Wallpapers: ids,
+		}
+	} else {
+		// Get all playlists
+		playlists, err := GetPlaylists()
+		if err != nil {
+			return fmt.Errorf("failed to get playlists: %w", err)
+		}
 
-	if selectedPlaylist == nil {
-		return fmt.Errorf("playlist '%s' not found", conf.Playlist)
-	}
+		// Find the selected playlist
+		var selectedPlaylist *Playlist
+		for i := range playlists {
+			if playlists[i].Name == conf.Playlist {
+				selectedPlaylist = &playlists[i]
+				break
+			}
+		}
 
-	if len(selectedPlaylist.Items) == 0 {
-		return fmt.Errorf("playlist '%s' has no wallpapers", conf.Playlist)
-	}
+		if selectedPlaylist == nil {
+			return fmt.Errorf("playlist '%s' not found", conf.Playlist)
+		}
 
-	session := &PlaylistSession{
-		Playlist:   selectedPlaylist,
-		Wallpapers: extractWallpaperIDs(selectedPlaylist.Items),
+		if len(selectedPlaylist.Items) == 0 {
+			return fmt.Errorf("playlist '%s' has no wallpapers", conf.Playlist)
+		}
+
+		session = &PlaylistSession{
+			Playlist:   selectedPlaylist,
+			Wallpapers: extractWallpaperIDs(selectedPlaylist.Items),
+		}
 	}
 
 	if len(session.Wallpapers) == 0 {
@@ -81,15 +102,15 @@ func StartPlaylistCycle(screenName string) error {
 	}
 
 	// If interval is 0, don't start the timer (one-time application only)
-	if selectedPlaylist.Settings.Delay == 0 {
+	if session.Playlist.Settings.Delay == 0 {
 		logger.Printf("Playlist delay is 0, applied single wallpaper from playlist '%s'", conf.Playlist)
 		return nil
 	}
 
 	// Start the timer (delay is in seconds)
-	interval := time.Duration(selectedPlaylist.Settings.Delay) * time.Second
-	if interval < 1*time.Minute {
-		interval = 1 * time.Minute // Minimum 1 minute
+	interval := time.Duration(session.Playlist.Settings.Delay) * time.Second
+	if interval < 1*time.Second {
+		interval = 1 * time.Second // Minimum 1 second
 	}
 
 	session.Timer = time.NewTicker(interval)
@@ -125,8 +146,8 @@ func StartPlaylistCycle(screenName string) error {
 				// Stop old ticker and create new one with updated interval
 				session.Timer.Stop()
 				newInterval := time.Duration(newIntervalMinutes * float64(time.Minute))
-				if newInterval < 1*time.Minute {
-					newInterval = 1 * time.Minute
+				if newInterval < 1*time.Second {
+					newInterval = 1 * time.Second
 				}
 				session.Timer = time.NewTicker(newInterval)
 				logger.Printf("Updated playlist interval for screen %s to %v", screenName, newInterval)
@@ -208,6 +229,11 @@ func UpdatePlaylistInterval(screenName string, intervalMinutes float64) error {
 		return fmt.Errorf("no playlist is currently running for screen %s", screenName)
 	}
 
+	// Update the stored playlist settings delay so it persists
+	if session.Playlist != nil && session.Playlist.Name != "Random All" {
+		UpdatePlaylistIntervalConfig(session.Playlist.Name, intervalMinutes)
+	}
+
 	// Send the new interval to the goroutine
 	select {
 	case session.UpdateChan <- intervalMinutes:
@@ -235,6 +261,20 @@ func extractWallpaperIDs(items []string) []string {
 
 // applyRandomPlaylistWallpaper picks and applies a random wallpaper.
 func applyRandomPlaylistWallpaper(conf config.AppConfig, session *PlaylistSession, screenName string) error {
+	// If "Random All", refresh the wallpaper list to include newly added ones
+	if session.Playlist != nil && session.Playlist.Name == "Random All" {
+		wallpapers, err := GetWallpapers()
+		if err == nil {
+			var ids []string
+			for id := range wallpapers {
+				ids = append(ids, id)
+			}
+			if len(ids) > 0 {
+				session.Wallpapers = ids
+			}
+		}
+	}
+
 	if len(session.Wallpapers) == 0 {
 		return fmt.Errorf("no wallpapers in playlist")
 	}

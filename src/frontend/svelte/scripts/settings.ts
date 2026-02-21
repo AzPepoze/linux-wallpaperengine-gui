@@ -61,6 +61,10 @@ export interface SettingsState {
 	playlistInterval: number;
 	steamApiKey: string;
 	nativeWayland: boolean;
+	dynamicUiTheme: boolean;
+	dynamicSidebarTheme: boolean;
+	transparentUi: boolean;
+	uiTransparency: number;
 }
 
 export const settingsStore: Writable<SettingsState | null> = writable(null);
@@ -94,6 +98,10 @@ const configFieldMap: Record<string, string> = {
 	playlistInterval: "playlistInterval",
 	steamApiKey: "steamApiKey",
 	nativeWayland: "nativeWayland",
+	dynamicUiTheme: "dynamicUiTheme",
+	dynamicSidebarTheme: "dynamicSidebarTheme",
+	transparentUi: "transparentUi",
+	uiTransparency: "uiTransparency",
 };
 
 // Settings Actions

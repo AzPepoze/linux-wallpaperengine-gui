@@ -48,7 +48,7 @@
 			outline: none;
 			border-color: var(--btn-primary-bg);
 			background-color: var(--bg-surface-active);
-			box-shadow: 0 0 0 3px rgba(0, 123, 255, 0.15);
+			box-shadow: 0 0 0 3px rgba(var(--primary-raw-rgb), 0.15);
 		}
 
 		&::placeholder {

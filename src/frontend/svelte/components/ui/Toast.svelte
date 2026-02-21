@@ -38,28 +38,28 @@
 		&.success {
 			background: var(--success-bg);
 			color: var(--success-color);
-			border: 1px solid #1e7e34;
+			border: 1px solid var(--success-border);
 			box-shadow: 0 8px 24px rgba(0, 0, 0, 0.4);
 		}
 
 		&.error {
 			background: var(--error-bg);
 			color: var(--error-color);
-			border: 1px solid #bd2130;
+			border: 1px solid var(--error-border);
 			box-shadow: 0 8px 24px rgba(0, 0, 0, 0.4);
 		}
 
 		&.warn {
-			background: #ffc107;
-			color: #000000;
-			border: 1px solid #d39e00;
+			background: var(--warn-bg);
+			color: var(--warn-color);
+			border: 1px solid var(--warn-border);
 			box-shadow: 0 8px 24px rgba(0, 0, 0, 0.4);
 		}
 
 		&.info {
-			background: #17a2b8;
-			color: #ffffff;
-			border: 1px solid #117a8b;
+			background: var(--info-bg);
+			color: var(--info-color);
+			border: 1px solid var(--info-border);
 			box-shadow: 0 8px 24px rgba(0, 0, 0, 0.4);
 		}
 	}

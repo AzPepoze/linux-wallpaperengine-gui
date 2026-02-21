@@ -65,11 +65,17 @@
 		{#if isWorkshop}
 			<!-- svelte-ignore a11y-click-events-have-key-events -->
 			<!-- svelte-ignore a11y-no-static-element-interactions -->
-			<div class="download-badge" title="Download" on:click|stopPropagation={() => {
-				if (wallpaper.projectData?.publishedfileid) {
-					window.electronAPI.openExternal(`steam://url/CommunityFilePage/${wallpaper.projectData.publishedfileid}`);
-				}
-			}}>
+			<div
+				class="download-badge"
+				title="Download"
+				on:click|stopPropagation={() => {
+					if (wallpaper.projectData?.publishedfileid) {
+						window.electronAPI.openExternal(
+							`steam://url/CommunityFilePage/${wallpaper.projectData.publishedfileid}`
+						);
+					}
+				}}
+			>
 				<DownloadIcon width="18" height="18" />
 			</div>
 		{/if}
@@ -82,8 +88,8 @@
 
 <style lang="scss">
 	.wallpaper-item {
-		--item-bg-color: rgba(66, 66, 66, 0.5);
-		--wallpaper-name-bg: black;
+		--item-bg-color: var(--item-bg-translucent);
+		--wallpaper-name-bg: var(--text-inverse);
 
 		width: 170px;
 		height: 170px;
@@ -112,13 +118,13 @@
 		&:hover,
 		&:focus {
 			transform: translateY(-5px);
-			box-shadow: 0 0 15px rgba(0, 123, 255, 0.7);
+			box-shadow: 0 0 15px var(--shadow-primary-glow);
 		}
 
 		&.selected,
 		&[aria-pressed='true'] {
-			border-color: #007bff;
-			box-shadow: 0 0 15px rgba(0, 123, 255, 0.7);
+			border-color: var(--btn-primary-bg);
+			box-shadow: 0 0 15px var(--shadow-primary-glow);
 		}
 
 		&.in-playlist {
@@ -183,10 +189,10 @@
 			border-radius: 10px;
 			font-weight: 500;
 			transition: all 0.2s;
-			border: 2px solid #007bff;
+			border: 2px solid var(--btn-primary-bg);
 			padding: 5px;
 			text-align: center;
-			color: #fff;
+			color: var(--text-color);
 		}
 
 		&:hover .wallpaper-name {
@@ -219,13 +225,13 @@
 			display: flex;
 			align-items: center;
 			justify-content: center;
-			background: rgba(0, 0, 0, 0.6);
-			color: #fff;
+			background: var(--badge-bg);
+			color: var(--text-color);
 			transition: all 0.2s;
 			pointer-events: auto;
 
 			&:hover {
-				background: #007bff;
+				background: var(--btn-primary-bg);
 				transform: scale(1.1);
 			}
 		}

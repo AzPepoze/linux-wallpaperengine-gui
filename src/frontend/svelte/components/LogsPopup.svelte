@@ -19,7 +19,9 @@
 		if (!element) return false;
 		const threshold = 50;
 		return (
-			element.scrollHeight - element.scrollTop - element.clientHeight <=
+			element.scrollHeight -
+				element.scrollTop -
+				element.clientHeight <=
 			threshold
 		);
 	}
@@ -190,7 +192,7 @@
 
 	.log-box {
 		flex: 1;
-		background-color: #1a1a1a;
+		background-color: var(--bg-dropdown);
 		border: 1px solid var(--border-color);
 		border-radius: var(--radius-sm);
 		padding: 10px;

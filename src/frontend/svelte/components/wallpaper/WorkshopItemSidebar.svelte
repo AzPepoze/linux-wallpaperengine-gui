@@ -418,13 +418,13 @@
 				padding-left: 1rem;
 
 				&.banned {
-					color: #ff6b6b;
+					color: var(--error-bg);
 				}
 			}
 		}
 
 		.warning-item {
-			border-left-color: #ff9800;
+			border-left-color: var(--warn-border);
 
 			.info-label {
 				font-weight: 600;
@@ -459,7 +459,7 @@
 
 				&:hover {
 					background: var(--btn-primary-bg);
-					color: var(--bg-app);
+					color: var(--sidebar-btn-text-final);
 				}
 			}
 		}
@@ -480,14 +480,14 @@
 
 				&.sexual {
 					background: rgba(255, 193, 7, 0.2);
-					color: #ffc107;
-					border: 1px solid #ffc107;
+					color: var(--warn-bg);
+					border: 1px solid var(--warn-border);
 				}
 
 				&.violence {
-					background: rgba(244, 67, 54, 0.2);
-					color: #f44336;
-					border: 1px solid #f44336;
+					background: var(--error-bg-translucent);
+					color: var(--error-bg);
+					border: 1px solid var(--error-border);
 				}
 			}
 		}

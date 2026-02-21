@@ -11,6 +11,7 @@ interface ElectronAPI {
 	minimize: () => Promise<void>;
 	maximize: () => Promise<void>;
 	hide: () => Promise<void>;
+	restartUI: () => Promise<void>;
 
 	// Screen management
 	getScreens: () => Promise<{ success: boolean; screens?: string[]; error?: string }>;

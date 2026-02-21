@@ -37,6 +37,10 @@ func init() {
 		Properties:          make(map[string]string),
 		WallpaperProperties: make(map[string]map[string]string),
 		Playlist:            "",
+		DynamicUiTheme:      true,
+		DynamicSidebarTheme: true,
+		TransparentUi:       true,
+		UiTransparency:      90,
 	}
 }
 
@@ -88,7 +92,7 @@ func ReadConfig() (AppConfig, error) {
 		return DefaultConfig, err
 	}
 
-	var conf AppConfig
+	conf := DefaultConfig
 	if err := json.Unmarshal(data, &conf); err != nil {
 		return DefaultConfig, err
 	}

@@ -48,7 +48,7 @@
 					id="playlist-select"
 					bind:value={$settingsStore.playlist}
 					options={playlistOptions}
-					onChange={onChange}
+					{onChange}
 				/>
 			{/if}
 		</div>
@@ -59,10 +59,12 @@
 					>Rename</Button
 				>
 				<Button variant="danger" on:click={onDelete}>Delete</Button>
+			{:else if $settingsStore?.playlist === 'Random All'}
+				<span class="info-tag">Dynamic Playlist</span>
 			{/if}
 		</div>
 
-		{#if activePlaylist}
+		{#if activePlaylist || $settingsStore?.playlist === 'Random All'}
 			<div class="interval-row">
 				<span class="label">Interval (min):</span>
 				<Input
@@ -117,11 +119,24 @@
 		.interval-row {
 			display: flex;
 			align-items: center;
+			justify-content: space-between;
 			gap: 10px;
-			margin-top: auto;
 			.label {
 				color: var(--text-muted);
 			}
+
+			:global(.input-wrapper) {
+				width: auto !important;
+			}
+		}
+
+		.info-tag {
+			font-size: 0.8em;
+			color: var(--btn-primary-bg);
+			background: var(--btn-primary-bg-alpha);
+			padding: 4px 8px;
+			border-radius: 4px;
+			font-weight: 600;
 		}
 	}
 </style>

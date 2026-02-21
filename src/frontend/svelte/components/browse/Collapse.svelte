@@ -77,7 +77,7 @@
 		}
 
 		&.expanded .collapse-header {
-			background: rgba(0, 123, 255, 0.15);
+			background: rgba(var(--primary-raw-rgb), 0.15);
 			border-radius: var(--radius-md);
 			padding: 8px 12px;
 			margin: 0 -20px;

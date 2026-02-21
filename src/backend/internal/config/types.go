@@ -11,12 +11,12 @@ type AppConfig struct {
 	// --- Linux Wallpaper Engine Arguments ---
 	// Performance & Basic Behavior
 	FPS               int  `json:"FPS,omitempty"`
-	Silence           bool `json:"SILENCE,omitempty"`
-	NoAutomute        bool `json:"noAutomute,omitempty"`
-	NoAudioProcessing bool `json:"noAudioProcessing,omitempty"`
-	NoFullscreenPause bool `json:"noFullscreenPause,omitempty"`
-	DisableParticles  bool `json:"disableParticles,omitempty"`
-	DumpStructure     bool `json:"dumpStructure,omitempty"`
+	Silence           bool `json:"SILENCE"`
+	NoAutomute        bool `json:"noAutomute"`
+	NoAudioProcessing bool `json:"noAudioProcessing"`
+	NoFullscreenPause bool `json:"noFullscreenPause"`
+	DisableParticles  bool `json:"disableParticles"`
+	DumpStructure     bool `json:"dumpStructure"`
 
 	// Display & Rendering
 	Scaling          string  `json:"scaling,omitempty"`
@@ -28,11 +28,11 @@ type AppConfig struct {
 	Volume *float64 `json:"volume,omitempty"`
 
 	// Input & Interaction
-	DisableMouse    bool `json:"disableMouse,omitempty"`
-	DisableParallax bool `json:"disableParallax,omitempty"`
+	DisableMouse    bool `json:"disableMouse"`
+	DisableParallax bool `json:"disableParallax"`
 
 	// Fullscreen Pause Logic
-	FullscreenPauseOnlyActive   bool     `json:"fullscreenPauseOnlyActive,omitempty"`
+	FullscreenPauseOnlyActive   bool     `json:"fullscreenPauseOnlyActive"`
 	FullscreenPauseIgnoreAppIds []string `json:"fullscreenPauseIgnoreAppIds,omitempty"`
 
 	// Wallpaper Properties
@@ -41,7 +41,7 @@ type AppConfig struct {
 
 	// Custom Arguments
 	CustomArgs        string `json:"customArgs,omitempty"`
-	CustomArgsEnabled bool   `json:"customArgsEnabled,omitempty"`
+	CustomArgsEnabled bool   `json:"customArgsEnabled"`
 
 	// Utilities & Paths
 	Screenshot      string `json:"screenshot,omitempty"`
@@ -56,4 +56,8 @@ type AppConfig struct {
 	WallpaperEngineDir       string         `json:"wallpaperEngineDir,omitempty"`
 	SteamApiKey              string         `json:"steamApiKey,omitempty"`
 	NativeWayland            bool           `json:"nativeWayland,omitempty"`
+	DynamicUiTheme           bool           `json:"dynamicUiTheme"`
+	DynamicSidebarTheme      bool           `json:"dynamicSidebarTheme"`
+	TransparentUi            bool           `json:"transparentUi"`
+	UiTransparency           int            `json:"uiTransparency,omitempty"`
 }
