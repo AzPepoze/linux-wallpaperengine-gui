@@ -9,6 +9,8 @@
 	import WorkshopItemSidebar from './WorkshopItemSidebar.svelte';
 	import LocalWallpaperSidebar from './LocalWallpaperSidebar.svelte';
 	import type { Wallpaper } from '../../../shared/types';
+	import DownloadIcon from '../../icons/DownloadIcon.svelte';
+	import WorkshopIcon from '../../icons/WorkshopIcon.svelte';
 
 	export let selectedWallpaper: Wallpaper | null = null;
 	export let onClose: () => void = () => {};
@@ -18,12 +20,16 @@
 	let textColor = '#fff';
 	let palette: [number, number, number][] = [];
 	let isResizing = false;
+	let btnPrimaryTextColor = '#fff';
+	let dominantColorArray: [number, number, number] | null = null;
+	let accentColor: [number, number, number] | null = null;
 
 	$: {
 		if (selectedWallpaper && selectedWallpaper.previewPath) {
 			getDominantColor(selectedWallpaper.previewPath).then(
 				(dominantColor) => {
 					if (dominantColor) {
+						dominantColorArray = dominantColor;
 						backgroundColor = `rgb(${dominantColor.join(',')})`;
 						textColor = isLight(dominantColor)
 							? '#000'
@@ -37,9 +43,32 @@
 				}
 			});
 		} else {
+			dominantColorArray = null;
+			accentColor = null;
 			backgroundColor = '#2a2a2a';
 			textColor = '#fff';
 			palette = [];
+		}
+	}
+
+	$: {
+		if (dominantColorArray && palette.length > 0) {
+			const targetIsLight = !isLight(dominantColorArray);
+			let contrastingColor = palette.find(c => isLight(c) === targetIsLight);
+			
+			if (contrastingColor) {
+				accentColor = contrastingColor;
+			} else {
+				accentColor = targetIsLight ? [255, 255, 255] : [0, 0, 0];
+			}
+		} else {
+			accentColor = null;
+		}
+
+		if (accentColor) {
+			btnPrimaryTextColor = isLight(accentColor) ? '#000' : '#fff';
+		} else {
+			btnPrimaryTextColor = backgroundColor;
 		}
 	}
 
@@ -90,17 +119,16 @@
 	style="
           --sidebar-bg: {backgroundColor};
           --sidebar-text: {textColor};
+          --btn-text-color: {btnPrimaryTextColor};
           --palette-primary: {palette.length > 0
 		? `rgb(${palette[0].join(',')})`
 		: 'var(--btn-primary-bg)'};
           --palette-secondary: {palette.length > 1
 		? `rgb(${palette[1].join(',')})`
 		: 'var(--btn-secondary-bg)'};
-          --palette-track: {palette.length > 2
-		? `rgb(${palette[2].join(',')})`
-		: palette.length > 1
-			? `rgb(${palette[1].join(',')})`
-			: 'var(--sidebar-text)'};
+          --palette-track: {accentColor
+		? `rgb(${accentColor.join(',')})`
+		: 'var(--sidebar-text)'};
           width: {selectedWallpaper ? $sidebarWidth + 'px' : '0'};
      "
 >
@@ -133,7 +161,13 @@
 				}
 			}}
 		>
-			View on Workshop
+			{#if selectedWallpaper?.projectData?.workshop_accepted === false}
+				<DownloadIcon width="18" height="18" />
+				Subscribe
+			{:else}
+				<WorkshopIcon width="18" height="18" />
+				View on Workshop
+			{/if}
 		</button>
 
 		{#if selectedWallpaper}
@@ -159,7 +193,8 @@
 		/* Dynamic Button Colors from Palette */
 		--btn-primary-bg: var(--palette-track);
 		--btn-primary-hover-bg: var(--sidebar-text);
-		--sidebar-btn-text-final: var(--sidebar-text);
+		--sidebar-btn-text-final: var(--btn-text-color);
+		--btn-primary-text: var(--btn-text-color);
 		--text-color: var(--sidebar-text);
 		--text-muted: var(--sidebar-text);
 		--border-color: var(--sidebar-text);
@@ -221,6 +256,11 @@
 			text-align: left;
 			border-radius: 15px;
 
+			:global(svg) {
+				color: inherit;
+				filter: invert(1);
+			}
+
 			:global(img) {
 				max-width: 100%;
 				height: auto;
@@ -265,6 +305,7 @@
 			display: flex;
 			justify-content: center;
 			align-items: center;
+			gap: 8px;
 			transition: all 0.3s ease;
 
 			&:hover {

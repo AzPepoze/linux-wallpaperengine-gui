@@ -35,7 +35,7 @@
 
 		&.primary {
 			background-color: var(--btn-primary-bg);
-			color: white;
+			color: var(--btn-primary-text, white);
 			&:hover:not(:disabled) {
 				background-color: var(--btn-primary-hover-bg);
 			}

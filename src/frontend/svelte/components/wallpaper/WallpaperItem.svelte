@@ -6,6 +6,7 @@
 		Playlist
 	} from '../../../shared/types';
 	import Trophy from '../../icons/Trophy.svelte';
+	import DownloadIcon from '../../icons/DownloadIcon.svelte';
 
 	export let folderName: string;
 	export let wallpaper: WallpaperData;
@@ -58,6 +59,18 @@
 		{#if wallpaper.projectData?.approved}
 			<div class="approved-badge" title="Approved Wallpaper">
 				<Trophy width="18" height="18" />
+			</div>
+		{/if}
+
+		{#if isWorkshop}
+			<!-- svelte-ignore a11y-click-events-have-key-events -->
+			<!-- svelte-ignore a11y-no-static-element-interactions -->
+			<div class="download-badge" title="Download" on:click|stopPropagation={() => {
+				if (wallpaper.projectData?.publishedfileid) {
+					window.electronAPI.openExternal(`steam://url/CommunityFilePage/${wallpaper.projectData.publishedfileid}`);
+				}
+			}}>
+				<DownloadIcon width="18" height="18" />
 			</div>
 		{/if}
 	</div>
@@ -183,18 +196,38 @@
 
 		.approved-badge {
 			position: absolute;
-			top: 10px;
-			left: 10px;
+			top: 5px;
+			left: 5px;
 			z-index: 5;
-			background: rgba(0, 0, 0, 0.4);
 			padding: 4px;
 			border-radius: 8px;
 			display: flex;
 			align-items: center;
 			justify-content: center;
-			border: 1px solid rgba(190, 255, 178, 0.3);
 			pointer-events: none;
-			box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+			filter: drop-shadow(0 0 5px rgba(0, 0, 0, 0.8))
+				drop-shadow(0 0 2px rgba(141, 255, 112, 0.8));
+		}
+
+		.download-badge {
+			position: absolute;
+			top: 5px;
+			right: 5px;
+			z-index: 5;
+			padding: 6px;
+			border-radius: 8px;
+			display: flex;
+			align-items: center;
+			justify-content: center;
+			background: rgba(0, 0, 0, 0.6);
+			color: #fff;
+			transition: all 0.2s;
+			pointer-events: auto;
+
+			&:hover {
+				background: #007bff;
+				transform: scale(1.1);
+			}
 		}
 	}
 </style>

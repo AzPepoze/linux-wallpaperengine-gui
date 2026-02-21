@@ -122,6 +122,49 @@ type FilterConfig struct {
 	UtilityTags    map[string]bool `json:"utilitytags"`
 }
 
+// UnmarshalJSON custom unmarshaler for FilterConfig to handle number/string to bool conversion in maps
+func (fc *FilterConfig) UnmarshalJSON(data []byte) error {
+	type Alias FilterConfig
+	aux := &struct {
+		CategoryTags   map[string]interface{} `json:"categorytags"`
+		RatingTags     map[string]interface{} `json:"ratingtags"`
+		ResolutionTags map[string]interface{} `json:"resolutiontags"`
+		SourceTags     map[string]interface{} `json:"sourcetags"`
+		Tags           map[string]interface{} `json:"tags"`
+		TypeTags       map[string]interface{} `json:"typetags"`
+		UtilityTags    map[string]interface{} `json:"utilitytags"`
+		*Alias
+	}{
+		Alias: (*Alias)(fc),
+	}
+
+	if err := json.Unmarshal(data, &aux); err != nil {
+		return err
+	}
+
+	// Helper to convert map[string]interface{} to map[string]bool
+	convertToBoolMap := func(m map[string]interface{}) map[string]bool {
+		if m == nil {
+			return nil
+		}
+		result := make(map[string]bool)
+		for k, v := range m {
+			result[k] = toBool(v)
+		}
+		return result
+	}
+
+	fc.CategoryTags = convertToBoolMap(aux.CategoryTags)
+	fc.RatingTags = convertToBoolMap(aux.RatingTags)
+	fc.ResolutionTags = convertToBoolMap(aux.ResolutionTags)
+	fc.SourceTags = convertToBoolMap(aux.SourceTags)
+	fc.Tags = convertToBoolMap(aux.Tags)
+	fc.TypeTags = convertToBoolMap(aux.TypeTags)
+	fc.UtilityTags = convertToBoolMap(aux.UtilityTags)
+
+	return nil
+}
+
 type WallpaperEngineConfig struct {
 	SteamUser struct {
 		General struct {

@@ -1,97 +1,15 @@
-export interface FilterCategory {
+import type { FilterConfig } from './types';
+
+export interface FilterGroup {
     name: string;
     items: string[];
 }
 
-export const filterCategories: FilterCategory[] = [
-    {
-        name: 'Type',
-        items: ['Scene', 'Video', 'Application', 'Web']
-    },
-    {
-        name: 'Genre',
-        items: [
-            'Abstract',
-            'Animal',
-            'Anime',
-            'Cartoon',
-            'CGI',
-            'Cyberpunk',
-            'Fantasy',
-            'Game',
-            'Girls',
-            'Guys',
-            'Landscape',
-            'Medieval',
-            'Memes',
-            'MMD',
-            'Music',
-            'Nature',
-            'Pixel art',
-            'Relaxing',
-            'Retro',
-            'Sci-Fi',
-            'Sports',
-            'Technology',
-            'Television',
-            'Vehicle',
-            'Unspecified'
-        ]
-    },
-    {
-        name: 'Age Rating',
-        items: ['Everyone', 'Questionable', 'Mature']
-    },
-    {
-        name: 'Resolution',
-        items: [
-            'Standard Definition',
-            '1280 x 720',
-            '1366 x 768',
-            '1920 x 1080',
-            '2560 x 1440',
-            '3840 x 2160',
-            'Ultrawide Standard Definition',
-            'Ultrawide 2560 x 1080',
-            'Ultrawide 3440 x 1440',
-            'Dual Standard Definition',
-            'Dual 3840 x 1080',
-            'Dual 5120 x 1440',
-            'Dual 7680 x 2160',
-            'Triple Standard Definition',
-            'Triple 4096 x 768',
-            'Triple 5760 x 1080',
-            'Triple 7680 x 1440',
-            'Triple 11520 x 2160',
-            'Portrait Standard Definition',
-            'Portrait 720 x 1280',
-            'Portrait 1080 x 1920',
-            'Portrait 1440 x 2560',
-            'Portrait 2160 x 3840',
-            'Other resolution',
-            'Dynamic resolution'
-        ]
-    },
-    {
-        name: 'Category',
-        items: ['Wallpaper', 'Preset', 'Asset']
-    },
-    {
-        name: 'Miscellaneous',
-        items: [
-            'Approved',
-            'Audio responsive',
-            '3D',
-            'Customizable',
-            'Puppet Warp',
-            'HDR',
-            'Media Integration',
-            'User Shortcut',
-            'Video Texture',
-            'Asset Pack'
-        ]
-    }
-];
+export interface FilterCategory {
+    name: string;
+    items: string[];
+    groups?: FilterGroup[];
+}
 
 export const mapCategoryToInternal = (category: string): string => {
     switch (category) {
@@ -103,4 +21,90 @@ export const mapCategoryToInternal = (category: string): string => {
         case 'Miscellaneous': return 'utilitytags';
         default: return 'tags';
     }
+};
+
+const internalToCategoryName: Record<string, string> = {
+    'typetags': 'Type',
+    'tags': 'Genre',
+    'ratingtags': 'Age Rating',
+    'resolutiontags': 'Resolution',
+    'categorytags': 'Category',
+    'utilitytags': 'Miscellaneous'
+};
+
+export const buildFilterCategories = (config: FilterConfig): FilterCategory[] => {
+    const categories: FilterCategory[] = [];
+    const categoryOrder = ['typetags', 'tags', 'ratingtags', 'resolutiontags', 'categorytags', 'utilitytags'];
+
+    categoryOrder.forEach(internalKey => {
+        const rawTagsMap = config[internalKey as keyof FilterConfig];
+        if (!rawTagsMap || typeof rawTagsMap !== 'object') return;
+
+        const availableTags = Object.keys(rawTagsMap);
+        if (availableTags.length === 0) return;
+
+        if (internalKey !== 'ratingtags') {
+            availableTags.sort();
+        }
+
+        const categoryName = internalToCategoryName[internalKey] || internalKey;
+
+        if (internalKey === 'resolutiontags') {
+            const groupsMap: Record<string, string[]> = {
+                'Widescreen': [],
+                'Ultra Widescreen': [],
+                'Dual Monitor': [],
+                'Triple Monitor': [],
+                'Portrait Monitor / Phone': [],
+                'Other': []
+            };
+
+            availableTags.forEach(tag => {
+                if (tag.startsWith('Ultrawide')) {
+                    groupsMap['Ultra Widescreen'].push(tag);
+                } else if (tag.startsWith('Dual')) {
+                    groupsMap['Dual Monitor'].push(tag);
+                } else if (tag.startsWith('Triple')) {
+                    groupsMap['Triple Monitor'].push(tag);
+                } else if (tag.startsWith('Portrait')) {
+                    groupsMap['Portrait Monitor / Phone'].push(tag);
+                } else if (tag.includes('Standard Definition') || tag.match(/^\d+ x \d+$/)) {
+                    groupsMap['Widescreen'].push(tag);
+                } else {
+                    groupsMap['Other'].push(tag);
+                }
+            });
+
+            const groups: FilterGroup[] = [];
+            const groupOrder = ['Widescreen', 'Ultra Widescreen', 'Dual Monitor', 'Triple Monitor', 'Portrait Monitor / Phone', 'Other'];
+
+            groupOrder.forEach(gName => {
+                if (groupsMap[gName].length > 0) {
+                    groups.push({
+                        name: gName,
+                        items: groupsMap[gName]
+                    });
+                }
+            });
+
+            categories.push({
+                name: categoryName,
+                items: [],
+                groups: groups
+            });
+        } else {
+            let items = availableTags;
+            if (internalKey === 'ratingtags') {
+                const ratingOrder = ['Everyone', 'Questionable', 'Mature'];
+                items = availableTags.sort((a, b) => ratingOrder.indexOf(a) - ratingOrder.indexOf(b));
+            }
+
+            categories.push({
+                name: categoryName,
+                items: items
+            });
+        }
+    });
+
+    return categories;
 };

@@ -3,11 +3,8 @@
 	import FilterItem from './FilterItem.svelte';
 	import Collapse from './Collapse.svelte';
 	import ResizeHandle from '../ui/ResizeHandle.svelte';
-
-	interface FilterCategory {
-		name: string;
-		items: string[];
-	}
+	import Button from '../ui/Button.svelte';
+	import type { FilterCategory } from '../../../shared/filterConstants';
 
 	export let filterCategories: FilterCategory[] = [];
 	export let selectedFilters: Map<string, Set<string>> = new Map();
@@ -27,6 +24,20 @@
 		return selectedFilters.get(category)?.has(filter) || false;
 	}
 
+	function setGroupState(category: string, items: string[], state: boolean) {
+		const categoryTags = selectedFilters.get(category) || new Set<string>();
+		items.forEach(item => {
+			if (state) {
+				categoryTags.add(item);
+			} else {
+				categoryTags.delete(item);
+			}
+			setTimeout(() => onToggleFilter(category, item), 0);
+		});
+		selectedFilters.set(category, categoryTags);
+		selectedFilters = new Map(selectedFilters);
+	}
+
 	function handleResize(newWidth: number) {
 		sidebarWidth = newWidth;
 	}
@@ -44,17 +55,47 @@
 				bind:isExpanded={expandedCategories[category.name]}
 			>
 				<div class="filter-list">
-					{#each category.items as item (item)}
-						<FilterItem
-							label={item}
-							isActive={isFilterActive(
-								category.name,
-								item
-							)}
-							onClick={() =>
-								handleToggleFilter(category.name, item)}
-						/>
-					{/each}
+					{#if category.items && category.items.length > 0}
+						{#each category.items as item (item)}
+							<FilterItem
+								label={item}
+								isActive={isFilterActive(
+									category.name,
+									item
+								)}
+								onClick={() =>
+									handleToggleFilter(category.name, item)}
+							/>
+						{/each}
+					{/if}
+
+					{#if category.groups}
+						{#each category.groups as group (group.name)}
+							<div class="filter-group">
+								<div class="group-header">
+									<h4>{group.name}</h4>
+									<div class="group-actions">
+										<Button variant="primary" style="padding: 2px 6px; font-size: 0.75em;" on:click={() => setGroupState(category.name, group.items, true)}>All</Button>
+										<Button variant="primary" style="padding: 2px 6px; font-size: 0.75em;" on:click={() => setGroupState(category.name, group.items, false)}>None</Button>
+									</div>
+								</div>
+								
+								<div class="group-items">
+									{#each group.items as item (item)}
+										<FilterItem
+											label={item}
+											isActive={isFilterActive(
+												category.name,
+												item
+											)}
+											onClick={() =>
+												handleToggleFilter(category.name, item)}
+										/>
+									{/each}
+								</div>
+							</div>
+						{/each}
+					{/if}
 				</div>
 			</Collapse>
 		{/each}
@@ -100,6 +141,47 @@
 				display: flex;
 				flex-direction: column;
 				gap: 4px;
+
+				.filter-group {
+					display: flex;
+					flex-direction: column;
+					margin-bottom: 6px;
+					padding-bottom: 6px;
+					border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+
+					&:last-child {
+						border-bottom: none;
+						margin-bottom: 0;
+						padding-bottom: 0;
+					}
+
+					.group-header {
+						display: flex;
+						flex-direction: column;
+						gap: 4px;
+						padding: 4px 6px;
+						margin-bottom: 4px;
+
+						h4 {
+							margin: 0;
+							font-size: 0.9em;
+							font-weight: 700;
+							color: var(--text-color);
+						}
+
+						.group-actions {
+							display: flex;
+							gap: 8px;
+						}
+					}
+
+					.group-items {
+						display: flex;
+						flex-direction: column;
+						gap: 2px;
+						padding-left: 0px;
+					}
+				}
 			}
 		}
 

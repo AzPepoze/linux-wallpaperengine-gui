@@ -45,6 +45,8 @@ export function formatWorkshopItem(file: PublishedFileDetails): WorkshopItem {
 	// Handle tags that can be either objects or strings
 	let formattedTags: string[] = [];
 	if (file.tags && Array.isArray(file.tags)) {
+		// console.log(`[DEBUG] Raw API tags for "${file.title}":`);
+		// console.log(file);
 		formattedTags = file.tags.map((tag: any) => {
 			if (typeof tag === "string") {
 				return tag;

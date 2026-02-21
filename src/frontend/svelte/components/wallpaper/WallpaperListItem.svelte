@@ -5,6 +5,7 @@
 		Playlist
 	} from '../../../shared/types';
 	import { formatBytes, formatDate } from '../../utils/formatHelper';
+	import DownloadIcon from '../../icons/DownloadIcon.svelte';
 
 	export let folderName: string;
 	export let wallpaper: WallpaperData;
@@ -102,6 +103,19 @@
 			</div>
 		{/if}
 	</div>
+	{#if isWorkshop}
+		<div class="actions">
+			<!-- svelte-ignore a11y-click-events-have-key-events -->
+			<!-- svelte-ignore a11y-no-static-element-interactions -->
+			<div class="download-badge" title="Download" on:click|stopPropagation={() => {
+				if (wallpaper.projectData?.publishedfileid) {
+					window.electronAPI.openExternal(`steam://url/CommunityFilePage/${wallpaper.projectData.publishedfileid}`);
+				}
+			}}>
+				<DownloadIcon width="20" height="20" />
+			</div>
+		</div>
+	{/if}
 </button>
 
 <style lang="scss">
@@ -269,6 +283,31 @@
 
 				.item-date {
 					color: #94a3b8;
+				}
+			}
+		}
+
+		.actions {
+			display: flex;
+			align-items: center;
+			justify-content: center;
+			padding-left: 10px;
+			z-index: 5;
+
+			.download-badge {
+				padding: 8px;
+				border-radius: 8px;
+				display: flex;
+				align-items: center;
+				justify-content: center;
+				background: rgba(0, 0, 0, 0.4);
+				color: #fff;
+				transition: all 0.2s;
+				pointer-events: auto;
+
+				&:hover {
+					background: #007bff;
+					transform: scale(1.1);
 				}
 			}
 		}

@@ -13,12 +13,13 @@
 		type WorkshopItem
 	} from '../utils/workshopHelper';
 	import type { FilterConfig } from '../../shared/types';
-	import { filterCategories, mapCategoryToInternal } from '../../shared/filterConstants';
+	import { buildFilterCategories, mapCategoryToInternal, type FilterCategory } from '../../shared/filterConstants';
 	import FilterPanel from './browse/FilterPanel.svelte';
 	import FilterIcon from '../icons/FilterIcon.svelte';
 	import SearchIcon from '../icons/SearchIcon.svelte';
 
 	let workshopFilters: FilterConfig | null = null;
+	let filterCategories: FilterCategory[] = [];
 	let initialLoadDone = false;
 	let showFilterPanel = false;
 	let searching = false;
@@ -49,6 +50,9 @@
 			const result = await window.electronAPI.getWorkshopFilters();
 			if (result.success) {
 				workshopFilters = result.filters;
+				if (workshopFilters) {
+					filterCategories = buildFilterCategories(workshopFilters);
+				}
 			}
 		} catch (err) {
 			console.error('Failed to load filters:', err);
@@ -95,7 +99,13 @@
 		
 		const categoryMap: Record<string, string[]> = {};
 		filterCategories.forEach(cat => {
-			categoryMap[mapCategoryToInternal(cat.name)] = cat.items;
+			let allItems = [...cat.items];
+			if (cat.groups) {
+				cat.groups.forEach(group => {
+					allItems.push(...group.items);
+				});
+			}
+			categoryMap[mapCategoryToInternal(cat.name)] = allItems;
 		});
 
 		const categories = [
@@ -111,17 +121,12 @@
 				.filter(([_, active]) => active)
 				.map(([tagName, _]) => tagName);
 
-			// Optimization: If all tags in a category are selected (and it's not ratingtags), 
-			// it's usually better to send nothing for that category to avoid ANDing every tag.
-			// Steam often ORs them, but sending a huge list is inefficient.
-			// exception for ratingtags where we want explicit inclusion/exclusion.
 			if (cat !== 'ratingtags' && activeTags.length === allPossibleTags.length && allPossibleTags.length > 0) {
 				return; 
 			}
 
 			activeTags.forEach(tag => required.push(tag));
 
-			// Age Rating exclusion logic: if a rating is not active, exclude it.
 			if (cat === 'ratingtags') {
 				allPossibleTags.forEach(tag => {
 					if (!filterTags[tag]) {

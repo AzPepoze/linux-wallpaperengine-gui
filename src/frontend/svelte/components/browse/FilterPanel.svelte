@@ -2,7 +2,7 @@
 	import { onMount } from 'svelte';
 	import { fly } from 'svelte/transition';
 	import type { FilterConfig } from '../../../shared/types';
-	import { filterCategories, mapCategoryToInternal } from '../../../shared/filterConstants';
+	import { buildFilterCategories, mapCategoryToInternal, type FilterCategory } from '../../../shared/filterConstants';
 	import FilterItem from './FilterItem.svelte';
 	import Collapse from './Collapse.svelte';
 	import Button from '../ui/Button.svelte';
@@ -15,6 +15,7 @@
 
 	let localConfig: FilterConfig = JSON.parse(JSON.stringify(config));
 	let expandedCategories: Record<string, boolean> = {};
+	let filterCategories: FilterCategory[] = buildFilterCategories(localConfig);
 
 	// Initialize expanded state
 	onMount(() => {
@@ -34,15 +35,21 @@
 		}
 	}
 
+	function setGroupState(category: string, items: string[], state: boolean) {
+		const internalKey = mapCategoryToInternal(category) as keyof FilterConfig;
+		const tags = localConfig[internalKey] as Record<string, boolean>;
+		items.forEach(item => tags[item] = state);
+		localConfig = { ...localConfig };
+		if (onChange) onChange(localConfig);
+	}
+
 	function handleSave() {
-		logger.log('FilterPanel: Apply clicked');
 		if (onSave) {
 			onSave(localConfig);
 		}
 	}
 
 	function handleReset() {
-		logger.log('FilterPanel: Reset clicked');
 		localConfig = JSON.parse(JSON.stringify(config));
 	}
 </script>
@@ -67,13 +74,39 @@
 		{#each filterCategories as category (category.name)}
 			<Collapse title={category.name} bind:isExpanded={expandedCategories[category.name]}>
 				<div class="filter-grid">
-					{#each category.items as item (item)}
-						<FilterItem
-							label={item}
-							isActive={(localConfig[mapCategoryToInternal(category.name) as keyof FilterConfig] as Record<string, boolean>)?.[item]}
-							onClick={() => toggleTag(category.name, item)}
-						/>
-					{/each}
+					{#if category.items && category.items.length > 0}
+						{#each category.items as item (item)}
+							<FilterItem
+								label={item}
+								isActive={(localConfig[mapCategoryToInternal(category.name) as keyof FilterConfig] as Record<string, boolean>)?.[item]}
+								onClick={() => toggleTag(category.name, item)}
+							/>
+						{/each}
+					{/if}
+
+					{#if category.groups}
+						{#each category.groups as group (group.name)}
+							<div class="filter-group">
+								<div class="group-header">
+									<h4>{group.name}</h4>
+									<div class="group-actions">
+										<Button variant="secondary" style="padding: 2px 6px; font-size: 0.75em;" on:click={() => setGroupState(category.name, group.items, true)}>All</Button>
+										<Button variant="secondary" style="padding: 2px 6px; font-size: 0.75em;" on:click={() => setGroupState(category.name, group.items, false)}>None</Button>
+									</div>
+								</div>
+								
+								<div class="group-items">
+									{#each group.items as item (item)}
+										<FilterItem
+											label={item}
+											isActive={(localConfig[mapCategoryToInternal(category.name) as keyof FilterConfig] as Record<string, boolean>)?.[item]}
+											onClick={() => toggleTag(category.name, item)}
+										/>
+									{/each}
+								</div>
+							</div>
+						{/each}
+					{/if}
 				</div>
 			</Collapse>
 		{/each}
@@ -132,6 +165,47 @@
 				display: flex;
 				flex-direction: column;
 				gap: 4px;
+
+				.filter-group {
+					display: flex;
+					flex-direction: column;
+					margin-bottom: 6px;
+					padding-bottom: 6px;
+					border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+
+					&:last-child {
+						border-bottom: none;
+						margin-bottom: 0;
+						padding-bottom: 0;
+					}
+
+					.group-header {
+						display: flex;
+						flex-direction: column;
+						gap: 4px;
+						padding: 4px 6px;
+						margin-bottom: 4px;
+
+						h4 {
+							margin: 0;
+							font-size: 0.9em;
+							font-weight: 700;
+							color: var(--text-color);
+						}
+
+						.group-actions {
+							display: flex;
+							gap: 8px;
+						}
+					}
+
+					.group-items {
+						display: flex;
+						flex-direction: column;
+						gap: 2px;
+						padding-left: 0px;
+					}
+				}
 			}
 		}
 	}

@@ -18,6 +18,7 @@ export function convertWorkshopItemToWallpaperData(
 			preview: item.previewUrl || "",
 			type: "workshop",
 			tags: item.tags,
+			approved: item.tags?.includes("Approved") || false, // This not work! but IDK how to get approval status just leave it for now
 			workshopid: item.publishedFileId,
 			views: item.views,
 			subscriptions: item.subscriptions,
