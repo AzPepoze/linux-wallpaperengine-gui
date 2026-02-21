@@ -5,6 +5,6 @@
  */
 
 export {
-     convertWorkshopItemToWallpaperData,
-     convertWorkshopItemsToWallpaperRecord,
+	convertWorkshopItemToWallpaperData,
+	convertWorkshopItemsToWallpaperRecord,
 } from "./browseTabUtils";

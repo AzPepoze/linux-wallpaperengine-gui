@@ -1,26 +1,28 @@
 package config
 
 type ScreenConfig struct {
-	Name      string  `json:"name"`
-	Wallpaper *string `json:"wallpaper"`
+	Name             string  `json:"name"`
+	Wallpaper        *string `json:"wallpaper"`
+	Playlist         string  `json:"playlist,omitempty"`
+	PlaylistInterval float64 `json:"playlistInterval,omitempty"`
 }
 
 type AppConfig struct {
 	// --- Linux Wallpaper Engine Arguments ---
 	// Performance & Basic Behavior
-	FPS                int  `json:"FPS,omitempty"`
-	Silence            bool `json:"SILENCE,omitempty"`
-	NoAutomute         bool `json:"noAutomute,omitempty"`
-	NoAudioProcessing  bool `json:"noAudioProcessing,omitempty"`
-	NoFullscreenPause  bool `json:"noFullscreenPause,omitempty"`
-	DisableParticles   bool `json:"disableParticles,omitempty"`
-	DumpStructure      bool `json:"dumpStructure,omitempty"`
+	FPS               int  `json:"FPS,omitempty"`
+	Silence           bool `json:"SILENCE,omitempty"`
+	NoAutomute        bool `json:"noAutomute,omitempty"`
+	NoAudioProcessing bool `json:"noAudioProcessing,omitempty"`
+	NoFullscreenPause bool `json:"noFullscreenPause,omitempty"`
+	DisableParticles  bool `json:"disableParticles,omitempty"`
+	DumpStructure     bool `json:"dumpStructure,omitempty"`
 
 	// Display & Rendering
-	Scaling  string   `json:"scaling,omitempty"`
-	Clamping string   `json:"clamping,omitempty"`
-	Playlist string   `json:"playlist,omitempty"`
-	PlaylistInterval int    `json:"playlistInterval,omitempty"`
+	Scaling          string  `json:"scaling,omitempty"`
+	Clamping         string  `json:"clamping,omitempty"`
+	Playlist         string  `json:"playlist,omitempty"`
+	PlaylistInterval float64 `json:"playlistInterval,omitempty"`
 
 	// Audio Settings
 	Volume *float64 `json:"volume,omitempty"`

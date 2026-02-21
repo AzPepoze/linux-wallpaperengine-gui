@@ -1,97 +1,99 @@
 export type WallpaperProjectData = {
-     title: string;
-     description?: string;
-     file: string;
-     preview: string;
-     type: string;
-     tags?: string[];
-     workshopid?: string;
-     general?: {
-          properties?: Record<string, any>;
-     };
-     [key: string]: any;
+	title: string;
+	description?: string;
+	file: string;
+	preview: string;
+	type: string;
+	tags?: string[];
+	workshopid?: string;
+	general?: {
+		properties?: Record<string, any>;
+	};
+	[key: string]: any;
 };
 
 export type WallpaperData = {
-     projectData: WallpaperProjectData | null;
-     previewPath: string | undefined;
+	projectData: WallpaperProjectData | null;
+	previewPath: string | undefined;
 };
 
 export type Wallpaper = WallpaperData & { folderName: string };
 
 export interface ScreenConfig {
-     name: string;
-     wallpaper: string | null;
+	name: string;
+	wallpaper: string | null;
+	playlist?: string;
+	playlistInterval?: number;
 }
 
 export type AppConfig = {
-     screens?: ScreenConfig[];
-     FPS?: number;
-     SILENCE?: boolean;
-     customArgs?: string;
-     customArgsEnabled?: boolean;
-     volume?: number;
-     noAutomute?: boolean;
-     noAudioProcessing?: boolean;
-     scaling?: string;
-     clamping?: string;
-     disableMouse?: boolean;
-     disableParallax?: boolean;
-     disableParticles?: boolean;
-     noFullscreenPause?: boolean;
-     customExecutableLocation?: string;
-     cloneMode?: boolean;
-     globalWallpaper?: string | null;
-     fullscreenPauseOnlyActive?: boolean;
-     fullscreenPauseIgnoreAppIds?: string[];
-     screenshot?: string;
-     screenshotDelay?: number;
-     assetsDir?: string;
-     wallpaperEngineDir?: string;
-     properties?: Record<string, string>;
-     wallpaperProperties?: Record<string, Record<string, string>>;
-     dumpStructure?: boolean;
-     playlist?: string;
-     playlistInterval?: number;
-     steamApiKey?: string;
-     nativeWayland?: boolean;
+	screens?: ScreenConfig[];
+	FPS?: number;
+	SILENCE?: boolean;
+	customArgs?: string;
+	customArgsEnabled?: boolean;
+	volume?: number;
+	noAutomute?: boolean;
+	noAudioProcessing?: boolean;
+	scaling?: string;
+	clamping?: string;
+	disableMouse?: boolean;
+	disableParallax?: boolean;
+	disableParticles?: boolean;
+	noFullscreenPause?: boolean;
+	customExecutableLocation?: string;
+	cloneMode?: boolean;
+	globalWallpaper?: string | null;
+	fullscreenPauseOnlyActive?: boolean;
+	fullscreenPauseIgnoreAppIds?: string[];
+	screenshot?: string;
+	screenshotDelay?: number;
+	assetsDir?: string;
+	wallpaperEngineDir?: string;
+	properties?: Record<string, string>;
+	wallpaperProperties?: Record<string, Record<string, string>>;
+	dumpStructure?: boolean;
+	playlist?: string;
+	playlistInterval?: number;
+	steamApiKey?: string;
+	nativeWayland?: boolean;
 };
 
 export type PropertyType =
-     | "slider"
-     | "boolean"
-     | "bool"
-     | "combolist"
-     | "combo"
-     | "color"
-     | "text"
-     | "textinput"
-     | "group"
-     | "unknown";
+	| "slider"
+	| "boolean"
+	| "bool"
+	| "combolist"
+	| "combo"
+	| "color"
+	| "text"
+	| "textinput"
+	| "group"
+	| "unknown";
 
 export interface WallpaperProperty {
-     name: string;
-     type: PropertyType;
-     description: string;
-     value: any;
-     min?: number;
-     max?: number;
-     step?: number;
-     options?: Record<string, string>;
+	name: string;
+	type: PropertyType;
+	description: string;
+	value: any;
+	min?: number;
+	max?: number;
+	step?: number;
+	options?: Record<string, string>;
 }
 
 export interface PlaylistSettings {
-     clock: string;
-     delay: number;
-     mode: string;
-     order: string;
-     transition: boolean;
-     updateonpause: boolean;
-     videosequence: boolean;
+	clock: string;
+	delay: number;
+	mode: string;
+	order: string;
+	transition: boolean;
+	updateonpause: boolean;
+	videosequence: boolean;
 }
 
 export interface Playlist {
-     name: string;
-     items: string[];
-     settings: PlaylistSettings;
+	name: string;
+	items: string[];
+	settings: PlaylistSettings;
 }

@@ -94,10 +94,11 @@ func GetWallpaperProjectData(folderName string) (map[string]interface{}, error) 
 
 	return properties, nil
 }
-func GetPlaylists() ([]Playlist, error) {
+
+func GetWEConfigPath() (string, error) {
 	err := config.EnsureInitialized()
 	if err != nil {
-		return nil, err
+		return "", err
 	}
 
 	// Find the wallpaper_engine installation directory
@@ -105,7 +106,7 @@ func GetPlaylists() ([]Playlist, error) {
 	// The installation is at ~/.../steamapps/common/wallpaper_engine
 	workshopPath := config.WallpaperPath
 	if workshopPath == "" {
-		return nil, fmt.Errorf("wallpaper path not initialized")
+		return "", fmt.Errorf("wallpaper path not initialized")
 	}
 
 	// Convert workshop path to common path
@@ -117,23 +118,8 @@ func GetPlaylists() ([]Playlist, error) {
 	} else if strings.Contains(workshopPath, "steamapps\\\\workshop\\\\content\\\\431960") {
 		installPath = strings.Replace(workshopPath, "steamapps\\\\workshop\\\\content\\\\431960", "steamapps\\\\common\\\\wallpaper_engine", 1)
 	} else {
-		return nil, fmt.Errorf("could not determine wallpaper_engine installation path")
+		return "", fmt.Errorf("could not determine wallpaper_engine installation path")
 	}
 
-	configPath := filepath.Join(installPath, "config.json")
-	if _, err := os.Stat(configPath); os.IsNotExist(err) {
-		return nil, fmt.Errorf("wallpaper_engine config.json not found at %s", configPath)
-	}
-
-	data, err := os.ReadFile(configPath)
-	if err != nil {
-		return nil, fmt.Errorf("failed to read config.json: %w", err)
-	}
-
-	var weConfig WallpaperEngineConfig
-	if err := json.Unmarshal(data, &weConfig); err != nil {
-		return nil, fmt.Errorf("failed to parse config.json: %w", err)
-	}
-
-	return weConfig.SteamUser.General.Playlists, nil
+	return filepath.Join(installPath, "config.json"), nil
 }
