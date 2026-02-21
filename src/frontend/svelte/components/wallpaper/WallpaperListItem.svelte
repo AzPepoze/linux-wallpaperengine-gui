@@ -228,6 +228,10 @@
 			border-color: var(--border-color-hover);
 		}
 
+		&:active {
+			transform: scale(0.98) translateX(4px);
+		}
+
 		&.selected {
 			border-color: var(--btn-primary-bg);
 			background: var(--bg-primary-translucent);

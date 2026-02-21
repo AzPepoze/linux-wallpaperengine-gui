@@ -104,10 +104,46 @@
 	}
 
 	let lastWallpaperId: string | null = null;
+	let calculatedFileSize: number | null = null;
+
+	async function resolveFileSize(wallpaper: Wallpaper) {
+		const isWorkshop = wallpaper.projectData?.isWorkshop;
+		try {
+			if (!isWorkshop) {
+				const basePath =
+					await window.electronAPI.getWallpaperBasePath();
+				if (basePath) {
+					calculatedFileSize =
+						await window.electronAPI.getDirectorySize(
+							`${basePath}/${wallpaper.folderName}`
+						);
+				}
+			} else {
+				// Try Steam install info first (accurate for downloaded)
+				const info =
+					await window.electronAPI.getWorkshopItemInstallInfo(
+						wallpaper.folderName
+					);
+				if (info && info.sizeOnDisk) {
+					calculatedFileSize = Number(info.sizeOnDisk);
+				} else {
+					// Fallback to metadata
+					const it = wallpaper as any;
+					calculatedFileSize =
+						it.fileSize || it.file_size || null;
+				}
+			}
+		} catch (e) {
+			calculatedFileSize = null;
+		}
+	}
+
 	$: if (sidebarContentElement && selectedWallpaper) {
 		if (selectedWallpaper.folderName !== lastWallpaperId) {
 			sidebarContentElement.scrollTop = 0;
 			lastWallpaperId = selectedWallpaper.folderName;
+			calculatedFileSize = null; // Reset
+			resolveFileSize(selectedWallpaper);
 
 			// Trigger a background check to populate the store if missing
 			if (selectedWallpaper.projectData?.isWorkshop) {
@@ -115,7 +151,6 @@
 			}
 		}
 	}
-
 	function close() {
 		onClose();
 	}
@@ -283,12 +318,16 @@
 					{/if}
 				</div>
 
-				<WorkshopItemSidebar wallpaper={selectedWallpaper} />
+				<WorkshopItemSidebar
+					wallpaper={selectedWallpaper}
+					fileSize={calculatedFileSize}
+				/>
 			{:else}
 				<LocalWallpaperSidebar
 					wallpaper={selectedWallpaper}
 					{textColor}
 					{palette}
+					fileSize={calculatedFileSize}
 				/>
 			{/if}
 		{/if}

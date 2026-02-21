@@ -79,6 +79,9 @@ contextBridge.exposeInMainWorld("electronAPI", {
 	getWorkshopItemDownloadInfo: createInvokeMethod(
 		"get-workshop-item-download-info",
 	),
+	getWorkshopItemInstallInfo: createInvokeMethod(
+		"get-workshop-item-install-info",
+	),
 	isSteamRunning: createInvokeMethod("is-steam-running"),
 
 	// Filter services

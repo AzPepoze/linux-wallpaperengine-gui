@@ -194,6 +194,7 @@ export function registerWorkshopService() {
 					subscriptions: Number(it.statistics?.numSubscriptions || 0),
 					favorites: Number(it.statistics?.numFavorites || 0),
 					views: Number(it.statistics?.numUniqueWebsiteViews || 0),
+					fileSize: Number(it.fileSize || it.file_size || 0),
 					_raw: it,
 				};
 			} catch (error) {
@@ -254,4 +255,21 @@ export function registerWorkshopService() {
 			}
 		},
 	);
+
+	ipcMain.handle("get-workshop-item-install-info", async (_, fileId: string) => {
+		const client = getSteamworksClient();
+		if (!client) return null;
+
+		try {
+			const info = client.workshop.installInfo(BigInt(fileId));
+			if (!info) return null;
+
+			return {
+				...info,
+				sizeOnDisk: info.sizeOnDisk.toString(),
+			};
+		} catch (error) {
+			return null;
+		}
+	});
 }

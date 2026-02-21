@@ -422,10 +422,10 @@
 
 		@keyframes wave-anim {
 			from {
-				transform: translateX(0);
+				transform: translateX(0) scaleY(-1);
 			}
 			to {
-				transform: translateX(-50%);
+				transform: translateX(-50%) scaleY(-1);
 			}
 		}
 	}

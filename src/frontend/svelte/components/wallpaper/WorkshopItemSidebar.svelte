@@ -14,6 +14,7 @@
 	}
 
 	export let wallpaper: Wallpaper;
+	export let fileSize: number | null = null;
 
 	const md = new MarkdownIt();
 
@@ -37,9 +38,12 @@
 	$: folderName = wallpaper?.folderName;
 
 	// Normalize data
-	$: fileSize = projectData.file_size
-		? parseInt(projectData.file_size)
-		: projectData.fileSize;
+	// Normalize data
+	$: displayFileSize =
+		fileSize ||
+		(projectData.file_size
+			? parseInt(projectData.file_size)
+			: projectData.fileSize);
 	$: createdDate = projectData.time_created
 		? projectData.time_created * 1000
 		: projectData.timeCreated
@@ -79,8 +83,8 @@
 
 	// Build file info array
 	$: fileInfo = [
-		...(fileSize
-			? [{ label: 'File Size', value: formatBytes(fileSize) }]
+		...(displayFileSize
+			? [{ label: 'File Size', value: formatBytes(displayFileSize) }]
 			: []),
 		...(createdDate
 			? [{ label: 'Created', value: formatDate(createdDate) }]
@@ -114,8 +118,10 @@
 			{#if projectData?.creator}
 				<p class="creator">by {projectData.creator}</p>
 			{/if}
-			{#if fileSize}
-				<p class="file-size-badge">{formatBytes(fileSize)}</p>
+			{#if displayFileSize}
+				<p class="file-size-badge">
+					{formatBytes(displayFileSize)}
+				</p>
 			{/if}
 		</div>
 	</div>

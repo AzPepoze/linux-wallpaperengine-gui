@@ -7,6 +7,7 @@
 	export let wallpaper: Wallpaper;
 	export let textColor: string = 'var(--text-color)';
 	export let palette: [number, number, number][] = [];
+	export let fileSize: number | null = null;
 
 	const md = new MarkdownIt();
 	let renderedContent = '';
@@ -24,15 +25,16 @@
 
 	$: {
 		const { projectData, folderName } = wallpaper;
-		const fileSize = projectData?.file_size
-			? parseInt(projectData.file_size)
-			: projectData?.fileSize;
-
+		const displayFileSize =
+			fileSize ||
+			(projectData?.file_size
+				? parseInt(projectData.file_size)
+				: projectData?.fileSize);
 		let content = `### ${projectData?.title || folderName}\n\n`;
 		content += `*Folder: ${folderName}*\n\n`;
 
-		if (fileSize) {
-			content += `**Size:** ${formatBytes(fileSize)}\n\n`;
+		if (displayFileSize) {
+			content += `**Size:** ${formatBytes(displayFileSize)}\n\n`;
 		}
 
 		if (projectData?.type) content += `**Type:** ${projectData.type}\n\n`;

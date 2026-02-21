@@ -82,6 +82,9 @@ interface ElectronAPI {
 	getWorkshopItemDownloadInfo: (
 		fileId: string,
 	) => Promise<{ current: string; total: string } | null>;
+	getWorkshopItemInstallInfo: (
+		fileId: string,
+	) => Promise<{ folder: string; sizeOnDisk: string; timestamp: number } | null>;
 
 	// Steam Filters
 	getInstalledFilters: () => Promise<{ success: boolean; filters: FilterConfig; error?: string }>;
