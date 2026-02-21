@@ -6,6 +6,7 @@ import (
 	"linux-wallpaperengine-gui/src/backend/internal/config"
 	"os"
 	"path/filepath"
+	"strings"
 )
 
 func GetWallpapers() (map[string]WallpaperData, error) {
@@ -92,4 +93,33 @@ func GetWallpaperProjectData(folderName string) (map[string]interface{}, error) 
 	}
 
 	return properties, nil
+}
+
+func GetWEConfigPath() (string, error) {
+	err := config.EnsureInitialized()
+	if err != nil {
+		return "", err
+	}
+
+	// Find the wallpaper_engine installation directory
+	// The workshop content is at ~/.../steamapps/workshop/content/431960
+	// The installation is at ~/.../steamapps/common/wallpaper_engine
+	workshopPath := config.WallpaperPath
+	if workshopPath == "" {
+		return "", fmt.Errorf("wallpaper path not initialized")
+	}
+
+	// Convert workshop path to common path
+	// From: ...steamapps/workshop/content/431960
+	// To:   ...steamapps/common/wallpaper_engine
+	installPath := ""
+	if strings.Contains(workshopPath, "steamapps/workshop/content/431960") {
+		installPath = strings.Replace(workshopPath, "steamapps/workshop/content/431960", "steamapps/common/wallpaper_engine", 1)
+	} else if strings.Contains(workshopPath, "steamapps\\\\workshop\\\\content\\\\431960") {
+		installPath = strings.Replace(workshopPath, "steamapps\\\\workshop\\\\content\\\\431960", "steamapps\\\\common\\\\wallpaper_engine", 1)
+	} else {
+		return "", fmt.Errorf("could not determine wallpaper_engine installation path")
+	}
+
+	return filepath.Join(installPath, "config.json"), nil
 }

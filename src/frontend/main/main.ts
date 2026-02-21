@@ -20,16 +20,16 @@ app.commandLine.appendSwitch("--no-zygote");
 app.commandLine.appendSwitch("--no-sandbox");
 
 protocol.registerSchemesAsPrivileged([
-     {
-          scheme: "wallpaper",
-          privileges: { bypassCSP: true, stream: true, supportFetchAPI: true },
-     },
+	{
+		scheme: "wallpaper",
+		privileges: { bypassCSP: true, stream: true, supportFetchAPI: true },
+	},
 ]);
 
 process.env.DIST = path.join(__dirname, "../");
 process.env.VITE_PUBLIC = process.env.VITE_DEV_SERVER_URL
-     ? path.join(process.env.DIST, "../public")
-     : process.env.DIST;
+	? path.join(process.env.DIST, "../public")
+	: process.env.DIST;
 
 let win: BrowserWindow | null = null;
 let cachedWallpaperBasePath = "";
@@ -39,164 +39,164 @@ const isMinimized = process.argv.includes("--minimized");
 const isDebug = process.argv.includes("--debug-mode");
 
 function createWindow() {
-     const preloadPath = path.join(__dirname, "preload.mjs");
-     logger.backend("Preload path:", preloadPath);
-     win = new BrowserWindow({
-          icon: path.join(process.env.VITE_PUBLIC || "", "icon.png"),
-          width: 1200,
-          height: 800,
-          webPreferences: {
-               preload: preloadPath,
-               contextIsolation: true,
-               nodeIntegration: false,
-               backgroundThrottling: true,
-               spellcheck: false,
-               offscreen: false,
-               enableWebSQL: false,
-          },
-          autoHideMenuBar: true,
-     });
-     setMainWindow(win);
-     logger.backend("Window created");
+	const preloadPath = path.join(__dirname, "preload.mjs");
+	logger.backend("Preload path:", preloadPath);
+	win = new BrowserWindow({
+		icon: path.join(process.env.VITE_PUBLIC || "", "icon.png"),
+		width: 1200,
+		height: 800,
+		webPreferences: {
+			preload: preloadPath,
+			contextIsolation: true,
+			nodeIntegration: false,
+			backgroundThrottling: true,
+			spellcheck: false,
+			offscreen: false,
+			enableWebSQL: false,
+		},
+		autoHideMenuBar: true,
+	});
+	setMainWindow(win);
+	logger.backend("Window created");
 
-     win.webContents.on("did-finish-load", () => {
-          win?.webContents.send(
-               "main-process-message",
-               new Date().toLocaleString(),
-          );
-     });
+	win.webContents.on("did-finish-load", () => {
+		win?.webContents.send(
+			"main-process-message",
+			new Date().toLocaleString(),
+		);
+	});
 
-     win.on("closed", () => {
-          win = null;
-          setMainWindow(null);
-     });
+	win.on("closed", () => {
+		win = null;
+		setMainWindow(null);
+	});
 
-     if (VITE_DEV_SERVER_URL) {
-          win.loadURL(VITE_DEV_SERVER_URL);
-     } else {
-          win.loadFile(path.join(process.env.DIST || "", "index.html"));
-     }
+	if (VITE_DEV_SERVER_URL) {
+		win.loadURL(VITE_DEV_SERVER_URL);
+	} else {
+		win.loadFile(path.join(process.env.DIST || "", "index.html"));
+	}
 }
 
 app.on("window-all-closed", () => {
-     app.quit();
+	app.quit();
 });
 
 app.on("activate", () => {
-     if (BrowserWindow.getAllWindows().length === 0) {
-          createWindow();
-     }
+	if (BrowserWindow.getAllWindows().length === 0) {
+		createWindow();
+	}
 });
 
 app.whenReady().then(async () => {
-     if (!process.env.INTERNAL_START && !process.env.VITE_DEV_SERVER_URL) {
-          const isProduction = !process.env.VITE_DEV_SERVER_URL;
-          let backendPath = "";
+	if (!process.env.INTERNAL_START && !process.env.VITE_DEV_SERVER_URL) {
+		const isProduction = !process.env.VITE_DEV_SERVER_URL;
+		let backendPath = "";
 
-          if (isProduction) {
-               backendPath = path.join(
-                    process.resourcesPath,
-                    "linux-wallpaperengine-gui",
-               );
-          } else {
-               backendPath = path.join(
-                    __dirname,
-                    "../../../build/backend/linux-wallpaperengine-gui",
-               );
-          }
+		if (isProduction) {
+			backendPath = path.join(
+				process.resourcesPath,
+				"linux-wallpaperengine-gui",
+			);
+		} else {
+			backendPath = path.join(
+				__dirname,
+				"../../../build/backend/linux-wallpaperengine-gui",
+			);
+		}
 
-          const args = process.argv.slice(isProduction ? 1 : 2);
-          logger.backend(
-               "Starting Go backend from Electron:",
-               backendPath,
-               args,
-          );
+		const args = process.argv.slice(isProduction ? 1 : 2);
+		logger.backend(
+			"Starting Go backend from Electron:",
+			backendPath,
+			args,
+		);
 
-          spawn(backendPath, args, {
-               detached: true,
-               stdio: isDebug ? ["ignore", "inherit", "inherit"] : "ignore",
-               env: process.env,
-          }).unref();
+		spawn(backendPath, args, {
+			detached: true,
+			stdio: isDebug ? ["ignore", "inherit", "inherit"] : "ignore",
+			env: process.env,
+		}).unref();
 
-          if (!isDebug) app.quit();
-          return;
-     }
+		if (!isDebug) app.quit();
+		return;
+	}
 
-     socketClient.onRetry((attempt, _error) => {
-          // Use different levels based on attempt
-          let type: "info" | "warn" | "error" = "info";
-          if (attempt > 7) type = "error";
-          else if (attempt > 3) type = "warn";
+	socketClient.onRetry((attempt, _error) => {
+		// Use different levels based on attempt
+		let type: "info" | "warn" | "error" = "info";
+		if (attempt > 7) type = "error";
+		else if (attempt > 3) type = "warn";
 
-          win?.webContents.send("show-toast", {
-               message: `Connecting to backend (Attempt ${attempt}/10)...`,
-               type,
-          });
-     });
+		win?.webContents.send("show-toast", {
+			message: `Connecting to backend (Attempt ${attempt}/10)...`,
+			type,
+		});
+	});
 
-     try {
-          await socketClient.connect();
-          logger.backend("Connected to Go backend");
+	try {
+		await socketClient.connect();
+		logger.backend("Connected to Go backend");
 
-          socketClient.onEvent((method, params) => {
-               if (method === "log") {
-                    const { type, message } = params;
-                    logger.toFrontend(type || "backend", message);
-               } else if (method === "screens-changed") {
-                    win?.webContents.send("screens-changed");
-               }
-          });
+		socketClient.onEvent((method, params) => {
+			if (method === "log") {
+				const { type, message } = params;
+				logger.toFrontend(type || "backend", message);
+			} else if (method === "screens-changed") {
+				win?.webContents.send("screens-changed");
+			}
+		});
 
-          // Cache base path immediately to avoid spamming the backend later
-          cachedWallpaperBasePath = await socketClient.send(
-               "get-wallpaper-base-path",
-          );
-     } catch (err) {
-          logger.backend(
-               "Failed to connect or get base path from Go backend:",
-               err,
-          );
-     }
+		// Cache base path immediately to avoid spamming the backend later
+		cachedWallpaperBasePath = await socketClient.send(
+			"get-wallpaper-base-path",
+		);
+	} catch (err) {
+		logger.backend(
+			"Failed to connect or get base path from Go backend:",
+			err,
+		);
+	}
 
-     registerConfigService();
-     registerWallpaperService();
-     registerDisplayService();
-     registerLoggerService();
-     registerWindowService();
-     registerFileService();
-     registerSystemService();
-     registerWorkshopService();
+	registerConfigService();
+	registerWallpaperService();
+	registerDisplayService();
+	registerLoggerService();
+	registerWindowService();
+	registerFileService();
+	registerSystemService();
+	registerWorkshopService();
 
-     protocol.handle("wallpaper", async (request) => {
-          const url = request.url.replace("wallpaper://", "");
-          const filePath = decodeURIComponent(url);
+	protocol.handle("wallpaper", async (request) => {
+		const url = request.url.replace("wallpaper://", "");
+		const filePath = decodeURIComponent(url);
 
-          if (!cachedWallpaperBasePath) {
-               try {
-                    cachedWallpaperBasePath = await socketClient.send(
-                         "get-wallpaper-base-path",
-                    );
-               } catch (err) {
-                    logger.backend(
-                         "Error getting wallpaper base path in handler:",
-                         err,
-                    );
-                    return new Response("Internal Server Error", {
-                         status: 500,
-                    });
-               }
-          }
+		if (!cachedWallpaperBasePath) {
+			try {
+				cachedWallpaperBasePath = await socketClient.send(
+					"get-wallpaper-base-path",
+				);
+			} catch (err) {
+				logger.backend(
+					"Error getting wallpaper base path in handler:",
+					err,
+				);
+				return new Response("Internal Server Error", {
+					status: 500,
+				});
+			}
+		}
 
-          if (!filePath.startsWith(cachedWallpaperBasePath)) {
-               logger.backend(
-                    `Blocked wallpaper:// access to: ${filePath} (not in ${cachedWallpaperBasePath})`,
-               );
-               return new Response("Access Denied", { status: 403 });
-          }
+		if (!filePath.startsWith(cachedWallpaperBasePath)) {
+			logger.backend(
+				`Blocked wallpaper:// access to: ${filePath} (not in ${cachedWallpaperBasePath})`,
+			);
+			return new Response("Access Denied", { status: 403 });
+		}
 
-          return net.fetch(`file://${filePath}`);
-     });
+		return net.fetch(`file://${filePath}`);
+	});
 
-     logger.backend("Is minimized:", isMinimized);
-     if (!isMinimized) createWindow();
+	logger.backend("Is minimized:", isMinimized);
+	if (!isMinimized) createWindow();
 });

@@ -164,6 +164,9 @@ pnpm run dev
 
 Feel free to contribute to this project by opening issues or submitting pull requests.
 
+> [!IMPORTANT]
+> Please make sure to select the `dev` branch when submitting pull requests.
+
 ## STONKS!
 
 <div align="center">

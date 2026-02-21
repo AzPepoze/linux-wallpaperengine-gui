@@ -9,73 +9,73 @@ export const wallpaperLogs = writable<string[]>([]);
 const MAX_LOGS = 200;
 
 function updateStore(store: typeof frontendLogs, message: string) {
-     const lines = message.split("\n").filter((line) => line.trim() !== "");
-     const entries = lines.map((line) => addTimestamp(line));
+	const lines = message.split("\n").filter((line) => line.trim() !== "");
+	const entries = lines.map((line) => addTimestamp(line));
 
-     store.update((logs) => {
-          const newLogs = [...logs, ...entries];
-          if (newLogs.length > MAX_LOGS) {
-               return newLogs.slice(newLogs.length - MAX_LOGS);
-          }
-          return newLogs;
-     });
+	store.update((logs) => {
+		const newLogs = [...logs, ...entries];
+		if (newLogs.length > MAX_LOGS) {
+			return newLogs.slice(newLogs.length - MAX_LOGS);
+		}
+		return newLogs;
+	});
 }
 
 export const logger = {
-     log: (...args: any[]) => {
-          const message = args.join(" ");
-          console.log(addTimestamp(message));
-          updateStore(frontendLogs, message);
+	log: (...args: any[]) => {
+		const message = args.join(" ");
+		console.log(addTimestamp(message));
+		updateStore(frontendLogs, message);
 
-          if (window.electronAPI) {
-               window.electronAPI.sendLog("frontend", ...args);
-          }
-     },
+		if (window.electronAPI) {
+			window.electronAPI.sendLog("frontend", ...args);
+		}
+	},
 
-     backend: (message: string) => {
-          updateStore(backendLogs, `[Backend] ${message}`);
-     },
+	backend: (message: string) => {
+		updateStore(backendLogs, `[Backend] ${message}`);
+	},
 
-     electron: (message: string) => {
-          updateStore(backendLogs, `[Electron] ${message}`);
-     },
+	electron: (message: string) => {
+		updateStore(backendLogs, `[Electron] ${message}`);
+	},
 
-     wallpaper: (message: string) => {
-          updateStore(wallpaperLogs, `[Wallpaper] ${message}`);
-     },
+	wallpaper: (message: string) => {
+		updateStore(wallpaperLogs, `[Wallpaper] ${message}`);
+	},
 
-     error: (...args: any[]) => {
-          logger.log(`ERROR: ${args.join(" ")}`);
-     },
+	error: (...args: any[]) => {
+		logger.log(`ERROR: ${args.join(" ")}`);
+	},
 
-     warn: (...args: any[]) => {
-          logger.log(`WARNING: ${args.join(" ")}`);
-     },
+	warn: (...args: any[]) => {
+		logger.log(`WARNING: ${args.join(" ")}`);
+	},
 
-     clearAll: () => {
-          frontendLogs.set([]);
-          backendLogs.set([]);
-          wallpaperLogs.set([]);
-     },
+	clearAll: () => {
+		frontendLogs.set([]);
+		backendLogs.set([]);
+		wallpaperLogs.set([]);
+	},
 };
 
 let isInitialized = false;
 
 export function initLogger() {
-     if (isInitialized) return;
+	if (isInitialized) return;
 
-     if (window.electronAPI) {
-          window.electronAPI.on(
-               IPC_LOG_CHANNEL,
-               (data: { type: string; message: string }) => {
-                    const method = logger[data.type as keyof typeof logger];
-                    if (typeof method === "function") {
-                         (method as Function)(data.message);
-                    } else {
-                         logger.backend(data.message);
-                    }
-               }
-          );
-          isInitialized = true;
-     }
+	if (window.electronAPI) {
+		window.electronAPI.on(
+			IPC_LOG_CHANNEL,
+			(data: { type: string; message: string }) => {
+				const method = logger[data.type as keyof typeof logger];
+				if (typeof method === "function") {
+					(method as Function)(data.message);
+				} else {
+					logger.backend(data.message);
+				}
+			}
+		);
+		isInitialized = true;
+	}
 }
