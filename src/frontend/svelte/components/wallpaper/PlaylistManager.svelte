@@ -46,6 +46,7 @@
 	function updateOptions() {
 		playlistOptions = [
 			{ value: '', label: 'None (All Wallpapers)' },
+			{ value: 'Random All', label: 'Random All (Dynamic)' },
 			...playlists.map((p) => ({
 				value: p.name,
 				label: `${p.name} (${p.items.length} items)`
@@ -68,13 +69,15 @@
 
 	async function handlePlaylistChange() {
 		if ($settingsStore) {
-			activePlaylist =
-				playlists.find((p) => p.name === $settingsStore.playlist) ||
-				null;
-
 			if (activePlaylist) {
 				tempInterval = activePlaylist.settings.delay / 60;
 				$settingsStore.playlistInterval = tempInterval;
+			} else if ($settingsStore.playlist === 'Random All') {
+				// Default interval for Random All if not set
+				if (!$settingsStore.playlistInterval) {
+					$settingsStore.playlistInterval = 1;
+				}
+				tempInterval = $settingsStore.playlistInterval;
 			} else {
 				$settingsStore.playlistInterval = 0;
 			}
@@ -90,6 +93,16 @@
 				);
 				showToast(
 					`Started playlist on ${cloneMode ? 'all displays' : selectedScreen || 'display'}: ${activePlaylist.name}`,
+					'success'
+				);
+			} else if ($settingsStore.playlist === 'Random All') {
+				await window.electronAPI.startPlaylist(
+					'Random All',
+					tempInterval,
+					screenName
+				);
+				showToast(
+					`Started dynamic random rotation on ${cloneMode ? 'all displays' : selectedScreen || 'display'}`,
 					'success'
 				);
 			} else {
@@ -155,14 +168,18 @@
 	function handleIntervalInput() {
 		if (saveTimeout) clearTimeout(saveTimeout);
 		saveTimeout = window.setTimeout(async () => {
-			if (activePlaylist && $settingsStore) {
+			if (
+				(activePlaylist ||
+					$settingsStore?.playlist === 'Random All') &&
+				$settingsStore
+			) {
 				$settingsStore.playlistInterval = tempInterval;
 				await window.electronAPI.saveConfig($settingsStore);
 				const screenName = cloneMode
 					? 'Global'
 					: selectedScreen || '';
 				await window.electronAPI.updatePlaylistInterval(
-					activePlaylist.name,
+					activePlaylist?.name || 'Random All',
 					tempInterval,
 					screenName
 				);
@@ -211,11 +228,20 @@
 				tempInterval =
 					$settingsStore.playlistInterval ||
 					activePlaylist.settings.delay / 60;
+			} else if (currentInStore === 'Random All') {
+				tempInterval = $settingsStore.playlistInterval || 1;
 			}
 		}
 	}
 
 	export async function addWallpaperToPlaylist(folderName: string) {
+		if ($settingsStore?.playlist === 'Random All') {
+			showToast(
+				'Cannot add to Random All (it includes everything)',
+				'info'
+			);
+			return;
+		}
 		if (!activePlaylist) {
 			showToast('Select a playlist to add wallpapers', 'info');
 			return;
