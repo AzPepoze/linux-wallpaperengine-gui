@@ -30,6 +30,7 @@ interface ElectronAPI {
 	fsExists: (path: string) => Promise<boolean>;
 	selectDir: () => Promise<string>;
 	selectFile: () => Promise<string>;
+	getDirectorySize: (path: string) => Promise<number>;
 
 	// Configuration management
 	getConfig: () => Promise<any>;
@@ -63,7 +64,7 @@ interface ElectronAPI {
 	updatePlaylistWallpapers: (name: string, items: string[]) => Promise<any>;
 
 	// Workshop
-	queryWorkshopFiles: (steamApiKey: string, options: {
+	queryWorkshopFiles: (options: {
 		query_type?: number;
 		page?: number;
 		cursor?: string;
@@ -72,7 +73,9 @@ interface ElectronAPI {
 		excludedtags?: string[];
 		match_all_tags?: boolean;
 		search_text?: string;
-	}) => Promise<{ items: any[]; total: number; nextCursor?: string }>;
+		item_type?: number;
+	}) => Promise<{ items: any[]; total: number; nextCursor?: string; error?: string }>;
+	getUGCFileDetails: (ugcId: string, steamId?: string) => Promise<any | null>;
 	fetchImage: (url: string) => Promise<string>;
 	subscribeWorkshopItem: (fileId: string) => Promise<{ success: boolean }>;
 	unsubscribeWorkshopItem: (fileId: string) => Promise<{ success: boolean }>;
@@ -85,6 +88,7 @@ interface ElectronAPI {
 	saveInstalledFilters: (filters: FilterConfig) => Promise<{ success: boolean; error?: string }>;
 	getWorkshopFilters: () => Promise<{ success: boolean; filters: FilterConfig; error?: string }>;
 	saveWorkshopFilters: (filters: FilterConfig) => Promise<{ success: boolean; error?: string }>;
+	isSteamRunning: () => Promise<boolean>;
 }
 
 interface Window {

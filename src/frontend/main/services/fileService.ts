@@ -73,4 +73,49 @@ export function registerFileService() {
 			return false;
 		}
 	});
+
+	ipcMain.handle("get-directory-size", async (_, dirPath: string) => {
+		logger.ipcReceived("get-directory-size", dirPath);
+		dirPath = normalizePath(dirPath);
+		try {
+			// Ensure the path exists
+			try {
+				await fs.stat(dirPath);
+			} catch (err: any) {
+				logger.backend(`Directory does not exist: ${dirPath}`, err);
+				return 0;
+			}
+
+			let total = 0;
+			const stack: string[] = [dirPath];
+
+			while (stack.length) {
+				const cur = stack.pop()!;
+				try {
+					const entries = await fs.readdir(cur);
+					for (const name of entries) {
+						const full = `${cur}/${name}`;
+						try {
+							const st = await fs.stat(full);
+							if (st.isDirectory()) {
+								stack.push(full);
+							} else {
+								total += st.size;
+							}
+						} catch (err: any) {
+							logger.backend(`Error statting ${full}:`, err);
+						}
+					}
+				} catch (err: any) {
+					logger.backend(`Error reading directory ${cur}:`, err);
+				}
+			}
+
+			logger.backend(`Directory size for ${dirPath}: ${total}`);
+			return total;
+		} catch (e: any) {
+			logger.error("Error getting directory size:", dirPath, e);
+			return 0;
+		}
+	});
 }

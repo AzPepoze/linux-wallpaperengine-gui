@@ -1,5 +1,6 @@
 <script lang="ts">
 	import MarkdownIt from 'markdown-it';
+	import { formatBytes } from '../../utils/formatHelper';
 	import type { Wallpaper } from '../../../shared/types';
 	import WallpaperProperties from './WallpaperProperties.svelte';
 
@@ -23,9 +24,16 @@
 
 	$: {
 		const { projectData, folderName } = wallpaper;
+		const fileSize = projectData?.file_size
+			? parseInt(projectData.file_size)
+			: projectData?.fileSize;
 
 		let content = `### ${projectData?.title || folderName}\n\n`;
 		content += `*Folder: ${folderName}*\n\n`;
+
+		if (fileSize) {
+			content += `**Size:** ${formatBytes(fileSize)}\n\n`;
+		}
 
 		if (projectData?.type) content += `**Type:** ${projectData.type}\n\n`;
 

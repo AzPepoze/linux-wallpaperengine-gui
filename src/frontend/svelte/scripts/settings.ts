@@ -59,7 +59,6 @@ export interface SettingsState {
 	dumpStructure: boolean;
 	playlist: string;
 	playlistInterval: number;
-	steamApiKey: string;
 	nativeWayland: boolean;
 	dynamicUiTheme: boolean;
 	dynamicSidebarTheme: boolean;
@@ -96,7 +95,6 @@ const configFieldMap: Record<string, string> = {
 	dumpStructure: "dumpStructure",
 	playlist: "playlist",
 	playlistInterval: "playlistInterval",
-	steamApiKey: "steamApiKey",
 	nativeWayland: "nativeWayland",
 	dynamicUiTheme: "dynamicUiTheme",
 	dynamicSidebarTheme: "dynamicSidebarTheme",

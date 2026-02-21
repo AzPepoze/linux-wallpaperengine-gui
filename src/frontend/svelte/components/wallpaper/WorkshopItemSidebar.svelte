@@ -33,70 +33,54 @@
 		(value || 0).toLocaleString();
 
 	// Computed properties
-	$: projectData = wallpaper?.projectData;
+	$: projectData = (wallpaper?.projectData || {}) as any;
 	$: folderName = wallpaper?.folderName;
 
-	// Normalize data to handle both naming conventions
-	$: fileSize = projectData?.file_size
+	// Normalize data
+	$: fileSize = projectData.file_size
 		? parseInt(projectData.file_size)
-		: projectData?.fileSize;
-	$: previewSize = projectData?.preview_file_size
-		? parseInt(projectData.preview_file_size)
-		: undefined;
-	$: createdDate = projectData?.time_created
+		: projectData.fileSize;
+	$: createdDate = projectData.time_created
 		? projectData.time_created * 1000
-		: projectData?.timeCreated;
-	$: updatedDate = projectData?.time_updated
+		: projectData.timeCreated
+			? projectData.timeCreated * 1000
+			: undefined;
+	$: updatedDate = projectData.time_updated
 		? projectData.time_updated * 1000
-		: projectData?.timeUpdated;
+		: projectData.timeUpdated
+			? projectData.timeUpdated * 1000
+			: undefined;
+
+	// Stats
+	$: stats = projectData.statistics || {};
+	$: views =
+		typeof projectData.views !== 'undefined'
+			? projectData.views
+			: parseInt(stats.numUniqueWebsiteViews || '0');
+	$: subs =
+		typeof projectData.subscriptions !== 'undefined'
+			? projectData.subscriptions
+			: typeof projectData.Subs !== 'undefined'
+				? projectData.Subs
+				: parseInt(stats.numSubscriptions || '0');
+	$: favorites =
+		typeof projectData.favorited !== 'undefined'
+			? projectData.favorited
+			: parseInt(stats.numFavorites || '0');
+	$: upvotes = projectData.numUpvotes || 0;
 
 	// Build engagement stats array
 	$: engagementStats = [
-		{ label: 'Views', value: projectData?.views || 0 },
-		{ label: 'Subs', value: projectData?.Subs || 0 },
-		...(projectData?.favorited !== undefined
-			? [{ label: 'Favorites', value: projectData.favorited }]
-			: []),
-		...(projectData?.followers !== undefined
-			? [{ label: 'Followers', value: projectData.followers }]
-			: [])
-	] as EngagementStat[];
-
-	// Build lifetime metrics array
-	$: lifetimeMetrics = [
-		...(projectData?.lifetime_Subs !== undefined
-			? [
-					{
-						label: 'Subs',
-						value: formatStat(projectData.lifetime_Subs)
-					}
-				]
-			: []),
-		...(projectData?.lifetime_favorited !== undefined
-			? [
-					{
-						label: 'Favorites',
-						value: formatStat(projectData.lifetime_favorited)
-					}
-				]
-			: []),
-		...(projectData?.lifetime_followers !== undefined
-			? [
-					{
-						label: 'Followers',
-						value: formatStat(projectData.lifetime_followers)
-					}
-				]
-			: [])
-	] as InfoItem[];
+		{ label: 'Views', value: views },
+		{ label: 'Subs', value: subs },
+		{ label: 'Favorites', value: favorites },
+		{ label: 'Upvotes', value: upvotes }
+	].filter((s: any) => s.value > 0) as EngagementStat[];
 
 	// Build file info array
 	$: fileInfo = [
 		...(fileSize
 			? [{ label: 'File Size', value: formatBytes(fileSize) }]
-			: []),
-		...(previewSize
-			? [{ label: 'Preview Size', value: formatBytes(previewSize) }]
 			: []),
 		...(createdDate
 			? [{ label: 'Created', value: formatDate(createdDate) }]
@@ -104,71 +88,36 @@
 		...(updatedDate
 			? [{ label: 'Updated', value: formatDate(updatedDate) }]
 			: []),
-		...(projectData?.num_comments_public !== undefined
-			? [
-					{
-						label: 'Comments',
-						value: formatStat(projectData.num_comments_public)
-					}
-				]
-			: [])
+		...(projectData.banned ? [{ label: 'Status', value: 'Banned' }] : [])
 	] as InfoItem[];
-
-	// Build moderation info array
-	$: moderationInfo = [
-		...(projectData?.banned !== undefined
-			? [
-					{
-						label: 'Status',
-						value: projectData.banned ? 'Banned' : 'Active',
-						isBanned: projectData.banned
-					}
-				]
-			: []),
-		...(projectData?.ban_reason
-			? [{ label: 'Ban Reason', value: projectData.ban_reason }]
-			: []),
-		...(projectData?.num_reports !== undefined
-			? [
-					{
-						label: 'Reports',
-						value: formatStat(projectData.num_reports)
-					}
-				]
-			: [])
-	];
 
 	// Check if sections should be visible
 	$: hasContent = {
-		lifetime: lifetimeMetrics.length > 0,
+		stats: engagementStats.length > 0,
 		fileInfo: fileInfo.length > 0,
-		tags:
-			projectData?.contentrating ||
-			projectData?.language ||
-			projectData?.tags?.length,
-		warnings:
-			projectData?.maybe_inappropriate_sex !== undefined ||
-			projectData?.maybe_inappropriate_violence !== undefined ||
-			projectData?.content_descriptorids?.length,
-		moderation: moderationInfo.length > 0,
+		tags: projectData.tags?.length > 0,
 		description:
-			(
-				projectData?.description || projectData?.file_description
-			)?.trim().length > 0
+			(projectData.description || projectData.file_description)?.trim()
+				.length > 0
 	};
 
 	// Get description text with fallback
 	$: description =
-		projectData?.file_description || projectData?.description || '';
+		projectData.file_description || projectData.description || '';
 </script>
 
 <div class="workshop-sidebar">
 	<!-- Header Section -->
 	<div class="section header-section">
 		<h1 class="title">{projectData?.title || folderName}</h1>
-		{#if projectData?.creator}
-			<p class="creator">by {projectData.creator}</p>
-		{/if}
+		<div class="header-meta">
+			{#if projectData?.creator}
+				<p class="creator">by {projectData.creator}</p>
+			{/if}
+			{#if fileSize}
+				<p class="file-size-badge">{formatBytes(fileSize)}</p>
+			{/if}
+		</div>
 	</div>
 
 	<!-- Tags -->
@@ -196,27 +145,16 @@
 	{/if}
 
 	<!-- Engagement Stats -->
-	<div class="section stats-section">
-		<h2 class="section-title">Engagement</h2>
-		<div class="stats-grid">
-			{#each engagementStats as stat (stat.label)}
-				<div class="stat-card">
-					<div class="stat-value">{formatStat(stat.value)}</div>
-					<div class="stat-label">{stat.label}</div>
-				</div>
-			{/each}
-		</div>
-	</div>
-
-	<!-- Lifetime Metrics -->
-	{#if hasContent.lifetime}
-		<div class="section metrics-section">
-			<h2 class="section-title">Lifetime Metrics</h2>
-			<div class="metrics-list">
-				{#each lifetimeMetrics as metric (metric.label)}
-					<div class="metric-item">
-						<span class="metric-label">{metric.label}:</span>
-						<span class="metric-value">{metric.value}</span>
+	{#if hasContent.stats}
+		<div class="section stats-section">
+			<h2 class="section-title">Engagement</h2>
+			<div class="stats-grid">
+				{#each engagementStats as stat (stat.label)}
+					<div class="stat-card">
+						<div class="stat-value">
+							{formatStat(stat.value)}
+						</div>
+						<div class="stat-label">{stat.label}</div>
 					</div>
 				{/each}
 			</div>
@@ -231,52 +169,14 @@
 				{#each fileInfo as item (item.label)}
 					<div class="info-item">
 						<span class="info-label">{item.label}:</span>
-						<span class="info-value">{item.value}</span>
+						<span
+							class="info-value"
+							class:banned={item.value === 'Banned'}
+							>{item.value}</span
+						>
 					</div>
 				{/each}
 			</div>
-		</div>
-	{/if}
-
-	<!-- Content Warnings -->
-	{#if hasContent.warnings}
-		<div class="section warnings-section">
-			<h2 class="section-title">Content Warnings</h2>
-			<div class="warnings-list">
-				{#if projectData?.maybe_inappropriate_sex}
-					<div class="warning-badge sexual">Sexual Content</div>
-				{/if}
-				{#if projectData?.maybe_inappropriate_violence}
-					<div class="warning-badge violence">Violence</div>
-				{/if}
-				{#if projectData?.content_descriptorids?.length}
-					<div class="warning-item">
-						<span class="info-label"
-							>Content Descriptors:</span
-						>
-						<span class="info-value">
-							{projectData.content_descriptorids.join(
-								', '
-							)}
-						</span>
-					</div>
-				{/if}
-			</div>
-		</div>
-	{/if}
-
-	<!-- Moderation Info -->
-	{#if hasContent.moderation}
-		<div class="section moderation-section">
-			<h2 class="section-title">Moderation</h2>
-			{#each moderationInfo as item (item.label)}
-				<div class="info-item">
-					<span class="info-label">{item.label}:</span>
-					<span class="info-value" class:banned={item.isBanned}>
-						{item.value}
-					</span>
-				</div>
-			{/each}
 		</div>
 	{/if}
 </div>
@@ -316,6 +216,25 @@
 				font-size: 0.9rem;
 				color: var(--text-muted);
 				opacity: 1;
+			}
+
+			.header-meta {
+				display: flex;
+				align-items: center;
+				justify-content: space-between;
+				gap: 12px;
+				margin-top: 4px;
+			}
+
+			.file-size-badge {
+				margin: 0;
+				font-size: 0.8rem;
+				font-weight: 700;
+				padding: 2px 8px;
+				background: var(--bg-surface-active);
+				border-radius: 12px;
+				color: var(--btn-primary-bg);
+				border: 1px solid var(--btn-primary-bg);
 			}
 		}
 
@@ -369,17 +288,13 @@
 		}
 
 		/* Lists */
-		.metrics-list,
-		.info-list,
-		.warnings-list {
+		.info-list {
 			display: flex;
 			flex-direction: column;
 			gap: 0.75rem;
 		}
 
-		.metric-item,
-		.info-item,
-		.warning-item {
+		.info-item {
 			display: flex;
 			justify-content: space-between;
 			align-items: center;
@@ -387,24 +302,7 @@
 			background: var(--bg-surface-hover);
 			border-radius: 4px;
 			border-left: 3px solid var(--btn-primary-bg);
-		}
 
-		.metric-item {
-			.metric-label {
-				font-weight: 600;
-				color: var(--text-color);
-				flex: 0 0 auto;
-			}
-			.metric-value {
-				text-align: right;
-				color: var(--text-color);
-				font-weight: 500;
-				flex: 1;
-				padding-left: 1rem;
-			}
-		}
-
-		.info-item {
 			.info-label {
 				font-weight: 600;
 				color: var(--text-color);
@@ -420,23 +318,6 @@
 				&.banned {
 					color: var(--error-bg);
 				}
-			}
-		}
-
-		.warning-item {
-			border-left-color: var(--warn-border);
-
-			.info-label {
-				font-weight: 600;
-				color: var(--text-color);
-				flex: 0 0 auto;
-			}
-			.info-value {
-				text-align: right;
-				color: var(--text-color);
-				font-weight: 500;
-				flex: 1;
-				padding-left: 1rem;
 			}
 		}
 
@@ -460,34 +341,6 @@
 				&:hover {
 					background: var(--btn-primary-bg);
 					color: var(--sidebar-btn-text-final);
-				}
-			}
-		}
-
-		/* Warnings */
-		.warnings-list {
-			display: flex;
-			flex-direction: column;
-			gap: 0.75rem;
-
-			.warning-badge {
-				padding: 0.75rem 1rem;
-				border-radius: 6px;
-				font-weight: 600;
-				font-size: 0.9rem;
-				display: inline-block;
-				width: fit-content;
-
-				&.sexual {
-					background: rgba(255, 193, 7, 0.2);
-					color: var(--warn-bg);
-					border: 1px solid var(--warn-border);
-				}
-
-				&.violence {
-					background: var(--error-bg-translucent);
-					color: var(--error-bg);
-					border: 1px solid var(--error-border);
 				}
 			}
 		}

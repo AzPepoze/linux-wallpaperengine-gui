@@ -264,9 +264,14 @@
 											)
 										: 0}
 								<div
-									class="progress-bar"
+									class="progress-cool"
 									style="width: {percent}%"
-								></div>
+								>
+									<div class="progress-glow"></div>
+									<div
+										class="progress-shimmer"
+									></div>
+								</div>
 								<span class="progress-text"
 									>Downloading {percent}%</span
 								>
@@ -472,20 +477,48 @@
 					cursor: wait;
 				}
 
-				.progress-bar {
+				.progress-cool {
 					position: absolute;
 					left: 0;
 					top: 0;
 					bottom: 0;
 					background-color: var(--btn-primary-bg);
-					opacity: 0.5;
-					transition: width 0.3s ease;
+					transition: width 0.4s cubic-bezier(0.1, 0.7, 1, 0.1);
 					z-index: 1;
+					box-shadow: 2px 0 10px var(--btn-primary-bg);
+
+					.progress-glow {
+						position: absolute;
+						right: -2px;
+						top: 0;
+						bottom: 0;
+						width: 4px;
+						background: white;
+						box-shadow:
+							0 0 15px white,
+							0 0 5px white;
+						opacity: 0.8;
+					}
+
+					.progress-shimmer {
+						position: absolute;
+						inset: 0;
+						background: linear-gradient(
+							90deg,
+							transparent,
+							rgba(255, 255, 255, 0.2),
+							transparent
+						);
+						background-size: 200% 100%;
+						animation: shimmer-anim 1.5s infinite linear;
+					}
 				}
 
 				.progress-text {
 					position: relative;
 					z-index: 2;
+					font-weight: 800;
+					text-shadow: 0 1px 3px rgba(0, 0, 0, 0.6);
 				}
 
 				:global(svg) {
@@ -567,6 +600,15 @@
 				);
 				transform: translateY(-2px);
 			}
+		}
+	}
+
+	@keyframes shimmer-anim {
+		from {
+			background-position: -200% 0;
+		}
+		to {
+			background-position: 200% 0;
 		}
 	}
 </style>
