@@ -1,8 +1,12 @@
-import { ipcMain } from "electron";
+import { ipcMain, net } from "electron";
 import { logger } from "../logger";
+import { init } from "steamworks.js";
+import { WALLPAPER_ENGINE_APP_ID } from "../../shared/constants";
+
+// Cache for workshop images to avoid redundant fetches
+const imageCache = new Map<string, string>();
 
 export const STEAM_API_BASE = "https://api.steampowered.com";
-export const WALLPAPER_ENGINE_APP_ID = 431960;
 
 export interface PublishedFileResponse {
 	response: {
@@ -259,21 +263,140 @@ export function registerWorkshopService() {
 
 	ipcMain.handle("fetch-image", async (_, url: string) => {
 		logger.ipcReceived("fetch-image", url);
+
+		// Check cache first
+		if (imageCache.has(url)) {
+			return imageCache.get(url);
+		}
+
+		const fetchWithRetry = async (
+			targetUrl: string,
+			retries = 3,
+			delay = 1000,
+		) => {
+			for (let i = 0; i < retries; i++) {
+				try {
+					// Using net.fetch which is Electron's own fetch,
+					// more reliable and respects system proxy settings
+					const response = await net.fetch(targetUrl);
+					if (!response.ok) {
+						throw new Error(
+							`HTTP error! status: ${response.status}`,
+						);
+					}
+
+					const arrayBuffer = await response.arrayBuffer();
+					const buffer = Buffer.from(arrayBuffer);
+					const base64 = buffer.toString("base64");
+					const mimeType =
+						response.headers.get("content-type") ||
+						"image/jpeg";
+					const dataUrl = `data:${mimeType};base64,${base64}`;
+
+					// Cache the result
+					imageCache.set(url, dataUrl);
+					// Limit cache size to 50 items
+					if (imageCache.size > 50) {
+						const firstKey = imageCache.keys().next().value;
+						if (typeof firstKey === "string") {
+							imageCache.delete(firstKey);
+						}
+					}
+
+					return dataUrl;
+				} catch (error) {
+					if (i === retries - 1) throw error;
+					logger.warn(
+						`Fetch failed for ${targetUrl}, retrying (${i + 1}/${retries})...`,
+						error,
+					);
+					await new Promise((resolve) =>
+						setTimeout(resolve, delay * (i + 1)),
+					);
+				}
+			}
+		};
+
 		try {
-			const response = await fetch(url);
-			if (!response.ok)
-				throw new Error(
-					`Failed to fetch image: ${response.status}`,
-				);
-			const arrayBuffer = await response.arrayBuffer();
-			const buffer = Buffer.from(arrayBuffer);
-			const base64 = buffer.toString("base64");
-			const mimeType =
-				response.headers.get("content-type") || "image/jpeg";
-			return `data:${mimeType};base64,${base64}`;
+			return await fetchWithRetry(url);
 		} catch (error) {
-			logger.error("Error fetching image:", error);
+			logger.error("Error fetching image after retries:", error);
 			throw error;
 		}
 	});
+
+	// Steamworks: Subscribe to workshop item
+	let steamworksClient: any = null;
+
+	const getSteamworksClient = () => {
+		if (steamworksClient) return steamworksClient;
+		try {
+			steamworksClient = init(WALLPAPER_ENGINE_APP_ID);
+			logger.backend("Steamworks client initialized");
+			return steamworksClient;
+		} catch (e) {
+			logger.error("Failed to initialize Steamworks client:", e);
+			return null;
+		}
+	};
+
+	ipcMain.handle("subscribe-workshop-item", async (_, fileId: string) => {
+		logger.ipcReceived("subscribe-workshop-item", fileId);
+		const client = getSteamworksClient();
+		if (!client) {
+			throw new Error(
+				"Steamworks client not initialized. Make sure Steam is running.",
+			);
+		}
+
+		try {
+			await client.workshop.subscribe(BigInt(fileId));
+			logger.backend(`Successfully subscribed to item ${fileId}`);
+			return { success: true };
+		} catch (error) {
+			logger.error(`Error subscribing to item ${fileId}:`, error);
+			throw error;
+		}
+	});
+
+	ipcMain.handle("unsubscribe-workshop-item", async (_, fileId: string) => {
+		logger.ipcReceived("unsubscribe-workshop-item", fileId);
+		const client = getSteamworksClient();
+		if (!client) {
+			throw new Error(
+				"Steamworks client not initialized. Make sure Steam is running.",
+			);
+		}
+
+		try {
+			await client.workshop.unsubscribe(BigInt(fileId));
+			logger.backend(`Successfully unsubscribed from item ${fileId}`);
+			return { success: true };
+		} catch (error) {
+			logger.error(`Error unsubscribing from item ${fileId}:`, error);
+			throw error;
+		}
+	});
+
+	ipcMain.handle(
+		"get-workshop-item-download-info",
+		async (_, fileId: string) => {
+			const client = getSteamworksClient();
+			if (!client) return null;
+
+			try {
+				const info = client.workshop.getItemDownloadInfo(
+					BigInt(fileId),
+				);
+				if (!info) return null;
+
+				return {
+					current: info.current.toString(),
+					total: info.total.toString(),
+				};
+			} catch (error) {
+				return null;
+			}
+		},
+	);
 }

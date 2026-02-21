@@ -74,6 +74,11 @@ interface ElectronAPI {
 		search_text?: string;
 	}) => Promise<{ items: any[]; total: number; nextCursor?: string }>;
 	fetchImage: (url: string) => Promise<string>;
+	subscribeWorkshopItem: (fileId: string) => Promise<{ success: boolean }>;
+	unsubscribeWorkshopItem: (fileId: string) => Promise<{ success: boolean }>;
+	getWorkshopItemDownloadInfo: (
+		fileId: string,
+	) => Promise<{ current: string; total: string } | null>;
 
 	// Steam Filters
 	getInstalledFilters: () => Promise<{ success: boolean; filters: FilterConfig; error?: string }>;

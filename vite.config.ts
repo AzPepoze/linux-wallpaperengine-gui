@@ -17,6 +17,9 @@ export default defineConfig({
                     vite: {
                          build: {
                               outDir: "build/frontend/electron",
+                              rollupOptions: {
+                                   external: ["steamworks.js"],
+                              },
                          },
                     },
                },
@@ -25,6 +28,9 @@ export default defineConfig({
                     vite: {
                          build: {
                               outDir: "build/frontend/electron",
+                              rollupOptions: {
+                                   external: ["steamworks.js"],
+                              },
                          },
                     },
                },

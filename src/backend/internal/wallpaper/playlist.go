@@ -231,7 +231,9 @@ func UpdatePlaylistInterval(screenName string, intervalMinutes float64) error {
 
 	// Update the stored playlist settings delay so it persists
 	if session.Playlist != nil && session.Playlist.Name != "Random All" {
-		UpdatePlaylistIntervalConfig(session.Playlist.Name, intervalMinutes)
+		if err := UpdatePlaylistIntervalConfig(session.Playlist.Name, intervalMinutes); err != nil {
+			logger.Printf("Warning: failed to update playlist interval config: %v", err)
+		}
 	}
 
 	// Send the new interval to the goroutine

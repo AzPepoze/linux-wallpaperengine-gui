@@ -2,6 +2,7 @@
 	import { onMount } from 'svelte';
 	import { fly } from 'svelte/transition';
 	import { settingsStore, showToast } from '../../scripts/settings';
+	import { WALLPAPER_ENGINE_APP_ID } from '../../../shared/constants';
 	import type { Playlist, WallpaperData } from '../../../shared/types';
 	import PlaylistSettingsPanel from './PlaylistSettingsPanel.svelte';
 	import PlaylistWallpapersPanel from './PlaylistWallpapersPanel.svelte';
@@ -210,7 +211,10 @@
 	}
 
 	function selectItem(itemPath: string) {
-		const match = itemPath.match(/431960[\/\\](\d+)[\/\\]/);
+		const regex = new RegExp(
+			`${WALLPAPER_ENGINE_APP_ID}[\\/\\\\](\\d+)[\\/\\\\]`
+		);
+		const match = itemPath.match(regex);
 		if (match && match[1]) {
 			const id = match[1];
 			if (wallpapers[id]) {

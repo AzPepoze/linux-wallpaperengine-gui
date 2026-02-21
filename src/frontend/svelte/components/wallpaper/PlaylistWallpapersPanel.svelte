@@ -1,5 +1,6 @@
 <script lang="ts">
 	import type { Playlist, WallpaperData } from '../../../shared/types';
+	import { WALLPAPER_ENGINE_APP_ID } from '../../../shared/constants';
 	import CloseIcon from '../../icons/CloseIcon.svelte';
 	import { fly, fade } from 'svelte/transition';
 
@@ -47,7 +48,9 @@
 						>
 							{#if itemPath}
 								{@const idMatch = itemPath.match(
-									/431960[\/\\](\d+)[\/\\]/
+									new RegExp(
+										`${WALLPAPER_ENGINE_APP_ID}[\\/\\\\](\\d+)[\\/\\\\]`
+									)
 								)}
 								{#if idMatch}
 									{@const id = idMatch[1]}

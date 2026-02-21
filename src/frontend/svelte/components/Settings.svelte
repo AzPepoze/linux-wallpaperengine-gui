@@ -8,6 +8,7 @@
 		validateBinaryFile,
 		showToast
 	} from '../scripts/settings';
+	import { WORKSHOP_CONTENT_SUFFIX } from '../../shared/constants';
 
 	import SettingsSection from './settings/SettingsSection.svelte';
 	import SettingItem from './ui/SettingItem.svelte';
@@ -532,7 +533,7 @@
 						label="Wallpaper Engine Directory"
 						id="wallpaperEngineDir"
 						vertical
-						description="Path to your Steam Workshop content (e.g. steamapps/workshop/content/431960). Leave empty to use auto-detect."
+						description="Path to your Steam Workshop content (e.g. {WORKSHOP_CONTENT_SUFFIX}). Leave empty to use auto-detect."
 					>
 						<Browse
 							bind:location={
@@ -739,14 +740,6 @@
 		font-size: 0.9em;
 		cursor: pointer;
 		transition: var(--transition-base);
-
-		&.primary {
-			background: var(--btn-primary-bg);
-			color: var(--text-color);
-			&:hover {
-				filter: brightness(1.1);
-			}
-		}
 
 		&.secondary {
 			background: var(--bg-surface);

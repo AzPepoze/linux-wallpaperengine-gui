@@ -13,7 +13,12 @@
 		type WorkshopItem
 	} from '../utils/workshopHelper';
 	import type { FilterConfig } from '../../shared/types';
-	import { buildFilterCategories, mapCategoryToInternal, type FilterCategory } from '../../shared/filterConstants';
+	import {
+		buildFilterCategories,
+		mapCategoryToInternal,
+		type FilterCategory
+	} from '../../shared/filterConstants';
+	import { WALLPAPER_ENGINE_APP_ID } from '../../shared/constants';
 	import FilterPanel from './browse/FilterPanel.svelte';
 	import FilterIcon from '../icons/FilterIcon.svelte';
 	import SearchIcon from '../icons/SearchIcon.svelte';
@@ -51,7 +56,8 @@
 			if (result.success) {
 				workshopFilters = result.filters;
 				if (workshopFilters) {
-					filterCategories = buildFilterCategories(workshopFilters);
+					filterCategories =
+						buildFilterCategories(workshopFilters);
 				}
 			}
 		} catch (err) {
@@ -62,15 +68,20 @@
 	async function saveFilters(newConfig: FilterConfig) {
 		logger.log('Workshop: saveFilters called');
 		try {
-			const result = await window.electronAPI.saveWorkshopFilters(newConfig);
+			const result =
+				await window.electronAPI.saveWorkshopFilters(newConfig);
 			if (result.success) {
 				workshopFilters = newConfig;
 				showFilterPanel = false;
-				logger.log('Workshop: Filters applied and saved successfully');
+				logger.log(
+					'Workshop: Filters applied and saved successfully'
+				);
 				// Reload items when filters change
 				handleSearch();
 			} else {
-				logger.error('Workshop: Failed to save filters - result was not success');
+				logger.error(
+					'Workshop: Failed to save filters - result was not success'
+				);
 			}
 		} catch (err) {
 			console.error('Failed to save filters:', err);
@@ -91,17 +102,20 @@
 		}
 	}
 
-	function getSearchParameters(): { required: string[], excluded: string[] } {
+	function getSearchParameters(): {
+		required: string[];
+		excluded: string[];
+	} {
 		if (!workshopFilters) return { required: [], excluded: [] };
-		
+
 		const required: string[] = [];
 		const excluded: string[] = [];
-		
+
 		const categoryMap: Record<string, string[]> = {};
-		filterCategories.forEach(cat => {
+		filterCategories.forEach((cat) => {
 			let allItems = [...cat.items];
 			if (cat.groups) {
-				cat.groups.forEach(group => {
+				cat.groups.forEach((group) => {
 					allItems.push(...group.items);
 				});
 			}
@@ -109,33 +123,44 @@
 		});
 
 		const categories = [
-			'tags', 'typetags', 'ratingtags', 'resolutiontags', 
-			'categorytags', 'sourcetags', 'utilitytags'
+			'tags',
+			'typetags',
+			'ratingtags',
+			'resolutiontags',
+			'categorytags',
+			'sourcetags',
+			'utilitytags'
 		];
 
-		categories.forEach(cat => {
-			const filterTags = workshopFilters![cat as keyof FilterConfig] as Record<string, boolean>;
+		categories.forEach((cat) => {
+			const filterTags = workshopFilters![
+				cat as keyof FilterConfig
+			] as Record<string, boolean>;
 			const allPossibleTags = categoryMap[cat] || [];
-			
+
 			const activeTags = Object.entries(filterTags)
 				.filter(([_, active]) => active)
 				.map(([tagName, _]) => tagName);
 
-			if (cat !== 'ratingtags' && activeTags.length === allPossibleTags.length && allPossibleTags.length > 0) {
-				return; 
+			if (
+				cat !== 'ratingtags' &&
+				activeTags.length === allPossibleTags.length &&
+				allPossibleTags.length > 0
+			) {
+				return;
 			}
 
-			activeTags.forEach(tag => required.push(tag));
+			activeTags.forEach((tag) => required.push(tag));
 
 			if (cat === 'ratingtags') {
-				allPossibleTags.forEach(tag => {
+				allPossibleTags.forEach((tag) => {
 					if (!filterTags[tag]) {
 						excluded.push(tag);
 					}
 				});
 			}
 		});
-		
+
 		return { required, excluded };
 	}
 
@@ -144,17 +169,25 @@
 		browseLoading = true;
 		try {
 			const { required, excluded } = getSearchParameters();
-			logger.log('Workshop: Starting search with required tags:', required.join(', '));
+			logger.log(
+				'Workshop: Starting search with required tags:',
+				required.join(', ')
+			);
 			if (excluded.length > 0) {
-				logger.log('Workshop: Excluding tags:', excluded.join(', '));
+				logger.log(
+					'Workshop: Excluding tags:',
+					excluded.join(', ')
+				);
 			}
 
 			const result = await window.electronAPI.queryWorkshopFiles(
 				steamApiKey,
 				{
 					search_text: searchText,
-					requiredtags: required.length > 0 ? required : undefined,
-					excludedtags: excluded.length > 0 ? excluded : undefined,
+					requiredtags:
+						required.length > 0 ? required : undefined,
+					excludedtags:
+						excluded.length > 0 ? excluded : undefined,
 					cursor: '*',
 					numperpage: 50
 				}
@@ -193,7 +226,6 @@
 		}
 	}
 
-
 	async function loadBrowseItems(pageNum: number = 0) {
 		browseLoading = true;
 		try {
@@ -218,8 +250,10 @@
 			const result = await window.electronAPI.queryWorkshopFiles(
 				steamApiKey,
 				{
-					requiredtags: required.length > 0 ? required : undefined,
-					excludedtags: excluded.length > 0 ? excluded : undefined,
+					requiredtags:
+						required.length > 0 ? required : undefined,
+					excludedtags:
+						excluded.length > 0 ? excluded : undefined,
 					cursor: cursor,
 					numperpage: 50
 				}
@@ -246,7 +280,10 @@
 			const firstItem =
 				validItems.length > 0 ? validItems[0].title : 'none';
 			logger.log(
-				'Workshop: Loaded page ' + pageNum + ' | First item: ' + firstItem
+				'Workshop: Loaded page ' +
+					pageNum +
+					' | First item: ' +
+					firstItem
 			);
 
 			// Store the next cursor if available
@@ -282,9 +319,9 @@
 		let url: string;
 
 		if (required.length > 0) {
-			url = `https://steamcommunity.com/workshop/browse/?appid=431960&searchtext=&requiredtags[]=${required[0]}`;
+			url = `https://steamcommunity.com/workshop/browse/?appid=${WALLPAPER_ENGINE_APP_ID}&searchtext=&requiredtags[]=${required[0]}`;
 		} else {
-			url = `https://steamcommunity.com/workshop/browse/?appid=431960`;
+			url = `https://steamcommunity.com/workshop/browse/?appid=${WALLPAPER_ENGINE_APP_ID}`;
 		}
 
 		window.electronAPI.openExternal(url);

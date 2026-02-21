@@ -7,6 +7,12 @@
 	} from '../../../shared/types';
 	import Trophy from '../../icons/Trophy.svelte';
 	import DownloadIcon from '../../icons/DownloadIcon.svelte';
+	import {
+		isDownloaded as checkIsDownloaded,
+		subscribe,
+		downloadProgress,
+		downloadStatus
+	} from '../../scripts/workshop';
 
 	export let folderName: string;
 	export let wallpaper: WallpaperData;
@@ -25,6 +31,25 @@
 		false;
 	$: fadeDuration = isWorkshop ? 0 : 300;
 	$: altText = `Preview for ${wallpaper.projectData?.title || folderName}`;
+
+	$: isDownloaded = $downloadStatus[folderName];
+
+	$: progress = $downloadProgress[folderName];
+	$: isDownloading = !!progress;
+	$: percent =
+		progress && progress.total > 0
+			? Math.round(
+					(Number(progress.current) / Number(progress.total)) *
+						100
+				)
+			: 0;
+
+	import { onMount } from 'svelte';
+	onMount(() => {
+		if (isWorkshop) {
+			checkIsDownloaded(folderName);
+		}
+	});
 </script>
 
 <button
@@ -62,21 +87,30 @@
 			</div>
 		{/if}
 
-		{#if isWorkshop}
+		{#if isWorkshop && !isDownloaded}
 			<!-- svelte-ignore a11y-click-events-have-key-events -->
 			<!-- svelte-ignore a11y-no-static-element-interactions -->
 			<div
 				class="download-badge"
-				title="Download"
-				on:click|stopPropagation={() => {
-					if (wallpaper.projectData?.publishedfileid) {
-						window.electronAPI.openExternal(
-							`steam://url/CommunityFilePage/${wallpaper.projectData.publishedfileid}`
-						);
+				class:is-downloading={isDownloading}
+				title={isDownloading
+					? `Downloading ${percent}%`
+					: 'Download'}
+				on:click|stopPropagation={async () => {
+					if (isDownloading) return;
+					try {
+						await subscribe(folderName);
+					} catch (e) {
+						// Error already logged in subscribe
 					}
 				}}
 			>
-				<DownloadIcon width="18" height="18" />
+				{#if isDownloading}
+					<div class="spinner"></div>
+					<span class="pct">{percent}%</span>
+				{:else}
+					<DownloadIcon width="18" height="18" />
+				{/if}
 			</div>
 		{/if}
 	</div>
@@ -234,6 +268,33 @@
 				background: var(--btn-primary-bg);
 				transform: scale(1.1);
 			}
+
+			&.is-downloading {
+				background: var(--btn-primary-bg);
+				padding: 4px 8px;
+				gap: 5px;
+				cursor: wait;
+
+				.pct {
+					font-size: 0.75rem;
+					font-weight: bold;
+				}
+			}
+
+			.spinner {
+				width: 12px;
+				height: 12px;
+				border: 2px solid rgba(255, 255, 255, 0.3);
+				border-top-color: white;
+				border-radius: 50%;
+				animation: spin 1s linear infinite;
+			}
+		}
+	}
+
+	@keyframes spin {
+		to {
+			transform: rotate(360deg);
 		}
 	}
 </style>

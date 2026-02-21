@@ -8,11 +8,19 @@
 	import { settingsStore } from '../../scripts/settings';
 	import { sidebarWidth } from '../../scripts/ui';
 	import { onDestroy } from 'svelte';
+	import { logger } from '../../scripts/logger';
 	import WorkshopItemSidebar from './WorkshopItemSidebar.svelte';
 	import LocalWallpaperSidebar from './LocalWallpaperSidebar.svelte';
 	import type { Wallpaper } from '../../../shared/types';
 	import DownloadIcon from '../../icons/DownloadIcon.svelte';
 	import WorkshopIcon from '../../icons/WorkshopIcon.svelte';
+	import {
+		isDownloaded as checkIsDownloaded,
+		subscribe,
+		unsubscribe,
+		downloadProgress,
+		downloadStatus
+	} from '../../scripts/workshop';
 
 	export let selectedWallpaper: Wallpaper | null = null;
 	export let onClose: () => void = () => {};
@@ -26,6 +34,8 @@
 	let btnPrimaryTextColor = 'rgba(255, 255, 255, 0.87)';
 	let dominantColorArray: [number, number, number] | null = null;
 	let accentColor: [number, number, number] | null = null;
+	$: isDownloaded =
+		selectedWallpaper && $downloadStatus[selectedWallpaper.folderName];
 
 	$: {
 		if (
@@ -98,6 +108,11 @@
 		if (selectedWallpaper.folderName !== lastWallpaperId) {
 			sidebarContentElement.scrollTop = 0;
 			lastWallpaperId = selectedWallpaper.folderName;
+
+			// Trigger a background check to populate the store if missing
+			if (selectedWallpaper.projectData?.isWorkshop) {
+				checkIsDownloaded(selectedWallpaper.folderName);
+			}
 		}
 	}
 
@@ -175,23 +190,94 @@
 			class="workshop-btn"
 			on:click={() => {
 				const url = `steam://url/CommunityFilePage/${selectedWallpaper?.folderName}`;
-				if (url) {
-					window.electronAPI.openExternal(url);
-					console.log('Opening URL:', url);
-				}
+				window.electronAPI.openExternal(url);
 			}}
 		>
-			{#if selectedWallpaper?.projectData?.workshop_accepted === false}
-				<DownloadIcon width="18" height="18" />
-				Subscribe
-			{:else}
-				<WorkshopIcon width="18" height="18" />
-				View on Workshop
-			{/if}
+			<WorkshopIcon width="18" height="18" />
+			View on Workshop
 		</button>
 
 		{#if selectedWallpaper}
+			{#if !selectedWallpaper.projectData?.isWorkshop || (isDownloaded && !$downloadProgress[selectedWallpaper?.folderName || ''])}
+				<div class="workshop-actions">
+					<button
+						type="button"
+						class="workshop-btn unsubscribe-btn"
+						on:click={async () => {
+							try {
+								await unsubscribe(
+									selectedWallpaper?.folderName || ''
+								);
+							} catch (e: any) {
+								logger.error(
+									'Unsubscription failed:',
+									e
+								);
+							}
+						}}
+					>
+						<DownloadIcon width="18" height="18" />
+						Unsubscribe
+					</button>
+				</div>
+			{/if}
+
 			{#if selectedWallpaper.projectData?.isWorkshop}
+				<div class="workshop-actions">
+					{#if !isDownloaded || $downloadProgress[selectedWallpaper?.folderName || '']}
+						<button
+							type="button"
+							class="workshop-btn"
+							class:downloading={$downloadProgress[
+								selectedWallpaper?.folderName || ''
+							]}
+							on:click={async () => {
+								try {
+									await subscribe(
+										selectedWallpaper?.folderName ||
+											''
+									);
+								} catch (e: any) {
+									logger.error(
+										'Subscription failed:',
+										e
+									);
+								}
+							}}
+						>
+							{#if $downloadProgress[selectedWallpaper?.folderName || '']}
+								{@const progress =
+									$downloadProgress[
+										selectedWallpaper?.folderName ||
+											''
+									]}
+								{@const percent =
+									progress.total > 0
+										? Math.round(
+												(Number(
+													progress.current
+												) /
+													Number(
+														progress.total
+													)) *
+													100
+											)
+										: 0}
+								<div
+									class="progress-bar"
+									style="width: {percent}%"
+								></div>
+								<span class="progress-text"
+									>Downloading {percent}%</span
+								>
+							{:else}
+								<DownloadIcon width="18" height="18" />
+								Subscribe
+							{/if}
+						</button>
+					{/if}
+				</div>
+
 				<WorkshopItemSidebar wallpaper={selectedWallpaper} />
 			{:else}
 				<LocalWallpaperSidebar
@@ -368,8 +454,45 @@
 			}
 		}
 
-		.workshop-btn {
+		.workshop-actions {
+			display: flex;
+			flex-direction: column;
+			gap: 8px;
 			margin-block: 10px;
+			width: 100%;
+
+			.workshop-btn {
+				margin-block: 0;
+				width: 100%;
+				position: relative;
+				overflow: hidden;
+
+				&.downloading {
+					background-color: var(--btn-secondary-bg);
+					cursor: wait;
+				}
+
+				.progress-bar {
+					position: absolute;
+					left: 0;
+					top: 0;
+					bottom: 0;
+					background-color: var(--btn-primary-bg);
+					opacity: 0.5;
+					transition: width 0.3s ease;
+					z-index: 1;
+				}
+
+				.progress-text {
+					position: relative;
+					z-index: 2;
+				}
+
+				:global(svg) {
+					position: relative;
+					z-index: 2;
+				}
+			}
 		}
 
 		&.open {

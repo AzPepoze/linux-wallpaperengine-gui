@@ -39,7 +39,8 @@
           "vite-plugin-electron-renderer": "^0.14.6"
      },
      "dependencies": {
-          "colorthief": "^2.6.0"
+          "colorthief": "^2.6.0",
+          "steamworks.js": "^0.4.0"
      },
      "pnpm": {
           "onlyBuiltDependencies": [
