@@ -55,6 +55,7 @@ contextBridge.exposeInMainWorld("electronAPI", {
 	toggleCloneMode: createInvokeMethod("toggle-clone-mode"),
 	clearAllWallpapers: createInvokeMethod("clear-all-wallpapers"),
 	loadWallpapers: createInvokeMethod("load-wallpapers"),
+	killWallpaper: createInvokeMethod("kill-wallpaper"),
 	getWallpaperPreview: createInvokeMethod("get-wallpaper-preview"),
 	getWallpaperProjectData: createInvokeMethod("get-wallpaper-project-data"),
 	getWallpaperProperties: createInvokeMethod("get-wallpaper-properties"),
@@ -83,6 +84,8 @@ contextBridge.exposeInMainWorld("electronAPI", {
 		"get-workshop-item-install-info",
 	),
 	isSteamRunning: createInvokeMethod("is-steam-running"),
+	getAllDownloadingItems: createInvokeMethod("get-all-downloading-items"),
+	getSubscribedItems: createInvokeMethod("get-subscribed-items"),
 
 	// Filter services
 	getInstalledFilters: createInvokeMethod("get-installed-filters"),

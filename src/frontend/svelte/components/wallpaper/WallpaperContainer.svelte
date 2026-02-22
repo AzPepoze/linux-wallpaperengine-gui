@@ -15,6 +15,11 @@
 	import { fly } from 'svelte/transition';
 	import { onMount } from 'svelte';
 	import { logger } from '../../scripts/logger';
+	import {
+		downloadProgress,
+		downloadingMetadata,
+		subscribedIds
+	} from '../../scripts/workshop';
 	import type {
 		WallpaperData,
 		Wallpaper,
@@ -35,6 +40,7 @@
 		folderName: string,
 		wallpaper: WallpaperData
 	) => void = () => {};
+	export let onWallpapersRefresh: (wallpapers: Record<string, WallpaperData>) => void = () => {};
 
 	let viewMode: 'grid' | 'list' | 'detail' = 'grid';
 
@@ -42,9 +48,49 @@
 	let installedFilters: FilterConfig | null = null;
 	let playlists: Playlist[] = [];
 
+	// Combine installed wallpapers with active subscriptions and downloads
+	$: combinedWallpapers = (() => {
+		const combined: Record<string, WallpaperData> = { ...wallpapers };
+		const subscribedList = Array.from($subscribedIds);
+
+		// 1. Add subscribed items that are missing from disk (treating as downloading)
+		subscribedList.forEach((fileId) => {
+			if (!combined[fileId]) {
+				// If we have metadata for this subscribed item, show it as downloading
+				if ($downloadingMetadata[fileId]) {
+					combined[fileId] = $downloadingMetadata[fileId];
+				} else {
+					// We might need to fetch metadata if missing, but for now we'll rely on the poller
+				}
+			}
+		});
+
+		// 2. Filter out workshop items that are NOT subscribed
+		const result: Record<string, WallpaperData> = {};
+		Object.entries(combined).forEach(([id, data]) => {
+			const isWorkshop =
+				!!data.projectData?.workshopid ||
+				!!data.projectData?.isWorkshop ||
+				/^\d+$/.test(id); // Simple numeric ID check as fallback
+
+			if (isWorkshop) {
+				if ($subscribedIds.has(id)) {
+					result[id] = data;
+				} else {
+					// Skip unsubscribed workshop items
+				}
+			} else {
+				// User wallpaper - always show
+				result[id] = data;
+			}
+		});
+
+		return result;
+	})();
+
 	// Reactive filtering of wallpapers
 	$: filteredWallpapers = (() => {
-		if (!installedFilters) return wallpapers;
+		if (!installedFilters) return combinedWallpapers;
 
 		// Extract active tags by category
 		const activeTags: Record<string, string[]> = {};
@@ -73,10 +119,10 @@
 			}
 		});
 
-		if (!hasAnyFilter) return wallpapers;
+		if (!hasAnyFilter) return combinedWallpapers;
 
 		const filtered: Record<string, WallpaperData> = {};
-		Object.entries(wallpapers).forEach(([folderName, data]) => {
+		Object.entries(combinedWallpapers).forEach(([folderName, data]) => {
 			const projectData = data.projectData;
 			const wpTags = (projectData?.tags || []).map((t) =>
 				t.toLowerCase()
@@ -181,6 +227,13 @@
 			}
 		});
 
+		// Always include downloading items, even if they don't match filters
+		Object.entries(combinedWallpapers).forEach(([folderName, data]) => {
+			if ($downloadProgress[folderName] && !filtered[folderName]) {
+				filtered[folderName] = data;
+			}
+		});
+
 		return filtered;
 	})();
 
@@ -189,7 +242,18 @@
 	);
 
 	onMount(async () => {
-		await Promise.all([loadPlaylists(), loadFilters()]);
+		window.electronAPI.on('wallpaper-folder-changed', (data) => {
+			logger.log(
+				`[DEBUG] Received wallpaper-folder-changed event: ${JSON.stringify(data)}`
+			);
+			refreshWallpapers();
+		});
+
+		await Promise.all([
+			loadPlaylists(),
+			loadFilters(),
+			refreshWallpapers()
+		]);
 	});
 
 	async function loadFilters() {
@@ -253,7 +317,11 @@
 	async function refreshWallpapers() {
 		const { wallpapers: loadedWallpapers } =
 			await window.electronAPI.loadWallpapers();
+		logger.log(
+			`[DEBUG] refreshWallpapers loaded ${Object.keys(loadedWallpapers).length} wallpapers`
+		);
 		wallpapers = loadedWallpapers;
+		onWallpapersRefresh(loadedWallpapers);
 	}
 
 	async function handleToggleCloneMode() {

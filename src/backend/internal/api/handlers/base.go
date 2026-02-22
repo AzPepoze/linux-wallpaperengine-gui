@@ -25,6 +25,7 @@ var dispatchTable = map[string]handlerFn{
 	"get-wallpaper-project-data": wrapWallpaper,
 	"get-wallpaper-base-path":    wrapWallpaper,
 	"kill-all-wallpapers":        wrapWallpaper,
+	"kill-wallpaper":             wrapWallpaper,
 
 	"get-playlists":              wrapPlaylist,
 	"create-playlist":            wrapPlaylist,

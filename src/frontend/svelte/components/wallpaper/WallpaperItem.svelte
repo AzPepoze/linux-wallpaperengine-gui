@@ -10,10 +10,10 @@
 	import DownloadIcon from '../../icons/DownloadIcon.svelte';
 	import CheckIcon from '../../icons/CheckIcon.svelte';
 	import {
-		isDownloaded as checkIsDownloaded,
 		subscribe,
 		downloadProgress,
-		downloadStatus
+		downloadStatus,
+		subscribedIds
 	} from '../../scripts/workshop';
 
 	export let folderName: string;
@@ -33,11 +33,13 @@
 		false;
 	$: fadeDuration = isWorkshop ? 0 : 300;
 	$: altText = `Preview for ${wallpaper.projectData?.title || folderName}`;
+	$: isWorkshopItem = !!wallpaper.projectData?.isWorkshop;
 
+	$: isSubscribed = $subscribedIds.has(folderName);
 	$: isDownloaded = $downloadStatus[folderName];
 
 	$: progress = $downloadProgress[folderName];
-	$: isDownloading = !!progress;
+	$: isDownloading = !!progress || (isSubscribed && !isDownloaded);
 	$: percent =
 		progress && progress.total > 0
 			? Math.round(
@@ -48,20 +50,35 @@
 
 	import { onMount } from 'svelte';
 	onMount(() => {
-		if (isWorkshop) {
-			checkIsDownloaded(folderName);
+		// Only check FS if we don't have a status or if it's subscribed
+		if (
+			(isWorkshop || isWorkshopItem) &&
+			($downloadStatus[folderName] === undefined || isSubscribed)
+		) {
+			// workshop.ts:isDownloaded actually triggers an FS check and updates the store
+			import('../../scripts/workshop').then((m) =>
+				m.isDownloaded(folderName)
+			);
 		}
 	});
 </script>
 
-<button
-	type="button"
+<div
+	role="button"
+	tabindex="0"
 	class="wallpaper-item"
 	class:selected
 	class:in-playlist={inPlaylist}
-	class:is-downloaded={isWorkshop && isDownloaded}
+	class:is-downloaded={isWorkshopItem && isDownloaded}
+	class:is-downloading={isWorkshopItem && isDownloading && !isDownloaded}
 	aria-pressed={selected}
 	on:click={() => onSelect(folderName, wallpaper)}
+	on:keydown={(e) => {
+		if (e.key === 'Enter' || e.key === ' ') {
+			e.preventDefault();
+			onSelect(folderName, wallpaper);
+		}
+	}}
 	style="animation-delay: {10 + index * 50}ms"
 >
 	<div class="wallpaper-preview-container">
@@ -90,7 +107,7 @@
 			</div>
 		{/if}
 
-		{#if isWorkshop && isDownloaded}
+		{#if isWorkshopItem && isDownloaded}
 			<div
 				class="downloaded-badge"
 				title="Downloaded"
@@ -100,7 +117,7 @@
 			</div>
 		{/if}
 
-		{#if isWorkshop && isDownloading && !isDownloaded}
+		{#if isWorkshopItem && isDownloading && !isDownloaded}
 			<div
 				class="full-card-progress"
 				in:fade={{ duration: 300 }}
@@ -120,14 +137,18 @@
 					}}
 					out:fade={{ duration: 300 }}
 				>
-					<span class="pct">{percent}%</span>
-					<span class="label">Downloading</span>
+					<span class="pct"
+						>{percent === 0 ? '' : percent + '%'}</span
+					>
+					<span class="label"
+						>{percent === 0 ? 'Queued' : 'Downloading'}</span
+					>
 				</div>
 				<div class="progress-overlay"></div>
 			</div>
 		{/if}
 
-		{#if isWorkshop && !isDownloaded && !isDownloading}
+		{#if isWorkshop && !isSubscribed && !isDownloading}
 			<!-- svelte-ignore a11y-click-events-have-key-events -->
 			<!-- svelte-ignore a11y-no-static-element-interactions -->
 			<div
@@ -150,7 +171,7 @@
 	<span class="wallpaper-name"
 		>{wallpaper.projectData?.title || folderName}</span
 	>
-</button>
+</div>
 
 <style lang="scss">
 	.wallpaper-item {
@@ -196,6 +217,11 @@
 		&.is-downloaded {
 			border-color: #4caf50;
 			box-shadow: 0 0 10px rgba(76, 175, 80, 0.3);
+		}
+
+		&.is-downloading {
+			border-color: var(--download-progress);
+			box-shadow: 0 0 15px rgba(255, 215, 0, 0.4);
 		}
 
 		&.in-playlist {
@@ -344,7 +370,7 @@
 				bottom: 0;
 				left: 0;
 				width: 100%;
-				background: var(--btn-primary-bg);
+				background: var(--download-progress);
 				opacity: 0.8;
 				transition: height 0.4s cubic-bezier(0.4, 0, 0.2, 1);
 				z-index: 1;
@@ -356,12 +382,22 @@
 					left: 0;
 					width: 200%;
 					height: 20px;
-					background: var(--btn-primary-bg);
+					background: var(--download-progress);
 					opacity: 1;
 					mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 1200 120' preserveAspectRatio='none'%3E%3Cpath d='M321.39,56.44c58-10.79,114.16-30.13,172-41.86,82.39-16.72,168.19-17.73,250.45-.39C823.78,31,906.67,72,985.66,92.83c70.05,18.48,146.53,26.09,214.34,3V0H0V27.35A600.21,600.21,0,0,0,321.39,56.44Z'/%3E%3C/svg%3E");
 					mask-size: 100% 100%;
 					animation: wave-anim 3s linear infinite;
+
+					/* Hide wave for solid yellow */
+					:global(.is-downloading) & {
+						display: none;
+					}
 				}
+			}
+
+			:global(.wallpaper-item.is-downloading .progress-wave-bg) {
+				background: var(--download-progress) !important;
+				opacity: 1;
 			}
 
 			.center-pct {
@@ -383,7 +419,7 @@
 				}
 
 				.label {
-					font-size: 0.7rem;
+					font-size: 1rem;
 					text-transform: uppercase;
 					letter-spacing: 1px;
 					font-weight: 700;

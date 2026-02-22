@@ -15,14 +15,20 @@
 	import DownloadIcon from '../../icons/DownloadIcon.svelte';
 	import WorkshopIcon from '../../icons/WorkshopIcon.svelte';
 	import {
-		isDownloaded as checkIsDownloaded,
 		subscribe,
 		unsubscribe,
 		downloadProgress,
-		downloadStatus
+		subscribedIds
 	} from '../../scripts/workshop';
+	import type { ProgressInfo } from '../../scripts/workshop';
 
 	export let selectedWallpaper: Wallpaper | null = null;
+
+	function getDownloadPercent(progress: ProgressInfo | undefined): number {
+		if (!progress || progress.total === 0) return 0;
+		return Math.round((Number(progress.current) / Number(progress.total)) * 100);
+	}
+
 	export let onClose: () => void = () => {};
 
 	let sidebarContentElement: HTMLDivElement;
@@ -34,8 +40,6 @@
 	let btnPrimaryTextColor = 'rgba(255, 255, 255, 0.87)';
 	let dominantColorArray: [number, number, number] | null = null;
 	let accentColor: [number, number, number] | null = null;
-	$: isDownloaded =
-		selectedWallpaper && $downloadStatus[selectedWallpaper.folderName];
 
 	$: {
 		if (
@@ -144,11 +148,6 @@
 			lastWallpaperId = selectedWallpaper.folderName;
 			calculatedFileSize = null; // Reset
 			resolveFileSize(selectedWallpaper);
-
-			// Trigger a background check to populate the store if missing
-			if (selectedWallpaper.projectData?.isWorkshop) {
-				checkIsDownloaded(selectedWallpaper.folderName);
-			}
 		}
 	}
 	function close() {
@@ -233,33 +232,45 @@
 		</button>
 
 		{#if selectedWallpaper}
-			{#if !selectedWallpaper.projectData?.isWorkshop || (isDownloaded && !$downloadProgress[selectedWallpaper?.folderName || ''])}
+			{#if !selectedWallpaper.projectData?.isWorkshop || $subscribedIds.has(selectedWallpaper.folderName)}
 				<div class="workshop-actions">
-					<button
-						type="button"
-						class="workshop-btn unsubscribe-btn"
-						on:click={async () => {
-							try {
-								await unsubscribe(
-									selectedWallpaper?.folderName || ''
-								);
-							} catch (e: any) {
-								logger.error(
-									'Unsubscription failed:',
-									e
-								);
-							}
-						}}
-					>
-						<DownloadIcon width="18" height="18" />
-						Unsubscribe
-					</button>
+					{#if $downloadProgress[selectedWallpaper?.folderName || '']}
+						{@const progress = $downloadProgress[selectedWallpaper?.folderName || '']}
+						{@const percent = getDownloadPercent(progress)}
+						<button type="button" class="workshop-btn downloading">
+							<div class="progress-cool" style="width: {percent}%">
+								<div class="progress-glow"></div>
+								<div class="progress-shimmer"></div>
+							</div>
+							<span class="progress-text">Downloading {percent}%</span>
+						</button>
+					{:else}
+						<button
+							type="button"
+							class="workshop-btn unsubscribe-btn"
+							on:click={async () => {
+								try {
+									await unsubscribe(
+										selectedWallpaper?.folderName || ''
+									);
+								} catch (e: any) {
+									logger.error(
+										'Unsubscription failed:',
+										e
+									);
+								}
+							}}
+						>
+							<DownloadIcon width="18" height="18" />
+							Unsubscribe
+						</button>
+					{/if}
 				</div>
 			{/if}
 
-			{#if selectedWallpaper.projectData?.isWorkshop}
+			{#if selectedWallpaper.projectData?.isWorkshop && !$subscribedIds.has(selectedWallpaper.folderName)}
 				<div class="workshop-actions">
-					{#if !isDownloaded || $downloadProgress[selectedWallpaper?.folderName || '']}
+					{#if true}
 						<button
 							type="button"
 							class="workshop-btn"
@@ -281,35 +292,13 @@
 							}}
 						>
 							{#if $downloadProgress[selectedWallpaper?.folderName || '']}
-								{@const progress =
-									$downloadProgress[
-										selectedWallpaper?.folderName ||
-											''
-									]}
-								{@const percent =
-									progress.total > 0
-										? Math.round(
-												(Number(
-													progress.current
-												) /
-													Number(
-														progress.total
-													)) *
-													100
-											)
-										: 0}
-								<div
-									class="progress-cool"
-									style="width: {percent}%"
-								>
+								{@const progress = $downloadProgress[selectedWallpaper?.folderName || '']}
+								{@const percent = getDownloadPercent(progress)}
+								<div class="progress-cool" style="width: {percent}%">
 									<div class="progress-glow"></div>
-									<div
-										class="progress-shimmer"
-									></div>
+									<div class="progress-shimmer"></div>
 								</div>
-								<span class="progress-text"
-									>Downloading {percent}%</span
-								>
+								<span class="progress-text">Downloading {percent}%</span>
 							{:else}
 								<DownloadIcon width="18" height="18" />
 								Subscribe
@@ -317,7 +306,9 @@
 						</button>
 					{/if}
 				</div>
+			{/if}
 
+			{#if selectedWallpaper.projectData?.isWorkshop}
 				<WorkshopItemSidebar
 					wallpaper={selectedWallpaper}
 					fileSize={calculatedFileSize}
@@ -525,6 +516,11 @@
 					transition: width 0.4s cubic-bezier(0.1, 0.7, 1, 0.1);
 					z-index: 1;
 					box-shadow: 2px 0 10px var(--btn-primary-bg);
+
+					:global(.is-downloading) & {
+						background-color: var(--download-progress);
+						box-shadow: 2px 0 10px var(--download-progress);
+					}
 
 					.progress-glow {
 						position: absolute;
