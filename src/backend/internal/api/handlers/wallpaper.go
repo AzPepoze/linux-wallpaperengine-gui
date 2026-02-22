@@ -52,6 +52,16 @@ func HandleWallpaper(req models.Request) models.Response {
 	case "kill-all-wallpapers":
 		wallpaper.KillAllWallpapers()
 		res.Result = map[string]bool{"success": true}
+	case "kill-wallpaper":
+		var params struct {
+			FolderName string `json:"folderName"`
+		}
+		if err := json.Unmarshal(req.Params, &params); err != nil {
+			res.Error = err.Error()
+		} else {
+			wallpaper.KillWallpaperByFolderName(params.FolderName)
+			res.Result = map[string]bool{"success": true}
+		}
 	}
 
 	return res

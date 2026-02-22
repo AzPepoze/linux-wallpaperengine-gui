@@ -2,6 +2,7 @@ import { ipcMain } from "electron";
 import { logger } from "../logger";
 import { init } from "steamworks.js";
 import { WALLPAPER_ENGINE_APP_ID } from "../../shared/constants";
+import { socketClient } from "../socket-client";
 
 export interface WorkshopQueryOptions {
 	query_type?: number;
@@ -228,11 +229,61 @@ export function registerWorkshopService() {
 		}
 
 		try {
+			// Kill the wallpaper before unsubscribing
+			try {
+				await socketClient.send("kill-wallpaper", { folderName: fileId });
+			} catch (e: any) {
+				logger.error(`Failed to kill wallpaper ${fileId} before unsubscription:`, e);
+			}
+
 			await client.workshop.unsubscribe(BigInt(fileId));
 			return { success: true };
 		} catch (error) {
 			logger.error(`Error unsubscribing from item ${fileId}:`, error);
 			throw error;
+		}
+	});
+
+	ipcMain.handle("get-all-downloading-items", async () => {
+		const client = getSteamworksClient();
+		if (!client) return [];
+
+		try {
+			const subscribedItems = client.workshop.getSubscribedItems();
+			const downloadingItems: any[] = [];
+
+			for (const fileId of subscribedItems) {
+				const state = client.workshop.state(fileId);
+				// 16 = Downloading, 32 = Download Pending
+				if ((state & 16) || (state & 32)) {
+					const info = client.workshop.downloadInfo(fileId);
+					if (info) {
+						downloadingItems.push({
+							fileId: fileId.toString(),
+							current: info.current.toString(),
+							total: info.total.toString(),
+							state
+						});
+					}
+				}
+			}
+			return downloadingItems;
+		} catch (error) {
+			logger.error("Error fetching all downloading items:", error);
+			return [];
+		}
+	});
+
+	ipcMain.handle("get-subscribed-items", async () => {
+		const client = getSteamworksClient();
+		if (!client) return [];
+
+		try {
+			const subscribedItems = client.workshop.getSubscribedItems();
+			return subscribedItems.map((id: bigint) => id.toString());
+		} catch (error) {
+			logger.error("Error fetching subscribed items:", error);
+			return [];
 		}
 	});
 

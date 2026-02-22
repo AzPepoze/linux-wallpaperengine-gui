@@ -389,6 +389,7 @@
 							{error}
 							playlistManager={playlistManagerComponent}
 							onSelect={handleSelectWallpaper}
+							onWallpapersRefresh={(w) => (wallpapers = w)}
 							bind:this={wallpaperContainerComponent}
 						/>
 					</div>

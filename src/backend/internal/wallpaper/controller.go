@@ -5,6 +5,7 @@ import (
 	"io"
 	"linux-wallpaperengine-gui/src/backend/internal/logger"
 	"os/exec"
+	"strings"
 	"sync"
 	"syscall"
 )
@@ -76,6 +77,18 @@ func killWallpaper(screen string) {
 		}
 	}
 	delete(activeWallpapers, screen)
+}
+
+func KillWallpaperByFolderName(folderName string) {
+	mu.Lock()
+	defer mu.Unlock()
+
+	for screen, active := range activeWallpapers {
+		if strings.Contains(active.Command, folderName) {
+			logger.Printf("Killing wallpaper with folder name %s on screen %s", folderName, screen)
+			killWallpaper(screen)
+		}
+	}
 }
 
 func spawnWallpaper(screen string, fullCommand string) {

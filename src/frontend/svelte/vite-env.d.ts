@@ -64,6 +64,7 @@ interface ElectronAPI {
 	updatePlaylistWallpapers: (name: string, items: string[]) => Promise<any>;
 
 	// Workshop
+	getPublishedFileDetails: (fileIds: string[]) => Promise<any[]>;
 	queryWorkshopFiles: (options: {
 		query_type?: number;
 		page?: number;
@@ -92,6 +93,9 @@ interface ElectronAPI {
 	getWorkshopFilters: () => Promise<{ success: boolean; filters: FilterConfig; error?: string }>;
 	saveWorkshopFilters: (filters: FilterConfig) => Promise<{ success: boolean; error?: string }>;
 	isSteamRunning: () => Promise<boolean>;
+	getAllDownloadingItems: () => Promise<any[]>;
+	killWallpaper: (params: { folderName: string }) => Promise<{ success: boolean }>;
+	getSubscribedItems: () => Promise<string[]>;
 }
 
 interface Window {

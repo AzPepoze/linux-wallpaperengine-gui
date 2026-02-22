@@ -10,8 +10,10 @@
 	import {
 		downloadStatus,
 		downloadProgress,
-		subscribe
+		subscribe,
+		subscribedIds
 	} from '../../scripts/workshop';
+	import { onMount } from 'svelte';
 	import { fade, scale } from 'svelte/transition';
 	import { backOut } from 'svelte/easing';
 
@@ -31,9 +33,10 @@
 		activePlaylist?.items.some((item) => item.includes(folderName)) ||
 		false;
 
+	$: isSubscribed = $subscribedIds.has(folderName);
 	$: isDownloaded = $downloadStatus[folderName];
 	$: progress = $downloadProgress[folderName];
-	$: isDownloading = !!progress;
+	$: isDownloading = !!progress || (isSubscribed && !isDownloaded);
 	$: percent =
 		progress && progress.total > 0
 			? Math.round(
@@ -41,6 +44,17 @@
 						100
 				)
 			: 0;
+
+	onMount(() => {
+		if (
+			(isWorkshop || wallpaper.projectData?.isWorkshop) &&
+			($downloadStatus[folderName] === undefined || isSubscribed)
+		) {
+			import('../../scripts/workshop').then((m) =>
+				m.isDownloaded(folderName)
+			);
+		}
+	});
 </script>
 
 <!-- svelte-ignore a11y-click-events-have-key-events -->
@@ -50,6 +64,7 @@
 	class:selected
 	class:in-playlist={inPlaylist}
 	class:is-downloaded={isWorkshop && isDownloaded}
+	class:is-downloading={isWorkshop && isDownloading && !isDownloaded}
 	on:click={() => onSelect(folderName, wallpaper)}
 	aria-pressed={selected}
 	in:scale={{ start: 0.95, duration: 200, easing: backOut }}
@@ -67,7 +82,7 @@
 			<div class="placeholder"></div>
 		{/if}
 
-		{#if isWorkshop && isDownloaded}
+		{#if isWorkshop && isSubscribed && isDownloaded}
 			<div class="downloaded-badge-overlay" in:fade>
 				<div class="badge-circle">
 					<CheckIcon width="14" height="14" strokeWidth="3" />
@@ -155,12 +170,18 @@
 						}}
 						out:fade={{ duration: 300 }}
 					>
-						<span class="pct">{percent}%</span>
-						<span class="label">Downloading</span>
+						<span class="pct"
+							>{percent === 0 ? '' : percent + '%'}</span
+						>
+						<span class="label"
+							>{percent === 0
+								? 'Queued'
+								: 'Downloading'}</span
+						>
 					</div>
 					<div class="progress-overlay"></div>
 				</div>
-			{:else if isDownloaded}
+			{:else if isSubscribed && isDownloaded}
 				<div
 					class="downloaded-check"
 					in:scale={{
@@ -176,7 +197,6 @@
 					role="button"
 					tabindex="0"
 					class="download-badge"
-					title="Download"
 					on:click|stopPropagation={async () => {
 						try {
 							await subscribe(folderName);
@@ -435,7 +455,19 @@
 						transform: scaleY(
 							-1
 						); // Re-applied flip for "upside down" peaks
+
+						:global(.is-downloading) & {
+							display: none;
+						}
 					}
+				}
+
+				:global(
+						.wallpaper-list-item.is-downloading
+							.progress-wave-bg
+					) {
+					background: var(--download-progress) !important;
+					opacity: 1;
 				}
 
 				.center-pct {
@@ -455,7 +487,7 @@
 					}
 
 					.label {
-						font-size: 0.6rem;
+						font-size: 0.9rem;
 						text-transform: uppercase;
 						letter-spacing: 1px;
 						font-weight: 700;

@@ -172,8 +172,8 @@
 				return;
 			}
 
-			if (catKey === 'ratingtags') {
-				// For ratings, we'll use exclusion for anything NOT checked
+			if (catKey === 'ratingtags' || catKey === 'typetags') {
+				// For ratings and types, we'll use exclusion for anything NOT checked
 				allPossibleTags.forEach((tag) => {
 					if (!filterTags[tag]) {
 						excluded.push(tag);

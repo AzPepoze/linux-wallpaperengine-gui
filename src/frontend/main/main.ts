@@ -2,6 +2,7 @@ import { app, BrowserWindow, protocol, net } from "electron";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
 import { spawn } from "node:child_process";
+import fs from "node:fs";
 import { socketClient } from "./socket-client";
 import { registerConfigService } from "./services/configService";
 import { registerWallpaperService } from "./services/wallpaperService";
@@ -147,6 +148,8 @@ app.whenReady().then(async () => {
 				logger.toFrontend(type || "backend", message);
 			} else if (method === "screens-changed") {
 				win?.webContents.send("screens-changed");
+			} else if (method === "wallpaper-folder-changed") {
+				win?.webContents.send("wallpaper-folder-changed", params);
 			}
 		});
 
@@ -154,6 +157,25 @@ app.whenReady().then(async () => {
 		cachedWallpaperBasePath = await socketClient.send(
 			"get-wallpaper-base-path",
 		);
+
+		// Watch wallpaper folder for changes
+		if (cachedWallpaperBasePath && fs.existsSync(cachedWallpaperBasePath)) {
+			let debounceTimer: NodeJS.Timeout | null = null;
+			const debounceDelay = 500;
+
+			fs.watch(cachedWallpaperBasePath, { recursive: true }, (eventType, filename) => {
+				if (!filename) return;
+				if (debounceTimer) clearTimeout(debounceTimer);
+				debounceTimer = setTimeout(() => {
+					logger.backend(`Wallpaper folder changed: ${eventType} - ${filename}`);
+					win?.webContents.send("wallpaper-folder-changed", {
+						path: filename,
+						op: eventType,
+					});
+				}, debounceDelay);
+			});
+			logger.backend(`Started watching wallpaper directory: ${cachedWallpaperBasePath}`);
+		}
 	} catch (err) {
 		logger.backend(
 			"Failed to connect or get base path from Go backend:",
