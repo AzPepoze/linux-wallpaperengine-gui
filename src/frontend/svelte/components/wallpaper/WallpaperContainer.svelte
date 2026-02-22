@@ -29,6 +29,8 @@
 	import WallpaperItemGrid from './WallpaperItemGrid.svelte';
 	import WallpaperItemList from './WallpaperItemList.svelte';
 
+	let steamRunning = false;
+
 	export let wallpapers: Record<string, WallpaperData> = {};
 	export let activeWallpaper: Wallpaper | null = null;
 	export let selectedWallpaper: Wallpaper | null = null;
@@ -48,39 +50,33 @@
 	let installedFilters: FilterConfig | null = null;
 	let playlists: Playlist[] = [];
 
-	// Combine installed wallpapers with active subscriptions and downloads
+	// Combine wallpapers with subscriptions/downloads
 	$: combinedWallpapers = (() => {
 		const combined: Record<string, WallpaperData> = { ...wallpapers };
 		const subscribedList = Array.from($subscribedIds);
 
-		// 1. Add subscribed items that are missing from disk (treating as downloading)
+		// Add subscribed items missing from disk
 		subscribedList.forEach((fileId) => {
-			if (!combined[fileId]) {
-				// If we have metadata for this subscribed item, show it as downloading
-				if ($downloadingMetadata[fileId]) {
-					combined[fileId] = $downloadingMetadata[fileId];
-				} else {
-					// We might need to fetch metadata if missing, but for now we'll rely on the poller
-				}
+			if (!combined[fileId] && $downloadingMetadata[fileId]) {
+				combined[fileId] = $downloadingMetadata[fileId];
 			}
 		});
 
-		// 2. Filter out workshop items that are NOT subscribed
+		// 2. Filter workshop items - show all when Steam is disconnected
 		const result: Record<string, WallpaperData> = {};
 		Object.entries(combined).forEach(([id, data]) => {
 			const isWorkshop =
 				!!data.projectData?.workshopid ||
 				!!data.projectData?.isWorkshop ||
-				/^\d+$/.test(id); // Simple numeric ID check as fallback
+				/^\d+$/.test(id);
 
 			if (isWorkshop) {
-				if ($subscribedIds.has(id)) {
+				// Show all when Steam offline, otherwise only subscribed
+				if (!steamRunning || $subscribedIds.has(id)) {
 					result[id] = data;
-				} else {
-					// Skip unsubscribed workshop items
 				}
 			} else {
-				// User wallpaper - always show
+				// Local wallpapers always shown
 				result[id] = data;
 			}
 		});
@@ -248,6 +244,13 @@
 			);
 			refreshWallpapers();
 		});
+
+		// Check Steam status
+		async function checkSteamStatus() {
+			steamRunning = await window.electronAPI.isSteamRunning();
+		}
+		checkSteamStatus();
+		setInterval(checkSteamStatus, 5000);
 
 		await Promise.all([
 			loadPlaylists(),
