@@ -8,7 +8,7 @@
 	export let isLoading: boolean = false;
 	export let onPageChange: (page: number) => void;
 
-	const maxPages = Math.ceil((totalItems || 1) / itemsPerPage);
+	$: maxPages = Math.ceil((totalItems || 1) / itemsPerPage);
 
 	function handlePrevClick() {
 		if (currentPage > 0) {

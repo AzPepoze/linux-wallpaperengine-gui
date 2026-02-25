@@ -19,12 +19,13 @@
 	export let autoLoad: boolean = true;
 	export let browseCursor: string | null = null;
 	export let infiniteScroll: boolean = false;
+	export let itemsPerPage: number = 50;
+	export let currentPage: number = 0;
 
 	let viewMode: 'grid' | 'list' = 'grid';
 	let contentElement: HTMLElement;
 	let selectedWorkshopData: WallpaperData | null = null;
 	let selectedItemId: string | null = null;
-	let currentPageNum: number = 0;
 	let observer: IntersectionObserver;
 	let sentinel: HTMLElement;
 
@@ -47,7 +48,7 @@
 	}
 
 	function handlePageChange(page: number) {
-		currentPageNum = page;
+		currentPage = page;
 		onLoadBrowseItems(page);
 		if (!infiniteScroll) {
 			selectedWorkshopData = null;
@@ -67,7 +68,7 @@
 					browseItems.length > 0 &&
 					browseItems.length < totalItems
 				) {
-					handlePageChange(currentPageNum + 1);
+					handlePageChange(currentPage + 1);
 				}
 			},
 			{
@@ -119,7 +120,7 @@
 
 	// Scroll to top when items finish loading (only if NOT infinite scroll OR first page)
 	$: if (!browseLoading && browseItems.length > 0 && !isAppending) {
-		if (contentElement && (!infiniteScroll || currentPageNum === 0)) {
+		if (contentElement && (!infiniteScroll || currentPage === 0)) {
 			contentElement.scrollTop = 0;
 		}
 	}
@@ -127,7 +128,7 @@
 	onMount(() => {
 		if (autoLoad) {
 			// Load page 0
-			currentPageNum = 0;
+			currentPage = 0;
 			onLoadBrowseItems(0);
 		}
 	});
@@ -165,7 +166,7 @@
 						<p>
 							{browseItems.length === 0
 								? 'Searching Workshop...'
-								: `Loading Page ${currentPageNum + 1}...`}
+								: `Loading Page ${currentPage + 1}...`}
 						</p>
 					</div>
 				{/if}
@@ -210,16 +211,14 @@
 				{/if}
 			</div>
 
-			{#if browseItems.length > 0 && !infiniteScroll}
-				<BrowsePagination
-					currentPage={currentPageNum}
-					{totalItems}
-					itemsPerPage={50}
-					hasMore={!!browseCursor}
-					isLoading={browseLoading}
-					onPageChange={handlePageChange}
-				/>
-			{/if}
+			<BrowsePagination
+				{currentPage}
+				{totalItems}
+				{itemsPerPage}
+				hasMore={!!browseCursor}
+				isLoading={browseLoading}
+				onPageChange={handlePageChange}
+			/>
 		</div>
 
 		<Sidebar {selectedWallpaper} onClose={closeSidebar} />
