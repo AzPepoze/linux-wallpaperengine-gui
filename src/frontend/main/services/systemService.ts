@@ -16,4 +16,9 @@ export function registerSystemService() {
 		logger.ipcReceived("open-external", url);
 		await shell.openExternal(url);
 	});
+
+	ipcMain.handle("open-path", async (_, path: string) => {
+		logger.ipcReceived("open-path", path);
+		return await shell.openPath(path);
+	});
 }

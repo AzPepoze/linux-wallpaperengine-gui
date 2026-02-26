@@ -21,6 +21,7 @@ interface ElectronAPI {
 	getEnv: (key: string) => Promise<string | undefined>;
 	getHomeDir: () => Promise<string>;
 	openExternal: (url: string) => Promise<void>;
+	openPath: (path: string) => Promise<string>;
 
 	// File system operations
 	readDirectory: (path: string) => Promise<{ entry: string; type: "DIRECTORY" | "FILE" }[]>;
@@ -40,6 +41,7 @@ interface ElectronAPI {
 	openConfigInEditor: () => Promise<{ success: boolean; error?: string }>;
 	getWallpaperExecutableLocation: () => Promise<string>;
 	getWallpaperBasePath: () => Promise<string>;
+	getAssetsBasePath: () => Promise<string>;
 	validateExecutable: () => Promise<boolean>;
 
 	// Wallpaper management
@@ -47,7 +49,7 @@ interface ElectronAPI {
 	setWallpaper: (screenName: string, wallpaperFolderName: string | null) => Promise<{ success: boolean; error?: string }>;
 	toggleCloneMode: (enabled: boolean, globalWallpaper?: string | null) => Promise<{ success: boolean; error?: string }>;
 	clearAllWallpapers: () => Promise<{ success: boolean; error?: string }>;
-	loadWallpapers: () => Promise<{ wallpapers: Record<string, any>; error: string | null; selectedWallpaper: any | null }>;
+	loadWallpapers: () => Promise<{ wallpapers: Record<string, any>; error: string | null; workshopPathValid: boolean; wallpaperEnginePathValid: boolean; selectedWallpaper: any | null }>;
 	getWallpaperPreview: (path: string) => Promise<{ success: boolean; data?: string; error?: string }>;
 	getWallpaperProjectData: (id: string) => Promise<{ success: boolean; properties?: Record<string, any>; error?: string }>;
 	getWallpaperProperties: (id: string) => Promise<any[]>;

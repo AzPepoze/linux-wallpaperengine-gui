@@ -5,6 +5,8 @@ import (
 	"linux-wallpaperengine-gui/src/backend/internal/config"
 	"linux-wallpaperengine-gui/src/backend/internal/display"
 	"linux-wallpaperengine-gui/src/backend/internal/logger"
+	"os"
+	"path/filepath"
 	"strings"
 )
 
@@ -85,20 +87,26 @@ func ApplyWallpapers() error {
 	}
 
 	for _, screen := range activeScreens {
-		targetWallpaper := ""
+		// preserve the wallpaper ID for config lookups, but resolve to a full path for the executable
+		targetWallpaperID := ""
 		if screen.Wallpaper != nil {
-			targetWallpaper = *screen.Wallpaper
+			targetWallpaperID = *screen.Wallpaper
 		}
 
 		if conf.CloneMode && conf.GlobalWallpaper != nil {
-			targetWallpaper = *conf.GlobalWallpaper
+			targetWallpaperID = *conf.GlobalWallpaper
 		}
 
-		if targetWallpaper == "" {
+		if targetWallpaperID == "" {
 			continue
 		}
 
-		args := []string{targetWallpaper, "-r", screen.Name, fmt.Sprintf("-f %d", fps)}
+		wallpaperPath := fmt.Sprintf("\"%s\"", targetWallpaperID)
+		if config.WorkshopPath != "" {
+			wallpaperPath = fmt.Sprintf("\"%s\"", filepath.Join(config.WorkshopPath, targetWallpaperID))
+		}
+
+		args := []string{wallpaperPath, "-r", screen.Name, fmt.Sprintf("-f %d", fps)}
 
 		if conf.Silence {
 			args = append(args, "-s")
@@ -140,19 +148,23 @@ func ApplyWallpapers() error {
 
 		if conf.Screenshot != "" {
 			args = append(args, fmt.Sprintf("--screenshot \"%s\"", conf.Screenshot))
+
+			if conf.ScreenshotDelay != 0 {
+				args = append(args, fmt.Sprintf("--screenshot-delay %d", conf.ScreenshotDelay))
+			}
 		}
-		if conf.ScreenshotDelay != 0 {
-			args = append(args, fmt.Sprintf("--screenshot-delay %d", conf.ScreenshotDelay))
-		}
-		if conf.AssetsDir != "" {
-			args = append(args, fmt.Sprintf("--assets-dir \"%s\"", conf.AssetsDir))
+
+		if conf.WallpaperEngineDir != "" {
+			args = append(args, fmt.Sprintf("--assets-dir \"%s\"", conf.WallpaperEngineDir+"/assets"))
+		} else if config.WallpaperEnginePath != "" {
+			args = append(args, fmt.Sprintf("--assets-dir \"%s\"", config.WallpaperEnginePath+"/assets"))
 		}
 		if conf.DumpStructure {
 			args = append(args, "--dump-structure")
 		}
 
 		// Properties
-		props, ok := conf.WallpaperProperties[targetWallpaper]
+		props, ok := conf.WallpaperProperties[targetWallpaperID]
 		if !ok {
 			props = conf.Properties
 		}
@@ -183,6 +195,19 @@ func LoadWallpapers() (map[string]interface{}, error) {
 	}
 
 	conf, _ := config.GetConfig()
+	workshopPathValid := false
+	if config.WorkshopPath != "" {
+		if _, err := os.Stat(config.WorkshopPath); err == nil {
+			workshopPathValid = true
+		}
+	}
+
+	wallpaperEnginePathValid := false
+	if config.WallpaperEnginePath != "" {
+		if _, err := os.Stat(config.WallpaperEnginePath); err == nil {
+			wallpaperEnginePathValid = true
+		}
+	}
 	availableScreens, _ := display.GetScreens()
 	connectedSet := make(map[string]bool)
 	for _, s := range availableScreens {
@@ -208,8 +233,10 @@ func LoadWallpapers() (map[string]interface{}, error) {
 	}
 
 	return map[string]interface{}{
-			"wallpapers":        wallpapers,
-			"selectedWallpaper": initialWallpaper,
+			"wallpapers":               wallpapers,
+			"selectedWallpaper":        initialWallpaper,
+			"workshopPathValid":        workshopPathValid,
+			"wallpaperEnginePathValid": wallpaperEnginePathValid,
 		},
 		nil
 }

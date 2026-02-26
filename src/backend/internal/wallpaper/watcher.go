@@ -24,7 +24,7 @@ func StartWallpaperWatcher(onChange func(path string, op string)) {
 		return
 	}
 
-	basePath := config.WallpaperPath
+	basePath := config.WorkshopPath
 	if _, err := os.Stat(basePath); os.IsNotExist(err) {
 		logger.Printf("Wallpaper path does not exist, watcher not started: %s", basePath)
 		return

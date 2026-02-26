@@ -5,10 +5,8 @@
 		loadSettings,
 		saveSettings,
 		openConfigFile,
-		validateBinaryFile,
-		showToast
+		validateBinaryFile
 	} from '../scripts/settings';
-	import { WORKSHOP_CONTENT_SUFFIX } from '../../shared/constants';
 
 	import SettingsSection from './settings/SettingsSection.svelte';
 	import SettingItem from './ui/SettingItem.svelte';
@@ -56,6 +54,44 @@
 	let initialLoad = true;
 	let saveTimeout: ReturnType<typeof setTimeout>;
 
+	async function openWallpaperFolder() {
+		try {
+			const path = await window.electronAPI.getWallpaperBasePath();
+			if (path) {
+				const error = await window.electronAPI.openPath(path);
+				if (error) {
+					console.error('Failed to open folder:', error);
+					alert('Failed to open folder: ' + error);
+				}
+			} else {
+				alert(
+					'No workshop folder path found. Check your search paths.'
+				);
+			}
+		} catch (e) {
+			console.error('Error opening folder:', e);
+		}
+	}
+
+	async function openAssetsFolder() {
+		try {
+			const path = await window.electronAPI.getAssetsBasePath();
+			if (path) {
+				const error = await window.electronAPI.openPath(path);
+				if (error) {
+					console.error('Failed to open assets folder:', error);
+					alert('Failed to open assets folder: ' + error);
+				}
+			} else {
+				alert(
+					'No assets folder path found. Check your search paths.'
+				);
+			}
+		} catch (e) {
+			console.error('Error opening folder:', e);
+		}
+	}
+
 	$: if ($settingsStore && !initialLoad) {
 		clearTimeout(saveTimeout);
 		saveTimeout = setTimeout(() => {
@@ -94,6 +130,7 @@
 		}
 
 		await loadSettings();
+		await updateDetectedPaths();
 
 		// Wait a small bit to ensure reactivity from loadSettings doesn't trigger a save
 		setTimeout(() => {
@@ -108,37 +145,46 @@
 		}
 	};
 
-	const onSelectAssetsDir = async (path: string) => {
-		if ($settingsStore) {
-			$settingsStore.assetsDir = path;
-		}
-	};
-
 	const onSelectWallpaperEngineDir = async (path: string) => {
 		if ($settingsStore) {
 			$settingsStore.wallpaperEngineDir = path;
 		}
 	};
 
+	const onSelectWorkshopDir = async (path: string) => {
+		if ($settingsStore) {
+			$settingsStore.workshopDir = path;
+		}
+	};
+
+	let detectedWallpaperPath = '';
+	let detectedwallpaperEnginePath = '';
+	let workshopPathValid = false;
+	let wallpaperEnginePathValid = false;
+
+	async function updateDetectedPaths() {
+		detectedWallpaperPath =
+			await window.electronAPI.getWallpaperBasePath();
+		detectedwallpaperEnginePath =
+			await window.electronAPI.getAssetsBasePath();
+
+		// Validation flags (re-use logic from service)
+		workshopPathValid =
+			!!detectedWallpaperPath && detectedWallpaperPath !== '';
+		wallpaperEnginePathValid =
+			!!detectedwallpaperEnginePath &&
+			detectedwallpaperEnginePath !== '';
+	}
+
 	const handleSaveSettings = async () => {
 		if ($settingsStore) {
 			await saveSettings($settingsStore);
+			await updateDetectedPaths();
 		}
 	};
 
 	const handleOpenConfig = async () => {
 		await openConfigFile();
-	};
-
-	const handleClearAll = async () => {
-		if (confirm('Are you sure you want to clear all wallpapers?')) {
-			const result = await window.electronAPI.clearAllWallpapers();
-			if (result.success) {
-				showToast('All wallpapers cleared', 'success');
-			} else {
-				showToast(`Error: ${result.error}`, 'error');
-			}
-		}
 	};
 </script>
 
@@ -168,9 +214,6 @@
 		<div class="sidebar-actions">
 			<button class="action-btn secondary" on:click={handleOpenConfig}>
 				Open Config
-			</button>
-			<button class="action-btn danger" on:click={handleClearAll}>
-				Clear All
 			</button>
 		</div>
 	</aside>
@@ -512,24 +555,10 @@
 					</SettingItem>
 
 					<SettingItem
-						label="Assets Directory"
-						id="assetsDir"
-						vertical
-						description="Folder where the assets are stored."
-					>
-						<Browse
-							bind:location={$settingsStore.assetsDir}
-							onSelect={onSelectAssetsDir}
-							dir={true}
-							placeholder="Path to assets directory..."
-						/>
-					</SettingItem>
-
-					<SettingItem
 						label="Wallpaper Engine Directory"
 						id="wallpaperEngineDir"
 						vertical
-						description="Path to your Steam Workshop content (e.g. {WORKSHOP_CONTENT_SUFFIX}). Leave empty to use auto-detect."
+						description="Main folder where Wallpaper Engine is installed (steamapps/common/wallpaper_engine)."
 					>
 						<Browse
 							bind:location={
@@ -537,8 +566,102 @@
 							}
 							onSelect={onSelectWallpaperEngineDir}
 							dir={true}
-							placeholder="Path to wallpaper engine workshop directory..."
+							placeholder="Path to wallpaper_engine folder..."
 						/>
+						<div
+							class="detected-path-info"
+							class:valid={wallpaperEnginePathValid}
+						>
+							<div class="status-tag">
+								<span class="status-dot"></span>
+								{wallpaperEnginePathValid
+									? 'Currently Active'
+									: 'NOT DETECTED'}
+							</div>
+							<div class="path-display">
+								{detectedwallpaperEnginePath ||
+									'No Wallpaper Engine directory found in search paths.'}
+							</div>
+						</div>
+						{#if wallpaperEnginePathValid}
+							<div class="setting-actions">
+								<Button
+									variant="ghost"
+									on:click={openAssetsFolder}
+								>
+									<svg
+										width="16"
+										height="16"
+										viewBox="0 0 24 24"
+										fill="none"
+										stroke="currentColor"
+										stroke-width="2"
+										stroke-linecap="round"
+										stroke-linejoin="round"
+									>
+										<path
+											d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"
+										></path>
+									</svg>
+									Open Wallpaper Engine Folder
+								</Button>
+							</div>
+						{/if}
+					</SettingItem>
+
+					<SettingItem
+						label="Workshop Directory"
+						id="wallpaperEngineDir"
+						vertical
+						description="Path to your Steam Workshop content (431960). Usually auto-detected from the Wallpaper Engine Directory above."
+					>
+						<Browse
+							bind:location={
+								$settingsStore.workshopDir
+							}
+							onSelect={onSelectWorkshopDir}
+							dir={true}
+							placeholder="Path to workshop content (431960)..."
+						/>
+						<div
+							class="detected-path-info"
+							class:valid={workshopPathValid}
+						>
+							<div class="status-tag">
+								<span class="status-dot"></span>
+								{workshopPathValid
+									? 'Currently Active'
+									: 'NOT DETECTED'}
+							</div>
+							<div class="path-display">
+								{detectedWallpaperPath ||
+									'No workshop directory found in search paths.'}
+							</div>
+						</div>
+						{#if workshopPathValid}
+							<div class="setting-actions">
+								<Button
+									variant="ghost"
+									on:click={openWallpaperFolder}
+								>
+									<svg
+										width="16"
+										height="16"
+										viewBox="0 0 24 24"
+										fill="none"
+										stroke="currentColor"
+										stroke-width="2"
+										stroke-linecap="round"
+										stroke-linejoin="round"
+									>
+										<path
+											d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"
+										></path>
+									</svg>
+									Open Workshop Folder
+								</Button>
+							</div>
+						{/if}
 					</SettingItem>
 
 					<SettingItem
@@ -640,9 +763,29 @@
 		.sidebar-actions {
 			display: flex;
 			flex-direction: column;
-			gap: 10px;
+			gap: 12px;
 			padding-top: 24px;
 			border-top: 1px solid var(--border-color);
+		}
+	}
+
+	.action-btn {
+		width: 100%;
+		padding: 12px;
+		border-radius: var(--radius-md);
+		border: none;
+		font-weight: 600;
+		font-size: 0.9em;
+		cursor: pointer;
+		transition: var(--transition-base);
+
+		&.secondary {
+			background: var(--bg-surface);
+			color: var(--text-color);
+			border: 1px solid var(--border-color);
+			&:hover {
+				background: var(--bg-surface-hover);
+			}
 		}
 	}
 
@@ -681,37 +824,72 @@
 		);
 	}
 
-	.action-btn {
-		width: 100%;
-		padding: 12px;
-		border-radius: var(--radius-md);
-		border: none;
-		font-weight: 600;
-		font-size: 0.9em;
-		cursor: pointer;
-		transition: var(--transition-base);
-
-		&.secondary {
-			background: var(--bg-surface);
-			color: var(--text-color);
-			border: 1px solid var(--border-color);
-			&:hover {
-				background: var(--bg-surface-hover);
-			}
-		}
-
-		&.danger {
-			background: transparent;
-			color: var(--error-color);
-			&:hover {
-				background: var(--error-bg-translucent);
-			}
-		}
+	.setting-actions {
+		margin-top: 14px;
+		display: flex;
+		gap: 12px;
 	}
 
-	.doc-actions {
+	.detected-path-info {
+		width: 100%;
 		margin-top: 12px;
+		padding: 14px;
+		background: var(--bg-surface);
+		border-radius: var(--radius-md);
+		border: 1px solid var(--border-color);
 		display: flex;
-		justify-content: flex-start;
+		flex-direction: column;
+		gap: 8px;
+		box-sizing: border-box;
+
+		&.valid {
+			border-color: var(--btn-primary-bg);
+			.status-tag {
+				color: var(--btn-primary-bg);
+				.status-dot {
+					background: var(--btn-primary-bg);
+					box-shadow: 0 0 8px var(--btn-primary-bg);
+				}
+			}
+		}
+
+		&:not(.valid) {
+			border-color: rgba(220, 53, 69, 0.5);
+			background: rgba(220, 53, 69, 0.05);
+			.status-tag {
+				color: #ff4d4d;
+				.status-dot {
+					background: #ff4d4d;
+					box-shadow: 0 0 10px #ff4d4d;
+				}
+			}
+			.path-display {
+				color: rgba(255, 255, 255, 0.6);
+			}
+		}
+
+		.status-tag {
+			display: flex;
+			align-items: center;
+			gap: 8px;
+			font-size: 0.75em;
+			font-weight: 700;
+			text-transform: uppercase;
+			letter-spacing: 0.5px;
+
+			.status-dot {
+				width: 6px;
+				height: 6px;
+				border-radius: 50%;
+			}
+		}
+
+		.path-display {
+			font-family: var(--font-mono, monospace);
+			font-size: 0.8em;
+			color: var(--text-muted);
+			word-break: break-all;
+			opacity: 0.8;
+		}
 	}
 </style>

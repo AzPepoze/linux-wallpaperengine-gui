@@ -15,7 +15,7 @@ func GetWallpapers() (map[string]WallpaperData, error) {
 		return nil, err
 	}
 
-	basePath := config.WallpaperPath
+	basePath := config.WorkshopPath
 	if basePath == "" {
 		return make(map[string]WallpaperData), nil
 	}
@@ -69,7 +69,7 @@ func GetWallpaperProjectData(folderName string) (map[string]interface{}, error) 
 		return nil, err
 	}
 
-	projectJsonPath := filepath.Join(config.WallpaperPath, folderName, "project.json")
+	projectJsonPath := filepath.Join(config.WorkshopPath, folderName, "project.json")
 	data, err := os.ReadFile(projectJsonPath)
 	if err != nil {
 		return nil, err
@@ -112,7 +112,7 @@ func GetWEConfigPath() (string, error) {
 	// Find the wallpaper_engine installation directory
 	// The workshop content is at ~/.../steamapps/workshop/content/431960
 	// The installation is at ~/.../steamapps/common/wallpaper_engine
-	workshopPath := config.WallpaperPath
+	workshopPath := config.WorkshopPath
 	if workshopPath == "" {
 		return "", fmt.Errorf("wallpaper path not initialized")
 	}

@@ -131,6 +131,11 @@ export function registerWallpaperService() {
 		return await socketClient.send("get-wallpaper-base-path");
 	});
 
+	ipcMain.handle("get-assets-base-path", async () => {
+		logger.ipcReceived("get-assets-base-path");
+		return await socketClient.send("get-assets-base-path");
+	});
+
 	ipcMain.handle("get-installed-filters", async () => {
 		logger.ipcReceived("get-installed-filters");
 		return await socketClient.send("get-installed-filters");

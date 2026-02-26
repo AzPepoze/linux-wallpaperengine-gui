@@ -78,6 +78,7 @@
 			onSelect(folderName, wallpaper);
 		}
 	}}
+	in:fade={{ duration: fadeDuration }}
 	style="animation-delay: {10 + index * 50}ms"
 >
 	<div class="wallpaper-preview-container">
