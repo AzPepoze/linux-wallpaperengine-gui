@@ -64,6 +64,7 @@ export interface SettingsState {
 	dynamicSidebarTheme: boolean;
 	transparentUi: boolean;
 	uiTransparency: number;
+	steamPaths: string[];
 }
 
 export const settingsStore: Writable<SettingsState | null> = writable(null);
@@ -100,6 +101,7 @@ const configFieldMap: Record<string, string> = {
 	dynamicSidebarTheme: "dynamicSidebarTheme",
 	transparentUi: "transparentUi",
 	uiTransparency: "uiTransparency",
+	steamPaths: "steamPaths",
 };
 
 // Settings Actions

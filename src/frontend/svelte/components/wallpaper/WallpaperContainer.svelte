@@ -8,7 +8,11 @@
 	import FilterIcon from '../../icons/FilterIcon.svelte';
 	import FilterPanel from '../browse/FilterPanel.svelte';
 
-	import { showDisplayManager, showPlaylistManager } from '../../scripts/ui';
+	import {
+		showDisplayManager,
+		showPlaylistManager,
+		activeView
+	} from '../../scripts/ui';
 	import { settingsStore } from '../../scripts/settings';
 	import { cloneMode, toggleCloneMode } from '../../scripts/display';
 	import { get } from 'svelte/store';
@@ -42,7 +46,9 @@
 		folderName: string,
 		wallpaper: WallpaperData
 	) => void = () => {};
-	export let onWallpapersRefresh: (wallpapers: Record<string, WallpaperData>) => void = () => {};
+	export let onWallpapersRefresh: (
+		wallpapers: Record<string, WallpaperData>
+	) => void = () => {};
 
 	let viewMode: 'grid' | 'list' | 'detail' = 'grid';
 
@@ -451,7 +457,16 @@
 				<div class="status-msg error">{error}</div>
 			{:else if Object.keys(filteredWallpapers).length === 0}
 				<div class="status-msg">
-					No wallpapers found matching filters.
+					<p>No wallpapers found matching filters.</p>
+					<p class="hint">
+						Check your <b>Steam Search Paths</b> in
+						<button
+							class="link-btn"
+							on:click={() => activeView.set('settings')}
+							>Settings</button
+						>
+						if you expect to see more.
+					</p>
 				</div>
 			{:else if viewMode === 'grid'}
 				<WallpaperItemGrid
@@ -594,6 +609,27 @@
 
 			&.error {
 				color: var(--error-color);
+			}
+
+			.hint {
+				font-size: 0.8em;
+				margin-top: 12px;
+				opacity: 0.8;
+			}
+
+			.link-btn {
+				background: none;
+				border: none;
+				color: var(--btn-primary-bg);
+				font-weight: 600;
+				cursor: pointer;
+				padding: 0;
+				text-decoration: underline;
+				font-size: inherit;
+
+				&:hover {
+					color: var(--btn-primary-hover-bg);
+				}
 			}
 		}
 	}

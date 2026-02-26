@@ -16,6 +16,14 @@ func GetWallpapers() (map[string]WallpaperData, error) {
 	}
 
 	basePath := config.WallpaperPath
+	if basePath == "" {
+		return make(map[string]WallpaperData), nil
+	}
+
+	if _, err := os.Stat(basePath); os.IsNotExist(err) {
+		return make(map[string]WallpaperData), nil
+	}
+
 	entries, err := os.ReadDir(basePath)
 	if err != nil {
 		return nil, err
