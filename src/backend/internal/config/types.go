@@ -44,16 +44,16 @@ type AppConfig struct {
 	CustomArgsEnabled bool   `json:"customArgsEnabled"`
 
 	// Utilities & Paths
-	Screenshot      string `json:"screenshot,omitempty"`
-	ScreenshotDelay int    `json:"screenshotDelay,omitempty"`
-	AssetsDir       string `json:"assetsDir,omitempty"`
+	Screenshot         string `json:"screenshot,omitempty"`
+	ScreenshotDelay    int    `json:"screenshotDelay,omitempty"`
+	WallpaperEngineDir string `json:"wallpaperEngineDir,omitempty"`
 
 	// --- GUI / Internal Settings ---
 	Screens                  []ScreenConfig `json:"screens,omitempty"`
 	CloneMode                bool           `json:"cloneMode,omitempty"`
 	GlobalWallpaper          *string        `json:"globalWallpaper,omitempty"`
 	CustomExecutableLocation string         `json:"customExecutableLocation,omitempty"`
-	WallpaperEngineDir       string         `json:"wallpaperEngineDir,omitempty"`
+	WorkshopDir              string         `json:"workshopDir,omitempty"`
 	NativeWayland            bool           `json:"nativeWayland,omitempty"`
 	DynamicUiTheme           bool           `json:"dynamicUiTheme"`
 	DynamicSidebarTheme      bool           `json:"dynamicSidebarTheme"`

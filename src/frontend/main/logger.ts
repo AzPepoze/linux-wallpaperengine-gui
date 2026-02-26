@@ -4,6 +4,11 @@ import { cleanLog, addTimestamp } from "../shared/logger";
 
 let mainWindow: BrowserWindow | null = null;
 
+// IPC channels to hide from logs
+const HIDDEN_IPC = new Set<string>([
+	"fs-exists",
+]);
+
 export function setMainWindow(win: BrowserWindow | null) {
 	mainWindow = win;
 }
@@ -74,6 +79,7 @@ export const logger = {
 	},
 
 	ipcReceived: (channel: string, ...args: any[]) => {
+		if (HIDDEN_IPC.has(channel)) return;
 		logToFrontend({
 			type: "electron",
 			showLog: true,

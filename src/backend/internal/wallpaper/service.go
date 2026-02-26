@@ -102,8 +102,8 @@ func ApplyWallpapers() error {
 		}
 
 		wallpaperPath := fmt.Sprintf("\"%s\"", targetWallpaperID)
-		if config.WallpaperPath != "" {
-			wallpaperPath = fmt.Sprintf("\"%s\"", filepath.Join(config.WallpaperPath, targetWallpaperID))
+		if config.WorkshopPath != "" {
+			wallpaperPath = fmt.Sprintf("\"%s\"", filepath.Join(config.WorkshopPath, targetWallpaperID))
 		}
 
 		args := []string{wallpaperPath, "-r", screen.Name, fmt.Sprintf("-f %d", fps)}
@@ -154,10 +154,10 @@ func ApplyWallpapers() error {
 			}
 		}
 
-		if conf.AssetsDir != "" {
-			args = append(args, fmt.Sprintf("--assets-dir \"%s\"", conf.AssetsDir))
-		} else if config.AssetsPath != "" {
-			args = append(args, fmt.Sprintf("--assets-dir \"%s\"", config.AssetsPath))
+		if conf.WallpaperEngineDir != "" {
+			args = append(args, fmt.Sprintf("--assets-dir \"%s\"", conf.WallpaperEngineDir+"/assets"))
+		} else if config.WallpaperEnginePath != "" {
+			args = append(args, fmt.Sprintf("--assets-dir \"%s\"", config.WallpaperEnginePath+"/assets"))
 		}
 		if conf.DumpStructure {
 			args = append(args, "--dump-structure")
@@ -196,16 +196,16 @@ func LoadWallpapers() (map[string]interface{}, error) {
 
 	conf, _ := config.GetConfig()
 	workshopPathValid := false
-	if config.WallpaperPath != "" {
-		if _, err := os.Stat(config.WallpaperPath); err == nil {
+	if config.WorkshopPath != "" {
+		if _, err := os.Stat(config.WorkshopPath); err == nil {
 			workshopPathValid = true
 		}
 	}
 
-	assetsPathValid := false
-	if config.AssetsPath != "" {
-		if _, err := os.Stat(config.AssetsPath); err == nil {
-			assetsPathValid = true
+	wallpaperEnginePathValid := false
+	if config.WallpaperEnginePath != "" {
+		if _, err := os.Stat(config.WallpaperEnginePath); err == nil {
+			wallpaperEnginePathValid = true
 		}
 	}
 	availableScreens, _ := display.GetScreens()
@@ -233,10 +233,10 @@ func LoadWallpapers() (map[string]interface{}, error) {
 	}
 
 	return map[string]interface{}{
-			"wallpapers":        wallpapers,
-			"selectedWallpaper": initialWallpaper,
-			"workshopPathValid": workshopPathValid,
-			"assetsPathValid":   assetsPathValid,
+			"wallpapers":               wallpapers,
+			"selectedWallpaper":        initialWallpaper,
+			"workshopPathValid":        workshopPathValid,
+			"wallpaperEnginePathValid": wallpaperEnginePathValid,
 		},
 		nil
 }

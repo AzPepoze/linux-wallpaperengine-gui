@@ -38,7 +38,7 @@
 	let wallpapers: Record<string, WallpaperData> = {};
 	let error: string | null = null;
 	let workshopPathValid = true;
-	let assetsPathValid = true;
+	let wallpaperEnginePathValid = true;
 	let loading = true;
 	let selectedFolderName: string | null = null;
 	let activeFolderName: string | null = null;
@@ -67,7 +67,7 @@
 			const currentPaths = JSON.stringify([
 				$settingsStore.wallpaperEngineDir,
 				$settingsStore.steamPaths,
-				$settingsStore.assetsDir
+				$settingsStore.wallpaperEngineDir
 			]);
 
 			if (currentPaths !== lastCheckPaths) {
@@ -92,13 +92,13 @@
 			wallpapers: loadedWallpapers,
 			error: loadError,
 			workshopPathValid: loadedWorkshopPathValid,
-			assetsPathValid: loadedAssetsPathValid,
+			wallpaperEnginePathValid: loadedwallpaperEnginePathValid,
 			selectedWallpaper: initialWallpaper
 		} = await window.electronAPI.loadWallpapers();
 
 		wallpapers = loadedWallpapers;
 		workshopPathValid = loadedWorkshopPathValid;
-		assetsPathValid = loadedAssetsPathValid;
+		wallpaperEnginePathValid = loadedwallpaperEnginePathValid;
 		error = loadError;
 
 		loading = false;
@@ -272,7 +272,7 @@
 							{activeWallpaper}
 							{selectedWallpaper}
 							bind:workshopPathValid
-							bind:assetsPathValid
+							bind:wallpaperEnginePathValid
 							selectedScreen={$selectedScreen}
 							{loading}
 							{error}
@@ -287,8 +287,8 @@
 									wallpapers = data.wallpapers;
 									workshopPathValid =
 										data.workshopPathValid;
-									assetsPathValid =
-										data.assetsPathValid;
+									wallpaperEnginePathValid =
+										data.wallpaperEnginePathValid;
 								} else {
 									wallpapers = data;
 								}

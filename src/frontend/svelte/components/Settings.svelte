@@ -145,32 +145,35 @@
 		}
 	};
 
-	const onSelectAssetsDir = async (path: string) => {
-		if ($settingsStore) {
-			$settingsStore.assetsDir = path;
-		}
-	};
-
 	const onSelectWallpaperEngineDir = async (path: string) => {
 		if ($settingsStore) {
 			$settingsStore.wallpaperEngineDir = path;
 		}
 	};
 
+	const onSelectWorkshopDir = async (path: string) => {
+		if ($settingsStore) {
+			$settingsStore.workshopDir = path;
+		}
+	};
+
 	let detectedWallpaperPath = '';
-	let detectedAssetsPath = '';
+	let detectedwallpaperEnginePath = '';
 	let workshopPathValid = false;
-	let assetsPathValid = false;
+	let wallpaperEnginePathValid = false;
 
 	async function updateDetectedPaths() {
 		detectedWallpaperPath =
 			await window.electronAPI.getWallpaperBasePath();
-		detectedAssetsPath = await window.electronAPI.getAssetsBasePath();
+		detectedwallpaperEnginePath =
+			await window.electronAPI.getAssetsBasePath();
 
 		// Validation flags (re-use logic from service)
 		workshopPathValid =
 			!!detectedWallpaperPath && detectedWallpaperPath !== '';
-		assetsPathValid = !!detectedAssetsPath && detectedAssetsPath !== '';
+		wallpaperEnginePathValid =
+			!!detectedwallpaperEnginePath &&
+			detectedwallpaperEnginePath !== '';
 	}
 
 	const handleSaveSettings = async () => {
@@ -553,32 +556,34 @@
 
 					<SettingItem
 						label="Wallpaper Engine Directory"
-						id="assetsDir"
+						id="wallpaperEngineDir"
 						vertical
 						description="Main folder where Wallpaper Engine is installed (steamapps/common/wallpaper_engine)."
 					>
 						<Browse
-							bind:location={$settingsStore.assetsDir}
-							onSelect={onSelectAssetsDir}
+							bind:location={
+								$settingsStore.wallpaperEngineDir
+							}
+							onSelect={onSelectWallpaperEngineDir}
 							dir={true}
 							placeholder="Path to wallpaper_engine folder..."
 						/>
 						<div
 							class="detected-path-info"
-							class:valid={assetsPathValid}
+							class:valid={wallpaperEnginePathValid}
 						>
 							<div class="status-tag">
 								<span class="status-dot"></span>
-								{assetsPathValid
+								{wallpaperEnginePathValid
 									? 'Currently Active'
 									: 'NOT DETECTED'}
 							</div>
 							<div class="path-display">
-								{detectedAssetsPath ||
+								{detectedwallpaperEnginePath ||
 									'No Wallpaper Engine directory found in search paths.'}
 							</div>
 						</div>
-						{#if assetsPathValid}
+						{#if wallpaperEnginePathValid}
 							<div class="setting-actions">
 								<Button
 									variant="ghost"
@@ -612,9 +617,9 @@
 					>
 						<Browse
 							bind:location={
-								$settingsStore.wallpaperEngineDir
+								$settingsStore.workshopDir
 							}
-							onSelect={onSelectWallpaperEngineDir}
+							onSelect={onSelectWorkshopDir}
 							dir={true}
 							placeholder="Path to workshop content (431960)..."
 						/>

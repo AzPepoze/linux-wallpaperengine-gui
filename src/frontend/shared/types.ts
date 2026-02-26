@@ -50,7 +50,6 @@ export type AppConfig = {
 	fullscreenPauseIgnoreAppIds?: string[];
 	screenshot?: string;
 	screenshotDelay?: number;
-	assetsDir?: string;
 	wallpaperEngineDir?: string;
 	properties?: Record<string, string>;
 	wallpaperProperties?: Record<string, Record<string, string>>;

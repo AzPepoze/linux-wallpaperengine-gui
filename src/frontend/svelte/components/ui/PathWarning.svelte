@@ -70,11 +70,12 @@
 		border-radius: var(--radius-lg);
 		display: flex;
 		gap: 20px;
-		align-items: flex-start;
+		align-items: center; // Center content vertically
+		justify-content: center; // Center content horizontally
 		backdrop-filter: blur(8px);
-		max-width: 800px;
 		width: 100%;
-		text-align: left;
+		text-align: center; // Center text
+		margin: 0 auto; // Center the warning horizontally
 
 		&.assets-warning {
 			background: rgba(255, 193, 7, 0.05);
@@ -98,18 +99,20 @@
 
 		.warning-content {
 			flex: 1;
+			text-align: center; // Center align text
 
 			h3 {
-				margin: 0 0 8px;
-				font-size: 1.25em;
-				font-weight: 700;
+				margin: 0 0 12px; // Add more spacing below the title
+				font-size: 1.5em; // Increase font size for better readability
+				font-weight: 800; // Make the title bolder
+				color: #ffffff; // Ensure the title is clearly visible
 			}
 
 			p {
 				margin: 0 0 20px;
 				color: var(--text-muted);
-				line-height: 1.5;
-				max-width: 600px;
+				line-height: 1.8; // Increase line spacing for better readability
+				font-size: 1.1em; // Slightly increase font size
 			}
 
 			.warning-action {

@@ -42,7 +42,7 @@
 	export let selectedScreen: string | null = null;
 	export let loading: boolean = true;
 	export let workshopPathValid: boolean = true;
-	export let assetsPathValid: boolean = true;
+	export let wallpaperEnginePathValid: boolean = true;
 	export let error: string | null = null;
 	export let playlistManager: any = null;
 	export let onSelect: (
@@ -330,7 +330,7 @@
 		const {
 			wallpapers: loadedWallpapers,
 			workshopPathValid: loadedWorkshopPathValid,
-			assetsPathValid: loadedAssetsPathValid
+			wallpaperEnginePathValid: loadedwallpaperEnginePathValid
 		} = await window.electronAPI.loadWallpapers();
 
 		logger.log(
@@ -338,7 +338,7 @@
 		);
 		wallpapers = loadedWallpapers;
 		workshopPathValid = loadedWorkshopPathValid;
-		assetsPathValid = loadedAssetsPathValid;
+		wallpaperEnginePathValid = loadedwallpaperEnginePathValid;
 		onWallpapersRefresh(loadedWallpapers);
 	}
 
@@ -476,7 +476,7 @@
 					<PathWarning type="workshop" />
 				</div>
 			{:else}
-				{#if !assetsPathValid}
+				{#if !wallpaperEnginePathValid}
 					<PathWarning type="assets" delay={100} />
 				{/if}
 

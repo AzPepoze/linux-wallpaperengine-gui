@@ -28,11 +28,11 @@ func HandleWallpaper(req models.Request) models.Response {
 			res.Error = err.Error()
 		} else {
 			res.Result = map[string]interface{}{
-				"success":           true,
-				"wallpapers":        result["wallpapers"],
-				"selectedWallpaper": result["selectedWallpaper"],
-				"workshopPathValid": result["workshopPathValid"],
-				"assetsPathValid":   result["assetsPathValid"],
+				"success":                  true,
+				"wallpapers":               result["wallpapers"],
+				"selectedWallpaper":        result["selectedWallpaper"],
+				"workshopPathValid":        result["workshopPathValid"],
+				"wallpaperEnginePathValid": result["wallpaperEnginePathValid"],
 			}
 		}
 	case "get-wallpaper-project-data":
@@ -53,13 +53,13 @@ func HandleWallpaper(req models.Request) models.Response {
 		if err := config.EnsureInitialized(); err != nil {
 			res.Error = err.Error()
 		} else {
-			res.Result = config.WallpaperPath
+			res.Result = config.WorkshopPath
 		}
 	case "get-assets-base-path":
 		if err := config.EnsureInitialized(); err != nil {
 			res.Error = err.Error()
 		} else {
-			res.Result = config.AssetsPath
+			res.Result = config.WallpaperEnginePath
 		}
 	case "kill-all-wallpapers":
 		wallpaper.KillAllWallpapers()

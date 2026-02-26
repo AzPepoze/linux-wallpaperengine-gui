@@ -49,7 +49,7 @@ interface ElectronAPI {
 	setWallpaper: (screenName: string, wallpaperFolderName: string | null) => Promise<{ success: boolean; error?: string }>;
 	toggleCloneMode: (enabled: boolean, globalWallpaper?: string | null) => Promise<{ success: boolean; error?: string }>;
 	clearAllWallpapers: () => Promise<{ success: boolean; error?: string }>;
-	loadWallpapers: () => Promise<{ wallpapers: Record<string, any>; error: string | null; workshopPathValid: boolean; assetsPathValid: boolean; selectedWallpaper: any | null }>;
+	loadWallpapers: () => Promise<{ wallpapers: Record<string, any>; error: string | null; workshopPathValid: boolean; wallpaperEnginePathValid: boolean; selectedWallpaper: any | null }>;
 	getWallpaperPreview: (path: string) => Promise<{ success: boolean; data?: string; error?: string }>;
 	getWallpaperProjectData: (id: string) => Promise<{ success: boolean; properties?: Record<string, any>; error?: string }>;
 	getWallpaperProperties: (id: string) => Promise<any[]>;
