@@ -270,7 +270,7 @@
 				page: browsePage,
 				query_type: parseInt(sortOrder),
 				item_type: parseInt(itemType),
-				numperpage: 50
+				numperpage: parseInt(pageSize)
 			});
 
 			if (result?.error) {
@@ -418,6 +418,8 @@
 					: null}
 				{totalItems}
 				{infiniteScroll}
+				currentPage={browsePage - 1}
+				itemsPerPage={parseInt(pageSize)}
 				onLoadBrowseItems={loadBrowseItems}
 				onOpenBrowseWithFilters={openBrowseWithFilters}
 			/>

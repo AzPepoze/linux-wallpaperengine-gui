@@ -41,6 +41,12 @@ func init() {
 		DynamicSidebarTheme: true,
 		TransparentUi:       true,
 		UiTransparency:      90,
+		SteamPaths: []string{
+			".local/share/Steam",
+			".var/app/com.valvesoftware.Steam/.local/share/Steam",
+			".steam/steam",
+			".steam/root",
+		},
 	}
 }
 
@@ -61,11 +67,9 @@ func EnsureInitialized() error {
 	}
 
 	workshopSuffix := "steamapps/workshop/content/431960"
-	steamPaths := []string{
-		".local/share/Steam",
-		".var/app/com.valvesoftware.Steam/.local/share/Steam",
-		".steam/steam",
-		".steam/root",
+	steamPaths := conf.SteamPaths
+	if len(steamPaths) == 0 {
+		steamPaths = DefaultConfig.SteamPaths
 	}
 
 	for _, p := range steamPaths {

@@ -13,7 +13,8 @@
 		subscribe,
 		downloadProgress,
 		downloadStatus,
-		subscribedIds
+		subscribedIds,
+		isWallpaperFolderExist
 	} from '../../scripts/workshop';
 
 	export let folderName: string;
@@ -56,9 +57,7 @@
 			($downloadStatus[folderName] === undefined || isSubscribed)
 		) {
 			// workshop.ts:isDownloaded actually triggers an FS check and updates the store
-			import('../../scripts/workshop').then((m) =>
-				m.isDownloaded(folderName)
-			);
+			isWallpaperFolderExist(folderName);
 		}
 	});
 </script>

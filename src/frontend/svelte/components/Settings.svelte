@@ -18,6 +18,7 @@
 	import Range from './ui/Range.svelte';
 	import Browse from './ui/Browse.svelte';
 	import Button from './ui/Button.svelte';
+	import ListEditor from './ui/ListEditor.svelte';
 	// Icons
 	import DisplayIcon from '../icons/DisplayIcon.svelte';
 	import AudioIcon from '../icons/AudioIcon.svelte';
@@ -537,6 +538,18 @@
 							onSelect={onSelectWallpaperEngineDir}
 							dir={true}
 							placeholder="Path to wallpaper engine workshop directory..."
+						/>
+					</SettingItem>
+
+					<SettingItem
+						label="Steam Search Paths"
+						id="steamPaths"
+						vertical
+						description="Additional directories to search for Steam workshop content."
+					>
+						<ListEditor
+							bind:items={$settingsStore.steamPaths}
+							placeholder="e.g. .local/share/Steam"
 						/>
 					</SettingItem>
 				</SettingsSection>

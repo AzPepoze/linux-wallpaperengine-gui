@@ -46,7 +46,7 @@ async function fetchMetadataForId(fileId: string) {
 	return false;
 }
 
-export async function isDownloaded(folderName: string): Promise<boolean> {
+export async function isWallpaperFolderExist(folderName: string): Promise<boolean> {
 	// Check cache first
 	const status = get(downloadStatus);
 	if (status[folderName] !== undefined) {

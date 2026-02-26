@@ -88,9 +88,13 @@ export function registerWorkshopService() {
 			}
 
 			try {
-				const page = options.page ?? 1;
+				const requestedPageSize = options.numperpage ?? 50;
+				const frontendPage = options.page ?? 1;
 				const requestedQueryType = options.query_type ?? 13;
 				const requestedItemType = options.item_type ?? 13;
+
+				const steamPagesPerFrontendPage = Math.ceil(requestedPageSize / 50);
+				const startingSteamPage = (frontendPage - 1) * steamPagesPerFrontendPage + 1;
 
 				const queryConfig: any = {
 					requiredTags: options.requiredtags || undefined,
@@ -100,6 +104,7 @@ export function registerWorkshopService() {
 					includeMetadata: true,
 					includeAdditionalPreviews: true,
 					includeLongDescription: false,
+					numPerPage: 50,
 					cachedResponseMaxAge: 0,
 				};
 
@@ -107,17 +112,21 @@ export function registerWorkshopService() {
 					queryConfig.matchAnyTag = true;
 				}
 
-				let rawResult: any = null;
+				let totalResults = 0;
+				const allMergedItems: any[] = [];
 
 				const itemTypesToTry = [requestedItemType, 13, 0];
 				const queryTypesToTry = Array.from(new Set([requestedQueryType, 13, 1, 2, 9]));
 
-				let succeeded = false;
+				let bestQT = requestedQueryType;
+				let bestIT = requestedItemType;
+				let typesFound = false;
+
 				for (const qt of queryTypesToTry) {
 					for (const it of itemTypesToTry) {
 						try {
-							rawResult = await client.workshop.getAllItems(
-								page,
+							const res = await client.workshop.getAllItems(
+								startingSteamPage,
 								qt,
 								it,
 								WALLPAPER_ENGINE_APP_ID,
@@ -125,19 +134,49 @@ export function registerWorkshopService() {
 								queryConfig,
 							);
 
-							const hasResults = (rawResult?.items || []).length > 0 || (rawResult?.totalResults || 0) > 0;
-							if (hasResults) {
-								succeeded = true;
+							if ((res?.items || []).length > 0 || (res?.totalResults || 0) > 0) {
+								bestQT = qt;
+								bestIT = it;
+								typesFound = true;
+								totalResults = res?.totalResults || 0;
+								allMergedItems.push(...(res?.items || []).filter((i: any) => i));
 								break;
 							}
 						} catch (e: any) {
 							logger.error(`getAllItems failed (queryType=${qt}, itemType=${it}):`, e?.message);
 						}
 					}
-					if (succeeded) break;
+					if (typesFound) break;
 				}
 
-				const mappedItems = (rawResult?.items || []).filter((it: any) => it).map((it: any) => ({
+				if (typesFound && steamPagesPerFrontendPage > 1) {
+					for (let i = 1; i < steamPagesPerFrontendPage; i++) {
+						const currentSteamPage = startingSteamPage + i;
+						if (allMergedItems.length >= totalResults && totalResults > 0) break;
+
+						try {
+							const res = await client.workshop.getAllItems(
+								currentSteamPage,
+								bestQT,
+								bestIT,
+								WALLPAPER_ENGINE_APP_ID,
+								WALLPAPER_ENGINE_APP_ID,
+								queryConfig,
+							);
+							if (res?.items) {
+								allMergedItems.push(...res.items.filter((i: any) => i));
+							}
+						} catch (e: any) {
+							logger.error(`Multi-page fetch failed for Steam page ${currentSteamPage}:`, e?.message);
+						}
+					}
+				}
+
+				if (allMergedItems.length > requestedPageSize) {
+					allMergedItems.length = requestedPageSize;
+				}
+
+				const mappedItems = allMergedItems.map((it: any) => ({
 					...it,
 					publishedfileid: it.publishedFileId?.toString(),
 					result: 1,
@@ -152,10 +191,11 @@ export function registerWorkshopService() {
 
 				return {
 					items: mappedItems,
-					total: rawResult?.totalResults ?? mappedItems.length,
+					total: totalResults,
 					nextCursor: null,
 				};
 			} catch (error: any) {
+				logger.error("Error in query-workshop-files:", error);
 				return { items: [], total: 0, nextCursor: null, error: error?.message };
 			}
 		},

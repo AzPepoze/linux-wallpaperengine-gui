@@ -11,7 +11,8 @@
 		downloadStatus,
 		downloadProgress,
 		subscribe,
-		subscribedIds
+		subscribedIds,
+		isWallpaperFolderExist
 	} from '../../scripts/workshop';
 	import { onMount } from 'svelte';
 	import { fade, scale } from 'svelte/transition';
@@ -50,9 +51,7 @@
 			(isWorkshop || wallpaper.projectData?.isWorkshop) &&
 			($downloadStatus[folderName] === undefined || isSubscribed)
 		) {
-			import('../../scripts/workshop').then((m) =>
-				m.isDownloaded(folderName)
-			);
+			isWallpaperFolderExist(folderName);
 		}
 	});
 </script>

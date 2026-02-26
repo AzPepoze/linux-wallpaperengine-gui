@@ -59,4 +59,5 @@ type AppConfig struct {
 	DynamicSidebarTheme      bool           `json:"dynamicSidebarTheme"`
 	TransparentUi            bool           `json:"transparentUi"`
 	UiTransparency           int            `json:"uiTransparency,omitempty"`
+	SteamPaths               []string       `json:"steamPaths,omitempty"`
 }
