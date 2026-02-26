@@ -62,6 +62,7 @@ export type AppConfig = {
 	dynamicSidebarTheme?: boolean;
 	transparentUi?: boolean;
 	uiTransparency?: number;
+	steamPaths?: string[];
 };
 
 export type PropertyType =

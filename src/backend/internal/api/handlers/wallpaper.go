@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"linux-wallpaperengine-gui/src/backend/internal/api/models"
 	"linux-wallpaperengine-gui/src/backend/internal/config"
+	"linux-wallpaperengine-gui/src/backend/internal/logger"
 	"linux-wallpaperengine-gui/src/backend/internal/wallpaper"
 )
 
@@ -19,6 +20,9 @@ func HandleWallpaper(req models.Request) models.Response {
 			res.Result = map[string]bool{"success": true}
 		}
 	case "load-wallpapers":
+		if err := config.EnsureInitialized(); err != nil {
+			logger.Printf("Failed to ensure config initialized in load-wallpapers: %v", err)
+		}
 		result, err := wallpaper.LoadWallpapers()
 		if err != nil {
 			res.Error = err.Error()
@@ -27,6 +31,8 @@ func HandleWallpaper(req models.Request) models.Response {
 				"success":           true,
 				"wallpapers":        result["wallpapers"],
 				"selectedWallpaper": result["selectedWallpaper"],
+				"workshopPathValid": result["workshopPathValid"],
+				"assetsPathValid":   result["assetsPathValid"],
 			}
 		}
 	case "get-wallpaper-project-data":
@@ -48,6 +54,12 @@ func HandleWallpaper(req models.Request) models.Response {
 			res.Error = err.Error()
 		} else {
 			res.Result = config.WallpaperPath
+		}
+	case "get-assets-base-path":
+		if err := config.EnsureInitialized(); err != nil {
+			res.Error = err.Error()
+		} else {
+			res.Result = config.AssetsPath
 		}
 	case "kill-all-wallpapers":
 		wallpaper.KillAllWallpapers()

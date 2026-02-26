@@ -2,11 +2,12 @@
 	import DisplayIcon from '../../icons/DisplayIcon.svelte';
 	import ApplyAllIcon from '../../icons/ApplyAllIcon.svelte';
 	import PlaylistIcon from '../../icons/PlaylistIcon.svelte';
-	import Button from '../ui/Button.svelte';
-	import ViewToggle from '../ui/ViewToggle.svelte';
 	import Refresh from '../ui/Refresh.svelte';
 	import FilterIcon from '../../icons/FilterIcon.svelte';
 	import FilterPanel from '../browse/FilterPanel.svelte';
+	import PathWarning from '../ui/PathWarning.svelte';
+	import Button from '../ui/Button.svelte';
+	import ViewToggle from '../ui/ViewToggle.svelte';
 
 	import {
 		showDisplayManager,
@@ -40,6 +41,8 @@
 	export let selectedWallpaper: Wallpaper | null = null;
 	export let selectedScreen: string | null = null;
 	export let loading: boolean = true;
+	export let workshopPathValid: boolean = true;
+	export let assetsPathValid: boolean = true;
 	export let error: string | null = null;
 	export let playlistManager: any = null;
 	export let onSelect: (
@@ -324,12 +327,18 @@
 	}
 
 	async function refreshWallpapers() {
-		const { wallpapers: loadedWallpapers } =
-			await window.electronAPI.loadWallpapers();
+		const {
+			wallpapers: loadedWallpapers,
+			workshopPathValid: loadedWorkshopPathValid,
+			assetsPathValid: loadedAssetsPathValid
+		} = await window.electronAPI.loadWallpapers();
+
 		logger.log(
 			`[DEBUG] refreshWallpapers loaded ${Object.keys(loadedWallpapers).length} wallpapers`
 		);
 		wallpapers = loadedWallpapers;
+		workshopPathValid = loadedWorkshopPathValid;
+		assetsPathValid = loadedAssetsPathValid;
 		onWallpapersRefresh(loadedWallpapers);
 	}
 
@@ -348,97 +357,108 @@
 </script>
 
 <div class="container">
-	<div class="toolbar">
-		<div class="left-actions">
-			<Button
-				variant={$showPlaylistManager ? 'primary' : 'secondary'}
-				on:click={() => {
-					showPlaylistManager.update((v) => !v);
-					if ($showPlaylistManager) loadPlaylists();
-				}}
-				title="Toggle Playlist Manager"
-				style="padding: 8px; margin-right: 5px; border-radius: 10px;"
-			>
-				<PlaylistIcon width="20" height="20" />
-				<span>Playlist</span>
-			</Button>
-
-			<Button
-				variant={showFilterPanel ? 'primary' : 'secondary'}
-				on:click={() => (showFilterPanel = !showFilterPanel)}
-				title="Filter Wallpapers"
-				style="padding: 8px; margin-right: 5px; border-radius: 10px;"
-			>
-				<FilterIcon width="20" height="20" />
-				<span>Filter</span>
-			</Button>
-		</div>
-
-		<div class="status-info">
-			<div class="status-item truncate-item">
-				<span class="label">CURRENTLY USING :</span>
-				{#if activeWallpaper}
-					<div class="value-container">
-						{#key activeWallpaper.projectData?.title || activeWallpaper.folderName}
-							<span
-								in:fly={{
-									y: 10,
-									duration: 300,
-									delay: 100
-								}}
-								out:fly={{ y: -10, duration: 300 }}
-								class="value truncate-text"
-								title={activeWallpaper.projectData
-									?.title ||
-									activeWallpaper.folderName}
-							>
-								{activeWallpaper.projectData?.title ||
-									activeWallpaper.folderName}
-							</span>
-						{/key}
-					</div>
-				{/if}
-			</div>
-			<div class="status-item">
-				<span class="label">DISPLAY :</span>
-				{#if selectedScreen || $cloneMode}
-					<span
-						in:fly={{ y: 20, duration: 300 }}
-						out:fly={{ y: -20, duration: 300 }}
-						class="value"
-						>{$cloneMode ? 'ALL' : selectedScreen}</span
-					>
-				{/if}
-
+	{#if workshopPathValid}
+		<div class="toolbar">
+			<div class="left-actions">
 				<Button
-					variant={$showDisplayManager ? 'primary' : 'secondary'}
-					on:click={() => showDisplayManager.update((v) => !v)}
-					title="Toggle Display Manager"
+					variant={$showPlaylistManager
+						? 'primary'
+						: 'secondary'}
+					on:click={() => {
+						showPlaylistManager.update((v) => !v);
+						if ($showPlaylistManager) loadPlaylists();
+					}}
+					title="Toggle Playlist Manager"
 					style="padding: 8px; margin-right: 5px; border-radius: 10px;"
 				>
-					<DisplayIcon width="20" height="20" />
-					<span>Display</span>
+					<PlaylistIcon width="20" height="20" />
+					<span>Playlist</span>
 				</Button>
 
 				<Button
-					variant={$cloneMode ? 'primary' : 'secondary'}
-					on:click={handleToggleCloneMode}
-					title="Clone mode (Apply to all displays)"
-					style="padding: 8px; margin-right: 10px; border-radius: 10px;"
+					variant={showFilterPanel ? 'primary' : 'secondary'}
+					on:click={() => (showFilterPanel = !showFilterPanel)}
+					title="Filter Wallpapers"
+					style="padding: 8px; margin-right: 5px; border-radius: 10px;"
 				>
-					<ApplyAllIcon width="20" height="20" />
-					<span>Clone mode</span>
+					<FilterIcon width="20" height="20" />
+					<span>Filter</span>
 				</Button>
 			</div>
-		</div>
 
-		<div class="refresh-modes-container">
-			<Refresh on:click={refreshWallpapers} />
-			<div class="mode-toggles">
-				<ViewToggle bind:viewMode />
+			<div class="status-info">
+				<div class="status-item truncate-item">
+					<span class="label">CURRENTLY USING :</span>
+					{#if activeWallpaper}
+						<div class="value-container">
+							{#key activeWallpaper.projectData?.title || activeWallpaper.folderName}
+								<span
+									in:fly={{
+										y: 10,
+										duration: 300,
+										delay: 100
+									}}
+									out:fly={{
+										y: -10,
+										duration: 300
+									}}
+									class="value truncate-text"
+									title={activeWallpaper.projectData
+										?.title ||
+										activeWallpaper.folderName}
+								>
+									{activeWallpaper.projectData
+										?.title ||
+										activeWallpaper.folderName}
+								</span>
+							{/key}
+						</div>
+					{/if}
+				</div>
+				<div class="status-item">
+					<span class="label">DISPLAY :</span>
+					{#if selectedScreen || $cloneMode}
+						<span
+							in:fly={{ y: 20, duration: 300 }}
+							out:fly={{ y: -20, duration: 300 }}
+							class="value"
+							>{$cloneMode ? 'ALL' : selectedScreen}</span
+						>
+					{/if}
+
+					<Button
+						variant={$showDisplayManager
+							? 'primary'
+							: 'secondary'}
+						on:click={() =>
+							showDisplayManager.update((v) => !v)}
+						title="Toggle Display Manager"
+						style="padding: 8px; margin-right: 5px; border-radius: 10px;"
+					>
+						<DisplayIcon width="20" height="20" />
+						<span>Display</span>
+					</Button>
+
+					<Button
+						variant={$cloneMode ? 'primary' : 'secondary'}
+						on:click={handleToggleCloneMode}
+						title="Clone mode (Apply to all displays)"
+						style="padding: 8px; margin-right: 10px; border-radius: 10px;"
+					>
+						<ApplyAllIcon width="20" height="20" />
+						<span>Clone mode</span>
+					</Button>
+				</div>
+			</div>
+
+			<div class="refresh-modes-container">
+				<Refresh on:click={refreshWallpapers} />
+				<div class="mode-toggles">
+					<ViewToggle bind:viewMode />
+				</div>
 			</div>
 		</div>
-	</div>
+	{/if}
 
 	<div class="content-area">
 		{#if showFilterPanel && installedFilters}
@@ -451,37 +471,48 @@
 		{/if}
 
 		<div class="wallpaper-container">
-			{#if loading}
-				<div class="status-msg">Loading...</div>
-			{:else if error}
-				<div class="status-msg error">{error}</div>
-			{:else if Object.keys(filteredWallpapers).length === 0}
-				<div class="status-msg">
-					<p>No wallpapers found matching filters.</p>
-					<p class="hint">
-						Check your <b>Steam Search Paths</b> in
-						<button
-							class="link-btn"
-							on:click={() => activeView.set('settings')}
-							>Settings</button
-						>
-						if you expect to see more.
-					</p>
+			{#if !workshopPathValid}
+				<div class="warning-center-wrapper">
+					<PathWarning type="workshop" />
 				</div>
-			{:else if viewMode === 'grid'}
-				<WallpaperItemGrid
-					wallpapers={filteredWallpapers}
-					{selectedWallpaper}
-					{activePlaylist}
-					onSelect={selectWallpaper}
-				/>
 			{:else}
-				<WallpaperItemList
-					wallpapers={filteredWallpapers}
-					{selectedWallpaper}
-					{activePlaylist}
-					onSelect={selectWallpaper}
-				/>
+				{#if !assetsPathValid}
+					<PathWarning type="assets" delay={100} />
+				{/if}
+
+				{#if loading}
+					<div class="status-msg">Loading...</div>
+				{:else if error}
+					<div class="status-msg error">{error}</div>
+				{:else if Object.keys(filteredWallpapers).length === 0}
+					<div class="status-msg">
+						<p>No wallpapers found matching filters.</p>
+						<p class="hint">
+							Check your <b>Steam Search Paths</b> in
+							<button
+								class="link-btn"
+								on:click={() =>
+									activeView.set('settings')}
+								>Settings</button
+							>
+							if you expect to see more.
+						</p>
+					</div>
+				{:else if viewMode === 'grid'}
+					<WallpaperItemGrid
+						wallpapers={filteredWallpapers}
+						{selectedWallpaper}
+						{activePlaylist}
+						onSelect={selectWallpaper}
+					/>
+				{:else}
+					<WallpaperItemList
+						wallpapers={filteredWallpapers}
+						{selectedWallpaper}
+						{activePlaylist}
+						onSelect={selectWallpaper}
+					/>
+				{/if}
 			{/if}
 		</div>
 	</div>
@@ -594,6 +625,9 @@
 		text-align: center;
 		overflow-y: auto;
 		position: relative;
+		display: flex;
+		flex-direction: column;
+
 		mask-image: linear-gradient(
 			to bottom,
 			transparent,
@@ -601,6 +635,15 @@
 			black 97%,
 			transparent
 		);
+
+		.warning-center-wrapper {
+			display: flex;
+			flex-grow: 1;
+			align-items: center;
+			justify-content: center;
+			padding: 40px;
+			min-height: 100%;
+		}
 
 		.status-msg {
 			padding: 40px;

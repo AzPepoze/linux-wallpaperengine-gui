@@ -5,6 +5,7 @@ import (
 	"linux-wallpaperengine-gui/src/backend/internal/config"
 	"linux-wallpaperengine-gui/src/backend/internal/display"
 	"linux-wallpaperengine-gui/src/backend/internal/logger"
+	"os"
 	"strings"
 )
 
@@ -146,6 +147,8 @@ func ApplyWallpapers() error {
 		}
 		if conf.AssetsDir != "" {
 			args = append(args, fmt.Sprintf("--assets-dir \"%s\"", conf.AssetsDir))
+		} else if config.AssetsPath != "" {
+			args = append(args, fmt.Sprintf("--assets-dir \"%s\"", config.AssetsPath))
 		}
 		if conf.DumpStructure {
 			args = append(args, "--dump-structure")
@@ -183,6 +186,19 @@ func LoadWallpapers() (map[string]interface{}, error) {
 	}
 
 	conf, _ := config.GetConfig()
+	workshopPathValid := false
+	if config.WallpaperPath != "" {
+		if _, err := os.Stat(config.WallpaperPath); err == nil {
+			workshopPathValid = true
+		}
+	}
+
+	assetsPathValid := false
+	if config.AssetsPath != "" {
+		if _, err := os.Stat(config.AssetsPath); err == nil {
+			assetsPathValid = true
+		}
+	}
 	availableScreens, _ := display.GetScreens()
 	connectedSet := make(map[string]bool)
 	for _, s := range availableScreens {
@@ -210,6 +226,8 @@ func LoadWallpapers() (map[string]interface{}, error) {
 	return map[string]interface{}{
 			"wallpapers":        wallpapers,
 			"selectedWallpaper": initialWallpaper,
+			"workshopPathValid": workshopPathValid,
+			"assetsPathValid":   assetsPathValid,
 		},
 		nil
 }

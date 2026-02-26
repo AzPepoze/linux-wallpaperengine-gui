@@ -5,12 +5,14 @@ import (
 	"os"
 	"os/exec"
 	"path/filepath"
+	"strings"
 )
 
 var (
 	HomePath      string
 	ConfigPath    string
 	WallpaperPath string
+	AssetsPath    string
 	DefaultConfig AppConfig
 )
 
@@ -54,33 +56,79 @@ func newFloat(f float64) *float64 {
 	return &f
 }
 
-func EnsureInitialized() error {
-	if WallpaperPath != "" {
-		return nil
+func resolvePath(p string) string {
+	if p == "" {
+		return ""
 	}
+	if filepath.IsAbs(p) || strings.HasPrefix(p, "/") {
+		return p
+	}
+	if strings.HasPrefix(p, "~/") {
+		return filepath.Join(HomePath, p[2:])
+	}
+	return filepath.Join(HomePath, p)
+}
+
+func EnsureInitialized() error {
+	// Clear previous paths to allow fresh detection
+	WallpaperPath = ""
+	AssetsPath = ""
 
 	// Try to get from config first
 	conf, err := ReadConfig()
-	if err == nil && conf.WallpaperEngineDir != "" {
-		WallpaperPath = conf.WallpaperEngineDir
-		return nil
+	if err != nil {
+		return err
 	}
 
 	workshopSuffix := "steamapps/workshop/content/431960"
+	assetsSuffix := "steamapps/common/wallpaper_engine"
 	steamPaths := conf.SteamPaths
 	if len(steamPaths) == 0 {
 		steamPaths = DefaultConfig.SteamPaths
 	}
 
-	for _, p := range steamPaths {
-		fullPath := filepath.Join(HomePath, p, workshopSuffix)
-		if _, err := os.Stat(fullPath); err == nil {
-			WallpaperPath = fullPath
-			return nil
+	// 1. Resolve Assets Path (Wallpaper Engine Dir)
+	if conf.AssetsDir != "" {
+		AssetsPath = resolvePath(conf.AssetsDir)
+	}
+
+	if AssetsPath == "" {
+		// Auto-detect from steam paths
+		for _, p := range steamPaths {
+			steamRoot := resolvePath(p)
+			fullPath := filepath.Join(steamRoot, assetsSuffix)
+			if _, err := os.Stat(fullPath); err == nil {
+				AssetsPath = fullPath
+				break
+			}
 		}
 	}
 
-	WallpaperPath = filepath.Join(HomePath, ".local/share/Steam", workshopSuffix)
+	// 2. Resolve Workshop Path
+	if conf.WallpaperEngineDir != "" {
+		WallpaperPath = resolvePath(conf.WallpaperEngineDir)
+	}
+
+	// Try to derive workshop from assets if still missing
+	if WallpaperPath == "" && AssetsPath != "" {
+		derived := filepath.Join(AssetsPath, "../../workshop/content/431960")
+		if _, err := os.Stat(derived); err == nil {
+			WallpaperPath = derived
+		}
+	}
+
+	if WallpaperPath == "" {
+		// Auto-detect from steam paths
+		for _, p := range steamPaths {
+			steamRoot := resolvePath(p)
+			fullPath := filepath.Join(steamRoot, workshopSuffix)
+			if _, err := os.Stat(fullPath); err == nil {
+				WallpaperPath = fullPath
+				break
+			}
+		}
+	}
+
 	return nil
 }
 

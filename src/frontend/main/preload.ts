@@ -28,6 +28,7 @@ contextBridge.exposeInMainWorld("electronAPI", {
 	selectDir: createInvokeMethod("select-dir"),
 	selectFile: createInvokeMethod("select-file"),
 	openExternal: createInvokeMethod("open-external"),
+	openPath: createInvokeMethod("open-path"),
 
 	// File system
 	readDirectory: createInvokeMethod("fs-read-dir"),
@@ -47,6 +48,7 @@ contextBridge.exposeInMainWorld("electronAPI", {
 		"get-wallpaper-executable",
 	),
 	getWallpaperBasePath: createInvokeMethod("get-wallpaper-base-path"),
+	getAssetsBasePath: createInvokeMethod("get-assets-base-path"),
 	validateExecutable: createInvokeMethod("validate-executable"),
 
 	// Wallpaper services
