@@ -15,6 +15,14 @@
 			<span class="collapse-icon">{isExpanded ? '▼' : '▶'}</span>
 			<span>{title}</span>
 		</div>
+		<div
+			class="header-actions"
+			on:click|stopPropagation
+			on:keydown|stopPropagation
+			role="presentation"
+		>
+			<slot name="header-actions" />
+		</div>
 	</button>
 
 	{#if isExpanded}
@@ -73,6 +81,13 @@
 					-webkit-background-clip: text;
 					-webkit-text-fill-color: transparent;
 				}
+			}
+
+			.header-actions {
+				display: flex;
+				gap: 8px;
+				margin-left: auto;
+				padding-left: 10px;
 			}
 		}
 

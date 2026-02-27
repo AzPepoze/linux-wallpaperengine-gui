@@ -99,7 +99,6 @@ func GetWallpaperProjectData(folderName string) (map[string]interface{}, error) 
 			}
 		}
 	}
-
 	return properties, nil
 }
 

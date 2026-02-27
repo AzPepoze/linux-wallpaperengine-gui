@@ -29,6 +29,7 @@
      },
      "include": [
           "src/**/*.ts",
+          "utils/**/*.ts",
           "src/**/*.svelte",
           "vite.config.ts",
           "tsconfig.json"

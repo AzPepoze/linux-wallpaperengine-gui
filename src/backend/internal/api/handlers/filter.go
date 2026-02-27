@@ -3,6 +3,7 @@ package handlers
 import (
 	"encoding/json"
 	"linux-wallpaperengine-gui/src/backend/internal/api/models"
+	"linux-wallpaperengine-gui/src/backend/internal/config"
 	"linux-wallpaperengine-gui/src/backend/internal/wallpaper"
 )
 
@@ -19,7 +20,7 @@ func HandleFilter(req models.Request) models.Response {
 			res.Result = map[string]interface{}{"success": true, "filters": filters}
 		}
 	case "save-installed-filters":
-		var filters wallpaper.FilterConfig
+		var filters config.FilterConfig
 		if err := json.Unmarshal(req.Params, &filters); err != nil {
 			res.Error = err.Error()
 		} else {
@@ -37,7 +38,7 @@ func HandleFilter(req models.Request) models.Response {
 			res.Result = map[string]interface{}{"success": true, "filters": filters}
 		}
 	case "save-workshop-filters":
-		var filters wallpaper.FilterConfig
+		var filters config.FilterConfig
 		if err := json.Unmarshal(req.Params, &filters); err != nil {
 			res.Error = err.Error()
 		} else {

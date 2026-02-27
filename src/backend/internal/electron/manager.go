@@ -58,9 +58,9 @@ func Start() {
 		}
 		args = []string{ozoneFlag}
 	} else {
-		logger.Println("Dev mode detected, running via pnpm...")
-		name = "pnpm"
-		args = []string{"run", "dev:frontend", "--", ozoneFlag}
+		logger.Println("Dev mode detected, running via bun...")
+		name = "bun"
+		args = []string{"run", "dev:frontend"}
 	}
 
 	cmd := exec.Command(name, args...)

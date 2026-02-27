@@ -1,5 +1,10 @@
 package config
 
+import (
+	"encoding/json"
+	"strings"
+)
+
 type ScreenConfig struct {
 	Name             string  `json:"name"`
 	Wallpaper        *string `json:"wallpaper"`
@@ -60,4 +65,79 @@ type AppConfig struct {
 	TransparentUi            bool           `json:"transparentUi"`
 	UiTransparency           int            `json:"uiTransparency,omitempty"`
 	SteamPaths               []string       `json:"steamPaths,omitempty"`
+
+	// Fixed Filters
+	InstalledFilters *FilterConfig `json:"installedFilters,omitempty"`
+	WorkshopFilters  *FilterConfig `json:"workshopFilters,omitempty"`
+}
+
+type FilterConfig struct {
+	CategoryTags   map[string]bool `json:"categorytags"`
+	Descending     bool            `json:"descending"`
+	RatingTags     map[string]bool `json:"ratingtags"`
+	ResolutionTags map[string]bool `json:"resolutiontags"`
+	Sort           string          `json:"sort"`
+	SourceTags     map[string]bool `json:"sourcetags"`
+	Tags           map[string]bool `json:"tags"`
+	Type           string          `json:"type"`
+	TypeTags       map[string]bool `json:"typetags"`
+	UtilityTags    map[string]bool `json:"utilitytags"`
+}
+
+// UnmarshalJSON custom unmarshaler for FilterConfig to handle number/string to bool conversion in maps
+func (fc *FilterConfig) UnmarshalJSON(data []byte) error {
+	type Alias FilterConfig
+	aux := &struct {
+		CategoryTags   map[string]interface{} `json:"categorytags"`
+		RatingTags     map[string]interface{} `json:"ratingtags"`
+		ResolutionTags map[string]interface{} `json:"resolutiontags"`
+		SourceTags     map[string]interface{} `json:"sourcetags"`
+		Tags           map[string]interface{} `json:"tags"`
+		TypeTags       map[string]interface{} `json:"typetags"`
+		UtilityTags    map[string]interface{} `json:"utilitytags"`
+		*Alias
+	}{
+		Alias: (*Alias)(fc),
+	}
+
+	if err := json.Unmarshal(data, &aux); err != nil {
+		return err
+	}
+
+	// Helper to convert map[string]interface{} to map[string]bool
+	convertToBoolMap := func(m map[string]interface{}) map[string]bool {
+		if m == nil {
+			return nil
+		}
+		result := make(map[string]bool)
+		for k, v := range m {
+			result[k] = ToBool(v)
+		}
+		return result
+	}
+
+	fc.CategoryTags = convertToBoolMap(aux.CategoryTags)
+	fc.RatingTags = convertToBoolMap(aux.RatingTags)
+	fc.ResolutionTags = convertToBoolMap(aux.ResolutionTags)
+	fc.SourceTags = convertToBoolMap(aux.SourceTags)
+	fc.Tags = convertToBoolMap(aux.Tags)
+	fc.TypeTags = convertToBoolMap(aux.TypeTags)
+	fc.UtilityTags = convertToBoolMap(aux.UtilityTags)
+
+	return nil
+}
+
+func ToBool(v interface{}) bool {
+	if v == nil {
+		return false
+	}
+	switch val := v.(type) {
+	case bool:
+		return val
+	case string:
+		return strings.ToLower(strings.TrimSpace(val)) != "false"
+	case float64:
+		return val != 0
+	}
+	return false
 }
