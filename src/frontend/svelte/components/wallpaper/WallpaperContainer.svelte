@@ -58,6 +58,7 @@
 
 	let showFilterPanel = false;
 	let installedFilters: FilterConfig | null = null;
+	let weConfigError = false;
 	let playlists: Playlist[] = [];
 
 	// Combine wallpapers with subscriptions/downloads
@@ -319,6 +320,14 @@
 			const result = await window.electronAPI.getPlaylists();
 			if (result.success && result.playlists) {
 				playlists = result.playlists;
+				weConfigError = false;
+			} else if (
+				result.error &&
+				result.error.includes(
+					'Wallpaper Engine configuration not found'
+				)
+			) {
+				weConfigError = true;
 			}
 		} catch (err) {
 			console.error('Failed to load playlists:', err);
@@ -485,6 +494,10 @@
 			{#if !workshopPathValid}
 				<div class="warning-center-wrapper">
 					<PathWarning type="workshop" />
+				</div>
+			{:else if weConfigError}
+				<div class="warning-center-wrapper">
+					<PathWarning type="we_config" delay={100} />
 				</div>
 			{:else}
 				{#if !wallpaperEnginePathValid}

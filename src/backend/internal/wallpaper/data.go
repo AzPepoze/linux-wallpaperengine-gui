@@ -128,5 +128,10 @@ func GetWEConfigPath() (string, error) {
 		return "", fmt.Errorf("could not determine wallpaper_engine installation path")
 	}
 
-	return filepath.Join(installPath, "config.json"), nil
+	configPath := filepath.Join(installPath, "config.json")
+	if _, err := os.Stat(configPath); os.IsNotExist(err) {
+		return "", fmt.Errorf("Wallpaper Engine configuration not found. Please run Wallpaper Engine at least once to initialize it")
+	}
+
+	return configPath, nil
 }

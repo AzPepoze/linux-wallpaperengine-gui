@@ -12,10 +12,6 @@ func GetPlaylists() ([]Playlist, error) {
 		return nil, err
 	}
 
-	if _, err := os.Stat(configPath); os.IsNotExist(err) {
-		return nil, fmt.Errorf("wallpaper_engine config.json not found at %s", configPath)
-	}
-
 	data, err := os.ReadFile(configPath)
 	if err != nil {
 		return nil, fmt.Errorf("failed to read config.json: %w", err)
