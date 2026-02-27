@@ -25,8 +25,9 @@
 	}
 
 	function setGroupState(category: string, items: string[], state: boolean) {
-		const categoryTags = selectedFilters.get(category) || new Set<string>();
-		items.forEach(item => {
+		const categoryTags =
+			selectedFilters.get(category) || new Set<string>();
+		items.forEach((item) => {
 			if (state) {
 				categoryTags.add(item);
 			} else {
@@ -35,6 +36,32 @@
 			setTimeout(() => onToggleFilter(category, item), 0);
 		});
 		selectedFilters.set(category, categoryTags);
+		selectedFilters = new Map(selectedFilters);
+	}
+
+	function setCategoryState(category: FilterCategory, state: boolean) {
+		const categoryTags =
+			selectedFilters.get(category.name) || new Set<string>();
+
+		const allItems: string[] = [];
+		if (category.items) allItems.push(...category.items);
+		if (category.groups) {
+			category.groups.forEach((group) =>
+				allItems.push(...group.items)
+			);
+		}
+
+		allItems.forEach((item) => {
+			if (state) {
+				categoryTags.add(item);
+			} else {
+				categoryTags.delete(item);
+			}
+			// Trigger individual update for each toggle
+			setTimeout(() => onToggleFilter(category.name, item), 0);
+		});
+
+		selectedFilters.set(category.name, categoryTags);
 		selectedFilters = new Map(selectedFilters);
 	}
 
@@ -54,6 +81,20 @@
 				title={category.name}
 				bind:isExpanded={expandedCategories[category.name]}
 			>
+				<svelte:fragment slot="header-actions">
+					<Button
+						variant="primary"
+						style="padding: 2px 6px; font-size: 0.75em;"
+						on:click={() => setCategoryState(category, true)}
+						>All</Button
+					>
+					<Button
+						variant="primary"
+						style="padding: 2px 6px; font-size: 0.75em;"
+						on:click={() => setCategoryState(category, false)}
+						>None</Button
+					>
+				</svelte:fragment>
 				<div class="filter-list">
 					{#if category.items && category.items.length > 0}
 						{#each category.items as item (item)}
@@ -64,7 +105,10 @@
 									item
 								)}
 								onClick={() =>
-									handleToggleFilter(category.name, item)}
+									handleToggleFilter(
+										category.name,
+										item
+									)}
 							/>
 						{/each}
 					{/if}
@@ -75,11 +119,29 @@
 								<div class="group-header">
 									<h4>{group.name}</h4>
 									<div class="group-actions">
-										<Button variant="primary" style="padding: 2px 6px; font-size: 0.75em;" on:click={() => setGroupState(category.name, group.items, true)}>All</Button>
-										<Button variant="primary" style="padding: 2px 6px; font-size: 0.75em;" on:click={() => setGroupState(category.name, group.items, false)}>None</Button>
+										<Button
+											variant="primary"
+											style="padding: 2px 6px; font-size: 0.75em;"
+											on:click={() =>
+												setGroupState(
+													category.name,
+													group.items,
+													true
+												)}>All</Button
+										>
+										<Button
+											variant="primary"
+											style="padding: 2px 6px; font-size: 0.75em;"
+											on:click={() =>
+												setGroupState(
+													category.name,
+													group.items,
+													false
+												)}>None</Button
+										>
 									</div>
 								</div>
-								
+
 								<div class="group-items">
 									{#each group.items as item (item)}
 										<FilterItem
@@ -89,7 +151,10 @@
 												item
 											)}
 											onClick={() =>
-												handleToggleFilter(category.name, item)}
+												handleToggleFilter(
+													category.name,
+													item
+												)}
 										/>
 									{/each}
 								</div>

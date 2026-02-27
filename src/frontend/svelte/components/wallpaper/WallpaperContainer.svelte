@@ -31,6 +31,7 @@
 		Playlist,
 		FilterConfig
 	} from '../../../shared/types';
+	import { DEFAULT_INSTALLED_FILTER_CONFIG } from '../../../shared/filterConstants';
 	import WallpaperItemGrid from './WallpaperItemGrid.svelte';
 	import WallpaperItemList from './WallpaperItemList.svelte';
 
@@ -57,6 +58,7 @@
 
 	let showFilterPanel = false;
 	let installedFilters: FilterConfig | null = null;
+	let weConfigError = false;
 	let playlists: Playlist[] = [];
 
 	// Combine wallpapers with subscriptions/downloads
@@ -95,7 +97,8 @@
 
 	// Reactive filtering of wallpapers
 	$: filteredWallpapers = (() => {
-		if (!installedFilters) return combinedWallpapers;
+		const currentFilters = installedFilters;
+		if (!currentFilters) return combinedWallpapers;
 
 		// Extract active tags by category
 		const activeTags: Record<string, string[]> = {};
@@ -111,9 +114,11 @@
 
 		let hasAnyFilter = false;
 		categories.forEach((cat) => {
-			const tags = installedFilters![
-				cat as keyof FilterConfig
-			] as Record<string, boolean>;
+			const catKey = cat as keyof FilterConfig;
+			const tags = (currentFilters[catKey] || {}) as Record<
+				string,
+				boolean
+			>;
 			const active = Object.entries(tags)
 				.filter(([_, val]) => val)
 				.map(([name, _]) => name.toLowerCase());
@@ -272,10 +277,17 @@
 		try {
 			const result = await window.electronAPI.getInstalledFilters();
 			if (result.success) {
-				installedFilters = result.filters;
+				// Merge with default config to ensure all fixed filters are present
+				installedFilters = {
+					...DEFAULT_INSTALLED_FILTER_CONFIG,
+					...result.filters
+				};
+			} else {
+				installedFilters = { ...DEFAULT_INSTALLED_FILTER_CONFIG };
 			}
 		} catch (err) {
 			console.error('Failed to load filters:', err);
+			installedFilters = { ...DEFAULT_INSTALLED_FILTER_CONFIG };
 		}
 	}
 
@@ -308,6 +320,14 @@
 			const result = await window.electronAPI.getPlaylists();
 			if (result.success && result.playlists) {
 				playlists = result.playlists;
+				weConfigError = false;
+			} else if (
+				result.error &&
+				result.error.includes(
+					'Wallpaper Engine configuration not found'
+				)
+			) {
+				weConfigError = true;
 			}
 		} catch (err) {
 			console.error('Failed to load playlists:', err);
@@ -474,6 +494,10 @@
 			{#if !workshopPathValid}
 				<div class="warning-center-wrapper">
 					<PathWarning type="workshop" />
+				</div>
+			{:else if weConfigError}
+				<div class="warning-center-wrapper">
+					<PathWarning type="we_config" delay={100} />
 				</div>
 			{:else}
 				{#if !wallpaperEnginePathValid}

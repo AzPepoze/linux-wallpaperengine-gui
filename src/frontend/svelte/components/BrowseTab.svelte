@@ -10,11 +10,7 @@
 	import Sidebar from './wallpaper/Sidebar.svelte';
 	import WallpaperItemGrid from './wallpaper/WallpaperItemGrid.svelte';
 	import WallpaperItemList from './wallpaper/WallpaperItemList.svelte';
-
-	interface FilterCategory {
-		name: string;
-		items: string[];
-	}
+	import type { FilterCategory } from '../../shared/filterConstants';
 
 	export let filterCategories: FilterCategory[] = [];
 	export let selectedFilters: Map<string, Set<string>> = new Map();

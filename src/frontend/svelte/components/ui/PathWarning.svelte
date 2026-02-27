@@ -2,7 +2,7 @@
 	import { fly } from 'svelte/transition';
 	import { activeView } from '../../scripts/ui';
 
-	export let type: 'workshop' | 'assets' = 'workshop';
+	export let type: 'workshop' | 'assets' | 'we_config' = 'workshop';
 	export let delay = 0;
 
 	const config = {
@@ -19,6 +19,13 @@
 				"Optional assets for some wallpapers (like effects or shaders) couldn't be auto-detected. Some wallpapers might not look right.",
 			action: 'Fix Assets Path',
 			icon: 'M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 18c-4.41 0-8-3.59-8-8s3.59-8 8-8 8 3.59 8 8-3.59 8-8 8zm-1-13h2v6h-2zm0 8h2v2h-2z'
+		},
+		we_config: {
+			title: 'Wallpaper Engine Config not found',
+			description:
+				'Wallpaper Engine configuration not found. Please run Wallpaper Engine at least once to initialize it.',
+			action: 'Open Steam',
+			icon: 'M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z'
 		}
 	};
 
@@ -70,12 +77,12 @@
 		border-radius: var(--radius-lg);
 		display: flex;
 		gap: 20px;
-		align-items: center; // Center content vertically
-		justify-content: center; // Center content horizontally
+		align-items: center;
+		justify-content: center;
 		backdrop-filter: blur(8px);
 		width: 100%;
-		text-align: center; // Center text
-		margin: 0 auto; // Center the warning horizontally
+		text-align: center;
+		margin: 0 auto;
 
 		&.assets-warning {
 			background: rgba(255, 193, 7, 0.05);
@@ -99,20 +106,20 @@
 
 		.warning-content {
 			flex: 1;
-			text-align: center; // Center align text
+			text-align: center;
 
 			h3 {
-				margin: 0 0 12px; // Add more spacing below the title
-				font-size: 1.5em; // Increase font size for better readability
-				font-weight: 800; // Make the title bolder
-				color: #ffffff; // Ensure the title is clearly visible
+				margin: 0 0 12px;
+				font-size: 1.5em;
+				font-weight: 800;
+				color: #ffffff;
 			}
 
 			p {
 				margin: 0 0 20px;
 				color: var(--text-muted);
-				line-height: 1.8; // Increase line spacing for better readability
-				font-size: 1.1em; // Slightly increase font size
+				line-height: 1.8;
+				font-size: 1.1em;
 			}
 
 			.warning-action {

@@ -2,7 +2,7 @@ package wallpaper
 
 import (
 	"encoding/json"
-	"strings"
+	"linux-wallpaperengine-gui/src/backend/internal/config"
 )
 
 type WallpaperProjectData struct {
@@ -80,27 +80,11 @@ func (ps *PlaylistSettings) UnmarshalJSON(data []byte) error {
 		return err
 	}
 
-	ps.Transition = toBool(aux.Transition)
-	ps.UpdateOnPause = toBool(aux.UpdateOnPause)
-	ps.VideoSequence = toBool(aux.VideoSequence)
+	ps.Transition = config.ToBool(aux.Transition)
+	ps.UpdateOnPause = config.ToBool(aux.UpdateOnPause)
+	ps.VideoSequence = config.ToBool(aux.VideoSequence)
 
 	return nil
-}
-
-// toBool converts various types to bool
-func toBool(v interface{}) bool {
-	if v == nil {
-		return false
-	}
-	switch val := v.(type) {
-	case bool:
-		return val
-	case string:
-		return strings.ToLower(strings.TrimSpace(val)) != "false"
-	case float64:
-		return val != 0
-	}
-	return false
 }
 
 type Playlist struct {
@@ -109,69 +93,13 @@ type Playlist struct {
 	Settings PlaylistSettings `json:"settings"`
 }
 
-type FilterConfig struct {
-	CategoryTags   map[string]bool `json:"categorytags"`
-	Descending     bool            `json:"descending"`
-	RatingTags     map[string]bool `json:"ratingtags"`
-	ResolutionTags map[string]bool `json:"resolutiontags"`
-	Sort           string          `json:"sort"`
-	SourceTags     map[string]bool `json:"sourcetags"`
-	Tags           map[string]bool `json:"tags"`
-	Type           string          `json:"type"`
-	TypeTags       map[string]bool `json:"typetags"`
-	UtilityTags    map[string]bool `json:"utilitytags"`
-}
-
-// UnmarshalJSON custom unmarshaler for FilterConfig to handle number/string to bool conversion in maps
-func (fc *FilterConfig) UnmarshalJSON(data []byte) error {
-	type Alias FilterConfig
-	aux := &struct {
-		CategoryTags   map[string]interface{} `json:"categorytags"`
-		RatingTags     map[string]interface{} `json:"ratingtags"`
-		ResolutionTags map[string]interface{} `json:"resolutiontags"`
-		SourceTags     map[string]interface{} `json:"sourcetags"`
-		Tags           map[string]interface{} `json:"tags"`
-		TypeTags       map[string]interface{} `json:"typetags"`
-		UtilityTags    map[string]interface{} `json:"utilitytags"`
-		*Alias
-	}{
-		Alias: (*Alias)(fc),
-	}
-
-	if err := json.Unmarshal(data, &aux); err != nil {
-		return err
-	}
-
-	// Helper to convert map[string]interface{} to map[string]bool
-	convertToBoolMap := func(m map[string]interface{}) map[string]bool {
-		if m == nil {
-			return nil
-		}
-		result := make(map[string]bool)
-		for k, v := range m {
-			result[k] = toBool(v)
-		}
-		return result
-	}
-
-	fc.CategoryTags = convertToBoolMap(aux.CategoryTags)
-	fc.RatingTags = convertToBoolMap(aux.RatingTags)
-	fc.ResolutionTags = convertToBoolMap(aux.ResolutionTags)
-	fc.SourceTags = convertToBoolMap(aux.SourceTags)
-	fc.Tags = convertToBoolMap(aux.Tags)
-	fc.TypeTags = convertToBoolMap(aux.TypeTags)
-	fc.UtilityTags = convertToBoolMap(aux.UtilityTags)
-
-	return nil
-}
-
 type WallpaperEngineConfig struct {
 	SteamUser struct {
 		General struct {
 			Browser struct {
 				FilterInfo struct {
-					Installed FilterConfig `json:"installed"`
-					Workshop  FilterConfig `json:"workshop"`
+					Installed config.FilterConfig `json:"installed"`
+					Workshop  config.FilterConfig `json:"workshop"`
 				} `json:"filterinfo"`
 			} `json:"browser"`
 			Playlists []Playlist `json:"playlists"`

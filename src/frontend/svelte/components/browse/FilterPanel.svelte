@@ -2,43 +2,82 @@
 	import { onMount } from 'svelte';
 	import { fly } from 'svelte/transition';
 	import type { FilterConfig } from '../../../shared/types';
-	import { buildFilterCategories, mapCategoryToInternal, type FilterCategory } from '../../../shared/filterConstants';
+	import {
+		buildFilterCategories,
+		type FilterCategory
+	} from '../../../shared/filterConstants';
 	import FilterItem from './FilterItem.svelte';
 	import Collapse from './Collapse.svelte';
 	import Button from '../ui/Button.svelte';
 	import { logger } from '../../scripts/logger';
 
 	export let config: FilterConfig;
-	export let onSave: ((config: FilterConfig) => void) | undefined = undefined;
-	export let onChange: ((config: FilterConfig) => void) | undefined = undefined;
+	export let onSave: ((config: FilterConfig) => void) | undefined =
+		undefined;
+	export let onChange: ((config: FilterConfig) => void) | undefined =
+		undefined;
 	export let onClose: () => void = () => {};
 
 	let localConfig: FilterConfig = JSON.parse(JSON.stringify(config));
 	let expandedCategories: Record<string, boolean> = {};
-	let filterCategories: FilterCategory[] = buildFilterCategories(localConfig);
+	let filterCategories: FilterCategory[] =
+		buildFilterCategories(localConfig);
 
 	// Initialize expanded state
 	onMount(() => {
-		filterCategories.forEach(cat => {
+		filterCategories.forEach((cat) => {
 			expandedCategories[cat.name] = true;
 		});
 	});
 
-	function toggleTag(category: string, item: string) {
-		const internalKey = mapCategoryToInternal(category) as keyof FilterConfig;
+	function toggleTag(internalKey: keyof FilterConfig, item: string) {
+		if (!localConfig[internalKey]) {
+			(localConfig[internalKey] as any) = {};
+		}
 		const tags = localConfig[internalKey] as Record<string, boolean>;
 		tags[item] = !tags[item];
 		localConfig = { ...localConfig };
-		logger.log(`Filter toggled: [${category}] ${item} -> ${tags[item]}`);
+		logger.log(
+			`Filter toggled: [${internalKey}] ${item} -> ${tags[item]}`
+		);
 		if (onChange) {
 			onChange(localConfig);
 		}
 	}
 
-	function setGroupState(category: string, items: string[], state: boolean) {
-		const internalKey = mapCategoryToInternal(category) as keyof FilterConfig;
+	function setGroupState(
+		internalKey: keyof FilterConfig,
+		items: string[],
+		state: boolean
+	) {
+		if (!localConfig[internalKey]) {
+			(localConfig[internalKey] as any) = {};
+		}
 		const tags = localConfig[internalKey] as Record<string, boolean>;
-		items.forEach(item => tags[item] = state);
+		items.forEach((item) => (tags[item] = state));
+		localConfig = { ...localConfig };
+		if (onChange) onChange(localConfig);
+	}
+
+	function setCategoryState(category: FilterCategory, state: boolean) {
+		const internalKey = category.internalKey;
+		if (!localConfig[internalKey]) {
+			(localConfig[internalKey] as any) = {};
+		}
+		const tags = localConfig[internalKey] as Record<string, boolean>;
+
+		// Set standalone items
+		if (category.items) {
+			category.items.forEach((item) => (tags[item] = state));
+		}
+
+		// Set grouped items
+		if (category.groups) {
+			category.groups.forEach((group) => {
+				group.items.forEach((item) => (tags[item] = state));
+			});
+		}
+
 		localConfig = { ...localConfig };
 		if (onChange) onChange(localConfig);
 	}
@@ -50,20 +89,45 @@
 	}
 
 	function handleReset() {
-		localConfig = JSON.parse(JSON.stringify(config));
+		if (config) {
+			localConfig = JSON.parse(JSON.stringify(config));
+		}
 	}
 </script>
 
-<div class="filter-panel" transition:fly={{ x: -260, duration: 250, opacity: 1 }}>
+<div
+	class="filter-panel"
+	transition:fly={{ x: -260, duration: 250, opacity: 1 }}
+>
 	<div class="panel-header">
 		<h3>Filters</h3>
 		<div class="header-actions">
-			<Button variant="secondary" on:click={handleReset} style="padding: 4px 8px; font-size: 0.8em;">Reset</Button>
+			<Button
+				variant="secondary"
+				on:click={handleReset}
+				style="padding: 4px 8px; font-size: 0.8em;">Reset</Button
+			>
 			{#if onSave}
-				<Button variant="primary" on:click={handleSave} style="padding: 4px 12px; font-size: 0.8em;">Apply</Button>
+				<Button
+					variant="primary"
+					on:click={handleSave}
+					style="padding: 4px 12px; font-size: 0.8em;"
+					>Apply</Button
+				>
 			{/if}
-			<Button variant="secondary" on:click={onClose} style="padding: 4px; display: flex; align-items: center; justify-content: center;">
-				<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+			<Button
+				variant="secondary"
+				on:click={onClose}
+				style="padding: 4px; display: flex; align-items: center; justify-content: center;"
+			>
+				<svg
+					width="16"
+					height="16"
+					viewBox="0 0 24 24"
+					fill="none"
+					stroke="currentColor"
+					stroke-width="2"
+				>
 					<path d="M18 6L6 18M6 6l12 12" />
 				</svg>
 			</Button>
@@ -72,14 +136,40 @@
 
 	<div class="panel-content">
 		{#each filterCategories as category (category.name)}
-			<Collapse title={category.name} bind:isExpanded={expandedCategories[category.name]}>
+			<Collapse
+				title={category.name}
+				bind:isExpanded={expandedCategories[category.name]}
+			>
+				<svelte:fragment slot="header-actions">
+					<Button
+						variant="secondary"
+						style="padding: 2px 6px; font-size: 0.75em;"
+						on:click={() => setCategoryState(category, true)}
+						>All</Button
+					>
+					<Button
+						variant="secondary"
+						style="padding: 2px 6px; font-size: 0.75em;"
+						on:click={() => setCategoryState(category, false)}
+						>None</Button
+					>
+				</svelte:fragment>
+
 				<div class="filter-grid">
 					{#if category.items && category.items.length > 0}
 						{#each category.items as item (item)}
 							<FilterItem
 								label={item}
-								isActive={(localConfig[mapCategoryToInternal(category.name) as keyof FilterConfig] as Record<string, boolean>)?.[item]}
-								onClick={() => toggleTag(category.name, item)}
+								isActive={(
+									localConfig[
+										category.internalKey
+									] as Record<string, boolean>
+								)?.[item]}
+								onClick={() =>
+									toggleTag(
+										category.internalKey,
+										item
+									)}
 							/>
 						{/each}
 					{/if}
@@ -90,17 +180,47 @@
 								<div class="group-header">
 									<h4>{group.name}</h4>
 									<div class="group-actions">
-										<Button variant="secondary" style="padding: 2px 6px; font-size: 0.75em;" on:click={() => setGroupState(category.name, group.items, true)}>All</Button>
-										<Button variant="secondary" style="padding: 2px 6px; font-size: 0.75em;" on:click={() => setGroupState(category.name, group.items, false)}>None</Button>
+										<Button
+											variant="secondary"
+											style="padding: 2px 6px; font-size: 0.75em;"
+											on:click={() =>
+												setGroupState(
+													category.internalKey,
+													group.items,
+													true
+												)}>All</Button
+										>
+										<Button
+											variant="secondary"
+											style="padding: 2px 6px; font-size: 0.75em;"
+											on:click={() =>
+												setGroupState(
+													category.internalKey,
+													group.items,
+													false
+												)}>None</Button
+										>
 									</div>
 								</div>
-								
+
 								<div class="group-items">
 									{#each group.items as item (item)}
 										<FilterItem
 											label={item}
-											isActive={(localConfig[mapCategoryToInternal(category.name) as keyof FilterConfig] as Record<string, boolean>)?.[item]}
-											onClick={() => toggleTag(category.name, item)}
+											isActive={(
+												localConfig[
+													category
+														.internalKey
+												] as Record<
+													string,
+													boolean
+												>
+											)?.[item]}
+											onClick={() =>
+												toggleTag(
+													category.internalKey,
+													item
+												)}
 										/>
 									{/each}
 								</div>

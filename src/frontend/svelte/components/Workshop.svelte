@@ -15,7 +15,7 @@
 	import type { FilterConfig } from '../../shared/types';
 	import {
 		buildFilterCategories,
-		mapCategoryToInternal,
+		DEFAULT_WORKSHOP_FILTER_CONFIG,
 		type FilterCategory
 	} from '../../shared/filterConstants';
 	import { WALLPAPER_ENGINE_APP_ID } from '../../shared/constants';
@@ -23,8 +23,8 @@
 	import FilterIcon from '../icons/FilterIcon.svelte';
 	import SearchIcon from '../icons/SearchIcon.svelte';
 
-	let workshopFilters: FilterConfig | null = null;
-	let filterCategories: FilterCategory[] = [];
+	let workshopFilters: FilterConfig = { ...DEFAULT_WORKSHOP_FILTER_CONFIG };
+	let filterCategories: FilterCategory[] = buildFilterCategories();
 	let initialLoadDone = false;
 	let showFilterPanel = false;
 	let searching = false;
@@ -90,11 +90,11 @@
 		try {
 			const result = await window.electronAPI.getWorkshopFilters();
 			if (result.success) {
-				workshopFilters = result.filters;
-				if (workshopFilters) {
-					filterCategories =
-						buildFilterCategories(workshopFilters);
-				}
+				workshopFilters = {
+					...DEFAULT_WORKSHOP_FILTER_CONFIG,
+					...result.filters
+				};
+				filterCategories = buildFilterCategories(workshopFilters);
 			}
 		} catch (err) {
 			console.error('Failed to load filters:', err);
@@ -142,7 +142,7 @@
 					allItems.push(...group.items);
 				});
 			}
-			categoryMap[mapCategoryToInternal(cat.name)] = allItems;
+			categoryMap[cat.internalKey] = allItems;
 		});
 
 		const categoryKeys = [
