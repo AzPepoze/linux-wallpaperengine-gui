@@ -102,6 +102,18 @@ func main() {
 			logger.Printf("Failed to apply wallpapers on startup: %v", err)
 			notification.Error("Wallpaper Engine Error", "Failed to apply wallpapers on startup: "+err.Error())
 		}
+		
+		conf, err := config.ReadConfig()
+		if err!= nil  {
+			logger.Printf("Failed to read config: %v", err)
+			notification.Error("Wallpaper Engine Error", "Failed to read config: "+err.Error())
+		}
+
+		for _, screen := range conf.Screens {
+			if screen.Playlist != "" {
+				wallpaper.StartPlaylistCycle(screen.Name)
+			}
+		}
 	}()
 
 	// Register tray callbacks
