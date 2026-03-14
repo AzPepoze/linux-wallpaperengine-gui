@@ -18,7 +18,10 @@
 	export let cloneMode: boolean = false;
 
 	let playlists: Playlist[] = [];
-	let playlistOptions: { value: string; label: string }[] = [];
+	let playlistOptions: { value: string; label: string }[] = [
+		{ value: '', label: 'None' },
+		{ value: 'Random All', label: 'Random All (Dynamic)' }
+	];
 	export let activePlaylist: Playlist | null = null;
 
 	let isCreating = false;
@@ -41,12 +44,14 @@
 			}
 		} catch (err) {
 			console.error('Failed to load playlists:', err);
+		} finally {
+			updateOptions();
 		}
 	}
 
 	function updateOptions() {
 		playlistOptions = [
-			{ value: '', label: 'None (All Wallpapers)' },
+			{ value: '', label: 'None' },
 			{ value: 'Random All', label: 'Random All (Dynamic)' },
 			...playlists.map((p) => ({
 				value: p.name,
@@ -223,7 +228,7 @@
 		}
 	}
 
-	$: if ($settingsStore?.playlist !== undefined && playlists.length > 0) {
+	$: if ($settingsStore?.playlist !== undefined) {
 		const currentInStore = $settingsStore.playlist;
 		if (activePlaylist?.name !== currentInStore) {
 			activePlaylist =

@@ -119,6 +119,10 @@ export async function loadSettings(): Promise<void> {
 				}
 			}
 
+			// Ensure playlist defaults
+			if (settings.playlist === undefined) settings.playlist = '';
+			if (settings.playlistInterval === undefined) settings.playlistInterval = 0;
+
 			settingsStore.set(settings as SettingsState);
 		} else {
 			showToast(`Error loading config: ${config.error}`, "error");

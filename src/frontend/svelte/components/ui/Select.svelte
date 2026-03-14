@@ -14,6 +14,7 @@
 		options.find((o) => o.value === value)?.label || 'Select option...';
 
 	function toggle() {
+		if (options.length === 0) return;
 		isOpen = !isOpen;
 	}
 
@@ -45,7 +46,7 @@
 		type="button"
 	>
 		<span class="label">{selectedLabel}</span>
-		<div class="chevron" class:rotated={isOpen}>
+		<div class="chevron" class:rotated={isOpen} class:hidden={options.length === 0}>
 			<svg
 				width="12"
 				height="12"
@@ -149,6 +150,10 @@
 		&.rotated {
 			transform: rotate(180deg);
 			color: var(--btn-primary-bg);
+		}
+
+		&.hidden {
+			visibility: hidden;
 		}
 	}
 
