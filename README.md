@@ -85,15 +85,17 @@
 
 ## FEATURES
 
-- **Wallpaper Management** – Browse and select wallpapers from your Steam Workshop content with ease.
-- **Steam Workshop Integration** – Search and download wallpapers directly from the Steam Workshop (requires steam running on background).
-- **Playlist Support** – Create and manage playlists, including a dynamic "Random All" playlist that automatically includes all your wallpapers.
-- **Wallpaper Properties** – Adjust individual wallpaper settings.
-- **Multi-Monitor Support** – Effortlessly choose which screen to apply wallpapers.
-- **Auto-Save & Auto-Run** – Remembers your last used wallpaper and applies it automatically on startup.
-- **Native Wayland Support** – Optional native Wayland mode for fix scaling issues on Wayland sessions.
-- **Customizable Settings** – Edit settings for linux-wallpaperengine, or edit raw JSON config.
-- **System Tray** – Minimize to the tray for seamless background operation without cluttering your workspace.
+| Feature | Description |
+|---------|-------------|
+| Wallpaper Management | Browse and select wallpapers from your Steam Workshop content |
+| Steam Workshop Integration | Search and download wallpapers directly from Steam Workshop |
+| Playlist Support | Create and manage playlists including dynamic "Random All" |
+| Wallpaper Properties | Adjust individual wallpaper settings |
+| Multi-Monitor Support | Choose which screen to apply wallpapers to |
+| Auto-Save & Auto-Run | Remembers and applies last used wallpaper on startup |
+| Native Wayland Support | Optional native Wayland mode for fixing scaling issues |
+| Customizable Settings | Edit settings or raw JSON config |
+| System Tray | Minimize to tray for seamless background operation |
 
 ## MEMORY EFFICIENCY
 

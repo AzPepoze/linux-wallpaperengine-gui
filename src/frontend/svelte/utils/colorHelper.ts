@@ -19,7 +19,7 @@ export function getDominantColor(
 			img.crossOrigin = "Anonymous";
 			img.onload = () => {
 				try {
-					const colorThief = new ColorThief();
+					const colorThief = new (ColorThief as any)();
 					const dominantColor = colorThief.getColor(img);
 					resolve(dominantColor);
 				} catch (error) {
@@ -63,7 +63,7 @@ export function getPalette(
 			img.crossOrigin = "Anonymous";
 			img.onload = () => {
 				try {
-					const colorThief = new ColorThief();
+					const colorThief = new (ColorThief as any)();
 					const palette = colorThief.getPalette(img, colorCount);
 					resolve(palette);
 				} catch (error) {
