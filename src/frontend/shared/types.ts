@@ -57,6 +57,7 @@ export type AppConfig = {
 	playlist?: string;
 	playlistInterval?: number;
 	nativeWayland?: boolean;
+	autostart?: boolean;
 	dynamicUiTheme?: boolean;
 	dynamicSidebarTheme?: boolean;
 	transparentUi?: boolean;

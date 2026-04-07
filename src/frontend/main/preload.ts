@@ -43,6 +43,7 @@ contextBridge.exposeInMainWorld("electronAPI", {
 	readConfig: createInvokeMethod("read-config"),
 	saveConfig: createInvokeMethod("save-config"),
 	writeConfig: createInvokeMethod("write-config"),
+	toggleAutostart: createInvokeMethod("toggle-autostart"),
 	openConfigInEditor: createInvokeMethod("open-config-editor"),
 	getWallpaperExecutableLocation: createInvokeMethod(
 		"get-wallpaper-executable",

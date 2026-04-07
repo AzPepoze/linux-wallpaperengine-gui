@@ -29,6 +29,18 @@ func HandleConfig(req models.Request) models.Response {
 				res.Result = map[string]bool{"success": true}
 			}
 		}
+	case "toggle-autostart":
+		var enabled bool
+		if err := json.Unmarshal(req.Params, &enabled); err != nil {
+			res.Error = err.Error()
+		} else {
+			if err := config.ToggleAutostart(enabled); err != nil {
+				res.Error = err.Error()
+			} else {
+				res.Result = map[string]bool{"success": true}
+			}
+		}
+
 	case "open-config-editor":
 		if err := config.OpenConfigEditor(); err != nil {
 			res.Error = err.Error()

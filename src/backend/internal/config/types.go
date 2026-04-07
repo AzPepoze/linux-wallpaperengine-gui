@@ -60,6 +60,7 @@ type AppConfig struct {
 	CustomExecutableLocation string         `json:"customExecutableLocation,omitempty"`
 	WorkshopDir              string         `json:"workshopDir,omitempty"`
 	NativeWayland            bool           `json:"nativeWayland,omitempty"`
+	Autostart                bool           `json:"autostart"`
 	DynamicUiTheme           bool           `json:"dynamicUiTheme"`
 	DynamicSidebarTheme      bool           `json:"dynamicSidebarTheme"`
 	TransparentUi            bool           `json:"transparentUi"`

@@ -37,6 +37,7 @@ interface ElectronAPI {
 	getConfig: () => Promise<any>;
 	readConfig: () => Promise<any>;
 	saveConfig: (newConfig: any) => Promise<{ success: boolean; error?: string }>;
+	toggleAutostart: (enable: boolean) => Promise<{ success: boolean; error?: string }>;
 	writeConfig: (newConfig: any) => Promise<void>;
 	openConfigInEditor: () => Promise<{ success: boolean; error?: string }>;
 	getWallpaperExecutableLocation: () => Promise<string>;

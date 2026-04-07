@@ -11,6 +11,7 @@ import (
 var (
 	HomePath            string
 	ConfigPath          string
+	AutostartPath       string
 	WorkshopPath        string
 	WallpaperEnginePath string
 	DefaultConfig       AppConfig
@@ -24,6 +25,7 @@ func init() {
 	}
 
 	ConfigPath = filepath.Join(HomePath, ".config/linux-wallpaperengine-gui/config.json")
+	AutostartPath = filepath.Join(HomePath, ".config/autostart/linux-wallpaperengine-gui.desktop")
 
 	DefaultConfig = AppConfig{
 		FPS:                 60,
@@ -39,6 +41,7 @@ func init() {
 		Properties:          make(map[string]string),
 		WallpaperProperties: make(map[string]map[string]string),
 		Playlist:            "",
+		Autostart:           false,
 		DynamicUiTheme:      true,
 		DynamicSidebarTheme: true,
 		TransparentUi:       true,
@@ -171,6 +174,32 @@ func WriteConfig(conf AppConfig) error {
 	}
 
 	return os.WriteFile(ConfigPath, data, 0644)
+}
+
+func ToggleAutostart(enabled bool) error {
+	dir := filepath.Dir(AutostartPath)
+	if enabled {
+		if _, err := os.Stat(dir); os.IsNotExist(err) {
+			if err := os.MkdirAll(dir, 0755); err != nil {
+				return err
+			}
+		}
+		data := `[Desktop Entry]
+Name=Linux Wallpaper Engine GUI
+Comment=Manage wallpapers for linux-wallpaperengine
+Exec=linux-wallpaperengine-gui --minimized
+Icon=linux-wallpaperengine-gui
+Terminal=false
+Type=Application
+Categories=Utility;
+`
+		return os.WriteFile(AutostartPath, []byte(data), 0644)
+	} else {
+		if _, err := os.Stat(dir); os.IsNotExist(err) {
+			return err
+		}
+		return os.Remove(AutostartPath)
+	}
 }
 
 func GetConfig() (AppConfig, error) {
