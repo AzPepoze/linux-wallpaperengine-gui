@@ -33,7 +33,7 @@
           "svelte": "^5.55.4",
           "svelte-check": "^4.4.6",
           "typescript": "~6.0.3",
-          "vite": "^8.0.9",
+          "vite": "^7.3.2",
           "vite-plugin-electron": "^0.29.1",
           "vite-plugin-electron-renderer": "^0.14.6"
      },
