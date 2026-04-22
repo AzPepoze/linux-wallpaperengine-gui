@@ -34,6 +34,11 @@ export function registerConfigService() {
 		return await socketClient.send("write-config", newConfig);
 	});
 
+	ipcMain.handle("toggle-autostart", async (_, newConfig: boolean) => {
+		logger.ipcReceived("toggle-autostart");
+		return await socketClient.send("toggle-autostart", newConfig);
+	});
+
 	ipcMain.handle("open-config-editor", async () => {
 		logger.ipcReceived("open-config-editor");
 		return await socketClient.send("open-config-editor");

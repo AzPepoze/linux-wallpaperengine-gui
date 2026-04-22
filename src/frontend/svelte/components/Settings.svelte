@@ -5,7 +5,8 @@
 		loadSettings,
 		saveSettings,
 		openConfigFile,
-		validateBinaryFile
+		validateBinaryFile,
+		toggleAutostart
 	} from '../scripts/settings';
 
 	import SettingsSection from './settings/SettingsSection.svelte';
@@ -186,6 +187,12 @@
 	const handleOpenConfig = async () => {
 		await openConfigFile();
 	};
+
+	const handleAutostart = async () => {
+		if ($settingsStore) {
+			await toggleAutostart($settingsStore.autostart);
+		}
+	}
 </script>
 
 <div class="settings-container">
@@ -226,6 +233,18 @@
 					id="general"
 					description="Basic wallpaper engine behavior and performance."
 				>
+					<SettingItem
+						label="Run on system startup"
+						id="autostart"
+						description="Run this GUI to apply wallpapers in the background on system startup."
+					>
+						<Toggle
+							id="autostart"
+							bind:checked={$settingsStore.autostart}
+							onChange={() => handleAutostart()}
+						/>
+					</SettingItem>
+
 					<SettingItem
 						label="Dynamic UI Theme"
 						id="dynamicUiTheme"
