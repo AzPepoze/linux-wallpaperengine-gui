@@ -28,6 +28,11 @@ jobs:
                with:
                     go-version: 'stable'
 
+             - name: Install golangci-lint
+               uses: golangci/golangci-lint-action@v4
+               with:
+                    version: latest
+
              - name: Install system dependencies (Linux)
                run: |
                     sudo apt-get update
