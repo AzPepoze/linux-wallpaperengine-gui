@@ -40,6 +40,7 @@ export default defineConfig({
 	resolve: {
 		alias: {
 			"@": path.resolve(__dirname, "./src/frontend/svelte"),
+			"@shared": path.resolve(__dirname, "./src/frontend/shared"),
 		},
 	},
 });

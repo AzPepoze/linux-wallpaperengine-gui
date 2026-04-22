@@ -1,5 +1,5 @@
-import type { WorkshopItem } from "../workshopHelper";
-import type { WallpaperData } from "../../../shared/types";
+import type { WorkshopItem } from "@/utils/workshopHelper";
+import type { WallpaperData } from "@shared/types";
 
 /**
  * Converts a WorkshopItem to WallpaperData format

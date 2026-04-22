@@ -1,5 +1,5 @@
 import { getColor, getPalette } from "colorthief";
-import { logger } from "../scripts/logger";
+import { logger } from "@/scripts/shared/logger";
 
 function getHTMLImageElement(src: string): Promise<HTMLImageElement> {
 	return new Promise((resolve, reject) => {

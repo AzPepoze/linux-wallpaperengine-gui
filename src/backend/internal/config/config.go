@@ -46,6 +46,7 @@ func init() {
 		DynamicSidebarTheme: true,
 		TransparentUi:       true,
 		UiTransparency:      90,
+		EnableScrollMask:    true,
 		SteamPaths: []string{
 			".local/share/Steam",
 			".var/app/com.valvesoftware.Steam/.local/share/Steam",
@@ -197,7 +198,7 @@ func ReadConfig() (AppConfig, error) {
 		return DefaultConfig, err
 	}
 
-	// Merge with defaults if necessary (simple version)
+	// Merge with defaults if necessary
 	if conf.FPS == 0 {
 		conf.FPS = 60
 	}
@@ -220,8 +221,6 @@ func WriteConfig(conf AppConfig) error {
 
 	return os.WriteFile(ConfigPath, data, 0644)
 }
-
-
 
 func GetConfig() (AppConfig, error) {
 	return ReadConfig()
