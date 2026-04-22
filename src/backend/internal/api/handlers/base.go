@@ -18,6 +18,8 @@ var dispatchTable = map[string]handlerFn{
 	"write-config":       wrapConfig,
 	"open-config-editor": wrapConfig,
 
+	"toggle-autostart": wrapConfig,
+
 	"get-screens": wrapDisplay,
 
 	"apply-wallpapers":           wrapWallpaper,

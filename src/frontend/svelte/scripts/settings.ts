@@ -60,6 +60,7 @@ export interface SettingsState {
 	playlist: string;
 	playlistInterval: number;
 	nativeWayland: boolean;
+	autostart: boolean;
 	dynamicUiTheme: boolean;
 	dynamicSidebarTheme: boolean;
 	transparentUi: boolean;
@@ -97,6 +98,7 @@ const configFieldMap: Record<string, string> = {
 	playlist: "playlist",
 	playlistInterval: "playlistInterval",
 	nativeWayland: "nativeWayland",
+	autostart: "autostart",
 	dynamicUiTheme: "dynamicUiTheme",
 	dynamicSidebarTheme: "dynamicSidebarTheme",
 	transparentUi: "transparentUi",
@@ -156,6 +158,19 @@ export async function saveSettings(settings: SettingsState): Promise<void> {
 		}
 	} catch (e) {
 		showToast(`Error saving settings: ${getErrorMessage(e)}`, "error");
+	}
+}
+
+export async function toggleAutostart(enable: boolean): Promise<void> {
+	try {
+		const result = await window.electronAPI.toggleAutostart(enable);
+		if (result.success) {
+			showToast("Autostart toggled successfully!", "success");
+		} else {
+			showToast(`Error toggling autostart: ${result.error}`, "error");
+		}
+	} catch (e) {
+		showToast(`Error toggling autostart: ${getErrorMessage(e)}`, "error")
 	}
 }
 

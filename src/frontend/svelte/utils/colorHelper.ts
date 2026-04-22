@@ -1,9 +1,19 @@
-import ColorThief from "colorthief";
+import { getColor, getPalette } from "colorthief";
 import { logger } from "../scripts/logger";
+
+function getHTMLImageElement(src: string): Promise<HTMLImageElement> {
+	return new Promise((resolve, reject) => {
+		const img = new Image();
+		img.crossOrigin = "Anonymous";
+		img.onload = () => resolve(img);
+		img.onerror = (error) => reject(error);
+		img.src = src;
+	});
+}
 
 export function getDominantColor(
 	base64String: string
-): Promise<[number, number, number] | null> {
+): Promise<[number, number, number]> {
 	return new Promise(async (resolve, reject) => {
 		try {
 			let src = base64String;
@@ -15,23 +25,18 @@ export function getDominantColor(
 				}
 			}
 
-			const img = new Image();
-			img.crossOrigin = "Anonymous";
-			img.onload = () => {
-				try {
-					const colorThief = new ColorThief();
-					const dominantColor = colorThief.getColor(img);
-					resolve(dominantColor);
-				} catch (error) {
-					logger.error("Getting dominant color:", error);
-					reject(error);
+			const img = await getHTMLImageElement(src);
+			try {
+				const color = await getColor(img);
+				if (color) {
+					resolve(color.array());
+				} else {
+					reject(new Error("No dominant color found"));
 				}
-			};
-			img.onerror = (error) => {
-				logger.error("Loading image for color thief:", error);
+			} catch (error) {
+				logger.error("Getting dominant color:", error);
 				reject(error);
-			};
-			img.src = src;
+			}
 		} catch (error) {
 			reject(error);
 		}
@@ -44,7 +49,7 @@ export function isLight(color: [number, number, number]): boolean {
 	return hsp > 127.5;
 }
 
-export function getPalette(
+export function getPaletteColor(
 	base64String: string,
 	colorCount: number = 6
 ): Promise<[number, number, number][] | null> {
@@ -59,23 +64,18 @@ export function getPalette(
 				}
 			}
 
-			const img = new Image();
-			img.crossOrigin = "Anonymous";
-			img.onload = () => {
-				try {
-					const colorThief = new ColorThief();
-					const palette = colorThief.getPalette(img, colorCount);
-					resolve(palette);
-				} catch (error) {
-					logger.error("Getting color palette:", error);
-					reject(error);
+			const img = await getHTMLImageElement(src);
+			try {
+				const palette = await getPalette(img, { colorCount });
+				if (palette) {
+					resolve(palette.map(c => c.array()));
+				} else {
+					reject(new Error("No palette found"));
 				}
-			};
-			img.onerror = (error) => {
-				logger.error("Loading image for color thief:", error);
+			} catch (error) {
+				logger.error("Getting palette:", error);
 				reject(error);
-			};
-			img.src = src;
+			}
 		} catch (error) {
 			reject(error);
 		}
