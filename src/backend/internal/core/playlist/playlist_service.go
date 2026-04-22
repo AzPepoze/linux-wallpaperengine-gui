@@ -1,16 +1,18 @@
-package wallpaper
+package playlist
 
 import (
 	"fmt"
-	"linux-wallpaperengine-gui/src/backend/internal/config"
-	"linux-wallpaperengine-gui/src/backend/internal/logger"
 	"math/rand"
 	"regexp"
 	"sync"
 	"time"
+
+	"linux-wallpaperengine-gui/src/backend/internal/config"
+	"linux-wallpaperengine-gui/src/backend/internal/core/wallpaper"
+	"linux-wallpaperengine-gui/src/backend/internal/logger"
 )
 
-type PlaylistSession struct {
+type Session struct {
 	Timer      *time.Ticker
 	StopChan   chan bool
 	PauseChan  chan bool
@@ -21,31 +23,37 @@ type PlaylistSession struct {
 	Wallpapers []string
 }
 
-var (
-	activePlaylistSessions = make(map[string]*PlaylistSession)
-	playlistMutex          sync.Mutex
-)
+type Service struct {
+	wallpaperService       *wallpaper.Service
+	activePlaylistSessions map[string]*Session
+	mutex                  sync.Mutex
+}
 
-// StartPlaylistCycle starts cycling wallpapers for a screen.
-func StartPlaylistCycle(screenName string) error {
-	playlistMutex.Lock()
-	defer playlistMutex.Unlock()
+func NewService(wallpaperService *wallpaper.Service) *Service {
+	return &Service{
+		wallpaperService:       wallpaperService,
+		activePlaylistSessions: make(map[string]*Session),
+	}
+}
 
-	// Stop existing timer for this screen if any
-	stopPlaylistCycleInternal(screenName)
+func (service *Service) StartPlaylistCycle(screenName string) error {
+	service.mutex.Lock()
+	defer service.mutex.Unlock()
 
-	conf, err := config.ReadConfig()
+	service.stopPlaylistCycleInternal(screenName)
+
+	appConfig, err := config.ReadConfig()
 	if err != nil {
 		return fmt.Errorf("failed to read config: %w", err)
 	}
 
-	if conf.Playlist == "" {
+	if appConfig.Playlist == "" {
 		return fmt.Errorf("no playlist configured")
 	}
 
-	var session *PlaylistSession
-	if conf.Playlist == "Random All" {
-		wallpapers, err := GetWallpapers()
+	var session *Session
+	if appConfig.Playlist == "Random All" {
+		wallpapers, err := wallpaper.GetWallpapers()
 		if err != nil {
 			return fmt.Errorf("failed to get all wallpapers: %w", err)
 		}
@@ -53,42 +61,40 @@ func StartPlaylistCycle(screenName string) error {
 		for id := range wallpapers {
 			ids = append(ids, id)
 		}
-		session = &PlaylistSession{
+		session = &Session{
 			Playlist: &Playlist{
 				Name: "Random All",
 				Settings: PlaylistSettings{
-					Delay: int(conf.PlaylistInterval * 60),
+					Delay: int(appConfig.PlaylistInterval * 60),
 				},
 			},
 			Wallpapers: ids,
 		}
 	} else {
-		// Get all playlists
 		playlists, err := GetPlaylists()
 		if err != nil {
 			return fmt.Errorf("failed to get playlists: %w", err)
 		}
 
-		// Find the selected playlist
 		var selectedPlaylist *Playlist
 		for i := range playlists {
-			if playlists[i].Name == conf.Playlist {
+			if playlists[i].Name == appConfig.Playlist {
 				selectedPlaylist = &playlists[i]
 				break
 			}
 		}
 
 		if selectedPlaylist == nil {
-			return fmt.Errorf("playlist '%s' not found", conf.Playlist)
+			return fmt.Errorf("playlist '%s' not found", appConfig.Playlist)
 		}
 
 		if len(selectedPlaylist.Items) == 0 {
-			return fmt.Errorf("playlist '%s' has no wallpapers", conf.Playlist)
+			return fmt.Errorf("playlist '%s' has no wallpapers", appConfig.Playlist)
 		}
 
-		session = &PlaylistSession{
+		session = &Session{
 			Playlist:   selectedPlaylist,
-			Wallpapers: extractWallpaperIDs(selectedPlaylist.Items),
+			Wallpapers: service.extractWallpaperIDs(selectedPlaylist.Items),
 		}
 	}
 
@@ -96,21 +102,18 @@ func StartPlaylistCycle(screenName string) error {
 		return fmt.Errorf("no valid wallpapers found in playlist")
 	}
 
-	// Apply first random wallpaper immediately
-	if err := applyRandomPlaylistWallpaper(conf, session, screenName); err != nil {
+	if err := service.applyRandomPlaylistWallpaper(appConfig, session, screenName); err != nil {
 		logger.Error("Failed to apply initial playlist wallpaper: %v", err)
 	}
 
-	// If interval is 0, don't start the timer (one-time application only)
 	if session.Playlist.Settings.Delay == 0 {
-		logger.Printf("Playlist delay is 0, applied single wallpaper from playlist '%s'", conf.Playlist)
+		logger.Printf("Playlist delay is 0, applied single wallpaper from playlist '%s'", appConfig.Playlist)
 		return nil
 	}
 
-	// Start the timer (delay is in seconds)
 	interval := time.Duration(session.Playlist.Settings.Delay) * time.Second
 	if interval < 1*time.Second {
-		interval = 1 * time.Second // Minimum 1 second
+		interval = 1 * time.Second
 	}
 
 	session.Timer = time.NewTicker(interval)
@@ -120,21 +123,19 @@ func StartPlaylistCycle(screenName string) error {
 	session.UpdateChan = make(chan float64)
 	session.Paused = false
 
-	activePlaylistSessions[screenName] = session
+	service.activePlaylistSessions[screenName] = session
 
 	go func() {
 		for {
 			select {
 			case <-session.Timer.C:
-				// Only apply wallpaper if not paused
 				if !session.Paused {
-					// Read config fresh each time
-					currentConf, err := config.ReadConfig()
+					currentConfig, err := config.ReadConfig()
 					if err != nil {
 						logger.Error("Failed to read config for playlist on screen %s: %v", screenName, err)
 						continue
 					}
-					if err := applyRandomPlaylistWallpaper(currentConf, session, screenName); err != nil {
+					if err := service.applyRandomPlaylistWallpaper(currentConfig, session, screenName); err != nil {
 						logger.Error("Failed to apply playlist wallpaper on screen %s: %v", screenName, err)
 					}
 				}
@@ -143,7 +144,6 @@ func StartPlaylistCycle(screenName string) error {
 			case <-session.ResumeChan:
 				session.Paused = false
 			case newIntervalMinutes := <-session.UpdateChan:
-				// Stop old ticker and create new one with updated interval
 				session.Timer.Stop()
 				newInterval := time.Duration(newIntervalMinutes * float64(time.Minute))
 				if newInterval < 1*time.Second {
@@ -158,19 +158,18 @@ func StartPlaylistCycle(screenName string) error {
 	}()
 
 	logger.Printf("Started playlist cycle for screen '%s' with playlist '%s' (%d wallpapers), interval: %v",
-		screenName, conf.Playlist, len(session.Wallpapers), interval)
+		screenName, appConfig.Playlist, len(session.Wallpapers), interval)
 	return nil
 }
 
-// StopPlaylistCycle stops cycling for a screen.
-func StopPlaylistCycle(screenName string) {
-	playlistMutex.Lock()
-	defer playlistMutex.Unlock()
-	stopPlaylistCycleInternal(screenName)
+func (service *Service) StopPlaylistCycle(screenName string) {
+	service.mutex.Lock()
+	defer service.mutex.Unlock()
+	service.stopPlaylistCycleInternal(screenName)
 }
 
-func stopPlaylistCycleInternal(screenName string) {
-	session, exists := activePlaylistSessions[screenName]
+func (service *Service) stopPlaylistCycleInternal(screenName string) {
+	session, exists := service.activePlaylistSessions[screenName]
 	if !exists {
 		return
 	}
@@ -181,62 +180,55 @@ func stopPlaylistCycleInternal(screenName string) {
 	if session.StopChan != nil {
 		close(session.StopChan)
 	}
-	delete(activePlaylistSessions, screenName)
+	delete(service.activePlaylistSessions, screenName)
 	logger.Printf("Stopped playlist cycle for screen '%s'", screenName)
 }
 
-// PausePlaylistCycle pauses all cycling.
-func PausePlaylistCycle() {
-	playlistMutex.Lock()
-	defer playlistMutex.Unlock()
+func (service *Service) PausePlaylistCycle() {
+	service.mutex.Lock()
+	defer service.mutex.Unlock()
 
-	for _, session := range activePlaylistSessions {
+	for _, session := range service.activePlaylistSessions {
 		if session.Timer != nil && session.PauseChan != nil && !session.Paused {
 			select {
 			case session.PauseChan <- true:
 				logger.Printf("Paused playlist cycle")
 			default:
-				// Channel full, already paused
 			}
 		}
 	}
 }
 
-// ResumePlaylistCycle resumes all cycling.
-func ResumePlaylistCycle() {
-	playlistMutex.Lock()
-	defer playlistMutex.Unlock()
+func (service *Service) ResumePlaylistCycle() {
+	service.mutex.Lock()
+	defer service.mutex.Unlock()
 
-	for _, session := range activePlaylistSessions {
+	for _, session := range service.activePlaylistSessions {
 		if session.Timer != nil && session.ResumeChan != nil && session.Paused {
 			select {
 			case session.ResumeChan <- true:
 				logger.Printf("Resumed playlist cycle")
 			default:
-				// Channel full, already resumed
 			}
 		}
 	}
 }
 
-// UpdatePlaylistInterval updates the interval without changing wallpaper.
-func UpdatePlaylistInterval(screenName string, intervalMinutes float64) error {
-	playlistMutex.Lock()
-	defer playlistMutex.Unlock()
+func (service *Service) UpdatePlaylistInterval(screenName string, intervalMinutes float64) error {
+	service.mutex.Lock()
+	defer service.mutex.Unlock()
 
-	session, exists := activePlaylistSessions[screenName]
+	session, exists := service.activePlaylistSessions[screenName]
 	if !exists || session.Timer == nil || session.UpdateChan == nil {
 		return fmt.Errorf("no playlist is currently running for screen %s", screenName)
 	}
 
-	// Update the stored playlist settings delay so it persists
 	if session.Playlist != nil && session.Playlist.Name != "Random All" {
 		if err := UpdatePlaylistIntervalConfig(session.Playlist.Name, intervalMinutes); err != nil {
 			logger.Printf("Warning: failed to update playlist interval config: %v", err)
 		}
 	}
 
-	// Send the new interval to the goroutine
 	select {
 	case session.UpdateChan <- intervalMinutes:
 		logger.Printf("Sent interval update signal to screen %s: %f minutes", screenName, intervalMinutes)
@@ -246,13 +238,12 @@ func UpdatePlaylistInterval(screenName string, intervalMinutes float64) error {
 	}
 }
 
-// extractWallpaperIDs gets IDs from playlist paths.
-func extractWallpaperIDs(items []string) []string {
+func (service *Service) extractWallpaperIDs(items []string) []string {
 	var ids []string
-	re := regexp.MustCompile(`431960[/\\](\d+)[/\\]`)
+	regex := regexp.MustCompile(`431960[/\\](\d+)[/\\]`)
 
 	for _, item := range items {
-		matches := re.FindStringSubmatch(item)
+		matches := regex.FindStringSubmatch(item)
 		if len(matches) > 1 {
 			ids = append(ids, matches[1])
 		}
@@ -261,11 +252,9 @@ func extractWallpaperIDs(items []string) []string {
 	return ids
 }
 
-// applyRandomPlaylistWallpaper picks and applies a random wallpaper.
-func applyRandomPlaylistWallpaper(conf config.AppConfig, session *PlaylistSession, screenName string) error {
-	// If "Random All", refresh the wallpaper list to include newly added ones
+func (service *Service) applyRandomPlaylistWallpaper(appConfig config.AppConfig, session *Session, screenName string) error {
 	if session.Playlist != nil && session.Playlist.Name == "Random All" {
-		wallpapers, err := GetWallpapers()
+		wallpapers, err := wallpaper.GetWallpapers()
 		if err == nil {
 			var ids []string
 			for id := range wallpapers {
@@ -281,26 +270,21 @@ func applyRandomPlaylistWallpaper(conf config.AppConfig, session *PlaylistSessio
 		return fmt.Errorf("no wallpapers in playlist")
 	}
 
-	// Pick a random wallpaper
 	randomIndex := rand.Intn(len(session.Wallpapers))
 	wallpaperID := session.Wallpapers[randomIndex]
 
-	// Update the configuration for the specific screen or global (Clone Mode)
-	updatedConf := conf
+	updatedConfig := appConfig
 	if screenName == "Global" {
-		// Update global wallpaper for clone mode
-		globalWP := wallpaperID
-		updatedConf.GlobalWallpaper = &globalWP
+		globalWallpaper := wallpaperID
+		updatedConfig.GlobalWallpaper = &globalWallpaper
 	} else {
-		// Find and update the specific screen
 		screenUpdated := false
-		for i := range updatedConf.Screens {
-			if updatedConf.Screens[i].Name == screenName {
-				updatedConf.Screens[i].Wallpaper = &wallpaperID
-				// Synchronize screen-specific playlist settings
+		for i := range updatedConfig.Screens {
+			if updatedConfig.Screens[i].Name == screenName {
+				updatedConfig.Screens[i].Wallpaper = &wallpaperID
 				if session.Playlist != nil {
-					updatedConf.Screens[i].Playlist = session.Playlist.Name
-					updatedConf.Screens[i].PlaylistInterval = float64(session.Playlist.Settings.Delay) / 60.0
+					updatedConfig.Screens[i].Playlist = session.Playlist.Name
+					updatedConfig.Screens[i].PlaylistInterval = float64(session.Playlist.Settings.Delay) / 60.0
 				}
 				screenUpdated = true
 				break
@@ -311,12 +295,11 @@ func applyRandomPlaylistWallpaper(conf config.AppConfig, session *PlaylistSessio
 		}
 	}
 
-	if err := config.WriteConfig(updatedConf); err != nil {
+	if err := config.WriteConfig(updatedConfig); err != nil {
 		return fmt.Errorf("failed to update config: %w", err)
 	}
 
-	// Apply the wallpapers
-	if err := ApplyWallpapers(); err != nil {
+	if err := service.wallpaperService.ApplyWallpapers(); err != nil {
 		return fmt.Errorf("failed to apply wallpapers: %w", err)
 	}
 
@@ -324,14 +307,13 @@ func applyRandomPlaylistWallpaper(conf config.AppConfig, session *PlaylistSessio
 	return nil
 }
 
-// GetPlaylistStatus returns status for all screens.
-func GetPlaylistStatus() map[string]interface{} {
-	playlistMutex.Lock()
-	defer playlistMutex.Unlock()
+func (service *Service) GetPlaylistStatus() map[string]interface{} {
+	service.mutex.Lock()
+	defer service.mutex.Unlock()
 
 	status := make(map[string]interface{})
 
-	for screenName, session := range activePlaylistSessions {
+	for screenName, session := range service.activePlaylistSessions {
 		screenStatus := map[string]interface{}{
 			"active": session.Timer != nil,
 		}
@@ -342,7 +324,6 @@ func GetPlaylistStatus() map[string]interface{} {
 		status[screenName] = screenStatus
 	}
 
-	// If no sessions exist, at least return an empty status object to signify inactive
 	if len(status) == 0 {
 		return map[string]interface{}{}
 	}

@@ -145,7 +145,7 @@ app.whenReady().then(async () => {
 		socketClient.onEvent((method, params) => {
 			if (method === "log") {
 				const { type, message } = params;
-				logger.toFrontend(type || "backend", message);
+				logger.socketLog(type || "backend", message);
 			} else if (method === "screens-changed") {
 				win?.webContents.send("screens-changed");
 			} else if (method === "wallpaper-folder-changed") {

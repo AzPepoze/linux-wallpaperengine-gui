@@ -2,32 +2,33 @@ package handlers
 
 import (
 	"encoding/json"
+
 	"linux-wallpaperengine-gui/src/backend/internal/api/models"
 	"linux-wallpaperengine-gui/src/backend/internal/config"
+	"linux-wallpaperengine-gui/src/backend/internal/core/wallpaper"
 	"linux-wallpaperengine-gui/src/backend/internal/logger"
-	"linux-wallpaperengine-gui/src/backend/internal/wallpaper"
 )
 
-func HandleWallpaper(req models.Request) models.Response {
-	var res models.Response
-	res.ID = req.ID
+func (handler *Handler) HandleWallpaper(request models.Request) models.Response {
+	var response models.Response
+	response.ID = request.ID
 
-	switch req.Method {
+	switch request.Method {
 	case "apply-wallpapers":
-		if err := wallpaper.ApplyWallpapers(); err != nil {
-			res.Error = err.Error()
+		if err := handler.wallpaperService.ApplyWallpapers(); err != nil {
+			response.Error = err.Error()
 		} else {
-			res.Result = map[string]bool{"success": true}
+			response.Result = map[string]bool{"success": true}
 		}
 	case "load-wallpapers":
 		if err := config.EnsureInitialized(); err != nil {
 			logger.Printf("Failed to ensure config initialized in load-wallpapers: %v", err)
 		}
-		result, err := wallpaper.LoadWallpapers()
+		result, err := handler.wallpaperService.LoadWallpapers()
 		if err != nil {
-			res.Error = err.Error()
+			response.Error = err.Error()
 		} else {
-			res.Result = map[string]interface{}{
+			response.Result = map[string]interface{}{
 				"success":                  true,
 				"wallpapers":               result["wallpapers"],
 				"selectedWallpaper":        result["selectedWallpaper"],
@@ -36,45 +37,45 @@ func HandleWallpaper(req models.Request) models.Response {
 			}
 		}
 	case "get-wallpaper-project-data":
-		var params struct {
+		var parameters struct {
 			ID string `json:"id"`
 		}
-		if err := json.Unmarshal(req.Params, &params); err != nil {
-			res.Error = err.Error()
+		if err := json.Unmarshal(request.Params, &parameters); err != nil {
+			response.Error = err.Error()
 		} else {
-			props, err := wallpaper.GetWallpaperProjectData(params.ID)
+			properties, err := wallpaper.GetWallpaperProjectData(parameters.ID)
 			if err != nil {
-				res.Error = err.Error()
+				response.Error = err.Error()
 			} else {
-				res.Result = map[string]interface{}{"success": true, "properties": props}
+				response.Result = map[string]interface{}{"success": true, "properties": properties}
 			}
 		}
 	case "get-wallpaper-base-path":
 		if err := config.EnsureInitialized(); err != nil {
-			res.Error = err.Error()
+			response.Error = err.Error()
 		} else {
-			res.Result = config.WorkshopPath
+			response.Result = config.WorkshopPath
 		}
 	case "get-assets-base-path":
 		if err := config.EnsureInitialized(); err != nil {
-			res.Error = err.Error()
+			response.Error = err.Error()
 		} else {
-			res.Result = config.WallpaperEnginePath
+			response.Result = config.WallpaperEnginePath
 		}
 	case "kill-all-wallpapers":
-		wallpaper.KillAllWallpapers()
-		res.Result = map[string]bool{"success": true}
+		handler.wallpaperService.KillAllWallpapers()
+		response.Result = map[string]bool{"success": true}
 	case "kill-wallpaper":
-		var params struct {
+		var parameters struct {
 			FolderName string `json:"folderName"`
 		}
-		if err := json.Unmarshal(req.Params, &params); err != nil {
-			res.Error = err.Error()
+		if err := json.Unmarshal(request.Params, &parameters); err != nil {
+			response.Error = err.Error()
 		} else {
-			wallpaper.KillWallpaperByFolderName(params.FolderName)
-			res.Result = map[string]bool{"success": true}
+			handler.wallpaperService.KillWallpaperByFolderName(parameters.FolderName)
+			response.Result = map[string]bool{"success": true}
 		}
 	}
 
-	return res
+	return response
 }

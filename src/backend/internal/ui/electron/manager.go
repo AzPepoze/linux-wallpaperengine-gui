@@ -1,6 +1,7 @@
 package electron
 
 import (
+	"bufio"
 	"linux-wallpaperengine-gui/src/backend/internal/config"
 	"linux-wallpaperengine-gui/src/backend/internal/logger"
 	"os"
@@ -67,8 +68,8 @@ func Start() {
 	cmd.Env = os.Environ()
 	cmd.Env = append(cmd.Env, "INTERNAL_START=true")
 
-	cmd.Stdout = os.Stdout
-	cmd.Stderr = os.Stderr
+	stdout, _ := cmd.StdoutPipe()
+	stderr, _ := cmd.StderrPipe()
 
 	logger.Printf("Starting GUI: %s %s", name, strings.Join(args, " "))
 
@@ -79,6 +80,22 @@ func Start() {
 
 	electronProcess = cmd.Process
 	logger.Printf("Electron started (PID: %d)", electronProcess.Pid)
+
+	// Handle stdout
+	go func() {
+		scanner := bufio.NewScanner(stdout)
+		for scanner.Scan() {
+			logger.ElectronLog(scanner.Text())
+		}
+	}()
+
+	// Handle stderr
+	go func() {
+		scanner := bufio.NewScanner(stderr)
+		for scanner.Scan() {
+			logger.ElectronLog(scanner.Text())
+		}
+	}()
 
 	go func() {
 		err := cmd.Wait()

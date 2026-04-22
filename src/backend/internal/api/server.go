@@ -3,12 +3,13 @@ package api
 import (
 	"encoding/json"
 	"io"
-	"linux-wallpaperengine-gui/src/backend/internal/api/handlers"
-	"linux-wallpaperengine-gui/src/backend/internal/api/models"
-	"linux-wallpaperengine-gui/src/backend/internal/logger"
 	"net"
 	"os"
 	"sync"
+
+	"linux-wallpaperengine-gui/src/backend/internal/api/handlers"
+	"linux-wallpaperengine-gui/src/backend/internal/api/models"
+	"linux-wallpaperengine-gui/src/backend/internal/logger"
 )
 
 var (
@@ -29,7 +30,7 @@ func BroadcastEvent(method string, params interface{}) {
 	}
 }
 
-func StartServer(path string, cleanup func()) {
+func StartServer(path string, handler *handlers.Handler) {
 	socketPath = path
 	if _, err := os.Stat(socketPath); err == nil {
 		if err := os.Remove(socketPath); err != nil {
@@ -55,11 +56,11 @@ func StartServer(path string, cleanup func()) {
 			logger.Println("Accept error:", err)
 			continue
 		}
-		go handleConnection(conn, cleanup)
+		go handleConnection(conn, handler)
 	}
 }
 
-func handleConnection(conn net.Conn, cleanup func()) {
+func handleConnection(conn net.Conn, handler *handlers.Handler) {
 	defer func() {
 		if err := conn.Close(); err != nil {
 			logger.Println("Error closing connection:", err)
@@ -124,7 +125,7 @@ func handleConnection(conn net.Conn, cleanup func()) {
 
 		logger.Printf("Received: %s (ID: %d)", req.Method, req.ID)
 
-		res := handlers.HandleIPC(req, encoder, cleanup)
+		res := handler.HandleIPC(req, encoder)
 
 		if err := encoder.Encode(res); err != nil {
 			logger.Println("Encode error:", err)

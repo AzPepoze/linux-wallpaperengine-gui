@@ -1,13 +1,15 @@
-package wallpaper
+package playlist
 
 import (
 	"encoding/json"
 	"fmt"
 	"os"
+
+	"linux-wallpaperengine-gui/src/backend/internal/core/wallpaper"
 )
 
 func GetPlaylists() ([]Playlist, error) {
-	configPath, err := GetWEConfigPath()
+	configPath, err := wallpaper.GetWEConfigPath()
 	if err != nil {
 		return nil, err
 	}
@@ -102,7 +104,7 @@ func UpdatePlaylistIntervalConfig(name string, intervalMinutes float64) error {
 }
 
 func SavePlaylists(playlists []Playlist) error {
-	configPath, err := GetWEConfigPath()
+	configPath, err := wallpaper.GetWEConfigPath()
 	if err != nil {
 		return err
 	}

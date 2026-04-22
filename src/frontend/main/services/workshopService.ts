@@ -84,6 +84,7 @@ export function registerWorkshopService() {
 
 			const client = getSteamworksClient();
 			if (!client) {
+				logger.error("Steamworks client not initialized");
 				throw new Error("Steamworks client not initialized");
 			}
 

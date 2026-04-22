@@ -3,15 +3,15 @@ package wallpaper
 import (
 	"encoding/json"
 	"fmt"
-	"linux-wallpaperengine-gui/src/backend/internal/config"
 	"os"
 	"path/filepath"
 	"strings"
+
+	"linux-wallpaperengine-gui/src/backend/internal/config"
 )
 
 func GetWallpapers() (map[string]WallpaperData, error) {
-	err := config.EnsureInitialized()
-	if err != nil {
+	if err := config.EnsureInitialized(); err != nil {
 		return nil, err
 	}
 
@@ -37,9 +37,9 @@ func GetWallpapers() (map[string]WallpaperData, error) {
 		}
 
 		folderName := entry.Name()
-		projectJsonPath := filepath.Join(basePath, folderName, "project.json")
+		projectJSONPath := filepath.Join(basePath, folderName, "project.json")
 
-		data, err := os.ReadFile(projectJsonPath)
+		data, err := os.ReadFile(projectJSONPath)
 		if err != nil {
 			continue
 		}
@@ -64,13 +64,12 @@ func GetWallpapers() (map[string]WallpaperData, error) {
 }
 
 func GetWallpaperProjectData(folderName string) (map[string]interface{}, error) {
-	err := config.EnsureInitialized()
-	if err != nil {
+	if err := config.EnsureInitialized(); err != nil {
 		return nil, err
 	}
 
-	projectJsonPath := filepath.Join(config.WorkshopPath, folderName, "project.json")
-	data, err := os.ReadFile(projectJsonPath)
+	projectJSONPath := filepath.Join(config.WorkshopPath, folderName, "project.json")
+	data, err := os.ReadFile(projectJSONPath)
 	if err != nil {
 		return nil, err
 	}
@@ -81,8 +80,8 @@ func GetWallpaperProjectData(folderName string) (map[string]interface{}, error) 
 	}
 
 	properties := make(map[string]interface{})
-	if gen, ok := raw["general"].(map[string]interface{}); ok {
-		if props, ok := gen["properties"].(map[string]interface{}); ok {
+	if general, ok := raw["general"].(map[string]interface{}); ok {
+		if props, ok := general["properties"].(map[string]interface{}); ok {
 			properties = props
 		}
 	} else if props, ok := raw["properties"].(map[string]interface{}); ok {
@@ -103,22 +102,15 @@ func GetWallpaperProjectData(folderName string) (map[string]interface{}, error) 
 }
 
 func GetWEConfigPath() (string, error) {
-	err := config.EnsureInitialized()
-	if err != nil {
+	if err := config.EnsureInitialized(); err != nil {
 		return "", err
 	}
 
-	// Find the wallpaper_engine installation directory
-	// The workshop content is at ~/.../steamapps/workshop/content/431960
-	// The installation is at ~/.../steamapps/common/wallpaper_engine
 	workshopPath := config.WorkshopPath
 	if workshopPath == "" {
 		return "", fmt.Errorf("wallpaper path not initialized")
 	}
 
-	// Convert workshop path to common path
-	// From: ...steamapps/workshop/content/431960
-	// To:   ...steamapps/common/wallpaper_engine
 	installPath := ""
 	if strings.Contains(workshopPath, "steamapps/workshop/content/431960") {
 		installPath = strings.Replace(workshopPath, "steamapps/workshop/content/431960", "steamapps/common/wallpaper_engine", 1)

@@ -6,6 +6,7 @@
 		logger
 	} from '../scripts/logger';
 	import { onMount, tick } from 'svelte';
+	import { colorizeLog } from '../utils/logColorizer';
 
 	let frontendLogContainer: HTMLDivElement;
 	let backendLogContainer: HTMLDivElement;
@@ -74,8 +75,9 @@
 	<div class="modal-header">
 		<h2>System Logs</h2>
 		<div class="header-actions">
-			<button class="clear-btn" onclick={() => logger.clearAll()}
-				>Clear Logs</button
+			<button
+				class="clear-btn"
+				onclick={() => logger.clearAll()}>Clear Logs</button
 			>
 		</div>
 	</div>
@@ -88,7 +90,7 @@
 				onscroll={handleFrontendScroll}
 			>
 				{#each $frontendLogs as log}
-					<div class="log-entry">{log}</div>
+					<div class="log-entry">{@html colorizeLog(log)}</div>
 				{/each}
 			</div>
 		</div>
@@ -100,7 +102,7 @@
 				onscroll={handleBackendScroll}
 			>
 				{#each $backendLogs as log}
-					<div class="log-entry">{log}</div>
+					<div class="log-entry">{@html colorizeLog(log)}</div>
 				{/each}
 			</div>
 		</div>
@@ -112,7 +114,7 @@
 				onscroll={handleWallpaperScroll}
 			>
 				{#each $wallpaperLogs as log}
-					<div class="log-entry">{log}</div>
+					<div class="log-entry">{@html colorizeLog(log)}</div>
 				{/each}
 			</div>
 		</div>
@@ -202,6 +204,34 @@
 		color: var(--text-muted);
 		white-space: pre;
 		text-align: left;
+
+		:global(.prefix-backend) {
+			color: #4caf50;
+			font-weight: bold;
+		}
+		:global(.prefix-electron) {
+			color: #2196f3;
+			font-weight: bold;
+		}
+		:global(.prefix-wallpaper) {
+			color: #00bcd4;
+			font-weight: bold;
+		}
+		:global(.prefix-frontend) {
+			color: #9c27b0;
+			font-weight: bold;
+		}
+
+		:global(.status-error) {
+			color: #f44336;
+			font-weight: bold;
+		}
+		:global(.status-warning) {
+			color: #ffeb3b;
+		}
+		:global(.status-success) {
+			color: #4caf50;
+		}
 	}
 
 	.log-entry {

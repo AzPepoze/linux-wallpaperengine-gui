@@ -2,22 +2,22 @@ package handlers
 
 import (
 	"linux-wallpaperengine-gui/src/backend/internal/api/models"
-	"linux-wallpaperengine-gui/src/backend/internal/display"
+	"linux-wallpaperengine-gui/src/backend/internal/platform/display"
 )
 
-func HandleDisplay(req models.Request) models.Response {
-	var res models.Response
-	res.ID = req.ID
+func (handler *Handler) HandleDisplay(request models.Request) models.Response {
+	var response models.Response
+	response.ID = request.ID
 
-	switch req.Method {
+	switch request.Method {
 	case "get-screens":
 		screens, err := display.GetScreens()
 		if err != nil {
-			res.Error = err.Error()
+			response.Error = err.Error()
 		} else {
-			res.Result = map[string]interface{}{"success": true, "screens": screens}
+			response.Result = map[string]interface{}{"success": true, "screens": screens}
 		}
 	}
 
-	return res
+	return response
 }
