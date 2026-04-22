@@ -94,7 +94,7 @@
 				</div>
 			{/if}
 
-			{#if isWorkshopItem && isDownloaded}
+			{#if isWorkshopItem && isDownloaded && isSubscribed}
 				<div
 					class="badge downloaded"
 					in:scale={{
@@ -102,6 +102,7 @@
 						duration: 300,
 						easing: backOut
 					}}
+					out:scale={{ start: 0.5, duration: 200 }}
 				>
 					<Icon name="check" size={16} />
 				</div>
@@ -111,12 +112,16 @@
 				<div class="progress-overlay" in:fade>
 					<div class="wave-bg" style="height: {percent}%"></div>
 					<div class="pct-text">
-						<span class="pct">{percent || ''}%</span>
-						<span class="label"
-							>{percent === 0
-								? 'Queued'
-								: 'Downloading'}</span
-						>
+						{#if percent === 0}
+							<div in:scale>
+								<Icon name="hourglass_empty" size={32} />
+							</div>
+						{:else}
+							<span class="pct">{percent}%</span>
+						{/if}
+						<span class="label">
+							{percent === 0 ? 'Queued' : 'Downloading'}
+						</span>
 					</div>
 				</div>
 			{/if}
@@ -152,8 +157,7 @@
 				<img src={wallpaper.previewPath} alt="" loading="lazy" />
 			{:else}
 				<div class="no-preview">
-					<Icon name="image_not_supported" size={80} />
-					<span>No Preview</span>
+					<Icon name="image_not_supported" size={24} />
 				</div>
 			{/if}
 			{#if isWorkshop && isSubscribed && isDownloaded}
@@ -208,7 +212,11 @@
 							style="height: {percent}%"
 						></div>
 						<div class="pct-text">
-							<span class="pct">{percent}%</span>
+							{#if percent === 0}
+								<Icon name="hourglass_empty" size={16} />
+							{:else}
+								<span class="pct">{percent}%</span>
+							{/if}
 						</div>
 					</div>
 				{:else if isSubscribed && isDownloaded}
@@ -281,12 +289,31 @@
 				position: relative;
 			}
 
-			.preview-img,
-			.no-preview {
+			.preview-img {
 				width: 100%;
 				height: 100%;
 				object-fit: cover;
 				border-radius: 12px;
+			}
+
+			.no-preview {
+				width: 100%;
+				height: 100%;
+				display: flex;
+				flex-direction: column;
+				align-items: center;
+				justify-content: center;
+				background: var(--bg-surface-hover);
+				border-radius: 12px;
+				color: var(--text-muted);
+				gap: 8px;
+
+				span {
+					font-size: 0.8rem;
+					font-weight: 600;
+					text-transform: uppercase;
+					opacity: 0.7;
+				}
 			}
 
 			.title {
@@ -304,6 +331,7 @@
 				transition: all 0.2s;
 				z-index: 10;
 				border: 2px solid var(--btn-primary-bg);
+				filter: drop-shadow(0 4px 8px rgba(0, 0, 0, 0.5));
 			}
 
 			&:hover {
@@ -357,12 +385,30 @@
 					background: var(--download-progress);
 					opacity: 0.8;
 					transition: height 0.4s;
+
+					&::before {
+						content: '';
+						position: absolute;
+						top: -19px;
+						left: 0;
+						width: 200%;
+						height: 20px;
+						background: var(--download-progress);
+						mask-size: 100% 100%;
+						-webkit-mask-size: 100% 100%;
+						mask-repeat: repeat-x;
+						-webkit-mask-repeat: repeat-x;
+						mask-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 1200 120' preserveAspectRatio='none'%3E%3Cpath d='M321.39,56.44c58-10.79,114.16-30.13,172-41.86,82.39-16.72,168.19-17.73,250.45-.39C823.78,31,906.67,72,985.66,92.83c70.05,18.48,146.53,26.09,214.34,3V120H0V27.35A600.21,600.21,0,0,0,321.39,56.44Z'/%3E%3C/svg%3E");
+						-webkit-mask-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 1200 120' preserveAspectRatio='none'%3E%3Cpath d='M321.39,56.44c58-10.79,114.16-30.13,172-41.86,82.39-16.72,168.19-17.73,250.45-.39C823.78,31,906.67,72,985.66,92.83c70.05,18.48,146.53,26.09,214.34,3V120H0V27.35A600.21,600.21,0,0,0,321.39,56.44Z'/%3E%3C/svg%3E");
+						animation: wave-anim 3s linear infinite;
+					}
 				}
 				.pct-text {
 					position: relative;
 					z-index: 5;
 					color: white;
 					text-align: center;
+					filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.8));
 					.pct {
 						font-size: 1.8rem;
 						font-weight: 900;
@@ -370,7 +416,8 @@
 					.label {
 						font-size: 0.8rem;
 						display: block;
-						opacity: 0.8;
+						opacity: 0.9;
+						font-weight: 700;
 					}
 				}
 			}
@@ -457,6 +504,15 @@
 					color: #4caf50;
 				}
 			}
+		}
+	}
+
+	@keyframes wave-anim {
+		from {
+			transform: translateX(0);
+		}
+		to {
+			transform: translateX(-50%);
 		}
 	}
 </style>

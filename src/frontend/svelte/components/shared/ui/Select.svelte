@@ -162,7 +162,8 @@
 		top: calc(100% + 8px);
 		left: 50%;
 		transform: translateX(-50%);
-		width: calc(100% + 20px);
+		min-width: 100%;
+		width: max-content;
 		box-sizing: border-box;
 		background: var(--bg-dropdown);
 		border: 1px solid var(--border-color);

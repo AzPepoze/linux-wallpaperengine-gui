@@ -195,6 +195,7 @@
 				position: relative;
 				z-index: 2;
 				font-weight: 800;
+				color: white !important;
 				text-shadow: 0 1px 3px rgba(0, 0, 0, 0.6);
 			}
 

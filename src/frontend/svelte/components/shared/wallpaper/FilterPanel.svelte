@@ -3,54 +3,45 @@
 	import { fly } from 'svelte/transition';
 	import {
 		buildFilterCategories,
+		DEFAULT_WORKSHOP_FILTER_CONFIG,
 		type FilterCategory
 	} from '@shared/filterConstants';
 	import type { FilterConfig } from '@shared/types';
 	import { logger } from '@/scripts/shared/logger';
 	import Button from '@/components/shared/ui/Button.svelte';
 	import Icon from '@/components/shared/ui/Icon.svelte';
-	import Collapse from './Collapse.svelte';
-	import FilterItem from './FilterItem.svelte';
+	import ResizeHandle from '@/components/shared/ui/ResizeHandle.svelte';
+	import FilterCategorySection from './FilterCategorySection.svelte';
+	import { filterPanelWidth } from '@/scripts/shared/ui';
 
 	export let config: FilterConfig;
-	export let onSave: ((config: FilterConfig) => void) | undefined =
-		undefined;
-	export let onChange: ((config: FilterConfig) => void) | undefined =
-		undefined;
+	export let onSave: ((config: FilterConfig) => void) | undefined = undefined;
+	export let onChange: ((config: FilterConfig) => void) | undefined = undefined;
 	export let onClose: () => void = () => {};
 
 	let localConfig: FilterConfig = JSON.parse(JSON.stringify(config));
 	let expandedCategories: Record<string, boolean> = {};
-	let filterCategories: FilterCategory[] =
-		buildFilterCategories(localConfig);
+	let filterCategories: FilterCategory[] = buildFilterCategories(localConfig);
+	let isResizing = false;
 
-	// Initialize expanded state
 	onMount(() => {
 		filterCategories.forEach((cat) => {
 			expandedCategories[cat.name] = true;
 		});
 	});
 
-	function toggleTag(internalKey: keyof FilterConfig, item: string) {
+	function handleToggleTag(internalKey: keyof FilterConfig, item: string) {
 		if (!localConfig[internalKey]) {
 			(localConfig[internalKey] as any) = {};
 		}
 		const tags = localConfig[internalKey] as Record<string, boolean>;
 		tags[item] = !tags[item];
 		localConfig = { ...localConfig };
-		logger.log(
-			`Filter toggled: [${internalKey}] ${item} -> ${tags[item]}`
-		);
-		if (onChange) {
-			onChange(localConfig);
-		}
+		logger.log(`Filter toggled: [${internalKey}] ${item} -> ${tags[item]}`);
+		if (onChange) onChange(localConfig);
 	}
 
-	function setGroupState(
-		internalKey: keyof FilterConfig,
-		items: string[],
-		state: boolean
-	) {
+	function handleSetGroupState(internalKey: keyof FilterConfig, items: string[], state: boolean) {
 		if (!localConfig[internalKey]) {
 			(localConfig[internalKey] as any) = {};
 		}
@@ -60,19 +51,17 @@
 		if (onChange) onChange(localConfig);
 	}
 
-	function setCategoryState(category: FilterCategory, state: boolean) {
+	function handleSetCategoryState(category: FilterCategory, state: boolean) {
 		const internalKey = category.internalKey as keyof FilterConfig;
 		if (!localConfig[internalKey]) {
 			(localConfig[internalKey] as any) = {};
 		}
 		const tags = localConfig[internalKey] as Record<string, boolean>;
 
-		// Set standalone items
 		if (category.items) {
 			category.items.forEach((item) => (tags[item] = state));
 		}
 
-		// Set grouped items
 		if (category.groups) {
 			category.groups.forEach((group) => {
 				group.items.forEach((item) => (tags[item] = state));
@@ -84,163 +73,114 @@
 	}
 
 	function handleSave() {
-		if (onSave) {
-			onSave(localConfig);
-		}
+		if (onSave) onSave(localConfig);
 	}
 
 	function handleReset() {
-		if (config) {
-			localConfig = JSON.parse(JSON.stringify(config));
-		}
+		localConfig = JSON.parse(JSON.stringify(DEFAULT_WORKSHOP_FILTER_CONFIG));
+		filterCategories = buildFilterCategories(localConfig);
+		if (onChange) onChange(localConfig);
 	}
 </script>
 
 <div
 	class="filter-panel"
+	class:resizing={isResizing}
 	transition:fly={{ x: -260, duration: 250, opacity: 1 }}
+	style="width: {$filterPanelWidth}px;"
 >
-	<div class="panel-header">
-		<h3>Filters</h3>
-		<div class="header-actions">
-			<Button
-				variant="secondary"
-				on:click={handleReset}
-				style="padding: 4px 8px; font-size: 0.8em;"
-			>
-				<Icon name="restart_alt" size={16} />
-				<span>Reset</span>
-			</Button>
-			{#if onSave}
+	<ResizeHandle
+		bind:isResizing
+		position="right"
+		minWidth={200}
+		maxWidth={600}
+		width={$filterPanelWidth}
+		onResize={(w) => filterPanelWidth.set(w)}
+		calculateWidth={(clientX) => {
+			const panel = document.querySelector('.filter-panel');
+			if (panel) {
+				const rect = panel.getBoundingClientRect();
+				return clientX - rect.left;
+			}
+			return clientX;
+		}}
+	/>
+
+	<div class="panel-inner">
+		<div class="panel-header">
+			<h3>Filters</h3>
+			<div class="header-actions">
 				<Button
-					variant="primary"
-					on:click={handleSave}
-					style="padding: 4px 12px; font-size: 0.8em;"
+					variant="secondary"
+					on:click={handleReset}
+					style="padding: 4px 8px; font-size: 0.8em;"
 				>
-					<Icon name="done" size={16} />
-					<span>Apply</span>
+					<Icon name="restart_alt" size={16} />
+					<span>Reset</span>
 				</Button>
-			{/if}
-			<Button
-				variant="secondary"
-				on:click={onClose}
-				style="padding: 4px; display: flex; align-items: center; justify-content: center;"
-			>
-				<Icon name="close" size={16} />
-			</Button>
+				{#if onSave}
+					<Button
+						variant="primary"
+						on:click={handleSave}
+						style="padding: 4px 12px; font-size: 0.8em;"
+					>
+						<Icon name="done" size={16} />
+						<span>Apply</span>
+					</Button>
+				{/if}
+				<Button
+					variant="secondary"
+					on:click={onClose}
+					style="padding: 4px; display: flex; align-items: center; justify-content: center;"
+				>
+					<Icon name="close" size={16} />
+				</Button>
+			</div>
 		</div>
-	</div>
 
-	<div class="panel-content">
-		{#each filterCategories as category (category.name)}
-			<Collapse
-				title={category.name}
-				bind:isExpanded={expandedCategories[category.name]}
-			>
-				<svelte:fragment slot="header-actions">
-					<Button
-						variant="primary"
-						style="padding: 2px 6px; font-size: 0.75em;"
-						on:click={() => setCategoryState(category, true)}
-						>All</Button
-					>
-					<Button
-						variant="primary"
-						style="padding: 2px 6px; font-size: 0.75em;"
-						on:click={() => setCategoryState(category, false)}
-						>None</Button
-					>
-				</svelte:fragment>
-
-				<div class="filter-grid">
-					{#if category.items && category.items.length > 0}
-						{#each category.items as item (item)}
-							<FilterItem
-								label={item}
-								isActive={(
-									localConfig[
-										category.internalKey as keyof FilterConfig
-									] as Record<string, boolean>
-								)?.[item]}
-								onClick={() =>
-									toggleTag(
-										category.internalKey as keyof FilterConfig,
-										item
-									)}
-							/>
-						{/each}
-					{/if}
-
-					{#if category.groups}
-						{#each category.groups as group (group.name)}
-							<div class="filter-group">
-								<div class="group-header">
-									<h4>{group.name}</h4>
-									<div class="group-actions">
-										<Button
-											variant="primary"
-											style="padding: 2px 6px; font-size: 0.75em;"
-											on:click={() =>
-												setGroupState(
-													category.internalKey as keyof FilterConfig,
-													group.items,
-													true
-												)}>All</Button
-										>
-										<Button
-											variant="primary"
-											style="padding: 2px 6px; font-size: 0.75em;"
-											on:click={() =>
-												setGroupState(
-													category.internalKey as keyof FilterConfig,
-													group.items,
-													false
-												)}>None</Button
-										>
-									</div>
-								</div>
-
-								<div class="group-items">
-									{#each group.items as item (item)}
-										<FilterItem
-											label={item}
-											isActive={(
-												localConfig[
-													category.internalKey as keyof FilterConfig
-												] as Record<
-													string,
-													boolean
-												>
-											)?.[item]}
-											onClick={() =>
-												toggleTag(
-													category.internalKey as keyof FilterConfig,
-													item
-												)}
-										/>
-									{/each}
-								</div>
-							</div>
-						{/each}
-					{/if}
-				</div>
-			</Collapse>
-		{/each}
+		<div class="panel-content">
+			{#each filterCategories as category (category.name)}
+				<FilterCategorySection
+					{category}
+					{localConfig}
+					bind:isExpanded={expandedCategories[category.name]}
+					onToggleTag={handleToggleTag}
+					onSetGroupState={handleSetGroupState}
+					onSetCategoryState={handleSetCategoryState}
+				/>
+			{/each}
+		</div>
 	</div>
 </div>
 
 <style lang="scss">
 	.filter-panel {
-		width: 300px;
+		position: relative;
 		flex-shrink: 0;
 		background: var(--bg-surface);
 		border-right: 1px solid var(--border-color);
 		display: flex;
 		flex-direction: column;
-		overflow: hidden;
+		overflow: visible;
 		border-radius: var(--radius-md);
-		margin-right: 20px;
-		margin-top: 20px;
+		margin-right: 15px;
+		margin-top: 15px;
+		margin-bottom: 15px;
+		transition: transform var(--transition-base), opacity var(--transition-base), width var(--transition-base);
+
+		&.resizing {
+			transition: none;
+		}
+
+		.panel-inner {
+			flex: 1;
+			display: flex;
+			flex-direction: column;
+			overflow: hidden;
+			border-radius: inherit;
+			height: 100%;
+			width: 100%;
+		}
 
 		.panel-header {
 			padding: 12px 15px;
@@ -277,56 +217,6 @@
 
 				&:last-child {
 					border-bottom: none;
-				}
-			}
-
-			.filter-grid {
-				display: flex;
-				flex-direction: column;
-				gap: 4px;
-
-				.filter-group {
-					display: flex;
-					flex-direction: column;
-					margin-bottom: 6px;
-					padding-bottom: 6px;
-					border-bottom: 1px solid rgba(255, 255, 255, 0.05);
-
-					&:last-child {
-						border-bottom: none;
-						margin-bottom: 0;
-						padding-bottom: 0;
-					}
-
-					.group-header {
-						display: flex;
-						flex-direction: row;
-						gap: 4px;
-						padding: 4px 6px;
-						margin-bottom: 4px;
-						justify-content: space-between;
-						align-items: center;
-						text-wrap: nowrap;
-
-						h4 {
-							margin: 0;
-							font-size: 0.9em;
-							font-weight: 700;
-							color: var(--text-color);
-						}
-
-						.group-actions {
-							display: flex;
-							gap: 8px;
-						}
-					}
-
-					.group-items {
-						display: flex;
-						flex-direction: column;
-						gap: 2px;
-						padding-left: 0px;
-					}
 				}
 			}
 		}

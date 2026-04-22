@@ -247,6 +247,7 @@
 				{browseItems}
 				{browseLoading}
 				{viewMode}
+				{infiniteScroll}
 				browseCursor={totalItems > browsePage * parseInt(pageSize) ? 'next' : null}
 				{totalItems}
 				currentPage={browsePage - 1}

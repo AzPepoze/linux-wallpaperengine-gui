@@ -8,7 +8,7 @@
 	export let calculateWidth: (clientX: number) => number = (clientX) =>
 		Math.max(minWidth, Math.min(maxWidth, clientX));
 
-	let isResizing = false;
+	export let isResizing = false;
 
 	function handleMouseDown() {
 		isResizing = true;
@@ -68,7 +68,7 @@
 
 			&:hover,
 			&.resizing {
-				box-shadow: -2px 0 10px #007bff;
+				box-shadow: -2px 0 10px var(--btn-primary-bg);
 			}
 		}
 
@@ -81,13 +81,13 @@
 
 			&:hover,
 			&.resizing {
-				box-shadow: 2px 0 10px #007bff;
+				box-shadow: 2px 0 10px var(--btn-primary-bg);
 			}
 		}
 
 		&:hover,
 		&.resizing {
-			background-color: #007bff;
+			background-color: var(--btn-primary-bg);
 			width: 7px;
 		}
 

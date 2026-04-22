@@ -26,12 +26,13 @@
 	</div>
 {/if}
 
-{#if isWorkshopItem && isDownloaded}
+{#if isWorkshopItem && isDownloaded && isSubscribed}
 	<div
 		class="downloaded-badge"
 		class:list-layout={layout === 'list'}
 		title="Downloaded"
 		in:scale={{ start: 0.8, duration: 300, easing: backOut }}
+		out:scale={{ start: 0.5, duration: 200 }}
 	>
 		<Icon name="check" size={layout === 'list' ? 14 : 16} strokeWidth={3} />
 	</div>
@@ -55,7 +56,13 @@
 			}}
 			out:fade={{ duration: 300 }}
 		>
-			<span class="pct">{percent === 0 ? '' : percent + '%'}</span>
+			{#if percent === 0}
+				<div in:scale>
+					<Icon name="hourglass_empty" size={layout === 'list' ? 20 : 32} />
+				</div>
+			{:else}
+				<span class="pct">{percent}%</span>
+			{/if}
 			<span class="label">{percent === 0 ? 'Queued' : 'Downloading'}</span>
 		</div>
 		<div class="progress-mask"></div>
@@ -148,14 +155,17 @@
 			&::before {
 				content: '';
 				position: absolute;
-				top: -15px;
+				top: -19px;
 				left: 0;
 				width: 200%;
 				height: 20px;
 				background: var(--download-progress);
-				opacity: 1;
-				mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 1200 120' preserveAspectRatio='none'%3E%3Cpath d='M321.39,56.44c58-10.79,114.16-30.13,172-41.86,82.39-16.72,168.19-17.73,250.45-.39C823.78,31,906.67,72,985.66,92.83c70.05,18.48,146.53,26.09,214.34,3V0H0V27.35A600.21,600.21,0,0,0,321.39,56.44Z'/%3E%3C/svg%3E");
 				mask-size: 100% 100%;
+				-webkit-mask-size: 100% 100%;
+				mask-repeat: repeat-x;
+				-webkit-mask-repeat: repeat-x;
+				mask-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 1200 120' preserveAspectRatio='none'%3E%3Cpath d='M321.39,56.44c58-10.79,114.16-30.13,172-41.86,82.39-16.72,168.19-17.73,250.45-.39C823.78,31,906.67,72,985.66,92.83c70.05,18.48,146.53,26.09,214.34,3V120H0V27.35A600.21,600.21,0,0,0,321.39,56.44Z'/%3E%3C/svg%3E");
+				-webkit-mask-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 1200 120' preserveAspectRatio='none'%3E%3Cpath d='M321.39,56.44c58-10.79,114.16-30.13,172-41.86,82.39-16.72,168.19-17.73,250.45-.39C823.78,31,906.67,72,985.66,92.83c70.05,18.48,146.53,26.09,214.34,3V120H0V27.35A600.21,600.21,0,0,0,321.39,56.44Z'/%3E%3C/svg%3E");
 				animation: wave-anim 3s linear infinite;
 			}
 		}
@@ -168,6 +178,7 @@
 			align-items: center;
 			gap: 4px;
 			color: white;
+			filter: drop-shadow(0 2px 8px rgba(0, 0, 0, 0.8));
 			text-shadow:
 				0 2px 10px rgba(0, 0, 0, 0.8),
 				0 0 4px rgba(0, 0, 0, 0.5);
@@ -244,10 +255,10 @@
 
 	@keyframes wave-anim {
 		from {
-			transform: translateX(0) scaleY(-1);
+			transform: translateX(0);
 		}
 		to {
-			transform: translateX(-50%) scaleY(-1);
+			transform: translateX(-50%);
 		}
 	}
 </style>

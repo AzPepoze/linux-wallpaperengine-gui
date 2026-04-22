@@ -1,5 +1,4 @@
 <script lang="ts">
-	import { onDestroy } from 'svelte';
 	import { sidebarWidth } from '@/scripts/shared/ui';
 	import { settingsStore } from '@/scripts/settings/settings';
 	import {
@@ -8,12 +7,13 @@
 		type SidebarTheme
 	} from '@/scripts/home/sidebarTheme';
 	import type { Wallpaper } from '@shared/types';
+	import ResizeHandle from '@/components/shared/ui/ResizeHandle.svelte';
 
 	export let selectedWallpaper: Wallpaper | null = null;
 	export let onClose: () => void = () => {};
 
-	let isResizing = false;
 	let theme: SidebarTheme = DEFAULT_THEME;
+	let isResizing = false;
 
 	$: {
 		if (selectedWallpaper) {
@@ -26,33 +26,6 @@
 			theme = DEFAULT_THEME;
 		}
 	}
-
-	function startResizing(e: MouseEvent) {
-		isResizing = true;
-		window.addEventListener('mousemove', handleMouseMove);
-		window.addEventListener('mouseup', stopResizing);
-		document.body.style.cursor = 'col-resize';
-		e.preventDefault();
-	}
-
-	function handleMouseMove(e: MouseEvent) {
-		if (!isResizing) return;
-		const newWidth = window.innerWidth - e.clientX - 40;
-		if (newWidth >= 250 && newWidth <= 800) {
-			sidebarWidth.set(newWidth);
-		}
-	}
-
-	function stopResizing() {
-		isResizing = false;
-		window.removeEventListener('mousemove', handleMouseMove);
-		window.removeEventListener('mouseup', stopResizing);
-		document.body.style.cursor = 'default';
-	}
-
-	onDestroy(() => {
-		stopResizing();
-	});
 </script>
 
 <div
@@ -75,12 +48,16 @@
 	"
 >
 	{#if selectedWallpaper}
-		<!-- svelte-ignore a11y_no_static_element_interactions -->
-		<div
-			class="resize-handle"
-			class:resizing={isResizing}
-			on:mousedown={startResizing}
-		></div>
+		<ResizeHandle
+			bind:isResizing
+			position="left"
+			minWidth={250}
+			maxWidth={800}
+			width={$sidebarWidth}
+			onResize={(w) => sidebarWidth.set(w)}
+			calculateWidth={(clientX) => window.innerWidth - clientX - 40}
+			style="--border-color: var(--btn-secondary-bg); z-index: 10;"
+		/>
 	{/if}
 
 	<div class="sidebar-container">
@@ -182,24 +159,12 @@
 			transition: none;
 		}
 
-		.resize-handle {
-			position: absolute;
-			left: 0;
-			top: 0;
-			bottom: 0;
-			width: 5px;
-			cursor: col-resize;
-			z-index: 10;
-			transition: var(--transition-base);
-			border-radius: var(--radius-md);
-			border: 2px dashed var(--btn-secondary-bg);
-
-			&:hover,
-			&.resizing {
-				background-color: var(--btn-primary-bg);
-				width: 7px;
-				box-shadow: 2px 0 10px var(--btn-primary-bg);
-			}
+		&.open {
+			min-width: 250px;
+			max-width: 800px;
+			flex-shrink: 0;
+			padding: 5px 10px;
+			margin-left: 20px;
 		}
 
 		.sidebar-container {
@@ -216,6 +181,7 @@
 			padding-bottom: 20px;
 			text-align: left;
 			border-radius: 15px;
+			padding: 0 10px;
 
 			.preview-image {
 				width: 100%;
@@ -255,18 +221,6 @@
 
 			&:hover {
 				filter: brightness(1.2);
-			}
-		}
-
-		&.open {
-			min-width: 250px;
-			max-width: 800px;
-			flex-shrink: 0;
-			padding: 5px 10px;
-			margin-left: 20px;
-
-			.sidebar-content {
-				padding: 0 10px;
 			}
 		}
 
