@@ -2,7 +2,7 @@
 	import {
 		getDominantColor,
 		isLight,
-		getPalette,
+		getPaletteColor,
 		adjustBrightness
 	} from '../../utils/colorHelper';
 	import { settingsStore } from '../../scripts/settings';
@@ -26,7 +26,9 @@
 
 	function getDownloadPercent(progress: ProgressInfo | undefined): number {
 		if (!progress || progress.total === 0) return 0;
-		return Math.round((Number(progress.current) / Number(progress.total)) * 100);
+		return Math.round(
+			(Number(progress.current) / Number(progress.total)) * 100
+		);
 	}
 
 	export let onClose: () => void = () => {};
@@ -64,7 +66,7 @@
 					}
 				}
 			);
-			getPalette(selectedWallpaper.previewPath, 8).then((p) => {
+			getPaletteColor(selectedWallpaper.previewPath, 8).then((p) => {
 				if (p) {
 					palette = p;
 				}
@@ -235,14 +237,25 @@
 			{#if !selectedWallpaper.projectData?.isWorkshop || $subscribedIds.has(selectedWallpaper.folderName)}
 				<div class="workshop-actions">
 					{#if $downloadProgress[selectedWallpaper?.folderName || '']}
-						{@const progress = $downloadProgress[selectedWallpaper?.folderName || '']}
+						{@const progress =
+							$downloadProgress[
+								selectedWallpaper?.folderName || ''
+							]}
 						{@const percent = getDownloadPercent(progress)}
-						<button type="button" class="workshop-btn downloading">
-							<div class="progress-cool" style="width: {percent}%">
+						<button
+							type="button"
+							class="workshop-btn downloading"
+						>
+							<div
+								class="progress-cool"
+								style="width: {percent}%"
+							>
 								<div class="progress-glow"></div>
 								<div class="progress-shimmer"></div>
 							</div>
-							<span class="progress-text">Downloading {percent}%</span>
+							<span class="progress-text"
+								>Downloading {percent}%</span
+							>
 						</button>
 					{:else}
 						<button
@@ -251,7 +264,8 @@
 							on:click={async () => {
 								try {
 									await unsubscribe(
-										selectedWallpaper?.folderName || ''
+										selectedWallpaper?.folderName ||
+											''
 									);
 								} catch (e: any) {
 									logger.error(
@@ -292,13 +306,25 @@
 							}}
 						>
 							{#if $downloadProgress[selectedWallpaper?.folderName || '']}
-								{@const progress = $downloadProgress[selectedWallpaper?.folderName || '']}
-								{@const percent = getDownloadPercent(progress)}
-								<div class="progress-cool" style="width: {percent}%">
+								{@const progress =
+									$downloadProgress[
+										selectedWallpaper?.folderName ||
+											''
+									]}
+								{@const percent =
+									getDownloadPercent(progress)}
+								<div
+									class="progress-cool"
+									style="width: {percent}%"
+								>
 									<div class="progress-glow"></div>
-									<div class="progress-shimmer"></div>
+									<div
+										class="progress-shimmer"
+									></div>
 								</div>
-								<span class="progress-text">Downloading {percent}%</span>
+								<span class="progress-text"
+									>Downloading {percent}%</span
+								>
 							{:else}
 								<DownloadIcon width="18" height="18" />
 								Subscribe

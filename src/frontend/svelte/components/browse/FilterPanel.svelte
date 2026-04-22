@@ -1,15 +1,15 @@
 <script lang="ts">
 	import { onMount } from 'svelte';
 	import { fly } from 'svelte/transition';
-	import type { FilterConfig } from '../../../shared/types';
 	import {
 		buildFilterCategories,
 		type FilterCategory
 	} from '../../../shared/filterConstants';
-	import FilterItem from './FilterItem.svelte';
-	import Collapse from './Collapse.svelte';
-	import Button from '../ui/Button.svelte';
+	import type { FilterConfig } from '../../../shared/types';
 	import { logger } from '../../scripts/logger';
+	import Button from '../ui/Button.svelte';
+	import Collapse from './Collapse.svelte';
+	import FilterItem from './FilterItem.svelte';
 
 	export let config: FilterConfig;
 	export let onSave: ((config: FilterConfig) => void) | undefined =
