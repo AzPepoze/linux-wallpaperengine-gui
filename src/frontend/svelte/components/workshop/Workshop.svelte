@@ -37,6 +37,7 @@
 
 	let steamRunning = true;
 	let searchError: string | null = null;
+	let searchRequestId = 0;
 
 	onMount(async () => {
 		await checkSteamStatus();
@@ -78,7 +79,8 @@
 
 	async function saveFilters(newConfig: FilterConfig) {
 		try {
-			const result = await window.electronAPI.saveWorkshopFilters(newConfig);
+			const result =
+				await window.electronAPI.saveWorkshopFilters(newConfig);
 			if (result.success) {
 				workshopFilters = newConfig;
 				showFilterPanel = false;
@@ -108,7 +110,9 @@
 		searching = true;
 		browseLoading = true;
 		browsePage = 1;
+		browseItems = [];
 		searchError = null;
+		const requestId = ++searchRequestId;
 		try {
 			const { required, excluded } = getSearchParameters(
 				workshopFilters,
@@ -125,13 +129,17 @@
 				numperpage: infiniteScroll ? 50 : parseInt(pageSize)
 			});
 
+			if (requestId !== searchRequestId) return;
+
 			if (result?.error) {
 				throw new Error(result.error);
 			}
 
 			const validItems = (result?.items || [])
 				.filter(isValidWorkshopItem)
-				.map((details: PublishedFileDetails) => formatWorkshopItem(details));
+				.map((details: PublishedFileDetails) =>
+					formatWorkshopItem(details)
+				);
 
 			if (infiniteScroll && browsePage > 1) {
 				browseItems = [...browseItems, ...validItems];
@@ -140,7 +148,8 @@
 			}
 			totalItems = result?.total || 0;
 		} catch (error) {
-			const errorMsg = error instanceof Error ? error.message : 'Unknown error';
+			const errorMsg =
+				error instanceof Error ? error.message : 'Unknown error';
 			searchError = errorMsg;
 			showToast(`Error searching: ${errorMsg}`, 'error');
 
@@ -159,7 +168,11 @@
 	async function loadBrowseItems(pageNum: number = 0) {
 		browseLoading = true;
 		browsePage = pageNum + 1;
+		if (!infiniteScroll) {
+			browseItems = [];
+		}
 		searchError = null;
+		const requestId = ++searchRequestId;
 		try {
 			const { required, excluded } = getSearchParameters(
 				workshopFilters,
@@ -176,13 +189,17 @@
 				numperpage: parseInt(pageSize)
 			});
 
+			if (requestId !== searchRequestId) return;
+
 			if (result?.error) {
 				throw new Error(result.error);
 			}
 
 			const validItems = (result?.items || [])
 				.filter(isValidWorkshopItem)
-				.map((details: PublishedFileDetails) => formatWorkshopItem(details));
+				.map((details: PublishedFileDetails) =>
+					formatWorkshopItem(details)
+				);
 
 			if (infiniteScroll && browsePage > 1) {
 				browseItems = [...browseItems, ...validItems];
@@ -195,7 +212,8 @@
 				showToast('No items found', 'info');
 			}
 		} catch (error) {
-			const errorMsg = error instanceof Error ? error.message : 'Unknown error';
+			const errorMsg =
+				error instanceof Error ? error.message : 'Unknown error';
 			searchError = errorMsg;
 			showToast(`Error browsing workshop: ${errorMsg}`, 'error');
 
@@ -248,7 +266,9 @@
 				{browseLoading}
 				{viewMode}
 				{infiniteScroll}
-				browseCursor={totalItems > browsePage * parseInt(pageSize) ? 'next' : null}
+				browseCursor={totalItems > browsePage * parseInt(pageSize)
+					? 'next'
+					: null}
 				{totalItems}
 				currentPage={browsePage - 1}
 				itemsPerPage={parseInt(pageSize)}

@@ -2,7 +2,7 @@
 	import type { WorkshopItem } from '@/utils/workshopHelper';
 	import type { WallpaperData, Wallpaper } from '@shared/types';
 	import { fade, fly } from 'svelte/transition';
-	import { convertWorkshopItemsToWallpaperRecord } from '@/utils/browse';
+	import { convertWorkshopItemsToWallpaperPairs } from '@/utils/browse';
 	import { settingsStore } from '@/scripts/settings/settings';
 	import BrowsePagination from './BrowsePagination.svelte';
 	import Sidebar from '@/components/home/Sidebar.svelte';
@@ -17,6 +17,7 @@
 	export let browseCursor: string | null = null;
 	export let currentPage = 0;
 	export let itemsPerPage = 50;
+	export let infiniteScroll = false;
 	let contentElement: HTMLElement;
 	let selectedWorkshopData: WallpaperData | null = null;
 	let selectedItemId: string | null = null;
@@ -47,6 +48,22 @@
 		onLoadBrowseItems(page);
 	}
 
+	function handleScroll(e: Event) {
+		if (!infiniteScroll || browseLoading) return;
+
+		const target = e.target as HTMLElement;
+		const threshold = 300;
+		const isNearBottom =
+			target.scrollHeight - target.scrollTop - target.clientHeight <
+			threshold;
+
+		const hasMore = totalItems > (currentPageNum + 1) * itemsPerPage;
+
+		if (isNearBottom && hasMore) {
+			handlePageChange(currentPageNum + 1);
+		}
+	}
+
 	$: selectedWallpaper =
 		selectedItemId && selectedWorkshopData
 			? ({
@@ -55,12 +72,16 @@
 				} as Wallpaper)
 			: null;
 
-	// Close sidebar when items finish loading and scroll to top
-	$: if (!browseLoading && browseItems.length > 0) {
-		closeSidebar();
-		if (contentElement) {
+	// Scroll to top only on new search (first page)
+	$: if (!browseLoading && browseItems.length > 0 && currentPageNum === 0) {
+		if (contentElement && !infiniteScroll) {
 			contentElement.scrollTop = 0;
 		}
+	}
+
+	// Also close sidebar when items change to avoid stale data
+	$: if (browseItems) {
+		closeSidebar();
 	}
 </script>
 
@@ -70,8 +91,9 @@
 			class="scroll-container"
 			class:scroll-mask={$settingsStore?.enableScrollMask}
 			bind:this={contentElement}
+			on:scroll={handleScroll}
 		>
-			{#if browseLoading}
+			{#if browseLoading && (!infiniteScroll || currentPageNum === 0)}
 				<div
 					class="loading"
 					in:fade={{
@@ -85,7 +107,7 @@
 				</div>
 			{/if}
 
-			{#if !browseLoading && browseItems.length > 0}
+			{#if browseItems.length > 0 && !(browseLoading && currentPageNum === 0)}
 				<div
 					class="results-container"
 					in:fly={{
@@ -93,33 +115,39 @@
 						duration: 400,
 						delay: 100
 					}}
-					out:fly={{
-						y: -20,
-						duration: 200
-					}}
+					out:fade={{ duration: 200 }}
 				>
 					{#if viewMode === 'grid'}
 						<WallpaperItemGrid
-							wallpapers={convertWorkshopItemsToWallpaperRecord(
+							wallpapers={convertWorkshopItemsToWallpaperPairs(
 								browseItems
 							)}
 							{selectedWallpaper}
 							onSelect={handleItemSelect}
+							container={contentElement}
 						/>
 					{:else}
 						<WallpaperItemList
-							wallpapers={convertWorkshopItemsToWallpaperRecord(
+							wallpapers={convertWorkshopItemsToWallpaperPairs(
 								browseItems
 							)}
 							{selectedWallpaper}
 							onSelect={handleItemSelect}
+							container={contentElement}
 						/>
+					{/if}
+
+					{#if infiniteScroll && browseLoading && currentPageNum > 0}
+						<div class="infinite-loading">
+							<div class="spinner small"></div>
+							<span>Loading more...</span>
+						</div>
 					{/if}
 				</div>
 			{/if}
 		</div>
 
-		{#if browseItems.length > 0}
+		{#if !infiniteScroll && (browseItems.length > 0 || browseLoading)}
 			<BrowsePagination
 				currentPage={currentPageNum}
 				{totalItems}
@@ -153,6 +181,7 @@
 				flex: 1;
 				overflow-y: auto;
 				display: flex;
+				flex-direction: column;
 				align-items: stretch;
 				position: relative;
 				padding: 10px;
@@ -201,10 +230,20 @@
 					}
 				}
 
-				.results-container {
-					flex: 1;
+				.infinite-loading {
 					display: flex;
-					flex-direction: column;
+					align-items: center;
+					justify-content: center;
+					gap: 10px;
+					padding: 20px;
+					color: var(--text-muted);
+					font-size: 0.9em;
+
+					.spinner.small {
+						width: 20px;
+						height: 20px;
+						border-width: 2px;
+					}
 				}
 			}
 		}

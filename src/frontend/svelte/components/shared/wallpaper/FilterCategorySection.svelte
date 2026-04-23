@@ -9,16 +9,23 @@
 	export let category: FilterCategory;
 	export let localConfig: FilterConfig;
 	export let isExpanded: boolean;
-	export let onToggleTag: (internalKey: keyof FilterConfig, item: string) => void;
-	export let onSetGroupState: (internalKey: keyof FilterConfig, items: string[], state: boolean) => void;
-	export let onSetCategoryState: (category: FilterCategory, state: boolean) => void;
+	export let onToggleTag: (
+		internalKey: keyof FilterConfig,
+		item: string
+	) => void;
+	export let onSetGroupState: (
+		internalKey: keyof FilterConfig,
+		items: string[],
+		state: boolean
+	) => void;
+	export let onSetCategoryState: (
+		category: FilterCategory,
+		state: boolean
+	) => void;
 
 	$: categoryKey = category.internalKey as keyof FilterConfig;
-	$: categoryConfig = localConfig[categoryKey] as Record<string, boolean> || {};
-
-	function getIsActive(item: string) {
-		return !!categoryConfig[item];
-	}
+	$: categoryConfig =
+		(localConfig[categoryKey] as Record<string, boolean>) || {};
 </script>
 
 <Collapse title={category.name} bind:isExpanded>
@@ -44,7 +51,7 @@
 			{#each category.items as item (item)}
 				<FilterItem
 					label={item}
-					isActive={getIsActive(item)}
+					isActive={!!categoryConfig[item]}
 					onClick={() => onToggleTag(categoryKey, item)}
 				/>
 			{/each}

@@ -7,7 +7,9 @@
 		Playlist
 	} from '@shared/types';
 
-	export let wallpapers: Record<string, WallpaperData> = {};
+	import VirtualList from '@/components/shared/ui/VirtualList.svelte';
+
+	export let wallpapers: [string, WallpaperData][] = [];
 	export let selectedWallpaper: Wallpaper | null = null;
 	export let activePlaylist: Playlist | undefined = undefined;
 	export let onSelect: (
@@ -15,33 +17,39 @@
 		wallpaper: WallpaperData
 	) => void;
 	export let isWorkshop: boolean = false;
+	export let container: HTMLElement | null = null;
 </script>
 
 <div
-	class="wallpaper-list"
+	class="wallpaper-list-wrapper"
 	in:fly={{ x: 20, delay: 200, duration: 200 }}
 	out:fly={{ x: 20, duration: 200 }}
 >
-	{#each Object.entries(wallpapers) as [folderName, wallpaper]}
-		<WallpaperCard
-			{folderName}
-			{wallpaper}
-			{selectedWallpaper}
-			{activePlaylist}
-			{onSelect}
-			{isWorkshop}
-			viewMode="list"
-		/>
-	{/each}
+	<VirtualList
+		items={wallpapers}
+		itemHeight={124}
+		gap={10}
+		{container}
+	>
+		{#snippet children({ visibleItems }: { visibleItems: [string, WallpaperData][] })}
+			{#each visibleItems as [folderName, wallpaper] (folderName)}
+				<WallpaperCard
+					{folderName}
+					{wallpaper}
+					{selectedWallpaper}
+					{activePlaylist}
+					{onSelect}
+					{isWorkshop}
+					viewMode="list"
+				/>
+			{/each}
+		{/snippet}
+	</VirtualList>
 </div>
 
 <style lang="scss">
-	.wallpaper-list {
-		display: flex;
-		flex-direction: column;
-		gap: 10px;
-		padding: 20px;
-		box-sizing: border-box;
+	.wallpaper-list-wrapper {
 		width: 100%;
+		flex: 1;
 	}
 </style>

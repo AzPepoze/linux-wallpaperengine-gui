@@ -50,20 +50,18 @@
 	let installedFilters: FilterConfig | null = null;
 	let weConfigError = false;
 	let playlists: Playlist[] = [];
+	let containerElement: HTMLElement | null = null;
 
-	// Combine wallpapers with subscriptions/downloads
 	$: combinedWallpapers = (() => {
 		const combined: Record<string, WallpaperData> = { ...wallpapers };
 		const subscribedList = Array.from($subscribedIds);
 
-		// Add subscribed items missing from disk
 		subscribedList.forEach((fileId) => {
 			if (!combined[fileId] && $downloadingMetadata[fileId]) {
 				combined[fileId] = $downloadingMetadata[fileId];
 			}
 		});
 
-		// 2. Filter workshop items - show all when Steam is disconnected
 		const result: Record<string, WallpaperData> = {};
 		Object.entries(combined).forEach(([id, data]) => {
 			const isWorkshop =
@@ -72,12 +70,10 @@
 				/^\d+$/.test(id);
 
 			if (isWorkshop) {
-				// Show all when Steam offline, otherwise only subscribed
 				if (!steamRunning || $subscribedIds.has(id)) {
 					result[id] = data;
 				}
 			} else {
-				// Local wallpapers always shown
 				result[id] = data;
 			}
 		});
@@ -122,7 +118,6 @@
 		try {
 			const result = await window.electronAPI.getInstalledFilters();
 			if (result.success) {
-				// Merge with default config to ensure all fixed filters are present
 				installedFilters = {
 					...DEFAULT_INSTALLED_FILTER_CONFIG,
 					...result.filters
@@ -153,8 +148,6 @@
 
 	function handleFilterChange(newConfig: FilterConfig) {
 		installedFilters = newConfig;
-		// Local filtering is lucky enough to be reactive, so just updating the state is enough
-		// We should also save it so it persists
 		window.electronAPI.saveInstalledFilters(newConfig).catch((err) => {
 			console.error('Failed to auto-save home filters:', err);
 		});
@@ -247,6 +240,7 @@
 		<div
 			class="wallpaper-container"
 			class:scroll-mask={$settingsStore?.enableScrollMask}
+			bind:this={containerElement}
 		>
 			{#if !workshopPathValid}
 				<div class="warning-center-wrapper">
@@ -281,17 +275,19 @@
 					</div>
 				{:else if viewMode === 'grid'}
 					<WallpaperItemGrid
-						wallpapers={filteredWallpapers}
+						wallpapers={Object.entries(filteredWallpapers)}
 						{selectedWallpaper}
 						{activePlaylist}
 						onSelect={selectWallpaper}
+						container={containerElement}
 					/>
 				{:else}
 					<WallpaperItemList
-						wallpapers={filteredWallpapers}
+						wallpapers={Object.entries(filteredWallpapers)}
 						{selectedWallpaper}
 						{activePlaylist}
 						onSelect={selectWallpaper}
+						container={containerElement}
 					/>
 				{/if}
 			{/if}

@@ -15,13 +15,16 @@
 	import { filterPanelWidth } from '@/scripts/shared/ui';
 
 	export let config: FilterConfig;
-	export let onSave: ((config: FilterConfig) => void) | undefined = undefined;
-	export let onChange: ((config: FilterConfig) => void) | undefined = undefined;
+	export let onSave: ((config: FilterConfig) => void) | undefined =
+		undefined;
+	export let onChange: ((config: FilterConfig) => void) | undefined =
+		undefined;
 	export let onClose: () => void = () => {};
 
 	let localConfig: FilterConfig = JSON.parse(JSON.stringify(config));
 	let expandedCategories: Record<string, boolean> = {};
-	let filterCategories: FilterCategory[] = buildFilterCategories(localConfig);
+	let filterCategories: FilterCategory[] =
+		buildFilterCategories(localConfig);
 	let isResizing = false;
 
 	onMount(() => {
@@ -37,16 +40,25 @@
 		const tags = localConfig[internalKey] as Record<string, boolean>;
 		tags[item] = !tags[item];
 		localConfig = { ...localConfig };
-		logger.log(`Filter toggled: [${internalKey}] ${item} -> ${tags[item]}`);
+		logger.log(
+			`Filter toggled: [${internalKey}] ${item} -> ${tags[item]}`
+		);
 		if (onChange) onChange(localConfig);
 	}
 
-	function handleSetGroupState(internalKey: keyof FilterConfig, items: string[], state: boolean) {
+	function handleSetGroupState(
+		internalKey: keyof FilterConfig,
+		items: string[],
+		state: boolean
+	) {
 		if (!localConfig[internalKey]) {
-			(localConfig[internalKey] as any) = {};
+			(localConfig as any)[internalKey] = {};
 		}
-		const tags = localConfig[internalKey] as Record<string, boolean>;
+		const tags = {
+			...(localConfig[internalKey] as Record<string, boolean>)
+		};
 		items.forEach((item) => (tags[item] = state));
+		(localConfig as any)[internalKey] = tags;
 		localConfig = { ...localConfig };
 		if (onChange) onChange(localConfig);
 	}
@@ -54,9 +66,11 @@
 	function handleSetCategoryState(category: FilterCategory, state: boolean) {
 		const internalKey = category.internalKey as keyof FilterConfig;
 		if (!localConfig[internalKey]) {
-			(localConfig[internalKey] as any) = {};
+			(localConfig as any)[internalKey] = {};
 		}
-		const tags = localConfig[internalKey] as Record<string, boolean>;
+		const tags = {
+			...(localConfig[internalKey] as Record<string, boolean>)
+		};
 
 		if (category.items) {
 			category.items.forEach((item) => (tags[item] = state));
@@ -68,6 +82,7 @@
 			});
 		}
 
+		(localConfig as any)[internalKey] = tags;
 		localConfig = { ...localConfig };
 		if (onChange) onChange(localConfig);
 	}
@@ -77,7 +92,9 @@
 	}
 
 	function handleReset() {
-		localConfig = JSON.parse(JSON.stringify(DEFAULT_WORKSHOP_FILTER_CONFIG));
+		localConfig = JSON.parse(
+			JSON.stringify(DEFAULT_WORKSHOP_FILTER_CONFIG)
+		);
 		filterCategories = buildFilterCategories(localConfig);
 		if (onChange) onChange(localConfig);
 	}
@@ -166,7 +183,12 @@
 		margin-right: 15px;
 		margin-top: 15px;
 		margin-bottom: 15px;
-		transition: transform var(--transition-base), opacity var(--transition-base), width var(--transition-base);
+		transition:
+			transform var(--transition-base),
+			opacity var(--transition-base),
+			width var(--transition-base);
+		min-width: 270px;
+		max-width: 500px;
 
 		&.resizing {
 			transition: none;
