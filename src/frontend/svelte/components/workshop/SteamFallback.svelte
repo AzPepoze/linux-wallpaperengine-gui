@@ -14,8 +14,8 @@
 		</div>
 		<h2>Steam is not running</h2>
 		<p>
-			The Workshop browser requires Steam to be running
-			in the background to fetch wallpapers.
+			The Workshop browser requires Steam to be running in the
+			background to fetch wallpapers.
 		</p>
 		{#if searchError}
 			<div class="error-notice">
@@ -26,10 +26,7 @@
 			<Button variant="primary" on:click={onLaunchSteam}>
 				Launch Steam
 			</Button>
-			<Button
-				variant="secondary"
-				on:click={onRetry}
-			>
+			<Button variant="secondary" on:click={onRetry}>
 				Retry Connection
 			</Button>
 		</div>
@@ -45,6 +42,8 @@
 		padding: 40px;
 		text-align: center;
 		background: var(--bg-surface);
+		border-radius: 20px;
+		margin-top: 10px;
 
 		.fallback-content {
 			max-width: 400px;

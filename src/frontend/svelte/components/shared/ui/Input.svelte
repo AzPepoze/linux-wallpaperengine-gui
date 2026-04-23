@@ -30,12 +30,13 @@
 
 	input {
 		width: 100%;
-		padding: 10px 14px;
+		padding: 12px 16px;
 		border: 1px solid var(--border-color);
-		border-radius: var(--radius-md);
+		border-radius: var(--radius-lg);
 		background-color: var(--bg-surface);
 		color: var(--text-color);
-		font-size: 0.9em;
+		font-size: 0.95em;
+		font-weight: 500;
 		box-sizing: border-box;
 		transition: var(--transition-base);
 
@@ -48,11 +49,18 @@
 			outline: none;
 			border-color: var(--btn-primary-bg);
 			background-color: var(--bg-surface-active);
-			box-shadow: 0 0 0 3px rgba(var(--primary-raw-rgb), 0.15);
+			box-shadow: 0 0 0 4px var(--focus-ring-light);
+			transform: translateY(-1px);
 		}
 
 		&::placeholder {
 			color: var(--text-muted);
+			opacity: 0.6;
+		}
+
+		&[type='number'] {
+			font-family: monospace;
+			letter-spacing: 0.05em;
 		}
 	}
 </style>

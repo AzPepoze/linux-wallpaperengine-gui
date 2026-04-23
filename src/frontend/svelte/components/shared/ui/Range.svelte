@@ -18,40 +18,46 @@
 		flex: 1;
 		display: flex;
 		align-items: center;
-		gap: 12px;
+		gap: 16px;
 		width: 100%;
-		min-width: 140px;
+		min-width: 160px;
 	}
 
 	.range-input {
 		display: flex;
 		align-items: center;
-		width: 100px;
+		width: 80px;
 		background: var(--bg-surface);
-		border-radius: var(--radius-sm);
+		border-radius: var(--radius-md);
 		border: 1px solid var(--border-color);
 		overflow: hidden;
+		transition: var(--transition-base);
+
+		&:focus-within {
+			border-color: var(--btn-primary-bg);
+			box-shadow: 0 0 0 2px var(--focus-ring-light);
+		}
 
 		input {
 			width: 100%;
 			border: none;
 			background: transparent;
-			padding: 8px 10px;
+			padding: 6px 8px;
 			color: var(--text-color);
 			font-size: 0.9em;
-			font-weight: 500;
+			font-weight: 600;
 			text-align: center;
 			outline: none;
 
 			&::-webkit-inner-spin-button,
 			&::-webkit-outer-spin-button {
-				opacity: 1;
+				opacity: 0.5;
 			}
 		}
 	}
 
 	input[type='range'] {
-		width: 100%;
+		flex: 1;
 		height: 6px;
 		background: var(--bg-surface-active);
 		border-radius: var(--radius-full);
@@ -59,36 +65,48 @@
 		outline: none;
 		cursor: pointer;
 		transition: var(--transition-base);
+		position: relative;
 
-		&:hover {
-			background: var(--border-color-hover);
-
-			&::-webkit-slider-thumb {
-				transform: scale(1.1);
-			}
+		&::-webkit-slider-runnable-track {
+			width: 100%;
+			height: 6px;
+			cursor: pointer;
+			background: var(--bg-surface-active);
+			border-radius: var(--radius-full);
+			border: 1px solid var(--border-color);
 		}
 
 		&::-webkit-slider-thumb {
 			appearance: none;
-			width: 18px;
-			height: 18px;
-			background: var(--btn-primary-bg);
+			width: 20px;
+			height: 20px;
+			background: white;
+			border: 2px solid var(--btn-primary-bg);
 			border-radius: 50%;
 			cursor: pointer;
-			transition: var(--transition-base);
-			box-shadow: var(--shadow-sm);
-			border: 2px solid var(--text-on-primary);
+			margin-top: -8px; /* Centers thumb on track */
+			transition: all 0.2s ease;
+			box-shadow: 0 2px 5px rgba(0, 0, 0, 0.3);
+
+			&:hover {
+				transform: scale(1.2);
+				box-shadow: 0 0 10px var(--shadow-primary);
+			}
+		}
+
+		&:active::-webkit-slider-thumb {
+			transform: scale(0.95);
 		}
 
 		&::-moz-range-thumb {
 			width: 18px;
 			height: 18px;
-			background: var(--btn-primary-bg);
+			background: white;
+			border: 2px solid var(--btn-primary-bg);
 			border-radius: 50%;
 			cursor: pointer;
-			transition: var(--transition-base);
-			box-shadow: var(--shadow-sm);
-			border: 2px solid var(--text-on-primary);
+			transition: all 0.2s ease;
+			box-shadow: 0 2px 5px rgba(0, 0, 0, 0.3);
 		}
 	}
 </style>

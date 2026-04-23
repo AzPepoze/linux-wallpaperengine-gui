@@ -38,7 +38,7 @@
 	});
 </script>
 
-<div class="select-container" {id} bind:this={container}>
+<div class="select-container" {id} bind:this={container} class:is-open={isOpen}>
 	<button
 		class="select-trigger"
 		class:active={isOpen}
@@ -104,6 +104,10 @@
 		width: 100%;
 		position: relative;
 		user-select: none;
+
+		&.is-open {
+			z-index: 100;
+		}
 	}
 
 	.select-trigger {
@@ -111,12 +115,13 @@
 		display: flex;
 		align-items: center;
 		justify-content: space-between;
-		padding: 10px 14px;
+		padding: 12px 16px;
 		border: 1px solid var(--border-color);
-		border-radius: var(--radius-md);
+		border-radius: var(--radius-lg);
 		background-color: var(--bg-surface);
 		color: var(--text-color);
-		font-size: 0.9em;
+		font-size: 0.95em;
+		font-weight: 500;
 		cursor: pointer;
 		transition: var(--transition-base);
 		text-align: left;
@@ -124,12 +129,13 @@
 		&:hover {
 			background-color: var(--bg-surface-hover);
 			border-color: var(--border-color-hover);
+			transform: translateY(-1px);
 		}
 
 		&.active {
 			border-color: var(--btn-primary-bg);
 			background-color: var(--bg-surface-active);
-			box-shadow: 0 0 0 3px var(--focus-ring-light);
+			box-shadow: 0 0 0 4px var(--focus-ring-light);
 		}
 
 		.label {
@@ -141,7 +147,7 @@
 	}
 
 	.chevron {
-		margin-left: 10px;
+		margin-left: 12px;
 		color: var(--text-muted);
 		display: flex;
 		align-items: center;
@@ -160,17 +166,16 @@
 	.options-dropdown {
 		position: absolute;
 		top: calc(100% + 8px);
-		left: 50%;
-		transform: translateX(-50%);
-		min-width: 100%;
-		width: max-content;
+		left: 0;
+		width: 100%;
 		box-sizing: border-box;
-		background: var(--bg-dropdown);
-		border: 1px solid var(--border-color);
-		border-radius: var(--radius-lg);
-		padding: 6px;
+		background: var(--bg-app);
+		border: 1px solid var(--border-color-hover);
+		border-radius: var(--radius-xl);
+		padding: 8px;
 		z-index: 1000;
 		box-shadow: var(--shadow-lg);
+		backdrop-filter: none;
 	}
 
 	.option-item {
@@ -178,13 +183,14 @@
 		display: flex;
 		align-items: center;
 		justify-content: space-between;
-		padding: 10px 12px;
+		padding: 12px 14px;
 		border: none;
 		background: transparent;
 		color: var(--text-color);
-		opacity: 0.7;
+		opacity: 0.9;
 		font-size: 0.9em;
-		border-radius: var(--radius-sm);
+		font-weight: 500;
+		border-radius: var(--radius-md);
 		cursor: pointer;
 		transition: var(--transition-base);
 		text-align: left;
@@ -195,13 +201,15 @@
 		&:hover {
 			background: var(--bg-surface-hover);
 			opacity: 1;
+			transform: translateX(4px);
 		}
 
 		&.selected {
-			background: var(--bg-primary-translucent);
+			background: var(--bg-surface-active);
 			color: var(--btn-primary-bg);
 			opacity: 1;
-			font-weight: 600;
+			font-weight: 700;
+			box-shadow: inset 0 0 0 1px var(--bg-primary-translucent);
 		}
 
 		.check {

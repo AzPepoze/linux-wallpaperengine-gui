@@ -20,11 +20,31 @@
 	let unsubscribe: () => void;
 
 	const sections = [
-		{ id: 'general', label: 'General', icon: 'monitor', component: General },
+		{
+			id: 'general',
+			label: 'General',
+			icon: 'monitor',
+			component: General
+		},
 		{ id: 'audio', label: 'Audio', icon: 'volume_up', component: Audio },
-		{ id: 'interaction', label: 'Interaction', icon: 'mouse', component: Interaction },
-		{ id: 'advanced', label: 'Advanced', icon: 'settings', component: Advanced },
-		{ id: 'executable', label: 'Executable', icon: 'folder', component: Executable }
+		{
+			id: 'interaction',
+			label: 'Interaction',
+			icon: 'mouse',
+			component: Interaction
+		},
+		{
+			id: 'advanced',
+			label: 'Advanced',
+			icon: 'settings',
+			component: Advanced
+		},
+		{
+			id: 'executable',
+			label: 'Executable',
+			icon: 'folder',
+			component: Executable
+		}
 	];
 
 	let activeSection = 'general';
@@ -125,6 +145,7 @@
 			</div>
 		{:else}
 			<div class="loading-container">
+				<div class="spinner"></div>
 				<p>Loading settings...</p>
 			</div>
 		{/if}
@@ -136,40 +157,34 @@
 		display: flex;
 		height: 100%;
 		width: 100%;
-		border-radius: var(--radius-xl);
 		overflow: hidden;
-		border: 1px solid var(--border-color);
-		box-shadow: var(--shadow-lg);
-		background: var(--bg-modal);
+		position: relative;
 	}
 
 	.settings-sidebar {
-		width: 280px;
-		background: var(--bg-modal);
-		border-right: 1px solid var(--border-color);
+		width: 260px;
 		display: flex;
 		flex-direction: column;
-		padding: 32px 16px;
+		padding: 40px 12px;
+		z-index: 10;
 
 		.sidebar-header {
-			padding: 0 16px 32px;
+			padding: 0 20px 40px;
 			h2 {
 				margin: 0;
-				font-size: 1.5em;
-				font-weight: 800;
-				background: linear-gradient(
-					135deg,
-					var(--text-color) 0%,
-					var(--text-muted) 100%
-				);
+				font-size: 1.8em;
+				font-weight: 900;
+				letter-spacing: -0.03em;
+				background: var(--text-color);
 				background-clip: text;
 				-webkit-background-clip: text;
 				-webkit-text-fill-color: transparent;
 			}
 			p {
-				margin: 4px 0 0;
-				font-size: 0.85em;
+				margin: 6px 0 0;
+				font-size: 0.9em;
 				color: var(--text-muted);
+				font-weight: 500;
 			}
 		}
 
@@ -177,31 +192,38 @@
 			flex: 1;
 			display: flex;
 			flex-direction: column;
-			gap: 4px;
+			gap: 8px;
 
 			.nav-item {
 				display: flex;
 				align-items: center;
-				gap: 12px;
-				padding: 12px 16px;
+				gap: 14px;
+				padding: 12px 20px;
 				background: transparent;
 				border: none;
 				color: var(--text-muted);
-				border-radius: var(--radius-md);
+				border-radius: var(--radius-lg);
 				cursor: pointer;
 				transition: var(--transition-base);
 				text-align: left;
-				font-weight: 500;
+				font-weight: 600;
+				position: relative;
+				overflow: hidden;
 
 				&:hover {
 					background: var(--bg-surface-hover);
 					color: var(--text-color);
+					padding-left: 24px;
 				}
 
 				&.active {
-					background: var(--btn-primary-bg);
-					color: var(--text-color);
-					box-shadow: 0 4px 12px var(--shadow-primary);
+					background: var(--bg-surface-active);
+					color: var(--btn-primary-bg);
+					box-shadow: inset 0 0 0 1px var(--border-color-hover);
+				}
+
+				span {
+					font-size: 0.95em;
 				}
 			}
 		}
@@ -210,27 +232,32 @@
 			display: flex;
 			flex-direction: column;
 			gap: 12px;
-			padding-top: 24px;
+			padding: 24px 8px 0;
 			border-top: 1px solid var(--border-color);
 		}
 	}
 
 	.action-btn {
 		width: 100%;
-		padding: 12px;
-		border-radius: var(--radius-md);
-		border: none;
-		font-weight: 600;
+		padding: 14px;
+		border-radius: var(--radius-lg);
+		border: 1px solid var(--border-color);
+		font-weight: 700;
 		font-size: 0.9em;
 		cursor: pointer;
 		transition: var(--transition-base);
+		display: flex;
+		align-items: center;
+		justify-content: center;
+		gap: 10px;
 
 		&.secondary {
 			background: var(--bg-surface);
 			color: var(--text-color);
-			border: 1px solid var(--border-color);
 			&:hover {
 				background: var(--bg-surface-hover);
+				border-color: var(--text-muted);
+				transform: translateY(-1px);
 			}
 		}
 	}
@@ -240,28 +267,50 @@
 		overflow-y: auto;
 		scroll-behavior: smooth;
 		position: relative;
+		background: radial-gradient(
+			circle at top right,
+			rgba(var(--primary-raw-rgb), 0.05),
+			transparent 40%
+		);
 
 		.content-wrapper {
-			max-width: 1000px;
+			max-width: 850px;
 			margin: 0 auto;
-			padding: 60px 40px 120px;
+			padding: 80px 60px 120px;
 			display: flex;
 			flex-direction: column;
-			gap: 48px;
+			gap: 64px;
 		}
 	}
 
 	.loading-container {
 		display: flex;
+		flex-direction: column;
 		align-items: center;
 		justify-content: center;
 		height: 100%;
 		color: var(--text-muted);
-		font-weight: 500;
+		gap: 20px;
+
+		.spinner {
+			width: 40px;
+			height: 40px;
+			border: 3px solid var(--bg-surface);
+			border-top-color: var(--btn-primary-bg);
+			border-radius: 50%;
+			animation: spin 1s linear infinite;
+		}
 	}
 
 	.divider {
 		height: 1px;
-		background: linear-gradient(90deg, transparent, var(--border-color), transparent);
+		background: linear-gradient(
+			90deg,
+			transparent,
+			var(--border-color) 20%,
+			var(--border-color) 80%,
+			transparent
+		);
+		opacity: 0.5;
 	}
 </style>

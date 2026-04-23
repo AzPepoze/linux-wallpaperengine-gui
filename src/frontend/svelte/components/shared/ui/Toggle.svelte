@@ -20,8 +20,8 @@
 	.toggle-switch {
 		position: relative;
 		display: inline-block;
-		width: 44px;
-		height: 24px;
+		width: 48px;
+		height: 26px;
 		flex-shrink: 0;
 
 		input {
@@ -43,35 +43,39 @@
 		transition: var(--transition-slow);
 		border-radius: var(--radius-full);
 		border: 1px solid var(--border-color);
+		box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.2);
 
 		&:before {
 			position: absolute;
 			content: '';
-			height: 18px;
-			width: 18px;
+			height: 20px;
+			width: 20px;
 			left: 2px;
 			bottom: 2px;
-			background-color: var(--text-color);
-			transition: var(--transition-slow);
+			background-color: #fff;
+			transition: all 0.3s cubic-bezier(0.68, -0.55, 0.265, 1.55);
 			border-radius: 50%;
-			box-shadow: var(--shadow-sm);
+			box-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
 		}
 	}
 
 	input:checked + .slider {
-		background-color: var(--btn-primary-bg);
-		border-color: var(--border-color);
+		background: linear-gradient(135deg, var(--btn-primary-bg) 0%, var(--btn-primary-hover-bg) 100%);
+		border-color: transparent;
+		box-shadow: 0 0 10px var(--shadow-primary);
 
 		&:before {
-			transform: translateX(20px);
+			transform: translateX(22px);
+			background-color: white;
 		}
 	}
 
 	input:focus + .slider {
-		box-shadow: 0 0 0 2px var(--focus-ring);
+		box-shadow: 0 0 0 3px var(--focus-ring);
 	}
 
 	.toggle-switch:hover .slider {
-		filter: brightness(1.2);
+		filter: brightness(1.1);
+		border-color: var(--border-color-hover);
 	}
 </style>
