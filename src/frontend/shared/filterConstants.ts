@@ -1,4 +1,5 @@
 import type { FilterConfig } from './types';
+export type { FilterConfig };
 
 export interface FilterGroup { name: string; items: string[]; }
 export interface FilterCategory {

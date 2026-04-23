@@ -46,13 +46,52 @@ func init() {
 		DynamicSidebarTheme: true,
 		TransparentUi:       true,
 		UiTransparency:      90,
+		EnableScrollMask:    true,
 		SteamPaths: []string{
 			".local/share/Steam",
 			".var/app/com.valvesoftware.Steam/.local/share/Steam",
 			".steam/steam",
 			".steam/root",
 		},
+		InstalledFilters: &FilterConfig{
+			CategoryTags:   make(map[string]bool),
+			RatingTags:     map[string]bool{"Everyone": true},
+			ResolutionTags: make(map[string]bool),
+			SourceTags:     make(map[string]bool),
+			Tags:           make(map[string]bool),
+			TypeTags:       make(map[string]bool),
+			UtilityTags:    make(map[string]bool),
+			Sort:           "priority",
+			Descending:     true,
+		},
+		WorkshopFilters: &FilterConfig{
+			CategoryTags:   make(map[string]bool),
+			RatingTags:     map[string]bool{"Everyone": true, "Questionable": false, "Mature": false},
+			ResolutionTags: make(map[string]bool),
+			SourceTags:     make(map[string]bool),
+			Tags:           make(map[string]bool),
+			TypeTags:       make(map[string]bool),
+			UtilityTags:    make(map[string]bool),
+			Sort:           "priority",
+			Descending:     true,
+		},
 	}
+}
+
+func showRecreatePrompt() bool {
+	// Try zenity first (common on GNOME/GTK environments)
+	cmd := exec.Command("zenity", "--question", "--title=Config Error", "--text=Config file is corrupted. Recreate with defaults?")
+	if err := cmd.Run(); err == nil {
+		return true
+	}
+
+	// Try kdialog (common on KDE)
+	cmd = exec.Command("kdialog", "--title", "Config Error", "--yesno", "Config file is corrupted. Recreate with defaults?")
+	if err := cmd.Run(); err == nil {
+		return true
+	}
+
+	return false
 }
 
 func newFloat(f float64) *float64 {
@@ -149,10 +188,17 @@ func ReadConfig() (AppConfig, error) {
 
 	conf := DefaultConfig
 	if err := json.Unmarshal(data, &conf); err != nil {
+		if strings.Contains(err.Error(), "unexpected end of JSON input") {
+			if showRecreatePrompt() {
+				if werr := WriteConfig(DefaultConfig); werr == nil {
+					return DefaultConfig, nil
+				}
+			}
+		}
 		return DefaultConfig, err
 	}
 
-	// Merge with defaults if necessary (simple version)
+	// Merge with defaults if necessary
 	if conf.FPS == 0 {
 		conf.FPS = 60
 	}
@@ -174,32 +220,6 @@ func WriteConfig(conf AppConfig) error {
 	}
 
 	return os.WriteFile(ConfigPath, data, 0644)
-}
-
-func ToggleAutostart(enabled bool) error {
-	dir := filepath.Dir(AutostartPath)
-	if enabled {
-		if _, err := os.Stat(dir); os.IsNotExist(err) {
-			if err := os.MkdirAll(dir, 0755); err != nil {
-				return err
-			}
-		}
-		data := `[Desktop Entry]
-Name=Linux Wallpaper Engine GUI
-Comment=Manage wallpapers for linux-wallpaperengine
-Exec=linux-wallpaperengine-gui --minimized
-Icon=linux-wallpaperengine-gui
-Terminal=false
-Type=Application
-Categories=Utility;
-`
-		return os.WriteFile(AutostartPath, []byte(data), 0644)
-	} else {
-		if _, err := os.Stat(dir); os.IsNotExist(err) {
-			return err
-		}
-		return os.Remove(AutostartPath)
-	}
 }
 
 func GetConfig() (AppConfig, error) {

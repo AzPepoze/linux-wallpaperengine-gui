@@ -1,38 +1,57 @@
 {
-     "compilerOptions": {
-          "target": "ESNext",
-          "useDefineForClassFields": true,
-          "module": "ESNext",
-          "resolveJsonModule": true,
-          "allowJs": true,
-          "checkJs": true,
-          "isolatedModules": true,
-          "moduleDetection": "force",
-          "noEmit": true,
-
-          /* Bundler mode */
-          "moduleResolution": "bundler",
-          "allowImportingTsExtensions": true,
-          "allowArbitraryExtensions": true,
-
-          /* Svelte & Electron specific */
-          "lib": ["es2023", "dom", "dom.iterable"], // Added dom libs for frontend
-          "types": ["svelte", "node"], // Added svelte and node types
-          "skipLibCheck": true, // From node config
-
-          /* Linting */
-          "strict": true,
-          "noUnusedLocals": true,
-          "noUnusedParameters": true,
-          "noFallthroughCasesInSwitch": true,
-          "noUncheckedSideEffectImports": true
-     },
-     "include": [
-          "src/**/*.ts",
-          "utils/**/*.ts",
-          "src/**/*.svelte",
-          "vite.config.ts",
-          "tsconfig.json"
-     ],
-     "exclude": ["node_modules"]
+    "compilerOptions": 
+    {
+        "target": "ESNext",
+        "useDefineForClassFields": true,
+        "module": "ESNext",
+        "resolveJsonModule": true,
+        "allowJs": true,
+        "checkJs": true,
+        "isolatedModules": true,
+        "moduleDetection": "force",
+        "noEmit": true,
+        "moduleResolution": "bundler",
+        "allowImportingTsExtensions": true,
+        "allowArbitraryExtensions": true,
+        "lib": 
+        [
+            "es2023",
+            "dom",
+            "dom.iterable"
+        ],
+        "types": 
+        [
+            "svelte",
+            "node"
+        ],
+        "skipLibCheck": true,
+        "strict": true,
+        "noUnusedLocals": true,
+        "noUnusedParameters": true,
+        "noFallthroughCasesInSwitch": true,
+        "noUncheckedSideEffectImports": true,
+        "paths": 
+        {
+            "@/*": 
+            [
+                "./src/frontend/svelte/*"
+            ],
+            "@shared/*": 
+            [
+                "./src/frontend/shared/*"
+            ]
+        }
+    },
+    "include": 
+    [
+        "src/**/*.ts",
+        "utils/**/*.ts",
+        "src/**/*.svelte",
+        "vite.config.ts",
+        "tsconfig.json"
+    ],
+    "exclude": 
+    [
+        "node_modules"
+    ]
 }

@@ -13,77 +13,77 @@ export function setMainWindow(win: BrowserWindow | null) {
 	mainWindow = win;
 }
 
-function log(...args: any[]) {
-	const message = cleanLog(...args);
-	console.log(addTimestamp(message));
+function writeToConsole(type: string, message: string) {
+	console.log(addTimestamp(`[${type.toUpperCase()}] ${message}`));
 }
 
-function logToFrontend(
-	{
-		type,
-		showLog,
-		data,
-	}: {
+/**
+ * Dispatches a log message to both the terminal and the UI.
+ * Handles loop prevention for logs originating from external processes (Go backend).
+ */
+function dispatchLog(
+	options: {
 		type: string;
-		showLog: boolean;
-		[key: string]: any;
-	} = {
-			type: "backend",
-			showLog: true,
-			data: [],
-		}
+		showInTerminal: boolean;
+		isExternal?: boolean;
+	},
+	...data: any[]
 ) {
 	const message = cleanLog(...data);
-	if (showLog) log(`[${type.toUpperCase()}] ${message}`);
 
+	// Output to terminal if requested and not already coming from an external source (to avoid loops)
+	if (options.showInTerminal && !options.isExternal) {
+		writeToConsole(options.type, message);
+	}
+
+	// Always send to UI for the Logs Popup if window is available
 	if (mainWindow && !mainWindow.isDestroyed()) {
 		mainWindow.webContents.send(IPC_LOG_CHANNEL, {
-			type,
+			type: options.type,
 			message,
 		});
 	}
 }
 
 export const logger = {
+	/** Logs from the Svelte UI */
 	frontend: (...args: any[]) => {
-		const message = cleanLog(...args);
-		log("[Frontend]", message);
+		dispatchLog({ type: "frontend", showInTerminal: true }, ...args);
 	},
 
+	/** Logs from the Electron main process about backend orchestration */
 	backend: (...args: any[]) => {
-		logToFrontend({ type: "electron", showLog: true, data: args });
+		dispatchLog({ type: "electron", showInTerminal: true }, ...args);
 	},
 
+	/** Logs about wallpaper management */
 	wallpaper: (...args: any[]) => {
-		logToFrontend({ type: "wallpaper", showLog: false, data: args });
+		dispatchLog({ type: "wallpaper", showInTerminal: false }, ...args);
 	},
 
 	warn: (...args: any[]) => {
-		logToFrontend({
-			type: "electron",
-			showLog: true,
-			data: ["Warning:", ...args],
-		});
+		dispatchLog({ type: "electron", showInTerminal: true }, "Warning:", ...args);
 	},
 
 	error: (...args: any[]) => {
-		logToFrontend({
-			type: "error",
-			showLog: true,
-			data: ["Error:", ...args],
-		});
+		dispatchLog({ type: "error", showInTerminal: true }, "Error:", ...args);
 	},
 
-	toFrontend: (type: string, ...args: any[]) => {
-		logToFrontend({ type, showLog: type !== "wallpaper", data: args });
+	/** Entry point for logs received from the Go backend socket */
+	socketLog: (type: string, message: string) => {
+		dispatchLog(
+			{
+				type: type || "backend",
+				showInTerminal: true,
+				isExternal: true
+			},
+			message
+		);
 	},
 
+	/** Logs about IPC communication */
 	ipcReceived: (channel: string, ...args: any[]) => {
 		if (HIDDEN_IPC.has(channel)) return;
-		logToFrontend({
-			type: "electron",
-			showLog: true,
-			data: [`Received: ${channel}`, ...args],
-		});
+		dispatchLog({ type: "electron", showInTerminal: true }, `Received: ${channel}`, ...args);
 	},
 };

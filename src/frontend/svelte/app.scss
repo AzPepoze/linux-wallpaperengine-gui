@@ -1,3 +1,5 @@
+@import 'material-icons/iconfont/material-icons.css';
+
 :root {
      /* -------------------------------------------------------------------------- */
      /*                                   Fonts                                    */
@@ -40,7 +42,7 @@
      --error-border: #bd2130;
      --download-progress: #ffd700;
      --error-bg-translucent: rgba(220, 53, 69, 0.1);
-     --error-color: #ffffff;
+     --error-color: #ff3131;
      --warn-bg: #ffc107;
      --warn-border: #d39e00;
      --warn-color: #000000;
@@ -197,4 +199,13 @@ button {
 hr {
      border: none;
      border-top: 1px solid var(--border-color);
+}
+
+@keyframes spin {
+     from { transform: rotate(0deg); }
+     to { transform: rotate(360deg); }
+}
+
+.spin {
+     animation: spin 1s linear infinite;
 }

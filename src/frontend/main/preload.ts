@@ -45,9 +45,7 @@ contextBridge.exposeInMainWorld("electronAPI", {
 	writeConfig: createInvokeMethod("write-config"),
 	toggleAutostart: createInvokeMethod("toggle-autostart"),
 	openConfigInEditor: createInvokeMethod("open-config-editor"),
-	getWallpaperExecutableLocation: createInvokeMethod(
-		"get-wallpaper-executable",
-	),
+	getWallpaperExecutableLocation: createInvokeMethod("get-wallpaper-executable"),
 	getWallpaperBasePath: createInvokeMethod("get-wallpaper-base-path"),
 	getAssetsBasePath: createInvokeMethod("get-assets-base-path"),
 	validateExecutable: createInvokeMethod("validate-executable"),
@@ -80,12 +78,8 @@ contextBridge.exposeInMainWorld("electronAPI", {
 	fetchImage: createInvokeMethod("fetch-image"),
 	subscribeWorkshopItem: createInvokeMethod("subscribe-workshop-item"),
 	unsubscribeWorkshopItem: createInvokeMethod("unsubscribe-workshop-item"),
-	getWorkshopItemDownloadInfo: createInvokeMethod(
-		"get-workshop-item-download-info",
-	),
-	getWorkshopItemInstallInfo: createInvokeMethod(
-		"get-workshop-item-install-info",
-	),
+	getWorkshopItemDownloadInfo: createInvokeMethod("get-workshop-item-download-info"),
+	getWorkshopItemInstallInfo: createInvokeMethod("get-workshop-item-install-info"),
 	isSteamRunning: createInvokeMethod("is-steam-running"),
 	getAllDownloadingItems: createInvokeMethod("get-all-downloading-items"),
 	getSubscribedItems: createInvokeMethod("get-subscribed-items"),

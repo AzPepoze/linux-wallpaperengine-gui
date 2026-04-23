@@ -3,80 +3,53 @@ package handlers
 import (
 	"encoding/json"
 	"fmt"
+
 	"linux-wallpaperengine-gui/src/backend/internal/api/models"
+	"linux-wallpaperengine-gui/src/backend/internal/core/playlist"
+	"linux-wallpaperengine-gui/src/backend/internal/core/wallpaper"
 )
 
-type handlerFn func(req models.Request, encoder *json.Encoder, cleanup func()) models.Response
-
-var dispatchTable = map[string]handlerFn{
-	"ping":       wrapSystem,
-	"quit":       wrapSystem,
-	"open-ui":    wrapSystem,
-	"restart-ui": wrapSystem,
-
-	"get-config":         wrapConfig,
-	"write-config":       wrapConfig,
-	"open-config-editor": wrapConfig,
-
-	"toggle-autostart": wrapConfig,
-
-	"get-screens": wrapDisplay,
-
-	"apply-wallpapers":           wrapWallpaper,
-	"load-wallpapers":            wrapWallpaper,
-	"get-wallpaper-project-data": wrapWallpaper,
-	"get-wallpaper-base-path":    wrapWallpaper,
-	"get-assets-base-path":       wrapWallpaper,
-	"kill-all-wallpapers":        wrapWallpaper,
-	"kill-wallpaper":             wrapWallpaper,
-
-	"get-playlists":              wrapPlaylist,
-	"create-playlist":            wrapPlaylist,
-	"rename-playlist":            wrapPlaylist,
-	"delete-playlist":            wrapPlaylist,
-	"update-playlist-wallpapers": wrapPlaylist,
-	"start-playlist":             wrapPlaylist,
-	"stop-playlist":              wrapPlaylist,
-	"update-playlist-interval":   wrapPlaylist,
-	"get-playlist-status":        wrapPlaylist,
-
-	"get-installed-filters":  wrapFilter,
-	"save-installed-filters": wrapFilter,
-	"get-workshop-filters":   wrapFilter,
-	"save-workshop-filters":  wrapFilter,
+type Handler struct {
+	wallpaperService *wallpaper.Service
+	playlistService  *playlist.Service
+	cleanupFunc      func()
 }
 
-func HandleIPC(req models.Request, encoder *json.Encoder, cleanup func()) models.Response {
-	handler, exists := dispatchTable[req.Method]
-	if !exists {
+func NewHandler(wallpaperService *wallpaper.Service, playlistService *playlist.Service, cleanupFunc func()) *Handler {
+	return &Handler{
+		wallpaperService: wallpaperService,
+		playlistService:  playlistService,
+		cleanupFunc:      cleanupFunc,
+	}
+}
+
+func (handler *Handler) HandleIPC(request models.Request, encoder *json.Encoder) models.Response {
+	switch request.Method {
+	case "ping", "quit", "open-ui", "restart-ui":
+		return handler.HandleSystem(request, encoder)
+
+	case "get-config", "write-config", "open-config-editor", "toggle-autostart":
+		return handler.HandleConfig(request)
+
+	case "get-screens":
+		return handler.HandleDisplay(request)
+
+	case "apply-wallpapers", "load-wallpapers", "get-wallpaper-project-data",
+		"get-wallpaper-base-path", "get-assets-base-path", "kill-all-wallpapers", "kill-wallpaper":
+		return handler.HandleWallpaper(request)
+
+	case "get-playlists", "create-playlist", "rename-playlist", "delete-playlist",
+		"update-playlist-wallpapers", "start-playlist", "stop-playlist",
+		"update-playlist-interval", "get-playlist-status":
+		return handler.HandlePlaylist(request)
+
+	case "get-installed-filters", "save-installed-filters", "get-workshop-filters", "save-workshop-filters":
+		return handler.HandleFilter(request)
+
+	default:
 		return models.Response{
-			ID:    req.ID,
-			Error: fmt.Sprintf("unknown method: %s", req.Method),
+			ID:    request.ID,
+			Error: fmt.Sprintf("unknown method: %s", request.Method),
 		}
 	}
-	return handler(req, encoder, cleanup)
-}
-
-func wrapSystem(req models.Request, encoder *json.Encoder, cleanup func()) models.Response {
-	return HandleSystem(req, encoder, cleanup)
-}
-
-func wrapConfig(req models.Request, _ *json.Encoder, _ func()) models.Response {
-	return HandleConfig(req)
-}
-
-func wrapDisplay(req models.Request, _ *json.Encoder, _ func()) models.Response {
-	return HandleDisplay(req)
-}
-
-func wrapWallpaper(req models.Request, _ *json.Encoder, _ func()) models.Response {
-	return HandleWallpaper(req)
-}
-
-func wrapPlaylist(req models.Request, _ *json.Encoder, _ func()) models.Response {
-	return HandlePlaylist(req)
-}
-
-func wrapFilter(req models.Request, _ *json.Encoder, _ func()) models.Response {
-	return HandleFilter(req)
 }

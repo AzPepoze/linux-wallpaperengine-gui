@@ -1,5 +1,5 @@
-import type { WorkshopItem } from "../workshopHelper";
-import type { WallpaperData } from "../../../shared/types";
+import type { WorkshopItem } from "@/utils/workshopHelper";
+import type { WallpaperData } from "@shared/types";
 
 /**
  * Converts a WorkshopItem to WallpaperData format
@@ -33,15 +33,13 @@ export function convertWorkshopItemToWallpaperData(
 }
 
 /**
- * Converts an array of WorkshopItems to a WallpaperData record
+ * Converts an array of WorkshopItems to an array of [id, WallpaperData] pairs to preserve order
  */
-export function convertWorkshopItemsToWallpaperRecord(
+export function convertWorkshopItemsToWallpaperPairs(
 	items: WorkshopItem[],
-): Record<string, WallpaperData> {
-	const record: Record<string, WallpaperData> = {};
-	items.forEach((item) => {
-		record[item.publishedFileId] =
-			convertWorkshopItemToWallpaperData(item);
-	});
-	return record;
+): [string, WallpaperData][] {
+	return items.map((item) => [
+		item.publishedFileId,
+		convertWorkshopItemToWallpaperData(item),
+	]);
 }

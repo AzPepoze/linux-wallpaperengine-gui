@@ -41,7 +41,6 @@
   - [\[Options\]](#options)
 - [BUILD FROM SOURCE](#build-from-source)
 - [DEVELOPMENT](#development)
-- [CONTRIBUTING](#contributing)
 - [STONKS!](#stonks)
 
 > [!NOTE]
@@ -174,13 +173,6 @@ Run with hot-reloading:
 ```bash
 bun run dev
 ```
-
-## CONTRIBUTING
-
-Feel free to contribute to this project by opening issues or submitting pull requests.
-
-> [!IMPORTANT]
-> Please make sure to select the `dev` branch when submitting pull requests.
 
 ## STONKS!
 

@@ -2,38 +2,39 @@ package handlers
 
 import (
 	"encoding/json"
-	"linux-wallpaperengine-gui/src/backend/internal/api/models"
-	"linux-wallpaperengine-gui/src/backend/internal/electron"
-	"linux-wallpaperengine-gui/src/backend/internal/logger"
 	"os"
 	"time"
+
+	"linux-wallpaperengine-gui/src/backend/internal/api/models"
+	"linux-wallpaperengine-gui/src/backend/internal/logger"
+	"linux-wallpaperengine-gui/src/backend/internal/ui/electron"
 )
 
-func HandleSystem(req models.Request, encoder *json.Encoder, cleanup func()) models.Response {
-	var res models.Response
-	res.ID = req.ID
+func (handler *Handler) HandleSystem(request models.Request, encoder *json.Encoder) models.Response {
+	var response models.Response
+	response.ID = request.ID
 
-	switch req.Method {
+	switch request.Method {
 	case "ping":
-		res.Result = "pong"
+		response.Result = "pong"
 	case "quit":
-		res.Result = "ok"
-		if err := encoder.Encode(res); err != nil {
+		response.Result = "ok"
+		if err := encoder.Encode(response); err != nil {
 			logger.Println("Encode error during quit:", err)
 		}
 		time.Sleep(100 * time.Millisecond)
-		cleanup()
+		handler.cleanupFunc()
 		os.Exit(0)
 	case "open-ui":
 		if !electron.IsRunning() {
 			go electron.Start()
-			res.Result = map[string]string{"status": "starting"}
+			response.Result = map[string]string{"status": "starting"}
 		} else {
-			res.Result = map[string]string{"status": "already_running"}
+			response.Result = map[string]string{"status": "already_running"}
 		}
 	case "restart-ui":
-		res.Result = "ok"
-		if err := encoder.Encode(res); err != nil {
+		response.Result = "ok"
+		if err := encoder.Encode(response); err != nil {
 			logger.Println("Encode error during restart-ui:", err)
 		}
 		go func() {
@@ -45,5 +46,5 @@ func HandleSystem(req models.Request, encoder *json.Encoder, cleanup func()) mod
 		}()
 	}
 
-	return res
+	return response
 }
