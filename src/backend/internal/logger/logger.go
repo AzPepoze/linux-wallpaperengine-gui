@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"log"
 	"regexp"
+	"strings"
 	"sync"
 
 	"linux-wallpaperengine-gui/src/backend/internal/platform/notification"
@@ -29,8 +30,11 @@ type LogEntry struct {
 }
 
 var (
-	listeners []chan LogEntry
-	mu        sync.Mutex
+	listeners           []chan LogEntry
+	mu                  sync.Mutex
+	ignoredElectronLogs = []string{
+		"[S_API] SteamAPI_Init()",
+	}
 )
 
 func stripANSI(text string) string {
@@ -79,6 +83,11 @@ func WallpaperLog(screen, msg string) {
 func ElectronLog(msg string) {
 	// Strip redundant frontend timestamps and prefixes
 	msg = frontendLogRegex.ReplaceAllString(msg, "")
+	for _, term := range ignoredElectronLogs {
+		if strings.Contains(msg, term) {
+			return
+		}
+	}
 	log.Printf("%s[ELECTRON]%s %s", colorBlue, colorReset, msg)
 	broadcast("electron", msg)
 }

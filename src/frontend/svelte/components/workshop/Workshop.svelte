@@ -1,13 +1,8 @@
 <script lang="ts">
 	import { onMount } from 'svelte';
-	import { showToast } from '@/scripts/settings/settings';
+	import { showToast } from '@/scripts/shared/toastStore';
 	import BrowseTab from './BrowseTab.svelte';
-	import {
-		formatWorkshopItem,
-		isValidWorkshopItem,
-		type PublishedFileDetails,
-		type WorkshopItem
-	} from '@/utils/workshopHelper';
+	import type { WorkshopItem } from '@/utils/workshopHelper';
 	import type { FilterConfig } from '@shared/types';
 	import {
 		buildFilterCategories,
@@ -17,7 +12,13 @@
 	import FilterPanel from '@/components/shared/wallpaper/FilterPanel.svelte';
 	import WorkshopControls from './WorkshopControls.svelte';
 	import SteamFallback from './SteamFallback.svelte';
-	import { getSearchParameters } from '@/scripts/workshop/workshopSearch';
+	import {
+		checkSteamStatus,
+		launchSteam,
+		loadFilters,
+		saveFilters,
+		performWorkshopQuery
+	} from './Workshop.svelte.ts';
 
 	let workshopFilters: FilterConfig = { ...DEFAULT_WORKSHOP_FILTER_CONFIG };
 	let filterCategories: FilterCategory[] = buildFilterCategories();
@@ -40,70 +41,51 @@
 	let searchRequestId = 0;
 
 	onMount(async () => {
-		await checkSteamStatus();
-		await loadFilters();
+		await updateSteamStatus();
+		await handleLoadFilters();
 		if (steamRunning && !initialLoadDone) {
 			initialLoadDone = true;
 			handleSearch();
 		}
 	});
 
-	async function checkSteamStatus() {
-		try {
-			steamRunning = await window.electronAPI.isSteamRunning();
-		} catch (err) {
-			console.error('Failed to check Steam status:', err);
-			steamRunning = false;
+	async function updateSteamStatus() {
+		steamRunning = await checkSteamStatus();
+	}
+
+	function handleLaunchSteam() {
+		launchSteam();
+		setTimeout(updateSteamStatus, 5000);
+	}
+
+	async function handleLoadFilters() {
+		const loaded = await loadFilters();
+		if (loaded) {
+			workshopFilters = loaded.filters;
+			filterCategories = loaded.categories;
 		}
 	}
 
-	function launchSteam() {
-		window.electronAPI.openExternal('steam://open/main');
-		setTimeout(checkSteamStatus, 5000);
-	}
-
-	async function loadFilters() {
-		try {
-			const result = await window.electronAPI.getWorkshopFilters();
-			if (result.success) {
-				workshopFilters = {
-					...DEFAULT_WORKSHOP_FILTER_CONFIG,
-					...result.filters
-				};
-				filterCategories = buildFilterCategories(workshopFilters);
-			}
-		} catch (err) {
-			console.error('Failed to load filters:', err);
-		}
-	}
-
-	async function saveFilters(newConfig: FilterConfig) {
-		try {
-			const result =
-				await window.electronAPI.saveWorkshopFilters(newConfig);
-			if (result.success) {
-				workshopFilters = newConfig;
-				showFilterPanel = false;
-				handleSearch();
-			}
-		} catch (err) {
-			console.error('Failed to save filters:', err);
+	async function handleSaveFilters(newConfig: FilterConfig) {
+		const success = await saveFilters(newConfig);
+		if (success) {
+			workshopFilters = newConfig;
+			showFilterPanel = false;
+			handleSearch();
 		}
 	}
 
 	async function handleFilterChange(newConfig: FilterConfig) {
 		workshopFilters = newConfig;
-		try {
-			await window.electronAPI.saveWorkshopFilters(newConfig);
+		const success = await saveFilters(newConfig);
+		if (success) {
 			handleSearch();
-		} catch (err) {
-			console.error('Failed to save filters on change:', err);
 		}
 	}
 
 	async function handleSearch() {
 		if (!steamRunning) {
-			await checkSteamStatus();
+			await updateSteamStatus();
 			if (!steamRunning) return;
 		}
 
@@ -113,43 +95,25 @@
 		browseItems = [];
 		searchError = null;
 		const requestId = ++searchRequestId;
-		try {
-			const { required, excluded } = getSearchParameters(
-				workshopFilters,
-				filterCategories
-			);
 
-			const result = await window.electronAPI.queryWorkshopFiles({
-				search_text: searchText,
-				requiredtags: required.length > 0 ? required : undefined,
-				excludedtags: excluded.length > 0 ? excluded : undefined,
+		try {
+			const result = await performWorkshopQuery({
+				searchText,
+				filters: workshopFilters,
+				categories: filterCategories,
 				page: browsePage,
-				query_type: parseInt(sortOrder),
-				item_type: parseInt(itemType),
-				numperpage: infiniteScroll ? 50 : parseInt(pageSize)
+				sortOrder,
+				itemType,
+				pageSize,
+				infiniteScroll
 			});
 
 			if (requestId !== searchRequestId) return;
 
-			if (result?.error) {
-				throw new Error(result.error);
-			}
-
-			const validItems = (result?.items || [])
-				.filter(isValidWorkshopItem)
-				.map((details: PublishedFileDetails) =>
-					formatWorkshopItem(details)
-				);
-
-			if (infiniteScroll && browsePage > 1) {
-				browseItems = [...browseItems, ...validItems];
-			} else {
-				browseItems = validItems;
-			}
-			totalItems = result?.total || 0;
+			browseItems = result.items;
+			totalItems = result.total;
 		} catch (error) {
-			const errorMsg =
-				error instanceof Error ? error.message : 'Unknown error';
+			const errorMsg = error instanceof Error ? error.message : 'Unknown error';
 			searchError = errorMsg;
 			showToast(`Error searching: ${errorMsg}`, 'error');
 
@@ -173,47 +137,33 @@
 		}
 		searchError = null;
 		const requestId = ++searchRequestId;
-		try {
-			const { required, excluded } = getSearchParameters(
-				workshopFilters,
-				filterCategories
-			);
 
-			const result = await window.electronAPI.queryWorkshopFiles({
-				search_text: searchText,
-				requiredtags: required.length > 0 ? required : undefined,
-				excludedtags: excluded.length > 0 ? excluded : undefined,
+		try {
+			const result = await performWorkshopQuery({
+				searchText,
+				filters: workshopFilters,
+				categories: filterCategories,
 				page: browsePage,
-				query_type: parseInt(sortOrder),
-				item_type: parseInt(itemType),
-				numperpage: parseInt(pageSize)
+				sortOrder,
+				itemType,
+				pageSize,
+				infiniteScroll
 			});
 
 			if (requestId !== searchRequestId) return;
 
-			if (result?.error) {
-				throw new Error(result.error);
-			}
-
-			const validItems = (result?.items || [])
-				.filter(isValidWorkshopItem)
-				.map((details: PublishedFileDetails) =>
-					formatWorkshopItem(details)
-				);
-
 			if (infiniteScroll && browsePage > 1) {
-				browseItems = [...browseItems, ...validItems];
+				browseItems = [...browseItems, ...result.items];
 			} else {
-				browseItems = validItems;
+				browseItems = result.items;
 			}
-			totalItems = result?.total || 0;
+			totalItems = result.total;
 
 			if (browseItems.length === 0) {
 				showToast('No items found', 'info');
 			}
 		} catch (error) {
-			const errorMsg =
-				error instanceof Error ? error.message : 'Unknown error';
+			const errorMsg = error instanceof Error ? error.message : 'Unknown error';
 			searchError = errorMsg;
 			showToast(`Error browsing workshop: ${errorMsg}`, 'error');
 
@@ -248,14 +198,14 @@
 		{#if !steamRunning}
 			<SteamFallback
 				{searchError}
-				onLaunchSteam={launchSteam}
-				onRetry={checkSteamStatus}
+				onLaunchSteam={handleLaunchSteam}
+				onRetry={updateSteamStatus}
 			/>
 		{:else}
 			{#if showFilterPanel && workshopFilters}
 				<FilterPanel
 					config={workshopFilters}
-					onSave={saveFilters}
+					onSave={handleSaveFilters}
 					onChange={handleFilterChange}
 					onClose={() => (showFilterPanel = false)}
 				/>

@@ -1,10 +1,9 @@
 <script lang="ts">
 	import type { WallpaperData, Wallpaper, Playlist } from '@shared/types';
 	import {
-		downloadProgress,
-		downloadStatus,
-		subscribedIds,
-		isWallpaperFolderExist
+		isWallpaperFolderExist,
+		getDownloadState,
+		downloadStatus
 	} from '@/scripts/workshop/workshop';
 	import { onMount } from 'svelte';
 	import WallpaperCardGrid from './WallpaperCardGrid.svelte';
@@ -27,17 +26,9 @@
 		activePlaylist?.items.some((item) => item.includes(folderName)) ||
 		false;
 	$: isWorkshopItem = !!wallpaper.projectData?.isWorkshop;
-	$: isSubscribed = $subscribedIds.has(folderName);
-	$: isDownloaded = $downloadStatus[folderName];
-	$: progress = $downloadProgress[folderName];
-	$: isDownloading = !!progress || (isSubscribed && !isDownloaded);
-	$: percent =
-		progress && progress.total > 0
-			? Math.round(
-					(Number(progress.current) / Number(progress.total)) *
-						100
-				)
-			: 0;
+
+	const downloadState = getDownloadState(folderName);
+	$: ({ isSubscribed, isDownloaded, isDownloading, percent } = $downloadState);
 
 	onMount(() => {
 		if (
@@ -83,7 +74,3 @@
 		{handleSelect}
 	/>
 {/if}
-
-<style lang="scss">
-	// Common transitions or base styles if needed
-</style>

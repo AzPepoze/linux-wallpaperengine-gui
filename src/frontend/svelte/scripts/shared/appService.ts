@@ -63,7 +63,7 @@ export function setupGlobalListeners() {
 			type: 'success' | 'error' | 'warn' | 'info';
 			duration?: number;
 		}) => {
-			import('@/scripts/settings/settings').then(({ showToast }) => {
+			import('@/scripts/shared/toastStore').then(({ showToast }) => {
 				showToast(data.message, data.type, data.duration);
 			});
 		}

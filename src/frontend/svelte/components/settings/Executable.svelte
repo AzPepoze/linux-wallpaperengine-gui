@@ -180,7 +180,6 @@
 		}
 
 		&.valid {
-			border-left: 4px solid var(--success-bg);
 			background: linear-gradient(
 				90deg,
 				rgba(40, 167, 69, 0.05) 0%,

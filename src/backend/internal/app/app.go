@@ -164,6 +164,13 @@ func (application *App) setupTray() {
 				electron.Stop()
 			}
 		},
+		func() { // Restart wallpaper callback
+			logger.Println("Restarting wallpapers from tray...")
+			application.wallpaperService.KillAllWallpapers()
+			if err := application.wallpaperService.ApplyWallpapers(); err != nil {
+				logger.Printf("Failed to apply wallpapers on restart: %v", err)
+			}
+		},
 		func() { // Quit callback
 			application.Cleanup()
 			os.Exit(0)

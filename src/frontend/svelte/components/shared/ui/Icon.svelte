@@ -4,20 +4,31 @@
 	export let color: string | undefined = undefined;
 	export let className: string = '';
 
-	$: style = [
+	$: styleProps = [
 		`font-size: ${typeof size === 'number' ? size + 'px' : size}`,
 		color ? `color: ${color}` : '',
 		'display: inline-flex',
 		'align-items: center',
 		'justify-content: center'
 	].filter(Boolean).join('; ');
+
+	$: restClass = $$restProps.class || '';
+	$: restStyle = $$restProps.style || '';
+
+	$: combinedClass = ['material-icons', className, restClass].filter(Boolean).join(' ');
+	$: combinedStyle = [styleProps, restStyle].filter(Boolean).join('; ');
+
+	$: restPropsWithoutClassStyle = (() => {
+		const { class: _, style: __, ...rest } = $$restProps;
+		return rest;
+	})();
 </script>
 
 <span 
-	class="material-icons {className}" 
-	style={style}
+	class={combinedClass} 
+	style={combinedStyle}
 	aria-hidden="true"
-	{...$$restProps}
+	{...restPropsWithoutClassStyle}
 >
 	{name}
 </span>
