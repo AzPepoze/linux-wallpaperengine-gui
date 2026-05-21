@@ -354,7 +354,6 @@
 		height: 100%;
 		width: 100%;
 		overflow: hidden;
-		background-color: color-mix(in srgb, var(--bg-app), black 30%);
 	}
 
 	.divider-handle {
