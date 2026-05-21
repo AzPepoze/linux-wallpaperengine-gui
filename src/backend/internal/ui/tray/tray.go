@@ -9,14 +9,16 @@ import (
 )
 
 var (
-	onShow  func()
-	onClose func()
-	onQuit  func()
+	onShow             func()
+	onClose            func()
+	onRestartWallpaper func()
+	onQuit             func()
 )
 
-func RegisterCallbacks(show func(), close func(), quit func()) {
+func RegisterCallbacks(show func(), close func(), restart func(), quit func()) {
 	onShow = show
 	onClose = close
+	onRestartWallpaper = restart
 	onQuit = quit
 }
 
@@ -32,7 +34,7 @@ func onReady() {
 
 	// Potential icon paths in order of priority
 	iconPaths := []string{
-		filepath.Join(cwd, "src", "public", "icon.png"), // pnpm dev (root)
+		filepath.Join(cwd, "src", "public", "icon.png"), // dev
 		filepath.Join(appDir, "icon.png"),               // next to binary
 		"/usr/share/icons/hicolor/48x48/apps/linux-wallpaperengine-gui.png",
 	}
@@ -60,6 +62,7 @@ func onReady() {
 
 	mShow := systray.AddMenuItem("Show", "Open the GUI")
 	mClose := systray.AddMenuItem("Hide", "Hide the GUI to system tray")
+	mRestart := systray.AddMenuItem("Restart Wallpaper", "Restart the current wallpapers")
 	systray.AddSeparator()
 	mQuit := systray.AddMenuItem("Quit", "Exit completely")
 
@@ -73,6 +76,10 @@ func onReady() {
 			case <-mClose.ClickedCh:
 				if onClose != nil {
 					onClose()
+				}
+			case <-mRestart.ClickedCh:
+				if onRestartWallpaper != nil {
+					onRestartWallpaper()
 				}
 			case <-mQuit.ClickedCh:
 				if onQuit != nil {

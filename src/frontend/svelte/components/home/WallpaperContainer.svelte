@@ -22,8 +22,15 @@
 		Playlist,
 		FilterConfig
 	} from '@shared/types';
-	import { DEFAULT_INSTALLED_FILTER_CONFIG } from '@shared/filterConstants';
 	import { filterWallpapers } from '@/utils/wallpaperFilter';
+	import {
+		checkSteamStatus,
+		loadInstalledFilters,
+		saveInstalledFilters,
+		fetchPlaylists,
+		fetchWallpapers,
+		getCombinedWallpapers
+	} from './WallpaperContainer.svelte.ts';
 
 	let steamRunning = false;
 
@@ -52,34 +59,12 @@
 	let playlists: Playlist[] = [];
 	let containerElement: HTMLElement | null = null;
 
-	$: combinedWallpapers = (() => {
-		const combined: Record<string, WallpaperData> = { ...wallpapers };
-		const subscribedList = Array.from($subscribedIds);
-
-		subscribedList.forEach((fileId) => {
-			if (!combined[fileId] && $downloadingMetadata[fileId]) {
-				combined[fileId] = $downloadingMetadata[fileId];
-			}
-		});
-
-		const result: Record<string, WallpaperData> = {};
-		Object.entries(combined).forEach(([id, data]) => {
-			const isWorkshop =
-				!!data.projectData?.workshopid ||
-				!!data.projectData?.isWorkshop ||
-				/^\d+$/.test(id);
-
-			if (isWorkshop) {
-				if (!steamRunning || $subscribedIds.has(id)) {
-					result[id] = data;
-				}
-			} else {
-				result[id] = data;
-			}
-		});
-
-		return result;
-	})();
+	$: combinedWallpapers = getCombinedWallpapers(
+		wallpapers,
+		$subscribedIds,
+		$downloadingMetadata,
+		steamRunning
+	);
 
 	// Reactive filtering of wallpapers
 	$: filteredWallpapers = filterWallpapers(
@@ -92,7 +77,7 @@
 		(p) => p.name === $settingsStore?.playlist
 	);
 
-	onMount(async () => {
+	onMount(() => {
 		window.electronAPI.on('wallpaper-folder-changed', (data) => {
 			logger.log(
 				`[DEBUG] Received wallpaper-folder-changed event: ${JSON.stringify(data)}`
@@ -101,75 +86,45 @@
 		});
 
 		// Check Steam status
-		async function checkSteamStatus() {
-			steamRunning = await window.electronAPI.isSteamRunning();
+		async function updateSteamStatus() {
+			steamRunning = await checkSteamStatus();
 		}
-		checkSteamStatus();
-		setInterval(checkSteamStatus, 5000);
+		updateSteamStatus();
+		const steamInterval = setInterval(updateSteamStatus, 5000);
 
-		await Promise.all([
+		Promise.all([
 			loadPlaylists(),
 			loadFilters(),
 			refreshWallpapers()
 		]);
+
+		return () => {
+			clearInterval(steamInterval);
+		};
 	});
 
 	async function loadFilters() {
-		try {
-			const result = await window.electronAPI.getInstalledFilters();
-			if (result.success) {
-				installedFilters = {
-					...DEFAULT_INSTALLED_FILTER_CONFIG,
-					...result.filters
-				};
-			} else {
-				installedFilters = { ...DEFAULT_INSTALLED_FILTER_CONFIG };
-			}
-		} catch (err) {
-			console.error('Failed to load filters:', err);
-			installedFilters = { ...DEFAULT_INSTALLED_FILTER_CONFIG };
-		}
+		installedFilters = await loadInstalledFilters();
 	}
 
 	async function saveFilters(newConfig: FilterConfig) {
-		try {
-			const result =
-				await window.electronAPI.saveInstalledFilters(newConfig);
-			if (result.success) {
-				installedFilters = newConfig;
-				showFilterPanel = false;
-				logger.log('Home filters applied and saved');
-			}
-		} catch (err) {
-			console.error('Failed to save filters:', err);
-			logger.error('Failed to save home filters:', err);
+		const success = await saveInstalledFilters(newConfig);
+		if (success) {
+			installedFilters = newConfig;
+			showFilterPanel = false;
+			logger.log('Home filters applied and saved');
 		}
 	}
 
 	function handleFilterChange(newConfig: FilterConfig) {
 		installedFilters = newConfig;
-		window.electronAPI.saveInstalledFilters(newConfig).catch((err) => {
-			console.error('Failed to auto-save home filters:', err);
-		});
+		saveInstalledFilters(newConfig);
 	}
 
 	async function loadPlaylists() {
-		try {
-			const result = await window.electronAPI.getPlaylists();
-			if (result.success && result.playlists) {
-				playlists = result.playlists;
-				weConfigError = false;
-			} else if (
-				result.error &&
-				result.error.includes(
-					'Wallpaper Engine configuration not found'
-				)
-			) {
-				weConfigError = true;
-			}
-		} catch (err) {
-			console.error('Failed to load playlists:', err);
-		}
+		const result = await fetchPlaylists();
+		playlists = result.playlists;
+		weConfigError = result.weConfigError;
 	}
 
 	function selectWallpaper(folderName: string, wallpaper: WallpaperData) {
@@ -185,19 +140,11 @@
 	}
 
 	async function refreshWallpapers() {
-		const {
-			wallpapers: loadedWallpapers,
-			workshopPathValid: loadedWorkshopPathValid,
-			wallpaperEnginePathValid: loadedwallpaperEnginePathValid
-		} = await window.electronAPI.loadWallpapers();
-
-		logger.log(
-			`[DEBUG] refreshWallpapers loaded ${Object.keys(loadedWallpapers).length} wallpapers`
-		);
-		wallpapers = loadedWallpapers;
-		workshopPathValid = loadedWorkshopPathValid;
-		wallpaperEnginePathValid = loadedwallpaperEnginePathValid;
-		onWallpapersRefresh(loadedWallpapers);
+		const result = await fetchWallpapers();
+		wallpapers = result.wallpapers;
+		workshopPathValid = result.workshopPathValid;
+		wallpaperEnginePathValid = result.wallpaperEnginePathValid;
+		onWallpapersRefresh(result.wallpapers);
 	}
 
 	async function handleToggleCloneMode() {

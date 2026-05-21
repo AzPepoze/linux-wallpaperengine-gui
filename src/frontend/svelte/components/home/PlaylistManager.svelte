@@ -1,11 +1,24 @@
 <script lang="ts">
 	import { onMount } from 'svelte';
 	import { fly } from 'svelte/transition';
-	import { settingsStore, showToast } from '@/scripts/settings/settings';
-	import { WALLPAPER_ENGINE_APP_ID } from '@shared/constants';
+	import { settingsStore } from '@/scripts/settings/settings';
+	import { showToast } from '@/scripts/shared/toastStore';
 	import type { Playlist, WallpaperData } from '@shared/types';
 	import PlaylistSettingsPanel from './PlaylistSettingsPanel.svelte';
 	import PlaylistWallpapersPanel from './PlaylistWallpapersPanel.svelte';
+	import {
+		getPlaylistOptions,
+		fetchPlaylists,
+		startPlaylist,
+		stopPlaylist,
+		createPlaylist,
+		renamePlaylist,
+		deletePlaylist,
+		updatePlaylistInterval,
+		removePlaylistItem,
+		parseWallpaperIdFromPath,
+		toggleWallpaperInPlaylist
+	} from './PlaylistManager.svelte.ts';
 
 	export let wallpapers: Record<string, WallpaperData> = {};
 	export let onSelect: (
@@ -36,28 +49,8 @@
 	});
 
 	async function loadPlaylists() {
-		try {
-			const result = await window.electronAPI.getPlaylists();
-			if (result.success && result.playlists) {
-				playlists = result.playlists;
-				updateOptions();
-			}
-		} catch (err) {
-			console.error('Failed to load playlists:', err);
-		} finally {
-			updateOptions();
-		}
-	}
-
-	function updateOptions() {
-		playlistOptions = [
-			{ value: '', label: 'None' },
-			{ value: 'Random All', label: 'Random All (Dynamic)' },
-			...playlists.map((p) => ({
-				value: p.name,
-				label: `${p.name} (${p.items.length} items)`
-			}))
-		];
+		playlists = await fetchPlaylists();
+		playlistOptions = getPlaylistOptions(playlists);
 	}
 
 	function initActivePlaylist() {
@@ -90,41 +83,31 @@
 
 			await window.electronAPI.saveConfig($settingsStore);
 
-			const screenName = cloneMode ? 'Global' : selectedScreen || '';
 			if (activePlaylist && activePlaylist.items.length > 0) {
-				await window.electronAPI.startPlaylist(
-					activePlaylist.name,
-					tempInterval,
-					screenName
-				);
+				await startPlaylist(activePlaylist.name, tempInterval, cloneMode, selectedScreen);
 				showToast(
 					`Started playlist on ${cloneMode ? 'all displays' : selectedScreen || 'display'}: ${activePlaylist.name}`,
 					'success'
 				);
 			} else if ($settingsStore.playlist === 'Random All') {
-				await window.electronAPI.startPlaylist(
-					'Random All',
-					tempInterval,
-					screenName
-				);
+				await startPlaylist('Random All', tempInterval, cloneMode, selectedScreen);
 				showToast(
 					`Started dynamic random rotation on ${cloneMode ? 'all displays' : selectedScreen || 'display'}`,
 					'success'
 				);
 			} else {
-				await window.electronAPI.stopPlaylist(screenName);
+				await stopPlaylist(cloneMode, selectedScreen);
 			}
 		}
 	}
 
 	async function createNewPlaylist() {
 		if (!newPlaylistName.trim()) return;
-		try {
-			await window.electronAPI.createPlaylist(newPlaylistName.trim());
+		const success = await createPlaylist(newPlaylistName.trim());
+		if (success) {
 			await loadPlaylists();
 			if ($settingsStore) {
 				$settingsStore.playlist = newPlaylistName.trim();
-				// Find and set the active playlist before calling handlePlaylistChange
 				activePlaylist =
 					playlists.find(
 						(p) => p.name === newPlaylistName.trim()
@@ -134,18 +117,13 @@
 			isCreating = false;
 			newPlaylistName = '';
 			showToast('Playlist created', 'success');
-		} catch (e) {
-			showToast('Failed to create playlist', 'error');
 		}
 	}
 
-	async function renamePlaylist() {
+	async function handleRenamePlaylist() {
 		if (!newPlaylistName.trim() || !activePlaylist) return;
-		try {
-			await window.electronAPI.renamePlaylist(
-				activePlaylist.name,
-				newPlaylistName.trim()
-			);
+		const success = await renamePlaylist(activePlaylist.name, newPlaylistName.trim());
+		if (success) {
 			if ($settingsStore) {
 				$settingsStore.playlist = newPlaylistName.trim();
 				await window.electronAPI.saveConfig($settingsStore);
@@ -155,15 +133,13 @@
 			isRenaming = false;
 			newPlaylistName = '';
 			showToast('Playlist renamed', 'success');
-		} catch (e) {
-			showToast('Failed to rename playlist', 'error');
 		}
 	}
 
-	async function deletePlaylist() {
+	async function handleDeletePlaylist() {
 		if (!activePlaylist) return;
-		try {
-			await window.electronAPI.deletePlaylist(activePlaylist.name);
+		const success = await deletePlaylist(activePlaylist.name);
+		if (success) {
 			if ($settingsStore) {
 				$settingsStore.playlist = '';
 				await handlePlaylistChange();
@@ -171,8 +147,6 @@
 			await loadPlaylists();
 			activePlaylist = null;
 			showToast('Playlist deleted', 'success');
-		} catch (e) {
-			showToast('Failed to delete playlist', 'error');
 		}
 	}
 
@@ -185,59 +159,36 @@
 				$settingsStore
 			) {
 				$settingsStore.playlistInterval = tempInterval;
-				await window.electronAPI.saveConfig($settingsStore);
-				const screenName = cloneMode
-					? 'Global'
-					: selectedScreen || '';
-
-				try {
-					await window.electronAPI.updatePlaylistInterval(
-						activePlaylist?.name || 'Random All',
-						tempInterval,
-						screenName
-					);
-				} catch (err) {
-					console.warn(
-						'Could not update playlist interval:',
-						err
-					);
-				}
+				await updatePlaylistInterval(
+					activePlaylist?.name || 'Random All',
+					tempInterval,
+					cloneMode,
+					selectedScreen
+				);
 			}
 		}, 500);
 	}
 
 	async function removeItem(index: number) {
 		if (!activePlaylist) return;
-		const newItems = [...activePlaylist.items];
-		newItems.splice(index, 1);
-		try {
-			await window.electronAPI.updatePlaylistWallpapers(
-				activePlaylist.name,
-				newItems
-			);
+		const newItems = await removePlaylistItem(activePlaylist.name, activePlaylist.items, index);
+		if (newItems) {
 			activePlaylist.items = newItems;
 			playlists = playlists.map((p) =>
 				p.name === activePlaylist?.name
 					? { ...p, items: newItems }
 					: p
 			);
-			updateOptions();
+			playlistOptions = getPlaylistOptions(playlists);
 			onPlaylistChange();
-		} catch (e) {
-			showToast('Failed to remove item', 'error');
+			showToast('Item removed', 'success');
 		}
 	}
 
 	function selectItem(itemPath: string) {
-		const regex = new RegExp(
-			`${WALLPAPER_ENGINE_APP_ID}[\\/\\\\](\\d+)[\\/\\\\]`
-		);
-		const match = itemPath.match(regex);
-		if (match && match[1]) {
-			const id = match[1];
-			if (wallpapers[id]) {
-				onSelect(id, wallpapers[id]);
-			}
+		const id = parseWallpaperIdFromPath(itemPath);
+		if (id && wallpapers[id]) {
+			onSelect(id, wallpapers[id]);
 		}
 	}
 
@@ -269,55 +220,18 @@
 			return;
 		}
 		const wpInfo = wallpapers[folderName];
-		if (!wpInfo || !wpInfo.projectData) return;
+		if (!wpInfo) return;
 
-		try {
-			const basePath = await window.electronAPI.getWallpaperBasePath();
-			if (!basePath) {
-				showToast(
-					'Could not determine wallpaper directory',
-					'error'
-				);
-				return;
-			}
-
-			const normalizedBase = basePath
-				.replace(/[\/]+$/, '')
-				.replace(/\\/g, '/');
-			const rawFile = wpInfo.projectData.file;
-			const wallpaperFile =
-				rawFile === 'scene.json' ? 'scene.pkg' : rawFile;
-			const itemPath = `Z:${normalizedBase}/${folderName}/${wallpaperFile}`;
-
-			let newItems: string[];
-			const alreadyIn = activePlaylist.items.some((p) =>
-				p.includes(`/${folderName}/`)
-			);
-			if (!alreadyIn) {
-				newItems = [...activePlaylist.items, itemPath];
-				showToast(`Added to ${activePlaylist.name}`, 'success');
-			} else {
-				newItems = activePlaylist.items.filter(
-					(path) => !path.includes(`/${folderName}/`)
-				);
-				showToast(`Removed from ${activePlaylist.name}`, 'info');
-			}
-
-			await window.electronAPI.updatePlaylistWallpapers(
-				activePlaylist.name,
-				newItems
-			);
+		const newItems = await toggleWallpaperInPlaylist(activePlaylist, folderName, wpInfo);
+		if (newItems) {
 			activePlaylist.items = newItems;
 			playlists = playlists.map((p) =>
 				p.name === activePlaylist?.name
 					? { ...p, items: newItems }
 					: p
 			);
-			updateOptions();
+			playlistOptions = getPlaylistOptions(playlists);
 			onPlaylistChange();
-		} catch (err) {
-			console.error('Failed to add wallpaper:', err);
-			showToast('Failed to update playlist', 'error');
 		}
 	}
 </script>
@@ -335,8 +249,8 @@
 		bind:isRenaming
 		bind:newPlaylistName
 		onCreate={createNewPlaylist}
-		onRename={renamePlaylist}
-		onDelete={deletePlaylist}
+		onRename={handleRenamePlaylist}
+		onDelete={handleDeletePlaylist}
 		onCancel={() => {
 			isCreating = false;
 			isRenaming = false;

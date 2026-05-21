@@ -1,4 +1,4 @@
-import { writable, get } from 'svelte/store';
+import { writable, get, derived } from 'svelte/store';
 import { logger } from '@/scripts/shared/logger';
 
 export interface ProgressInfo {
@@ -257,3 +257,33 @@ export function startGlobalDownloadPolling() {
 if (typeof window !== 'undefined' && window.electronAPI) {
 	startGlobalDownloadPolling();
 }
+
+/**
+ * Returns a derived store containing the download state for a specific wallpaper folder.
+ */
+export function getDownloadState(folderName: string) {
+	return derived(
+		[subscribedIds, downloadStatus, downloadProgress],
+		([$subscribedIds, $downloadStatus, $downloadProgress]) => {
+			const isSubscribed = $subscribedIds.has(folderName);
+			const isDownloaded = !!$downloadStatus[folderName];
+			const progress = $downloadProgress[folderName];
+			const isDownloading = !!progress || (isSubscribed && !isDownloaded);
+			const percent =
+				progress && progress.total > 0
+					? Math.round(
+							(Number(progress.current) / Number(progress.total)) *
+								100
+						)
+					: 0;
+
+			return {
+				isSubscribed,
+				isDownloaded,
+				isDownloading,
+				percent
+			};
+		}
+	);
+}
+

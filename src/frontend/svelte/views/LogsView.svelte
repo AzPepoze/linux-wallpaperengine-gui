@@ -1,5 +1,5 @@
 <script lang="ts">
-	import LogsPopup from '@/components/logs/LogsPopup.svelte';
+	import LogViewer from '@/components/logs/LogViewer.svelte';
 	import { scale } from 'svelte/transition';
 
 	const pageTransitionInParams = {
@@ -19,7 +19,7 @@
 	in:scale={pageTransitionInParams}
 	out:scale={pageTransitionOutParams}
 >
-	<LogsPopup />
+	<LogViewer />
 </div>
 
 <style lang="scss">

@@ -17,7 +17,14 @@
 	import { applyDynamicTheme } from '@/scripts/shared/theme';
 	import Topbar from '@/components/shared/layout/Topbar.svelte';
 	import Toast from '@/components/shared/ui/Toast.svelte';
-	import { toastStore } from '@/scripts/settings/settings';
+	import { toastStore } from '@/scripts/shared/toastStore';
+
+	const viewComponents = {
+		wallpapers: WallpaperView,
+		workshop: WorkshopView,
+		logs: LogsView,
+		settings: SettingsView
+	};
 
 	let appReady = false;
 	let lastCheckPaths = '';
@@ -66,15 +73,7 @@
 			class="content"
 			in:fly={{ y: 30, duration: 800, delay: 350, easing: cubicOut }}
 		>
-			{#if $activeView === 'wallpapers'}
-				<WallpaperView />
-			{:else if $activeView === 'workshop'}
-				<WorkshopView />
-			{:else if $activeView === 'logs'}
-				<LogsView />
-			{:else if $activeView === 'settings'}
-				<SettingsView />
-			{/if}
+			<svelte:component this={viewComponents[$activeView]} />
 		</div>
 	</div>
 {/if}
