@@ -42,7 +42,7 @@ export const DEFAULT_INSTALLED_FILTER_CONFIG: FilterConfig = {
 	ratingtags: { "Everyone": true, "Mature": false, "Questionable": false },
 	resolutiontags: { ...commonResolutions },
 	sort: "name",
-	sourcetags: { "Local": true, "Official": true, "Workshop": true },
+	sourcetags: { "Local": true, "Workshop": true },
 	tags: { ...commonTags, "Unspecified": true },
 	type: "",
 	typetags: { "Application": true, "Scene": true, "Video": true, "Web": true },
@@ -55,7 +55,7 @@ export const DEFAULT_WORKSHOP_FILTER_CONFIG: FilterConfig = {
 	ratingtags: { "Everyone": true, "Mature": false, "Questionable": false },
 	resolutiontags: { ...commonResolutions },
 	sort: "trend_year",
-	sourcetags: { "Local": true, "Official": true, "Workshop": true },
+	sourcetags: { "Local": true, "Workshop": true },
 	tags: { ...commonTags, "Unspecified": false },
 	type: "",
 	typetags: { "Application": false, "Scene": true, "Video": true, "Web": true },
@@ -83,7 +83,7 @@ export const FILTER_CATEGORIES: FilterCategory[] = [
 		]
 	},
 	{ name: 'Category', internalKey: 'categorytags', items: ["Preset", "Wallpaper"] },
-	{ name: 'Source', internalKey: 'sourcetags', items: ["Local", "Official", "Workshop"] },
+	{ name: 'Source', internalKey: 'sourcetags', items: ["Local", "Workshop"] },
 	{ name: 'Miscellaneous', internalKey: 'utilitytags', items: [] }
 ];
 

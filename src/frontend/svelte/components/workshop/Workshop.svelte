@@ -21,7 +21,9 @@
 	} from './Workshop.svelte.ts';
 
 	let workshopFilters: FilterConfig = { ...DEFAULT_WORKSHOP_FILTER_CONFIG };
-	let filterCategories: FilterCategory[] = buildFilterCategories();
+	let filterCategories: FilterCategory[] = buildFilterCategories().filter(
+		(cat) => cat.internalKey !== 'sourcetags'
+	);
 	let initialLoadDone = false;
 	let showFilterPanel = false;
 	let searching = false;
