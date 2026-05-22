@@ -55,9 +55,21 @@
 		steamRunning = await checkSteamStatus();
 	}
 
+	async function handleRetryConnection() {
+		await updateSteamStatus();
+		if (steamRunning) {
+			handleSearch();
+		}
+	}
+
 	function handleLaunchSteam() {
 		launchSteam();
-		setTimeout(updateSteamStatus, 5000);
+		setTimeout(async () => {
+			await updateSteamStatus();
+			if (steamRunning) {
+				handleSearch();
+			}
+		}, 5000);
 	}
 
 	async function handleLoadFilters() {
@@ -201,7 +213,7 @@
 			<SteamFallback
 				{searchError}
 				onLaunchSteam={handleLaunchSteam}
-				onRetry={updateSteamStatus}
+				onRetry={handleRetryConnection}
 			/>
 		{:else}
 			{#if showFilterPanel && workshopFilters}
