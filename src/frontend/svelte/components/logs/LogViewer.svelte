@@ -1,5 +1,7 @@
 <script lang="ts">
+	import { onMount } from 'svelte';
 	import Icon from '@/components/shared/ui/Icon.svelte';
+	import ToggleButton from '@/components/shared/ui/ToggleButton.svelte';
 	import {
 		backendLogs,
 		frontendLogs,
@@ -12,6 +14,7 @@
 	let showBackend = $state(true);
 	let showFrontend = $state(true);
 	let showWallpaper = $state(true);
+	let wrapText = $state(true);
 
 	// Config list representing columns to make code DRY and fully reactive via Svelte 5 $derived
 	const columns = $derived([
@@ -88,6 +91,18 @@
 		logger.clearAll();
 	}
 
+	function onWrapToggle(checked: boolean) {
+		wrapText = checked;
+		localStorage.setItem('log_viewer_wrap_text', checked.toString());
+	}
+
+	onMount(() => {
+		const stored = localStorage.getItem('log_viewer_wrap_text');
+		if (stored !== null) {
+			wrapText = stored === 'true';
+		}
+	});
+
 	// Resizing logic
 	function startResize(e: MouseEvent, leftVisibleIdx: number) {
 		e.preventDefault();
@@ -156,6 +171,13 @@
 					</button>
 				{/each}
 			</div>
+			<ToggleButton
+				checked={wrapText}
+				onChange={onWrapToggle}
+				icon="wrap_text"
+				label="Wrap Text"
+				style="padding: 6px 14px; font-size: 0.85em; border-radius: var(--radius-md);"
+			/>
 		</div>
 		<div class="header-actions">
 			<button
@@ -190,6 +212,7 @@
 						logs={col.logs}
 						onClear={col.onClear}
 						width={colWidths[col.id]}
+						{wrapText}
 					/>
 
 					{#if idx < visibleCols.length - 1}
@@ -331,6 +354,8 @@
 					color: var(--text-color);
 				}
 			}
+
+
 		}
 	}
 
