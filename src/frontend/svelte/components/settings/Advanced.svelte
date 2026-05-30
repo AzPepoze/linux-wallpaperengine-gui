@@ -5,9 +5,10 @@
 	import Button from '@/components/shared/ui/Button.svelte';
 	import Icon from '@/components/shared/ui/Icon.svelte';
 	import { settingsStore, saveSettings } from '@/scripts/settings/settings';
+	import { t } from '@/i18n';
 
 	async function handleRestart() {
-		if (confirm('Changing Wayland support requires a restart. Do you want to restart now?')) {
+		if (confirm($t('settings.advanced.restartConfirm'))) {
 			if ($settingsStore) {
 				await saveSettings($settingsStore);
 				window.electronAPI.restartUI();
@@ -18,9 +19,9 @@
 
 {#if $settingsStore}
 	<SettingItem
-		label="Use Native Wayland"
+		label={$t('settings.advanced.useNativeWayland')}
 		id="nativeWayland"
-		description="Run the GUI with native Wayland support (requires restart)."
+		description={$t('settings.advanced.useNativeWaylandDesc')}
 	>
 		<Toggle
 			id="nativeWayland"
@@ -30,7 +31,7 @@
 	</SettingItem>
 
 	<SettingItem
-		label="Enable Custom Arguments"
+		label={$t('settings.advanced.enableCustomArgs')}
 		id="customArgsEnabled"
 	>
 		<Toggle
@@ -41,16 +42,16 @@
 
 	{#if $settingsStore.customArgsEnabled}
 		<SettingItem
-			label="Custom Command Args"
+			label={$t('settings.advanced.customCommandArgs')}
 			id="customArgs"
 			vertical
-			description="Pass raw arguments to the backend."
+			description={$t('settings.advanced.customCommandArgsDesc')}
 		>
 			<Input
 				type="text"
 				id="customArgs"
 				bind:value={$settingsStore.customArgs}
-				placeholder="e.g. --window 0x0x1920x1080"
+				placeholder={$t('settings.advanced.customArgsPlaceholder')}
 			/>
 			<div class="doc-actions">
 				<Button
@@ -61,7 +62,7 @@
 						)}
 				>
 					<Icon name="open_in_new" size={14} />
-					<span>Common Options Documentation</span>
+					<span>{$t('settings.advanced.commonOptionsDoc')}</span>
 				</Button>
 			</div>
 		</SettingItem>

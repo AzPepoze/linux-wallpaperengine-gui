@@ -6,6 +6,7 @@
 	import type { Playlist, WallpaperData } from '@shared/types';
 	import PlaylistSettingsPanel from './PlaylistSettingsPanel.svelte';
 	import PlaylistWallpapersPanel from './PlaylistWallpapersPanel.svelte';
+	import { t } from '@/i18n';
 	import {
 		getPlaylistOptions,
 		fetchPlaylists,
@@ -31,9 +32,9 @@
 	export let cloneMode: boolean = false;
 
 	let playlists: Playlist[] = [];
-	let playlistOptions: { value: string; label: string }[] = [
-		{ value: '', label: 'None' },
-		{ value: 'Random All', label: 'Random All (Dynamic)' }
+	$: playlistOptions = [
+		{ value: '', label: $t('playlist.settings.none') },
+		{ value: 'Random All', label: $t('playlist.settings.randomAll') }
 	];
 	export let activePlaylist: Playlist | null = null;
 
@@ -86,13 +87,13 @@
 			if (activePlaylist && activePlaylist.items.length > 0) {
 				await startPlaylist(activePlaylist.name, tempInterval, cloneMode, selectedScreen);
 				showToast(
-					`Started playlist on ${cloneMode ? 'all displays' : selectedScreen || 'display'}: ${activePlaylist.name}`,
+					$t('playlist.messages.startedPlaylist', { display: cloneMode ? 'all displays' : selectedScreen || 'display', name: activePlaylist.name }),
 					'success'
 				);
 			} else if ($settingsStore.playlist === 'Random All') {
 				await startPlaylist('Random All', tempInterval, cloneMode, selectedScreen);
 				showToast(
-					`Started dynamic random rotation on ${cloneMode ? 'all displays' : selectedScreen || 'display'}`,
+					$t('playlist.messages.startedRandom', { display: cloneMode ? 'all displays' : selectedScreen || 'display' }),
 					'success'
 				);
 			} else {
@@ -116,7 +117,7 @@
 			}
 			isCreating = false;
 			newPlaylistName = '';
-			showToast('Playlist created', 'success');
+			showToast($t('playlist.messages.created'), 'success');
 		}
 	}
 
@@ -132,7 +133,7 @@
 			initActivePlaylist();
 			isRenaming = false;
 			newPlaylistName = '';
-			showToast('Playlist renamed', 'success');
+			showToast($t('playlist.messages.renamed'), 'success');
 		}
 	}
 
@@ -146,7 +147,7 @@
 			}
 			await loadPlaylists();
 			activePlaylist = null;
-			showToast('Playlist deleted', 'success');
+			showToast($t('playlist.messages.deleted'), 'success');
 		}
 	}
 
@@ -181,7 +182,7 @@
 			);
 			playlistOptions = getPlaylistOptions(playlists);
 			onPlaylistChange();
-			showToast('Item removed', 'success');
+			showToast($t('playlist.messages.itemRemoved'), 'success');
 		}
 	}
 
@@ -209,14 +210,11 @@
 
 	export async function addWallpaperToPlaylist(folderName: string) {
 		if ($settingsStore?.playlist === 'Random All') {
-			showToast(
-				'Cannot add to Random All (it includes everything)',
-				'info'
-			);
+			showToast($t('playlist.messages.cannotAddToRandom'), 'info');
 			return;
 		}
 		if (!activePlaylist) {
-			showToast('Select a playlist to add wallpapers', 'info');
+			showToast($t('playlist.messages.selectPlaylistFirst'), 'info');
 			return;
 		}
 		const wpInfo = wallpapers[folderName];

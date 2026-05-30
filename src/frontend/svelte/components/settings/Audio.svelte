@@ -3,13 +3,14 @@
 	import Toggle from '@/components/shared/ui/Toggle.svelte';
 	import Range from '@/components/shared/ui/Range.svelte';
 	import { settingsStore } from '@/scripts/settings/settings';
+	import { t } from '@/i18n';
 </script>
 
 {#if $settingsStore}
 	<SettingItem
-		label="Silence Wallpaper"
+		label={$t('settings.audio.silenceWallpaper')}
 		id="silence"
-		description="Mute all audio output."
+		description={$t('settings.audio.silenceWallpaperDesc')}
 	>
 		<Toggle
 			id="silence"
@@ -19,9 +20,9 @@
 
 	{#if !$settingsStore.silence}
 		<SettingItem
-			label="Volume"
+			label={$t('settings.audio.volume')}
 			id="volume"
-			description="Adjust master volume level."
+			description={$t('settings.audio.volumeDesc')}
 		>
 			<Range
 				id="volume"
@@ -32,9 +33,9 @@
 		</SettingItem>
 
 		<SettingItem
-			label="No Automute"
+			label={$t('settings.audio.noAutomute')}
 			id="noAutomute"
-			description="Prevent automatic muting when not in focus."
+			description={$t('settings.audio.noAutomuteDesc')}
 		>
 			<Toggle
 				id="noAutomute"
@@ -43,9 +44,9 @@
 		</SettingItem>
 
 		<SettingItem
-			label="No Audio Processing"
+			label={$t('settings.audio.noAudioProcessing')}
 			id="noAudioProcessing"
-			description="Disable audio analysis features."
+			description={$t('settings.audio.noAudioProcessingDesc')}
 		>
 			<Toggle
 				id="noAudioProcessing"

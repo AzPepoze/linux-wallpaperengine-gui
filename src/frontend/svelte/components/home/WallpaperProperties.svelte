@@ -11,6 +11,7 @@
 		renderMarkdown,
 		getLabelParts
 	} from './WallpaperProperties.svelte.ts';
+	import { t } from '@/i18n';
 
 	export let wallpaperId: string;
 	export let textColor: string = 'var(--text-color)';
@@ -99,14 +100,14 @@
 
 <div class="properties-wrapper" style="color: {textColor}">
 	<div class="header">
-		<span class="title">Properties</span>
+		<span class="title">{$t('wallpaper.properties.title')}</span>
 		<div class="divider"></div>
 	</div>
 
 	{#if loading}
-		<div class="status-msg">Loading properties...</div>
+		<div class="status-msg">{$t('wallpaper.properties.loading')}</div>
 	{:else if properties.length === 0}
-		<div class="status-msg empty">No configurable properties.</div>
+		<div class="status-msg empty">{$t('wallpaper.properties.noConfigurable')}</div>
 	{:else}
 		<div class="properties-list">
 			{#each properties as prop}

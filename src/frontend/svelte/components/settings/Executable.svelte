@@ -4,6 +4,7 @@
 	import Button from '@/components/shared/ui/Button.svelte';
 	import ListEditor from '@/components/shared/ui/ListEditor.svelte';
 	import Icon from '@/components/shared/ui/Icon.svelte';
+	import { t } from '@/i18n';
 	import {
 		settingsStore,
 		validateBinaryFile,
@@ -34,29 +35,29 @@
 
 {#if $settingsStore}
 	<SettingItem
-		label="Binary Location"
+		label={$t('settings.executable.binaryLocation')}
 		id="binary"
 		vertical
-		description="Set the path to your linux-wallpaperengine binary. Leave empty to use system PATH."
+		description={$t('settings.executable.binaryLocationDesc')}
 	>
 		<Browse
 			bind:location={$settingsStore.binaryLocation}
 			onSelect={onSelectBinFile}
-			placeholder="Path to linux-wallpaperengine binary..."
+			placeholder={$t('settings.executable.binaryPlaceholder')}
 		/>
 	</SettingItem>
 
 	<SettingItem
-		label="Wallpaper Engine Directory"
+		label={$t('settings.executable.wallpaperEngineDir')}
 		id="wallpaperEngineDir"
 		vertical
-		description="Main folder where Wallpaper Engine is installed (steamapps/common/wallpaper_engine)."
+		description={$t('settings.executable.wallpaperEngineDirDesc')}
 	>
 		<Browse
 			bind:location={$settingsStore.wallpaperEngineDir}
 			onSelect={onSelectWallpaperEngineDir}
 			dir={true}
-			placeholder="Path to wallpaper_engine folder..."
+			placeholder={$t('settings.executable.weDirPlaceholder')}
 		/>
 		<div
 			class="detected-path-card"
@@ -72,8 +73,8 @@
 					/>
 					<span
 						>{$detectedPathsStore.assetsValid
-							? 'Currently Active'
-							: 'NOT DETECTED'}</span
+							? $t('settings.executable.currentlyActive')
+							: $t('settings.executable.notDetected')}</span
 					>
 				</div>
 				{#if $detectedPathsStore.assetsValid}
@@ -83,31 +84,31 @@
 						on:click={openAssetsFolder}
 					>
 						<Icon name="folder_open" size={14} />
-						<span>Open Folder</span>
+						<span>{$t('settings.executable.openFolder')}</span>
 					</Button>
 				{/if}
 			</div>
 			<div class="path-content">
-				<div class="path-label">Detected Path</div>
+				<div class="path-label">{$t('settings.executable.detectedPath')}</div>
 				<div class="path-display">
 					{$detectedPathsStore.assetsPath ||
-						'No Wallpaper Engine directory found in search paths.'}
+						$t('settings.executable.noWeDirFound')}
 				</div>
 			</div>
 		</div>
 	</SettingItem>
 
 	<SettingItem
-		label="Workshop Directory"
+		label={$t('settings.executable.workshopDir')}
 		id="workshopDir"
 		vertical
-		description="Path to your Steam Workshop content (431960). Usually auto-detected from the Wallpaper Engine Directory above."
+		description={$t('settings.executable.workshopDirDesc')}
 	>
 		<Browse
 			bind:location={$settingsStore.workshopDir}
 			onSelect={onSelectWorkshopDir}
 			dir={true}
-			placeholder="Path to workshop content (431960)..."
+			placeholder={$t('settings.executable.workshopDirPlaceholder')}
 		/>
 		<div
 			class="detected-path-card"
@@ -123,8 +124,8 @@
 					/>
 					<span
 						>{$detectedPathsStore.workshopValid
-							? 'Currently Active'
-							: 'NOT DETECTED'}</span
+							? $t('settings.executable.currentlyActive')
+							: $t('settings.executable.notDetected')}</span
 					>
 				</div>
 				{#if $detectedPathsStore.workshopValid}
@@ -134,29 +135,29 @@
 						on:click={openWallpaperFolder}
 					>
 						<Icon name="folder_open" size={14} />
-						<span>Open Folder</span>
+						<span>{$t('settings.executable.openFolder')}</span>
 					</Button>
 				{/if}
 			</div>
 			<div class="path-content">
-				<div class="path-label">Detected Path</div>
+				<div class="path-label">{$t('settings.executable.detectedPath')}</div>
 				<div class="path-display">
 					{$detectedPathsStore.wallpaperPath ||
-						'No workshop directory found in search paths.'}
+						$t('settings.executable.noWorkshopDirFound')}
 				</div>
 			</div>
 		</div>
 	</SettingItem>
 
 	<SettingItem
-		label="Steam Search Paths"
+		label={$t('settings.executable.steamSearchPaths')}
 		id="steamPaths"
 		vertical
-		description="Additional directories to search for Steam workshop content."
+		description={$t('settings.executable.steamSearchPathsDesc')}
 	>
 		<ListEditor
 			bind:items={$settingsStore.steamPaths}
-			placeholder="e.g. .local/share/Steam"
+			placeholder={$t('settings.executable.steamPathsPlaceholder')}
 		/>
 	</SettingItem>
 {/if}
