@@ -67,6 +67,8 @@ type AppConfig struct {
 	UiTransparency           int            `json:"uiTransparency,omitempty"`
 	SteamPaths               []string       `json:"steamPaths,omitempty"`
 	EnableScrollMask         bool           `json:"enableScrollMask"`
+	HookEnabled              bool           `json:"hookEnabled"`
+	WallpaperChangeCommand   string         `json:"wallpaperChangeCommand,omitempty"`
 
 	// Fixed Filters
 	InstalledFilters *FilterConfig `json:"installedFilters,omitempty"`

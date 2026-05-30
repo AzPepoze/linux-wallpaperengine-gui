@@ -3,6 +3,7 @@ package wallpaper
 import (
 	"fmt"
 	"os"
+	"os/exec"
 	"path/filepath"
 	"strings"
 
@@ -14,6 +15,7 @@ import (
 
 type Service struct {
 	processManager *process.Manager
+	wallpapers     map[string]WallpaperData
 }
 
 func NewService(processManager *process.Manager) *Service {
@@ -64,6 +66,53 @@ func (service *Service) ApplyWallpapers() error {
 	}
 
 	service.processManager.UpdateWallpapers(desiredWallpapers)
+
+	if appConfig.HookEnabled && appConfig.WallpaperChangeCommand != "" {
+		if service.wallpapers == nil {
+			service.wallpapers, _ = GetWallpapers()
+		}
+
+		for _, screen := range activeScreens {
+			wallpaperID := service.getEffectiveWallpaperID(appConfig, screen)
+			if wallpaperID == "" {
+				continue
+			}
+
+			wd, ok := service.wallpapers[wallpaperID]
+			if !ok || wd.ProjectData == nil || wd.ProjectData.Preview == "" {
+				continue
+			}
+			pd := wd.ProjectData
+
+			previewPath := filepath.Join(config.WorkshopPath, wallpaperID, pd.Preview)
+			var videoPath string
+			isVideo := "false"
+			if pd.Type == "Video" && pd.File != "" {
+				videoPath = filepath.Join(config.WorkshopPath, wallpaperID, pd.File)
+				isVideo = "true"
+			}
+
+			cmd := appConfig.WallpaperChangeCommand
+			cmd = strings.ReplaceAll(cmd, "$PREVIEW_PATH", previewPath)
+			cmd = strings.ReplaceAll(cmd, "$VIDEO_PATH", videoPath)
+			cmd = strings.ReplaceAll(cmd, "$IS_VIDEO", isVideo)
+			cmd = strings.ReplaceAll(cmd, "$WALLPAPER_TITLE", pd.Title)
+			cmd = strings.ReplaceAll(cmd, "$WALLPAPER_TYPE", pd.Type)
+			cmd = strings.ReplaceAll(cmd, "$WALLPAPER_ID", wallpaperID)
+			cmd = strings.ReplaceAll(cmd, "$SCREEN_NAME", screen.Name)
+			logger.Printf("Running hook command for %s on %s: %s", wallpaperID, screen.Name, cmd)
+
+			go func(c, id, screenName string) {
+				out, err := exec.Command("sh", "-c", c).CombinedOutput()
+				if err != nil {
+					logger.Printf("hook command failed for %s on %s: %v\n%s", id, screenName, err, string(out))
+				} else {
+					logger.Printf("hook command succeeded for %s on %s\n%s", id, screenName, string(out))
+				}
+			}(cmd, wallpaperID, screen.Name)
+		}
+	}
+
 	return nil
 }
 
@@ -222,6 +271,7 @@ func (service *Service) LoadWallpapers() (map[string]interface{}, error) {
 	if err != nil {
 		return nil, err
 	}
+	service.wallpapers = wallpapers
 
 	appConfig, _ := config.GetConfig()
 	workshopPathValid := false

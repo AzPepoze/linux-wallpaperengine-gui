@@ -66,4 +66,31 @@
 			</div>
 		</SettingItem>
 	{/if}
+
+	<!-- Hooks: add more hook items below as needed -->
+	<SettingItem
+		label="Hooks"
+		id="hookEnabled"
+		description="Enable hooks."
+	>
+		<Toggle
+			id="hookEnabled"
+			bind:checked={$settingsStore.hookEnabled}
+		/>
+	</SettingItem>
+
+	{#if $settingsStore.hookEnabled}
+		<SettingItem
+			label="On wallpaper change"
+			id="wallpaperChangeCommand"
+			vertical
+			description="Shell command. Variables: $PREVIEW_PATH, $VIDEO_PATH, $IS_VIDEO, $WALLPAPER_TITLE, $WALLPAPER_TYPE, $WALLPAPER_ID, $SCREEN_NAME."
+		>
+			<Input
+				id="wallpaperChangeCommand"
+				bind:value={$settingsStore.wallpaperChangeCommand}
+				placeholder='e.g. matugen image "$PREVIEW_PATH" -j'
+			/>
+		</SettingItem>
+	{/if}
 {/if}
