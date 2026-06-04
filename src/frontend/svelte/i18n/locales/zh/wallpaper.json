@@ -1,0 +1,15 @@
+{
+	"toolbar": {
+		"playlist": "播放列表",
+		"filter": "筛选",
+		"currentlyUsing": "当前使用：",
+		"display": "显示器：",
+		"displayBtn": "显示器",
+		"cloneMode": "克隆模式"
+	},
+	"properties": {
+		"title": "属性",
+		"loading": "正在加载属性...",
+		"noConfigurable": "没有可配置的属性。"
+	}
+}

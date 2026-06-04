@@ -5,14 +5,11 @@
 	import Input from '@/components/shared/ui/Input.svelte';
 	import SettingItem from '@/components/shared/ui/SettingItem.svelte';
 	import Toggle from '@/components/shared/ui/Toggle.svelte';
-	import { saveSettings, settingsStore } from '@/scripts/settings/settings';
+	import { settingsStore, saveSettings } from '@/scripts/settings/settings';
+	import { t } from '@/i18n';
 
 	async function handleRestart() {
-		if (
-			confirm(
-				'Changing Wayland support requires a restart. Do you want to restart now?'
-			)
-		) {
+		if (confirm($t('settings.advanced.restartConfirm'))) {
 			if ($settingsStore) {
 				await saveSettings($settingsStore);
 				window.electronAPI.restartUI();
@@ -23,9 +20,9 @@
 
 {#if $settingsStore}
 	<SettingItem
-		label="Use Native Wayland"
+		label={$t('settings.advanced.useNativeWayland')}
 		id="nativeWayland"
-		description="Run the GUI with native Wayland support (requires restart)."
+		description={$t('settings.advanced.useNativeWaylandDesc')}
 	>
 		<Toggle
 			id="nativeWayland"
@@ -34,7 +31,10 @@
 		/>
 	</SettingItem>
 
-	<SettingItem label="Enable Custom Arguments" id="customArgsEnabled">
+	<SettingItem
+		label={$t('settings.advanced.enableCustomArgs')}
+		id="customArgsEnabled"
+	>
 		<Toggle
 			id="customArgsEnabled"
 			bind:checked={$settingsStore.customArgsEnabled}
@@ -43,16 +43,16 @@
 
 	{#if $settingsStore.customArgsEnabled}
 		<SettingItem
-			label="Custom Command Args"
+			label={$t('settings.advanced.customCommandArgs')}
 			id="customArgs"
 			vertical
-			description="Pass raw arguments to the backend."
+			description={$t('settings.advanced.customCommandArgsDesc')}
 		>
 			<Input
 				type="text"
 				id="customArgs"
 				bind:value={$settingsStore.customArgs}
-				placeholder="e.g. --window 0x0x1920x1080"
+				placeholder={$t('settings.advanced.customArgsPlaceholder')}
 			/>
 			<div class="doc-actions">
 				<Button
@@ -63,30 +63,30 @@
 						)}
 				>
 					<Icon name="open_in_new" size={14} />
-					<span>Common Options Documentation</span>
+					<span>{$t('settings.advanced.commonOptionsDoc')}</span>
 				</Button>
 			</div>
 		</SettingItem>
 	{/if}
 
 	<!-- Hooks: add more hook items below as needed -->
-	<SettingItem label="Hooks" id="hookEnabled" description="Enable hooks.">
+	<SettingItem label={$t('settings.advanced.enableHooks')} id="hookEnabled" description={$t('settings.advanced.enableHooksDesc')}>
 		<Toggle id="hookEnabled" bind:checked={$settingsStore.hookEnabled} />
 	</SettingItem>
 
 	{#if $settingsStore.hookEnabled}
 		<SettingItem
-			label="On wallpaper change"
+			label={$t('settings.advanced.wallpaperChangeCommand')}
 			id="wallpaperChangeCommand"
 			vertical
-			description="Shell command to execute when a wallpaper is applied."
+			description={$t('settings.advanced.wallpaperChangeCommandDesc')}
 		>
 			<div class="table-container">
 				<table class="variable-table">
 					<thead>
 						<tr>
-							<th>Variable</th>
-							<th>Description</th>
+							<th>{$t('settings.advanced.hooks.variable')}</th>
+							<th>{$t('settings.advanced.hooks.description')}</th>
 						</tr>
 					</thead>
 					<tbody>
@@ -94,43 +94,43 @@
 							<td>
 								<CopyableCode code="$PREVIEW_PATH" />
 							</td>
-							<td>Absolute path to the wallpaper's preview image.</td>
+							<td>{$t('settings.advanced.hooks.previewPathDesc')}</td>
 						</tr>
 						<tr>
 							<td>
 								<CopyableCode code="$VIDEO_PATH" />
 							</td>
-							<td>Absolute path to the main media file (video/html).</td>
+							<td>{$t('settings.advanced.hooks.videoPathDesc')}</td>
 						</tr>
 						<tr>
 							<td>
 								<CopyableCode code="$IS_VIDEO" />
 							</td>
-							<td>Boolean indicating if wallpaper is video.</td>
+							<td>{$t('settings.advanced.hooks.isVideoDesc')}</td>
 						</tr>
 						<tr>
 							<td>
 								<CopyableCode code="$WALLPAPER_TITLE" />
 							</td>
-							<td>Display name or title of the wallpaper.</td>
+							<td>{$t('settings.advanced.hooks.wallpaperTitleDesc')}</td>
 						</tr>
 						<tr>
 							<td>
 								<CopyableCode code="$WALLPAPER_TYPE" />
 							</td>
-							<td>Type of the wallpaper (video, web, scene).</td>
+							<td>{$t('settings.advanced.hooks.wallpaperTypeDesc')}</td>
 						</tr>
 						<tr>
 							<td>
 								<CopyableCode code="$WALLPAPER_ID" />
 							</td>
-							<td>Unique Steam Workshop ID.</td>
+							<td>{$t('settings.advanced.hooks.wallpaperIdDesc')}</td>
 						</tr>
 						<tr>
 							<td>
 								<CopyableCode code="$SCREEN_NAME" />
 							</td>
-							<td>Monitor/screen name (e.g., DP-1).</td>
+							<td>{$t('settings.advanced.hooks.screenNameDesc')}</td>
 						</tr>
 					</tbody>
 				</table>
@@ -138,7 +138,7 @@
 			<Input
 				id="wallpaperChangeCommand"
 				bind:value={$settingsStore.wallpaperChangeCommand}
-				placeholder="e.g. matugen image '$PREVIEW_PATH' -j"
+				placeholder={$t('settings.advanced.hooks.commandPlaceholder')}
 			/>
 		</SettingItem>
 	{/if}

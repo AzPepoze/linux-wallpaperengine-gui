@@ -1,0 +1,29 @@
+{
+	"settings": {
+		"title": "播放列表设置",
+		"namePlaceholder": "播放列表名称",
+		"save": "保存",
+		"cancel": "取消",
+		"new": "新建",
+		"rename": "重命名",
+		"delete": "删除",
+		"dynamicPlaylist": "动态播放列表",
+		"interval": "间隔（分钟）：",
+		"none": "无",
+		"randomAll": "随机全部（动态）"
+	},
+	"messages": {
+		"startedPlaylist": "已在 {display} 上启动播放列表：{name}",
+		"startedRandom": "已在 {display} 上启动动态随机轮换",
+		"created": "播放列表已创建",
+		"renamed": "播放列表已重命名",
+		"deleted": "播放列表已删除",
+		"itemRemoved": "项目已移除",
+		"cannotAddToRandom": "无法添加到随机全部（它已包含所有内容）",
+		"selectPlaylistFirst": "请先选择一个播放列表来添加壁纸",
+		"noItemsFound": "未找到项目",
+		"errorSearching": "搜索出错：{message}",
+		"errorBrowsing": "浏览创意工坊出错：{message}",
+		"restartRequired": "更改此设置需要重启。是否立即重启？"
+	}
+}

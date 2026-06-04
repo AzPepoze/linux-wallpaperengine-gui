@@ -6,6 +6,7 @@
 	import Icon from '@/components/shared/ui/Icon.svelte';
 	import Toolbar from '@/components/shared/layout/Toolbar.svelte';
 	import ViewToggle from '@/components/shared/ui/ViewToggle.svelte';
+	import { t } from '@/i18n';
 
 	export let searchText = '';
 	export let sortOrder = '0';
@@ -20,26 +21,26 @@
 	export let onSearch: () => void;
 	export let onToggleFilters: () => void;
 
-	const sortOptions = [
-		{ label: 'Trend', value: '13' },
-		{ label: 'Recent', value: '1' },
-		{ label: 'Popular', value: '0' },
-		{ label: 'Subscriptions', value: '12' },
-		{ label: 'Voted Up', value: '10' },
-		{ label: 'Last Updated', value: '19' }
+	$: sortOptions = [
+		{ label: $t('workshop.controls.sortTrend'), value: '13' },
+		{ label: $t('workshop.controls.sortRecent'), value: '1' },
+		{ label: $t('workshop.controls.sortPopular'), value: '0' },
+		{ label: $t('workshop.controls.sortSubscriptions'), value: '12' },
+		{ label: $t('workshop.controls.sortVotedUp'), value: '10' },
+		{ label: $t('workshop.controls.sortLastUpdated'), value: '19' }
 	];
 
-	const itemTypeOptions = [
-		{ label: 'All', value: '13' },
-		{ label: 'Items', value: '0' },
-		{ label: 'Collections', value: '3' }
+	$: itemTypeOptions = [
+		{ label: $t('workshop.controls.typeAll'), value: '13' },
+		{ label: $t('workshop.controls.typeItems'), value: '0' },
+		{ label: $t('workshop.controls.typeCollections'), value: '3' }
 	];
 
-	const pageSizeOptions = [
-		{ label: '50 items', value: '50' },
-		{ label: '100 items', value: '100' },
-		{ label: '150 items', value: '150' },
-		{ label: '200 items', value: '200' }
+	$: pageSizeOptions = [
+		{ label: $t('workshop.controls.page50'), value: '50' },
+		{ label: $t('workshop.controls.page100'), value: '100' },
+		{ label: $t('workshop.controls.page150'), value: '150' },
+		{ label: $t('workshop.controls.page200'), value: '200' }
 	];
 </script>
 
@@ -51,13 +52,13 @@
 			style="padding: 8px; border-radius: 10px;"
 		>
 			<Icon name="filter_list" size={20} />
-			<span>Filter</span>
+			<span>{$t('workshop.controls.filter')}</span>
 		</Button>
 
 		<div class="search-input-wrap">
 			<Input
 				type="text"
-				placeholder="Search wallpapers..."
+				placeholder={$t('workshop.controls.searchPlaceholder')}
 				bind:value={searchText}
 				on:keydown={(e) => e.key === 'Enter' && onSearch()}
 				style="height: 36px;"
@@ -71,13 +72,13 @@
 			style="padding: 8px 16px; border-radius: 10px;"
 		>
 			<Icon name="search" size={20} />
-			<span>Search</span>
+			<span>{$t('workshop.controls.search')}</span>
 		</Button>
 	</div>
 
 	<div slot="center" class="center-options">
 		<div class="option-item">
-			<span class="label">SORT :</span>
+			<span class="label">{$t('workshop.controls.sort')}</span>
 			<Select
 				bind:value={sortOrder}
 				options={sortOptions}
@@ -85,7 +86,7 @@
 			/>
 		</div>
 		<div class="option-item">
-			<span class="label">TYPE :</span>
+			<span class="label">{$t('workshop.controls.type')}</span>
 			<Select
 				bind:value={itemType}
 				options={itemTypeOptions}
@@ -93,7 +94,7 @@
 			/>
 		</div>
 		<div class="option-item">
-			<span class="label">PAGE :</span>
+			<span class="label">{$t('workshop.controls.page')}</span>
 			<Select
 				bind:value={pageSize}
 				options={pageSizeOptions}
@@ -105,11 +106,11 @@
 	<div slot="right" class="right-actions">
 		<div class="toggle-wrap">
 			<Toggle bind:checked={infiniteScroll} />
-			<span class="toggle-label">Infinite</span>
+			<span class="toggle-label">{$t('workshop.controls.infinite')}</span>
 		</div>
 
 		{#if totalItems > 0}
-			<span class="status-text">{totalItems.toLocaleString()} items found</span>
+			<span class="status-text">{$t('workshop.controls.itemsFound', { count: totalItems.toLocaleString() })}</span>
 		{/if}
 
 		<div class="mode-toggle-wrap">

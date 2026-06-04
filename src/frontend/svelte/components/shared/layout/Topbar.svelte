@@ -3,17 +3,18 @@
 	import { activeView } from '@/scripts/shared/ui';
 	import { onMount, tick } from 'svelte';
 	import steamIcon from '@/components/shared/icons/steam.png';
+	import { t } from '@/i18n';
 
 	// ── Types ────────────────────────────────────────────────────────────────
 	type View = 'wallpapers' | 'workshop' | 'logs' | 'settings';
 
 	const VIEWS: View[] = ['wallpapers', 'workshop', 'logs', 'settings'];
 
-	const NAV_ITEMS: { view: View; icon: string; label: string }[] = [
-		{ view: 'wallpapers', icon: 'home', label: 'Home' },
-		{ view: 'workshop', icon: 'storefront', label: 'Workshop' },
-		{ view: 'logs', icon: 'history', label: 'Logs' },
-		{ view: 'settings', icon: 'settings', label: 'Settings' }
+	const NAV_ITEMS: { view: View; icon: string; key: string }[] = [
+		{ view: 'wallpapers', icon: 'home', key: 'topbar.home' },
+		{ view: 'workshop', icon: 'storefront', key: 'topbar.workshop' },
+		{ view: 'logs', icon: 'history', key: 'topbar.logs' },
+		{ view: 'settings', icon: 'settings', key: 'topbar.settings' }
 	];
 
 	// ── Steam status ─────────────────────────────────────────────────────────
@@ -67,18 +68,18 @@
 <div class="topbar">
 	<div class="steam-status" class:connected={steamRunning}>
 		<img src={steamIcon} alt="Steam" class="steam-icon" />
-		<span>{steamRunning ? 'Connected' : 'Disconnected'}</span>
+		<span>{steamRunning ? $t('topbar.connected') : $t('topbar.disconnected')}</span>
 	</div>
 
 	<nav
 		class="capsule-container"
 		style="--ind-left: {indicatorLeft}px; --ind-width: {indicatorWidth}px;"
 	>
-		{#each NAV_ITEMS as { view, icon, label }, i}
+		{#each NAV_ITEMS as { view, icon, key }, i}
 			<button
 				class="capsule-button"
 				class:active={$activeView === view}
-				title={label}
+				title={$t(key)}
 				bind:this={buttonEls[i]}
 				on:click={() => setView(view)}
 			>

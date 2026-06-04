@@ -2,35 +2,16 @@
 	import { fly } from 'svelte/transition';
 	import { activeView } from '@/scripts/shared/ui';
 	import Icon from '@/components/shared/ui/Icon.svelte';
+	import { t } from '@/i18n';
 
 	export let type: 'workshop' | 'assets' | 'we_config' = 'workshop';
 	export let delay = 0;
 
-	const config = {
-		workshop: {
-			title: 'Steam Workshop path not found',
-			description:
-				"The application couldn't find your Wallpaper Engine workshop content. Please check your Steam Search Paths in Settings.",
-			action: 'Configure Search Paths',
-			icon: 'warning'
-		},
-		assets: {
-			title: 'Wallpaper Engine Assets not found',
-			description:
-				"Optional assets for some wallpapers (like effects or shaders) couldn't be auto-detected. Some wallpapers might not look right.",
-			action: 'Fix Assets Path',
-			icon: 'info'
-		},
-		we_config: {
-			title: 'Wallpaper Engine Config not found',
-			description:
-				'Wallpaper Engine configuration not found. Please run Wallpaper Engine at least once to initialize it.',
-			action: 'Open Steam',
-			icon: 'warning'
-		}
-	};
+	$: titleKey = `warnings.path.${type}Title`;
+	$: descKey = `warnings.path.${type}Desc`;
+	$: actionKey = `warnings.path.${type}Action`;
 
-	const current = config[type];
+	$: iconName = type === 'assets' ? 'info' : 'warning';
 </script>
 
 <div
@@ -39,16 +20,16 @@
 	in:fly={{ y: -20, duration: 400, delay }}
 >
 	<div class="warning-icon">
-		<Icon name={current.icon} size={48} />
+		<Icon name={iconName} size={48} />
 	</div>
 	<div class="warning-content">
-		<h3>{current.title}</h3>
-		<p>{current.description}</p>
+		<h3>{$t(titleKey)}</h3>
+		<p>{$t(descKey)}</p>
 		<button
 			class="warning-action"
 			on:click={() => activeView.set('settings')}
 		>
-			{current.action}
+			{$t(actionKey)}
 		</button>
 	</div>
 </div>

@@ -5,6 +5,7 @@
 	import Icon from '@/components/shared/ui/Icon.svelte';
 	import { settingsStore } from '@/scripts/settings/settings';
 	import type { Playlist } from '@shared/types';
+	import { t } from '@/i18n';
 
 	export let playlistOptions: { value: string; label: string }[] = [];
 	export let activePlaylist: Playlist | null = null;
@@ -24,13 +25,13 @@
 </script>
 
 <div class="panel left-panel">
-	<div class="header">Playlist Settings</div>
+	<div class="header">{$t('playlist.settings.title')}</div>
 
 	{#if isCreating || isRenaming}
 		<div class="form-group">
 			<Input
 				bind:value={newPlaylistName}
-				placeholder="Playlist Name"
+				placeholder={$t('playlist.settings.namePlaceholder')}
 				autoFocus
 			/>
 			<div class="actions">
@@ -39,11 +40,11 @@
 					on:click={isCreating ? onCreate : onRename}
 				>
 					<Icon name="save" size={18} />
-					<span>Save</span>
+					<span>{$t('playlist.settings.save')}</span>
 				</Button>
 				<Button on:click={onCancel}>
 					<Icon name="close" size={18} />
-					<span>Cancel</span>
+					<span>{$t('playlist.settings.cancel')}</span>
 				</Button>
 			</div>
 		</div>
@@ -61,25 +62,25 @@
 		<div class="controls-row">
 			<Button variant="secondary" on:click={startCreating}>
 				<Icon name="add" size={18} />
-				<span>New</span>
+				<span>{$t('playlist.settings.new')}</span>
 			</Button>
 			{#if activePlaylist}
 				<Button variant="secondary" on:click={startRenaming}>
 					<Icon name="edit" size={18} />
-					<span>Rename</span>
+					<span>{$t('playlist.settings.rename')}</span>
 				</Button>
 				<Button variant="danger" on:click={onDelete}>
 					<Icon name="delete" size={18} />
-					<span>Delete</span>
+					<span>{$t('playlist.settings.delete')}</span>
 				</Button>
 			{:else if $settingsStore?.playlist === 'Random All'}
-				<span class="info-tag">Dynamic Playlist</span>
+				<span class="info-tag">{$t('playlist.settings.dynamicPlaylist')}</span>
 			{/if}
 		</div>
 
 		{#if activePlaylist || $settingsStore?.playlist === 'Random All'}
 			<div class="interval-row">
-				<span class="label">Interval (min):</span>
+				<span class="label">{$t('playlist.settings.interval')}</span>
 				<Input
 					type="number"
 					step="any"

@@ -1,6 +1,7 @@
 <script lang="ts">
 	import type { FilterCategory } from '@shared/filterConstants';
 	import type { FilterConfig } from '@shared/types';
+	import { t } from '@/i18n';
 	import Button from '@/components/shared/ui/Button.svelte';
 	import Collapse from './Collapse.svelte';
 	import FilterItem from './FilterItem.svelte';
@@ -23,26 +24,43 @@
 		state: boolean
 	) => void;
 
+	const ITEM_NS: Record<string, string> = {
+		typetags: 'filter.type',
+		tags: 'filter.genre',
+		ratingtags: 'filter.items',
+		categorytags: 'filter.items',
+		sourcetags: 'filter.items',
+		resolutiontags: 'filter.items'
+	};
+
 	$: categoryKey = category.internalKey as keyof FilterConfig;
 	$: categoryConfig =
 		(localConfig[categoryKey] as Record<string, boolean>) || {};
+
+	function itemLabel(item: string): string {
+		const ns = ITEM_NS[categoryKey];
+		if (!ns) return item;
+		const key = ns + '.' + item;
+		const result = $t(key);
+		return result === key ? item : result;
+	}
 </script>
 
-<Collapse title={category.name} bind:isExpanded>
+<Collapse title={$t('filter.categories.' + category.internalKey)} bind:isExpanded>
 	<svelte:fragment slot="header-actions">
 		<Button
 			variant="primary"
 			style="padding: 2px 6px; font-size: 0.75em;"
 			on:click={() => onSetCategoryState(category, true)}
 		>
-			All
+			{$t('filter.ui.all')}
 		</Button>
 		<Button
 			variant="primary"
 			style="padding: 2px 6px; font-size: 0.75em;"
 			on:click={() => onSetCategoryState(category, false)}
 		>
-			None
+			{$t('filter.ui.none')}
 		</Button>
 	</svelte:fragment>
 
@@ -50,7 +68,7 @@
 		{#if category.items && category.items.length > 0}
 			{#each category.items as item (item)}
 				<FilterItem
-					label={item}
+					label={itemLabel(item)}
 					isActive={!!categoryConfig[item]}
 					onClick={() => onToggleTag(categoryKey, item)}
 				/>

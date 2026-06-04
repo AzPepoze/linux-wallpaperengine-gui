@@ -5,22 +5,28 @@
 	import Select from '@/components/shared/ui/Select.svelte';
 	import Range from '@/components/shared/ui/Range.svelte';
 	import { settingsStore, saveSettings, handleAutostart } from '@/scripts/settings/settings';
+	import { t, locale, setLocale } from '@/i18n';
 
-	const scalingOptions = [
-		{ value: 'default', label: 'Default' },
-		{ value: 'stretch', label: 'Stretch' },
-		{ value: 'fit', label: 'Fit' },
-		{ value: 'fill', label: 'Fill' }
+	const langOptions = [
+		{ value: 'en', label: 'English' },
+		{ value: 'zh', label: '中文' }
 	];
 
-	const clampingOptions = [
-		{ value: 'clamp', label: 'Clamp' },
-		{ value: 'border', label: 'Border' },
-		{ value: 'repeat', label: 'Repeat' }
+	$: scalingOptions = [
+		{ value: 'default', label: $t('settings.generalScaling.default') },
+		{ value: 'stretch', label: $t('settings.generalScaling.stretch') },
+		{ value: 'fit', label: $t('settings.generalScaling.fit') },
+		{ value: 'fill', label: $t('settings.generalScaling.fill') }
+	];
+
+	$: clampingOptions = [
+		{ value: 'clamp', label: $t('settings.generalClamping.clamp') },
+		{ value: 'border', label: $t('settings.generalClamping.border') },
+		{ value: 'repeat', label: $t('settings.generalClamping.repeat') }
 	];
 
 	async function handleRestart() {
-		if (confirm('Changing this setting requires a restart. Do you want to restart now?')) {
+		if (confirm($t('playlist.messages.restartRequired'))) {
 			if ($settingsStore) {
 				await saveSettings($settingsStore);
 				window.electronAPI.restartUI();
@@ -31,9 +37,22 @@
 
 {#if $settingsStore}
 	<SettingItem
-		label="Run on system startup"
+		label={$t('settings.general.language')}
+		id="language"
+		description={$t('settings.general.languageDesc')}
+	>
+		<Select
+			id="language"
+			bind:value={$locale}
+			options={langOptions}
+			onChange={(v) => setLocale(v)}
+		/>
+	</SettingItem>
+
+	<SettingItem
+		label={$t('settings.general.autostart')}
 		id="autostart"
-		description="Run this GUI to apply wallpapers in the background on system startup."
+		description={$t('settings.general.autostartDesc')}
 	>
 		<Toggle
 			id="autostart"
@@ -43,9 +62,9 @@
 	</SettingItem>
 
 	<SettingItem
-		label="Dynamic UI Theme"
+		label={$t('settings.general.dynamicTheme')}
 		id="dynamicUiTheme"
-		description="Adapt application colors to match the currently selected wallpaper."
+		description={$t('settings.general.dynamicThemeDesc')}
 	>
 		<Toggle
 			id="dynamicUiTheme"
@@ -54,9 +73,9 @@
 	</SettingItem>
 
 	<SettingItem
-		label="Dynamic Sidebar Theme"
+		label={$t('settings.general.dynamicSidebarTheme')}
 		id="dynamicSidebarTheme"
-		description="Apply wallpaper colors locally to the sidebar directly."
+		description={$t('settings.general.dynamicSidebarThemeDesc')}
 	>
 		<Toggle
 			id="dynamicSidebarTheme"
@@ -66,9 +85,9 @@
 
 
 	<SettingItem
-		label="Transparent UI"
+		label={$t('settings.general.transparentUi')}
 		id="transparentUi"
-		description="Make the window background transparent (requires restart)."
+		description={$t('settings.general.transparentUiDesc')}
 	>
 		<Toggle
 			id="transparentUi"
@@ -79,9 +98,9 @@
 
 	{#if $settingsStore.transparentUi}
 		<SettingItem
-			label="UI Transparency Level"
+			label={$t('settings.general.uiTransparency')}
 			id="uiTransparency"
-			description="Adjust the opacity of the application."
+			description={$t('settings.general.uiTransparencyDesc')}
 		>
 			<Range
 				id="uiTransparency"
@@ -94,9 +113,9 @@
 	{/if}
 
 	<SettingItem
-		label="FPS Limit"
+		label={$t('settings.general.fpsLimit')}
 		id="fps"
-		description="Target frames per second for animations."
+		description={$t('settings.general.fpsLimitDesc')}
 	>
 		<Input
 			type="number"
@@ -107,9 +126,9 @@
 	</SettingItem>
 
 	<SettingItem
-		label="Scaling Mode"
+		label={$t('settings.general.scalingMode')}
 		id="scaling"
-		description="How the wallpaper fits the screen."
+		description={$t('settings.general.scalingModeDesc')}
 	>
 		<Select
 			id="scaling"
@@ -119,9 +138,9 @@
 	</SettingItem>
 
 	<SettingItem
-		label="Clamping Mode"
+		label={$t('settings.general.clampingMode')}
 		id="clamping"
-		description="Texture wrapping behavior."
+		description={$t('settings.general.clampingModeDesc')}
 	>
 		<Select
 			id="clamping"
@@ -131,9 +150,9 @@
 	</SettingItem>
 
 	<SettingItem
-		label="No Fullscreen Pause"
+		label={$t('settings.general.noFullscreenPause')}
 		id="noFullscreenPause"
-		description="Keep running when other apps are fullscreen."
+		description={$t('settings.general.noFullscreenPauseDesc')}
 	>
 		<Toggle
 			id="noFullscreenPause"
@@ -142,9 +161,9 @@
 	</SettingItem>
 
 	<SettingItem
-		label="Disable Particles"
+		label={$t('settings.general.disableParticles')}
 		id="disableParticles"
-		description="Turn off particle effects to save resources."
+		description={$t('settings.general.disableParticlesDesc')}
 	>
 		<Toggle
 			id="disableParticles"
@@ -153,9 +172,9 @@
 	</SettingItem>
 
 	<SettingItem
-		label="Scroll Mask Effect"
+		label={$t('settings.general.scrollMask')}
 		id="enableScrollMask"
-		description="Enable smooth fade effect at the top and bottom of scroll areas. (Note: May impact performance on some systems)"
+		description={$t('settings.general.scrollMaskDesc')}
 	>
 		<Toggle
 			id="enableScrollMask"

@@ -1,0 +1,31 @@
+{
+	"actions": {
+		"viewOnWorkshop": "View on Workshop",
+		"subscribe": "Subscribe",
+		"unsubscribe": "Unsubscribe",
+		"downloading": "Downloading {percent}%"
+	},
+	"controls": {
+		"filter": "Filter",
+		"search": "Search",
+		"sort": "SORT :",
+		"type": "TYPE :",
+		"page": "PAGE :",
+		"infinite": "Infinite",
+		"itemsFound": "{count} items found",
+		"searchPlaceholder": "Search wallpapers...",
+		"sortTrend": "Trend",
+		"sortRecent": "Recent",
+		"sortPopular": "Popular",
+		"sortSubscriptions": "Subscriptions",
+		"sortVotedUp": "Voted Up",
+		"sortLastUpdated": "Last Updated",
+		"typeAll": "All",
+		"typeItems": "Items",
+		"typeCollections": "Collections",
+		"page50": "50 items",
+		"page100": "100 items",
+		"page150": "150 items",
+		"page200": "200 items"
+	}
+}

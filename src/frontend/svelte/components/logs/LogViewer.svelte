@@ -9,6 +9,7 @@
 		wallpaperLogs
 	} from '@/scripts/shared/logger';
 	import LogPanel from './LogPanel.svelte';
+	import { t } from '@/i18n';
 
 	// Visibility states (declared with Svelte 5 $state)
 	let showBackend = $state(true);
@@ -20,7 +21,7 @@
 	const columns = $derived([
 		{
 			id: 'backend' as const,
-			title: 'Background Logs',
+			title: $t('logs.viewer.backgroundLogs'),
 			icon: 'dns',
 			logs: $backendLogs,
 			visible: showBackend,
@@ -29,7 +30,7 @@
 		},
 		{
 			id: 'frontend' as const,
-			title: 'UI Logs',
+			title: $t('logs.viewer.uiLogs'),
 			icon: 'terminal',
 			logs: $frontendLogs,
 			visible: showFrontend,
@@ -38,7 +39,7 @@
 		},
 		{
 			id: 'wallpaper' as const,
-			title: 'Wallpaper Logs',
+			title: $t('logs.viewer.wallpaperLogs'),
 			icon: 'wallpaper',
 			logs: $wallpaperLogs,
 			visible: showWallpaper,
@@ -156,7 +157,7 @@
 <div class="logs-wrapper full">
 	<div class="modal-header">
 		<div class="header-left">
-			<h2>System Logs</h2>
+			<h2>{$t('logs.viewer.systemLogs')}</h2>
 			<div class="tabs-switcher">
 				{#each columns as col}
 					<button
@@ -186,7 +187,7 @@
 				title="Clear all logs"
 			>
 				<Icon name="delete" size={18} />
-				<span>Clear All</span>
+				<span>{$t('logs.viewer.clearAll')}</span>
 			</button>
 		</div>
 	</div>
@@ -195,10 +196,9 @@
 		{#if visibleCols.length === 0}
 			<div class="empty-state">
 				<Icon name="view_week" size={48} />
-				<h3>All columns hidden</h3>
+				<h3>{$t('logs.viewer.allHidden')}</h3>
 				<p>
-					Enable at least one log category from the switcher
-					above to view logs.
+					{$t('logs.viewer.allHiddenDesc')}
 				</p>
 			</div>
 		{:else}

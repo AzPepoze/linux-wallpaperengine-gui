@@ -1,0 +1,15 @@
+{
+	"toolbar": {
+		"playlist": "Playlist",
+		"filter": "Filter",
+		"currentlyUsing": "CURRENTLY USING :",
+		"display": "DISPLAY :",
+		"displayBtn": "Display",
+		"cloneMode": "Clone mode"
+	},
+	"properties": {
+		"title": "Properties",
+		"loading": "Loading properties...",
+		"noConfigurable": "No configurable properties."
+	}
+}

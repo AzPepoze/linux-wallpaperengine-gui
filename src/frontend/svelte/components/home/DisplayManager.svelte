@@ -8,6 +8,7 @@
 		refreshScreens
 	} from '@/scripts/home/display';
 	import type { WallpaperData } from '@shared/types';
+	import { t } from '@/i18n';
 
 	export let wallpapers: Record<string, WallpaperData> = {};
 
@@ -55,7 +56,7 @@
 							alt={screen}
 						/>
 					{:else}
-						<div class="placeholder">No Wallpaper</div>
+						<div class="placeholder">{$t('display.noWallpaper')}</div>
 					{/if}
 				</div>
 				<div class="screen-name">{screen}</div>

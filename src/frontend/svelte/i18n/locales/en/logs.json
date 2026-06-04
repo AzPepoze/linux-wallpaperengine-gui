@@ -1,0 +1,19 @@
+{
+	"viewer": {
+		"systemLogs": "System Logs",
+		"backgroundLogs": "Background Logs",
+		"uiLogs": "UI Logs",
+		"wallpaperLogs": "Wallpaper Logs",
+		"clearAll": "Clear All",
+		"allHidden": "All columns hidden",
+		"allHiddenDesc": "Enable at least one log category from the switcher above to view logs."
+	},
+	"toolbar": {
+		"searchPlaceholder": "Search logs...",
+		"allLevels": "All Levels",
+		"info": "Info",
+		"success": "Success",
+		"warning": "Warning",
+		"error": "Error"
+	}
+}

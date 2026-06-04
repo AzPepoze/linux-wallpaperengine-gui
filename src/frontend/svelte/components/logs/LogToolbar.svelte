@@ -1,6 +1,7 @@
 <script lang="ts">
 	import Icon from '@/components/shared/ui/Icon.svelte';
 	import Select from '@/components/shared/ui/Select.svelte';
+	import { t } from '@/i18n';
 
 	interface Props {
 		searchQuery: string;
@@ -9,13 +10,13 @@
 
 	let { searchQuery = $bindable(), levelFilter = $bindable() }: Props = $props();
 
-	const filterOptions = [
-		{ label: 'All Levels', value: 'all' },
-		{ label: 'Info', value: 'info' },
-		{ label: 'Success', value: 'success' },
-		{ label: 'Warning', value: 'warning' },
-		{ label: 'Error', value: 'error' }
-	];
+	let filterOptions = $derived([
+		{ label: $t('logs.toolbar.allLevels'), value: 'all' },
+		{ label: $t('logs.toolbar.info'), value: 'info' },
+		{ label: $t('logs.toolbar.success'), value: 'success' },
+		{ label: $t('logs.toolbar.warning'), value: 'warning' },
+		{ label: $t('logs.toolbar.error'), value: 'error' }
+	]);
 </script>
 
 <div class="panel-toolbar">
@@ -23,7 +24,7 @@
 		<Icon name="search" size={14} className="search-icon" />
 		<input 
 			type="text" 
-			placeholder="Search logs..." 
+			placeholder={$t('logs.toolbar.searchPlaceholder')} 
 			bind:value={searchQuery}
 		/>
 		{#if searchQuery}
