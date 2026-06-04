@@ -65,18 +65,22 @@
 		].filter(Boolean) as ('backend' | 'frontend' | 'wallpaper')[]
 	);
 
+	let lastVisibleColsStr = $state('');
+
 	// Handle column visibility updates and redistribution of widths
 	$effect(() => {
 		const cols = visibleCols;
 		const count = cols.length;
-		if (count === 0) return;
-
-		let currentSum = 0;
-		for (const c of cols) {
-			currentSum += colWidths[c] || 0;
+		
+		if (count === 0) {
+			lastVisibleColsStr = '';
+			return;
 		}
 
-		if (Math.abs(currentSum - 100) > 0.1) {
+		const colsStr = cols.join(',');
+		
+		// If the visible columns changed, always redistribute evenly
+		if (colsStr !== lastVisibleColsStr) {
 			const share = 100 / count;
 			for (const c of ['backend', 'frontend', 'wallpaper']) {
 				if (cols.includes(c as any)) {
@@ -85,6 +89,7 @@
 					colWidths[c] = 0;
 				}
 			}
+			lastVisibleColsStr = colsStr;
 		}
 	});
 

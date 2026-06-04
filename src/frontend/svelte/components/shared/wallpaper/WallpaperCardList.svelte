@@ -65,8 +65,8 @@
 		{/if}
 
 		{#if wallpaper.projectData?.approved}
-			<div class="verified-badge" title="Approved" in:scale>
-				<Icon name="emoji_events" size={14} />
+			<div class="badge approved" title="Approved" in:scale>
+				<Icon name="emoji_events" size={22} />
 			</div>
 		{/if}
 	</div>
@@ -194,57 +194,60 @@
 		display: flex;
 		align-items: center;
 		gap: 16px;
-		padding: 12px 20px;
+		padding: 12px 16px;
 		width: 100%;
-		background: rgba(255, 255, 255, 0.04);
-		backdrop-filter: blur(12px);
-		-webkit-backdrop-filter: blur(12px);
-		border-radius: 12px;
+		background: rgba(255, 255, 255, 0.02);
+		border-radius: var(--radius-md, 8px);
 		text-align: left;
 		color: var(--text-main);
-		border: 1px solid rgba(255, 255, 255, 0.05);
-		transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+		border: 1px solid var(--border-color, rgba(255, 255, 255, 0.05));
+		transition: background-color 0.15s ease, border-color 0.15s ease;
 		cursor: pointer;
 
 		&:hover {
-			background: var(--bg-surface-hover);
-			transform: scale(1.005) translateX(4px);
-			border-color: rgba(255, 255, 255, 0.1);
-			box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+			background: var(--bg-surface-hover, rgba(255, 255, 255, 0.05));
+			border-color: var(--border-color-hover, rgba(255, 255, 255, 0.1));
 		}
 
 		&.selected {
-			background: var(--bg-surface-selected);
+			background: var(--btn-primary-bg);
 			border-color: var(--btn-primary-bg);
-			box-shadow: 0 0 20px var(--shadow-primary-glow);
-			transform: scale(1.01) translateX(6px);
+			color: white;
+
+			.title { color: white; }
+			.meta { color: rgba(255, 255, 255, 0.9); }
+			.stat-item { background: rgba(255, 255, 255, 0.2); }
+			.local-info .type-badge { background: white; color: var(--btn-primary-bg); }
+			.local-info .tag { background: rgba(255, 255, 255, 0.2); color: white; }
+			.status-icon { color: white; }
+			.download-btn-circle { color: white; border-color: rgba(255, 255, 255, 0.3); }
+			.active-indicator { color: white; filter: none; }
 		}
 
 		.list-thumb {
-			width: 100px;
-			height: 100px;
+			width: 90px;
+			height: 90px;
 			flex-shrink: 0;
-			border-radius: 10px;
+			border-radius: var(--radius-sm, 6px);
 			position: relative;
-			box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
+			background: rgba(0, 0, 0, 0.2);
 
 			img {
 				width: 100%;
 				height: 100%;
 				object-fit: cover;
-				border-radius: 10px;
+				border-radius: var(--radius-sm, 6px);
 			}
 
 			.badge-overlay {
 				position: absolute;
-				top: -6px;
-				right: -6px;
-				background: #4caf50;
+				top: -4px;
+				right: -4px;
+				background: var(--success-bg, #4caf50);
 				color: white;
 				border-radius: 50%;
-				padding: 3px;
+				padding: 2px;
 				border: 2px solid var(--bg-surface);
-				box-shadow: 0 2px 5px rgba(0, 0, 0, 0.3);
 				z-index: 2;
 			}
 		}
@@ -324,17 +327,19 @@
 			}
 		}
 
-		.verified-badge {
+		.badge {
 			position: absolute;
-			top: 5px;
-			left: 5px;
 			z-index: 5;
-			filter: drop-shadow(0 0 5px rgba(0, 0, 0, 0.8))
-				drop-shadow(0 0 2px rgba(141, 255, 112, 0.8));
 			display: flex;
 			align-items: center;
 			justify-content: center;
-			animation: trophy-pulse 2s infinite ease-in-out;
+
+			&.approved {
+				top: 5px;
+				left: 5px;
+				filter: drop-shadow(0 0 5px rgba(0, 0, 0, 0.8))
+					drop-shadow(0 0 2px rgba(141, 255, 112, 0.8));
+			}
 		}
 
 		.actions {
@@ -355,21 +360,20 @@
 			}
 
 			.download-btn-circle {
-				width: 40px;
-				height: 40px;
-				border-radius: 50%;
-				background: var(--bg-surface-hover);
+				width: 36px;
+				height: 36px;
+				border-radius: var(--radius-md, 6px);
+				background: rgba(255, 255, 255, 0.05);
 				color: var(--text-main);
 				display: flex;
 				align-items: center;
 				justify-content: center;
-				transition: all 0.2s;
+				transition: all 0.15s ease;
 				border: 1px solid rgba(255, 255, 255, 0.1);
 
 				&:hover {
 					background: var(--btn-primary-bg);
-					transform: scale(1.1);
-					box-shadow: 0 0 15px var(--shadow-primary-glow);
+					border-color: var(--btn-primary-bg);
 				}
 			}
 
@@ -409,16 +413,6 @@
 				color: var(--btn-primary-bg);
 				filter: drop-shadow(0 0 8px var(--shadow-primary-glow));
 			}
-		}
-	}
-
-	@keyframes trophy-pulse {
-		0%,
-		100% {
-			transform: scale(1);
-		}
-		50% {
-			transform: scale(1.1);
 		}
 	}
 </style>

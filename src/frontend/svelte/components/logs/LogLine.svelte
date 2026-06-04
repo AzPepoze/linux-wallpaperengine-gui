@@ -72,9 +72,6 @@
 				color: color-mix(in srgb, var(--success-bg, #28a745), white 30%);
 			}
 		}
-
-		&.info {
-		}
 	}
 
 	.line-no {
