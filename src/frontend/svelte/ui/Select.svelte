@@ -6,6 +6,7 @@
 	export let value: string;
 	export let options: { value: string; label: string }[] = [];
 	export let id: string = '';
+	export let style: string = '';
 	export let onChange: (value: string) => void = () => {};
 
 	let isOpen = false;
@@ -71,7 +72,7 @@
 	});
 </script>
 
-<div class="select-container" {id} bind:this={container} class:is-open={isOpen}>
+<div class="select-container" {id} {style} bind:this={container} class:is-open={isOpen}>
 	<button
 		class="select-trigger"
 		class:active={isOpen}
@@ -211,13 +212,14 @@
 
 	.options-dropdown {
 		box-sizing: border-box;
-		background: var(--bg-app);
+		background: var(--bg-overlay);
 		border: 1px solid var(--border-color-hover);
 		border-radius: var(--radius-xl);
 		padding: 8px;
 		z-index: 1000;
 		box-shadow: var(--shadow-lg);
-		backdrop-filter: none;
+		backdrop-filter: blur(20px);
+		-webkit-backdrop-filter: blur(20px);
 		max-height: 300px;
 		overflow-y: auto;
 

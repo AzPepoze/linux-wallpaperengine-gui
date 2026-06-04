@@ -52,18 +52,21 @@
 	) => void = () => {};
 
 	let viewMode: 'grid' | 'list' | 'detail' = 'grid';
+	let sortMethod: 'date-desc' | 'date-asc' | 'name-asc' | 'name-desc' = 'date-desc';
 
 	let showFilterPanel = false;
 	let installedFilters: FilterConfig | null = null;
 	let weConfigError = false;
 	let playlists: Playlist[] = [];
 	let containerElement: HTMLElement | null = null;
+	let steamInstallDates: Record<string, number> = {};
 
 	$: combinedWallpapers = getCombinedWallpapers(
 		wallpapers,
 		$subscribedIds,
 		$downloadingMetadata,
-		steamRunning
+		steamRunning,
+		steamInstallDates
 	);
 
 	// Reactive filtering of wallpapers
@@ -72,6 +75,24 @@
 		installedFilters,
 		$downloadProgress
 	);
+
+	// Sorting logic
+	$: sortedWallpapers = Object.entries(filteredWallpapers).sort((a, b) => {
+		const wpA = a[1];
+		const wpB = b[1];
+		
+		if (sortMethod.startsWith('date')) {
+			const dateA = wpA.installDate || 0;
+			const dateB = wpB.installDate || 0;
+			return sortMethod === 'date-desc' ? dateB - dateA : dateA - dateB;
+		} else {
+			const nameA = (wpA.projectData?.title || a[0]).toLowerCase();
+			const nameB = (wpB.projectData?.title || b[0]).toLowerCase();
+			if (nameA < nameB) return sortMethod === 'name-asc' ? -1 : 1;
+			if (nameA > nameB) return sortMethod === 'name-asc' ? 1 : -1;
+			return 0;
+		}
+	});
 
 	$: activePlaylist = playlists.find(
 		(p) => p.name === $settingsStore?.playlist
@@ -87,7 +108,12 @@
 
 		// Check Steam status
 		async function updateSteamStatus() {
+			const wasRunning = steamRunning;
 			steamRunning = await checkSteamStatus();
+			
+			if (steamRunning && !wasRunning) {
+				steamInstallDates = await window.electronAPI.getAllWorkshopInstallInfo();
+			}
 		}
 		updateSteamStatus();
 		const steamInterval = setInterval(updateSteamStatus, 5000);
@@ -144,6 +170,11 @@
 		wallpapers = result.wallpapers;
 		workshopPathValid = result.workshopPathValid;
 		wallpaperEnginePathValid = result.wallpaperEnginePathValid;
+		
+		if (steamRunning) {
+			steamInstallDates = await window.electronAPI.getAllWorkshopInstallInfo();
+		}
+
 		onWallpapersRefresh(result.wallpapers);
 	}
 
@@ -168,6 +199,7 @@
 			{selectedScreen}
 			bind:showFilterPanel
 			bind:viewMode
+			bind:sortMethod
 			onRefresh={refreshWallpapers}
 			onToggleCloneMode={handleToggleCloneMode}
 			onLoadPlaylists={loadPlaylists}
@@ -206,7 +238,7 @@
 					<div class="status-msg">Loading...</div>
 				{:else if error}
 					<div class="status-msg error">{error}</div>
-				{:else if Object.keys(filteredWallpapers).length === 0}
+				{:else if sortedWallpapers.length === 0}
 					<div class="status-msg">
 						<p>No wallpapers found matching filters.</p>
 						<p class="hint">
@@ -222,7 +254,7 @@
 					</div>
 				{:else if viewMode === 'grid'}
 					<WallpaperItemGrid
-						wallpapers={Object.entries(filteredWallpapers)}
+						wallpapers={sortedWallpapers}
 						{selectedWallpaper}
 						{activePlaylist}
 						onSelect={selectWallpaper}
@@ -230,7 +262,7 @@
 					/>
 				{:else}
 					<WallpaperItemList
-						wallpapers={Object.entries(filteredWallpapers)}
+						wallpapers={sortedWallpapers}
 						{selectedWallpaper}
 						{activePlaylist}
 						onSelect={selectWallpaper}

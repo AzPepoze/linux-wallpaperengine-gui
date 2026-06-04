@@ -17,6 +17,7 @@ export type WallpaperProjectData = {
 export type WallpaperData = {
 	projectData: WallpaperProjectData | null;
 	previewPath: string | undefined;
+	installDate?: number;
 };
 
 export type Wallpaper = WallpaperData & { folderName: string };

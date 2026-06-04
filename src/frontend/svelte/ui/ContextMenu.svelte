@@ -7,6 +7,7 @@
 
 	let menuElement: HTMLDivElement | undefined = $state();
 	let activeSubMenuIndex = $state<number | null>(null);
+	let activeSubMenuTop = $state(0);
 
 	let windowWidth = $state(1920);
 	let windowHeight = $state(1080);
@@ -48,9 +49,10 @@
 		Math.min($contextMenuStore.y, Math.max(0, windowHeight - menuHeight - 10))
 	);
 
-	function handleMouseEnter(index: number, item: ContextMenuItem) {
+	function handleMouseEnter(index: number, item: ContextMenuItem, event: MouseEvent) {
 		if (item.subMenu) {
 			activeSubMenuIndex = index;
+			activeSubMenuTop = (event.currentTarget as HTMLElement).offsetTop;
 		} else {
 			activeSubMenuIndex = null;
 		}
@@ -72,72 +74,81 @@
 	<!-- svelte-ignore a11y_no_static_element_interactions -->
 	<!-- svelte-ignore a11y_click_events_have_key_events -->
 	<div 
-		class="context-menu" 
+		class="context-menu-root" 
 		bind:this={menuElement}
 		style="left: {safeX}px; top: {safeY}px;"
 		in:fly={{ y: 5, duration: 150 }}
 		out:fade={{ duration: 100 }}
 		oncontextmenu={(e) => e.preventDefault()}
 	>
-		{#each $contextMenuStore.items as item, index}
-			{#if item.divider}
-				<div class="divider"></div>
-			{:else}
-				<div 
-					class="menu-item"
-					class:danger={item.danger}
-					class:disabled={item.disabled}
-					class:has-submenu={!!item.subMenu}
-					onclick={(e) => handleItemClick(item, e)}
-					onmouseenter={() => handleMouseEnter(index, item)}
-				>
-					<div class="item-content">
-						{#if item.icon}
-							<Icon name={item.icon} size={16} />
-						{:else}
-							<div class="icon-placeholder"></div>
+		<div class="menu-box">
+			{#each $contextMenuStore.items as item, index}
+				{#if item.divider}
+					<div class="divider"></div>
+				{:else}
+					<div 
+						class="menu-item"
+						class:danger={item.danger}
+						class:disabled={item.disabled}
+						class:has-submenu={!!item.subMenu}
+						onclick={(e) => handleItemClick(item, e)}
+						onmouseenter={(e) => handleMouseEnter(index, item, e)}
+					>
+						<div class="item-content">
+							{#if item.icon}
+								<Icon name={item.icon} size={16} />
+							{:else}
+								<div class="icon-placeholder"></div>
+							{/if}
+							<span class="label">{item.label}</span>
+						</div>
+						{#if item.subMenu}
+							<Icon name="chevron_right" size={16} />
 						{/if}
-						<span class="label">{item.label}</span>
 					</div>
-					{#if item.subMenu}
-						<Icon name="chevron_right" size={16} />
-						{#if activeSubMenuIndex === index}
-							<div class="sub-menu">
-								{#each item.subMenu as subItem}
-									{#if subItem.divider}
-										<div class="divider"></div>
+				{/if}
+			{/each}
+		</div>
+
+		{#if activeSubMenuIndex !== null && $contextMenuStore.items[activeSubMenuIndex]?.subMenu}
+			{@const subMenu = $contextMenuStore.items[activeSubMenuIndex].subMenu}
+			{#if subMenu}
+				<div class="menu-box sub-menu" style="top: {activeSubMenuTop - 6}px;">
+					{#each subMenu as subItem}
+						{#if subItem.divider}
+							<div class="divider"></div>
+						{:else}
+							<div 
+								class="menu-item"
+								class:danger={subItem.danger}
+								class:disabled={subItem.disabled}
+								onclick={(e) => handleItemClick(subItem, e)}
+							>
+								<div class="item-content">
+									{#if subItem.icon}
+										<Icon name={subItem.icon} size={16} />
 									{:else}
-										<div 
-											class="menu-item"
-											class:danger={subItem.danger}
-											class:disabled={subItem.disabled}
-											onclick={(e) => handleItemClick(subItem, e)}
-										>
-											<div class="item-content">
-												{#if subItem.icon}
-													<Icon name={subItem.icon} size={16} />
-												{:else}
-													<div class="icon-placeholder"></div>
-												{/if}
-												<span class="label">{subItem.label}</span>
-											</div>
-										</div>
+										<div class="icon-placeholder"></div>
 									{/if}
-								{/each}
+									<span class="label">{subItem.label}</span>
+								</div>
 							</div>
 						{/if}
-					{/if}
+					{/each}
 				</div>
 			{/if}
-		{/each}
+		{/if}
 	</div>
 {/if}
 
 <style lang="scss">
-	.context-menu, .sub-menu {
+	.context-menu-root {
 		position: fixed;
 		z-index: 9999;
-		background: color-mix(in srgb, var(--bg-modal), black 20%);
+	}
+
+	.menu-box {
+		background: var(--bg-overlay);
 		border: 1px solid var(--border-color);
 		border-radius: var(--radius-md, 8px);
 		padding: 6px;

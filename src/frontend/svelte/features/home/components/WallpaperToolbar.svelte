@@ -2,6 +2,7 @@
 	import Icon from '@/ui/Icon.svelte';
 	import Refresh from '@/ui/Refresh.svelte';
 	import Button from '@/ui/Button.svelte';
+	import Select from '@/ui/Select.svelte';
 	import ViewToggle from '@/ui/ViewToggle.svelte';
 	import Toolbar from '@/ui/layout/Toolbar.svelte';
 	import { fly } from 'svelte/transition';
@@ -17,6 +18,7 @@
 	export let selectedScreen: string | null = null;
 	export let showFilterPanel: boolean = false;
 	export let viewMode: 'grid' | 'list' | 'detail' = 'grid';
+	export let sortMethod: 'date-desc' | 'date-asc' | 'name-asc' | 'name-desc' = 'date-desc';
 	export let onRefresh: () => void;
 	export let onToggleCloneMode: () => void;
 	export let onLoadPlaylists: () => void;
@@ -103,6 +105,17 @@
 	</div>
 
 	<div slot="right" class="refresh-modes-container">
+		<Select
+			id="sort-select"
+			bind:value={sortMethod}
+			options={[
+				{ value: 'date-desc', label: $t('wallpaper.sort.dateDesc') },
+				{ value: 'date-asc', label: $t('wallpaper.sort.dateAsc') },
+				{ value: 'name-asc', label: $t('wallpaper.sort.nameAsc') },
+				{ value: 'name-desc', label: $t('wallpaper.sort.nameDesc') }
+			]}
+			style="width: 160px;"
+		/>
 		<Refresh on:click={onRefresh} />
 		<div class="mode-toggles">
 			<ViewToggle bind:viewMode />

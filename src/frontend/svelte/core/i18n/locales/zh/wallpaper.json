@@ -7,6 +7,12 @@
 		"displayBtn": "显示器",
 		"cloneMode": "克隆模式"
 	},
+	"sort": {
+		"dateDesc": "[NYT_ZH] Date (Newest)",
+		"dateAsc": "[NYT_ZH] Date (Oldest)",
+		"nameAsc": "[NYT_ZH] Name (A-Z)",
+		"nameDesc": "[NYT_ZH] Name (Z-A)"
+	},
 	"properties": {
 		"title": "属性",
 		"loading": "正在加载属性...",
