@@ -11,6 +11,7 @@
 	} from '@/scripts/shared/ui';
 	import { cloneMode } from '@/scripts/home/display';
 	import type { Wallpaper } from '@shared/types';
+	import { t } from '@/i18n';
 
 	export let activeWallpaper: Wallpaper | null = null;
 	export let selectedScreen: string | null = null;
@@ -33,7 +34,7 @@
 			style="padding: 8px; border-radius: 10px;"
 		>
 			<Icon name="featured_play_list" size={20} />
-			<span>Playlist</span>
+			<span>{$t('wallpaper.toolbar.playlist')}</span>
 		</Button>
 
 		<Button
@@ -43,13 +44,13 @@
 			style="padding: 8px; border-radius: 10px;"
 		>
 			<Icon name="filter_list" size={20} />
-			<span>Filter</span>
+			<span>{$t('wallpaper.toolbar.filter')}</span>
 		</Button>
 	</div>
 
 	<div slot="center" class="status-info">
 		<div class="status-item truncate-item">
-			<span class="label">CURRENTLY USING :</span>
+			<span class="label">{$t('wallpaper.toolbar.currentlyUsing')}</span>
 			{#if activeWallpaper}
 				<div class="value-container">
 					{#key activeWallpaper.projectData?.title || activeWallpaper.folderName}
@@ -68,7 +69,7 @@
 			{/if}
 		</div>
 		<div class="status-item">
-			<span class="label">DISPLAY :</span>
+			<span class="label">{$t('wallpaper.toolbar.display')}</span>
 			{#if selectedScreen || $cloneMode}
 				<span
 					in:fly={{ y: 20, duration: 300 }}
@@ -86,7 +87,7 @@
 				style="padding: 8px; border-radius: 10px;"
 			>
 				<Icon name="monitor" size={20} />
-				<span>Display</span>
+				<span>{$t('wallpaper.toolbar.displayBtn')}</span>
 			</Button>
 
 			<Button
@@ -96,7 +97,7 @@
 				style="padding: 8px; border-radius: 10px;"
 			>
 				<Icon name="layers" size={20} />
-				<span>Clone mode</span>
+				<span>{$t('wallpaper.toolbar.cloneMode')}</span>
 			</Button>
 		</div>
 	</div>

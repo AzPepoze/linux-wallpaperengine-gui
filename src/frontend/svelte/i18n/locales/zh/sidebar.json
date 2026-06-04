@@ -1,0 +1,27 @@
+{
+	"local": {
+		"folder": "文件夹：",
+		"fileInfo": "文件信息",
+		"size": "大小：",
+		"type": "类型：",
+		"version": "版本：",
+		"rating": "评级：",
+		"description": "描述",
+		"properties": "属性"
+	},
+	"workshop": {
+		"tags": "标签",
+		"description": "描述",
+		"engagement": "互动",
+		"views": "浏览",
+		"subs": "订阅",
+		"favorites": "收藏",
+		"upvotes": "赞",
+		"fileInfo": "文件信息",
+		"fileSize": "文件大小",
+		"created": "创建",
+		"updated": "更新",
+		"status": "状态",
+		"banned": "已封禁"
+	}
+}

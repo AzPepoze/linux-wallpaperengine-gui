@@ -20,7 +20,9 @@
         "preview": "vite preview",
         "check": "bun utils/check.ts",
         "check:frontend": "bun utils/check.ts --frontend",
-        "check:backend": "bun utils/check.ts --backend"
+        "check:backend": "bun utils/check.ts --backend",
+        "i18n:check": "bun utils/i18n-check.ts",
+        "i18n:generate": "bun utils/i18n-generate.ts"
     },
     "devDependencies": 
     {

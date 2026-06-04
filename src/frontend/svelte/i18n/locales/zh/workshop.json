@@ -1,0 +1,31 @@
+{
+	"actions": {
+		"viewOnWorkshop": "在创意工坊查看",
+		"subscribe": "订阅",
+		"unsubscribe": "取消订阅",
+		"downloading": "下载中 {percent}%"
+	},
+	"controls": {
+		"filter": "筛选",
+		"search": "搜索",
+		"sort": "排序：",
+		"type": "类型：",
+		"page": "每页：",
+		"infinite": "无限滚动",
+		"itemsFound": "找到 {count} 个项目",
+		"searchPlaceholder": "搜索壁纸...",
+		"sortTrend": "趋势",
+		"sortRecent": "最新",
+		"sortPopular": "热门",
+		"sortSubscriptions": "订阅数",
+		"sortVotedUp": "好评",
+		"sortLastUpdated": "最近更新",
+		"typeAll": "全部",
+		"typeItems": "项目",
+		"typeCollections": "合集",
+		"page50": "50 项",
+		"page100": "100 项",
+		"page150": "150 项",
+		"page200": "200 项"
+	}
+}

@@ -18,6 +18,7 @@
 	import Topbar from '@/components/shared/layout/Topbar.svelte';
 	import Toast from '@/components/shared/ui/Toast.svelte';
 	import { toastStore } from '@/scripts/shared/toastStore';
+	import { setLocale } from '@/i18n';
 
 	const viewComponents = {
 		wallpapers: WallpaperView,
@@ -51,6 +52,9 @@
 	onMount(() => {
 		const cleanup = setupGlobalListeners();
 		initLogger();
+
+		const lang = navigator.language?.startsWith('zh') ? 'zh' : 'en';
+		setLocale(lang);
 
 		async function init() {
 			await loadSettings();

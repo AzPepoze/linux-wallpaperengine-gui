@@ -8,7 +8,7 @@ async function runCommand(
 	args: string[],
 	name: string,
 	dir: string = ".",
-): Promise<{ success: boolean; duration: number }> {
+): Promise<{ success: boolean; duration: number; status: "PASS" | "WARN" | "FAIL" }> {
 	console.log(`\x1b[36m▶ Running ${name}...\x1b[0m`);
 	const start = performance.now();
 
@@ -25,12 +25,17 @@ async function runCommand(
 				console.log(
 					`\x1b[32m✔ ${name} passed in ${duration.toFixed(2)}s\x1b[0m\n`,
 				);
-				resolve({ success: true, duration });
+				resolve({ success: true, duration, status: "PASS" });
+			} else if (code === 2) {
+				console.log(
+					`\x1b[33m⚠ ${name} finished with warnings in ${duration.toFixed(2)}s\x1b[0m\n`,
+				);
+				resolve({ success: true, duration, status: "WARN" });
 			} else {
 				console.log(
 					`\x1b[31m✘ ${name} failed in ${duration.toFixed(2)}s (exit code ${code})\x1b[0m\n`,
 				);
-				resolve({ success: false, duration });
+				resolve({ success: false, duration, status: "FAIL" });
 			}
 		});
 	});
@@ -54,6 +59,16 @@ async function main() {
 			name: "Frontend (TypeScript)",
 			cmd: "bun",
 			args: ["exec", "tsc", "-p", "tsconfig.json"],
+		},
+		{
+			name: "Frontend (i18n Sync & Gen)",
+			cmd: "bun",
+			args: ["run", "utils/i18n-generate.ts"],
+		},
+		{
+			name: "Frontend (i18n Check)",
+			cmd: "bun",
+			args: ["run", "utils/i18n-check.ts"],
 		},
 	];
 
@@ -91,7 +106,7 @@ async function main() {
 	}
 
 	let allSuccess = true;
-	const results: { name: string; success: boolean; duration: number }[] = [];
+	const results: { name: string; success: boolean; duration: number; status: "PASS" | "WARN" | "FAIL" }[] = [];
 
 	for (const task of tasks) {
 		const result = await runCommand(
@@ -108,11 +123,12 @@ async function main() {
 
 	console.log("\x1b[1m\x1b[35m=== Summary ===\x1b[0m");
 	results.forEach((r) => {
-		const status = r.success
-			? "\x1b[32mPASS\x1b[0m"
-			: "\x1b[31mFAIL\x1b[0m";
+		let statusLabel = "\x1b[31mFAIL\x1b[0m";
+		if (r.status === "PASS") statusLabel = "\x1b[32mPASS\x1b[0m";
+		else if (r.status === "WARN") statusLabel = "\x1b[33mWARN\x1b[0m";
+		
 		console.log(
-			`${status} | ${r.name.padEnd(25)} | ${r.duration.toFixed(2)}s`,
+			`${statusLabel} | ${r.name.padEnd(25)} | ${r.duration.toFixed(2)}s`,
 		);
 	});
 

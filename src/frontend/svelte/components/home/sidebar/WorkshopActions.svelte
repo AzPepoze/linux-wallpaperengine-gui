@@ -9,6 +9,7 @@
 	import { logger } from '@/scripts/shared/logger';
 	import Icon from '@/components/shared/ui/Icon.svelte';
 	import type { Wallpaper } from '@shared/types';
+	import { t } from '@/i18n';
 
 	export let wallpaper: Wallpaper;
 
@@ -49,7 +50,7 @@
 		}}
 	>
 		<Icon name="storefront" size={18} />
-		View on Workshop
+		{$t('workshop.actions.viewOnWorkshop')}
 	</button>
 
 	{#if isSubscribed}
@@ -59,7 +60,7 @@
 					<div class="progress-glow"></div>
 					<div class="progress-shimmer"></div>
 				</div>
-				<span class="progress-text">Downloading {percent}%</span>
+				<span class="progress-text">{$t('workshop.actions.downloading', { percent })}</span>
 			</button>
 		{:else}
 			<button
@@ -68,7 +69,7 @@
 				on:click={handleUnsubscribe}
 			>
 				<Icon name="remove_shopping_cart" size={18} />
-				Unsubscribe
+				{$t('workshop.actions.unsubscribe')}
 			</button>
 		{/if}
 	{:else}
@@ -83,10 +84,10 @@
 					<div class="progress-glow"></div>
 					<div class="progress-shimmer"></div>
 				</div>
-				<span class="progress-text">Downloading {percent}%</span>
+				<span class="progress-text">{$t('workshop.actions.downloading', { percent })}</span>
 			{:else}
 				<Icon name="download" size={18} />
-				Subscribe
+				{$t('workshop.actions.subscribe')}
 			{/if}
 		</button>
 	{/if}

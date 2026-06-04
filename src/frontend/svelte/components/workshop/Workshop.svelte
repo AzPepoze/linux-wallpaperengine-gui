@@ -1,6 +1,7 @@
 <script lang="ts">
 	import { onMount } from 'svelte';
 	import { showToast } from '@/scripts/shared/toastStore';
+	import { t } from '@/i18n';
 	import BrowseTab from './BrowseTab.svelte';
 	import type { WorkshopItem } from '@/utils/workshopHelper';
 	import type { FilterConfig } from '@shared/types';
@@ -21,7 +22,9 @@
 	} from './Workshop.svelte.ts';
 
 	let workshopFilters: FilterConfig = { ...DEFAULT_WORKSHOP_FILTER_CONFIG };
-	let filterCategories: FilterCategory[] = buildFilterCategories();
+	let filterCategories: FilterCategory[] = buildFilterCategories().filter(
+		(cat) => cat.internalKey !== 'sourcetags'
+	);
 	let initialLoadDone = false;
 	let showFilterPanel = false;
 	let searching = false;
@@ -53,9 +56,21 @@
 		steamRunning = await checkSteamStatus();
 	}
 
+	async function handleRetryConnection() {
+		await updateSteamStatus();
+		if (steamRunning) {
+			handleSearch();
+		}
+	}
+
 	function handleLaunchSteam() {
 		launchSteam();
-		setTimeout(updateSteamStatus, 5000);
+		setTimeout(async () => {
+			await updateSteamStatus();
+			if (steamRunning) {
+				handleSearch();
+			}
+		}, 5000);
 	}
 
 	async function handleLoadFilters() {
@@ -115,7 +130,7 @@
 		} catch (error) {
 			const errorMsg = error instanceof Error ? error.message : 'Unknown error';
 			searchError = errorMsg;
-			showToast(`Error searching: ${errorMsg}`, 'error');
+			showToast($t('playlist.messages.errorSearching', { message: errorMsg }), 'error');
 
 			if (
 				errorMsg.includes('Steamworks client not initialized') ||
@@ -160,12 +175,12 @@
 			totalItems = result.total;
 
 			if (browseItems.length === 0) {
-				showToast('No items found', 'info');
+				showToast($t('playlist.messages.noItemsFound'), 'info');
 			}
 		} catch (error) {
 			const errorMsg = error instanceof Error ? error.message : 'Unknown error';
 			searchError = errorMsg;
-			showToast(`Error browsing workshop: ${errorMsg}`, 'error');
+			showToast($t('playlist.messages.errorBrowsing', { message: errorMsg }), 'error');
 
 			if (
 				errorMsg.includes('Steamworks client not initialized') ||
@@ -199,7 +214,7 @@
 			<SteamFallback
 				{searchError}
 				onLaunchSteam={handleLaunchSteam}
-				onRetry={updateSteamStatus}
+				onRetry={handleRetryConnection}
 			/>
 		{:else}
 			{#if showFilterPanel && workshopFilters}

@@ -45,6 +45,8 @@ export interface SettingsState {
 	uiTransparency: number;
 	steamPaths: string[];
 	enableScrollMask: boolean;
+	hookEnabled: boolean;
+	wallpaperChangeCommand: string;
 }
 
 export const settingsStore: Writable<SettingsState | null> = writable(null);
@@ -83,6 +85,8 @@ const configFieldMap: Record<string, string> = {
 	uiTransparency: "uiTransparency",
 	steamPaths: "steamPaths",
 	enableScrollMask: "enableScrollMask",
+	hookEnabled: "hookEnabled",
+	wallpaperChangeCommand: "wallpaperChangeCommand",
 };
 
 // Settings Actions

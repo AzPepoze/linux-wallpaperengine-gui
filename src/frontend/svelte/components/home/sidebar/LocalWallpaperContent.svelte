@@ -3,6 +3,7 @@
 	import { formatBytes } from '@/utils/formatHelper';
 	import type { Wallpaper } from '@shared/types';
 	import WallpaperProperties from '../WallpaperProperties.svelte';
+	import { t } from '@/i18n';
 
 	export let wallpaper: Wallpaper;
 	export let fileSize: number | null = null;
@@ -38,33 +39,33 @@
 <div class="local-sidebar">
 	<div class="section header-section">
 		<h3 class="title">{projectData?.title || folderName}</h3>
-		<p class="folder-name">Folder: {folderName}</p>
+		<p class="folder-name">{$t('sidebar.local.folder')} {folderName}</p>
 	</div>
 
 	<div class="section info-section">
-		<h4 class="section-title">File Info</h4>
+		<h4 class="section-title">{$t('sidebar.local.fileInfo')}</h4>
 		<div class="info-list">
 			{#if displayFileSize}
 				<div class="info-item">
-					<span class="info-label">Size:</span>
+					<span class="info-label">{$t('sidebar.local.size')}</span>
 					<span class="info-value">{formatBytes(displayFileSize)}</span>
 				</div>
 			{/if}
 			{#if projectData.type}
 				<div class="info-item">
-					<span class="info-label">Type:</span>
+					<span class="info-label">{$t('sidebar.local.type')}</span>
 					<span class="info-value">{projectData.type}</span>
 				</div>
 			{/if}
 			{#if projectData.version}
 				<div class="info-item">
-					<span class="info-label">Version:</span>
+					<span class="info-label">{$t('sidebar.local.version')}</span>
 					<span class="info-value">{projectData.version}</span>
 				</div>
 			{/if}
 			{#if projectData.contentrating}
 				<div class="info-item">
-					<span class="info-label">Rating:</span>
+					<span class="info-label">{$t('sidebar.local.rating')}</span>
 					<span class="info-value">{projectData.contentrating}</span>
 				</div>
 			{/if}
@@ -73,7 +74,7 @@
 
 	{#if description}
 		<div class="section description-section">
-			<h4 class="section-title">Description</h4>
+			<h4 class="section-title">{$t('sidebar.local.description')}</h4>
 			<div class="description-content">
 				{@html renderMarkdown(description)}
 			</div>
@@ -83,7 +84,7 @@
 	<hr />
 
 	<div class="section properties-section">
-		<h4 class="section-title">Properties</h4>
+		<h4 class="section-title">{$t('sidebar.local.properties')}</h4>
 		<WallpaperProperties wallpaperId={folderName} {textColor} {palette} />
 	</div>
 </div>

@@ -1,0 +1,27 @@
+{
+	"local": {
+		"folder": "Folder:",
+		"fileInfo": "File Info",
+		"size": "Size:",
+		"type": "Type:",
+		"version": "Version:",
+		"rating": "Rating:",
+		"description": "Description",
+		"properties": "Properties"
+	},
+	"workshop": {
+		"tags": "Tags",
+		"description": "Description",
+		"engagement": "Engagement",
+		"views": "Views",
+		"subs": "Subs",
+		"favorites": "Favorites",
+		"upvotes": "Upvotes",
+		"fileInfo": "File Info",
+		"fileSize": "File Size",
+		"created": "Created",
+		"updated": "Updated",
+		"status": "Status",
+		"banned": "Banned"
+	}
+}

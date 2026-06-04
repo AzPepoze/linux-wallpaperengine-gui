@@ -9,6 +9,7 @@
 	import type { FilterConfig } from '@shared/types';
 	import { logger } from '@/scripts/shared/logger';
 	import Button from '@/components/shared/ui/Button.svelte';
+	import { t } from '@/i18n';
 	import Icon from '@/components/shared/ui/Icon.svelte';
 	import ResizeHandle from '@/components/shared/ui/ResizeHandle.svelte';
 	import FilterCategorySection from './FilterCategorySection.svelte';
@@ -125,7 +126,7 @@
 
 	<div class="panel-inner">
 		<div class="panel-header">
-			<h3>Filters</h3>
+			<h3>{$t('filter.ui.filters')}</h3>
 			<div class="header-actions">
 				<Button
 					variant="secondary"
@@ -133,7 +134,7 @@
 					style="padding: 4px 8px; font-size: 0.8em;"
 				>
 					<Icon name="restart_alt" size={16} />
-					<span>Reset</span>
+					<span>{$t('filter.ui.reset')}</span>
 				</Button>
 				{#if onSave}
 					<Button
@@ -142,7 +143,7 @@
 						style="padding: 4px 12px; font-size: 0.8em;"
 					>
 						<Icon name="done" size={16} />
-						<span>Apply</span>
+						<span>{$t('filter.ui.apply')}</span>
 					</Button>
 				{/if}
 				<Button

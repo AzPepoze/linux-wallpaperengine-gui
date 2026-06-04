@@ -14,6 +14,7 @@
 	} from '@/scripts/settings/settings';
 	import SettingsSection from '@/components/settings/SettingsSection.svelte';
 	import Icon from '@/components/shared/ui/Icon.svelte';
+	import { t } from '@/i18n';
 
 	let saveTimeout: ReturnType<typeof setTimeout>;
 	let initialLoadDone = false;
@@ -22,26 +23,26 @@
 	const sections = [
 		{
 			id: 'general',
-			label: 'General',
+			labelKey: 'settings.sectionGeneral',
 			icon: 'monitor',
 			component: General
 		},
-		{ id: 'audio', label: 'Audio', icon: 'volume_up', component: Audio },
+		{ id: 'audio', labelKey: 'settings.sectionAudio', icon: 'volume_up', component: Audio },
 		{
 			id: 'interaction',
-			label: 'Interaction',
+			labelKey: 'settings.sectionInteraction',
 			icon: 'mouse',
 			component: Interaction
 		},
 		{
 			id: 'advanced',
-			label: 'Advanced',
+			labelKey: 'settings.sectionAdvanced',
 			icon: 'settings',
 			component: Advanced
 		},
 		{
 			id: 'executable',
-			label: 'Executable',
+			labelKey: 'settings.sectionExecutable',
 			icon: 'folder',
 			component: Executable
 		}
@@ -110,8 +111,8 @@
 <div class="settings-container">
 	<aside class="settings-sidebar">
 		<div class="sidebar-header">
-			<h2>Settings</h2>
-			<p>Configure your experience</p>
+			<h2>{$t('settings.title')}</h2>
+			<p>{$t('settings.subtitle')}</p>
 		</div>
 		<nav class="sidebar-nav">
 			{#each sections as section}
@@ -121,14 +122,14 @@
 					on:click={() => scrollToSection(section.id)}
 				>
 					<Icon name={section.icon} size={18} />
-					<span>{section.label}</span>
+					<span>{$t(section.labelKey)}</span>
 				</button>
 			{/each}
 		</nav>
 
 		<div class="sidebar-actions">
 			<button class="action-btn secondary" on:click={handleOpenConfig}>
-				Open Config
+				{$t('settings.openConfig')}
 			</button>
 		</div>
 	</aside>
@@ -137,7 +138,7 @@
 		{#if $settingsStore}
 			<div class="content-wrapper">
 				{#each sections as section}
-					<SettingsSection title={section.label} id={section.id}>
+					<SettingsSection title={$t(section.labelKey)} id={section.id}>
 						<svelte:component this={section.component} />
 					</SettingsSection>
 					<div class="divider"></div>
@@ -146,7 +147,7 @@
 		{:else}
 			<div class="loading-container">
 				<div class="spinner"></div>
-				<p>Loading settings...</p>
+				<p>{$t('settings.loading')}</p>
 			</div>
 		{/if}
 	</main>

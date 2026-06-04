@@ -13,9 +13,10 @@
 		logs: string[];
 		onClear: () => void;
 		width: number;
+		wrapText: boolean;
 	}
 
-	let { title, icon, type, logs, onClear, width }: Props = $props();
+	let { title, icon, type, logs, onClear, width, wrapText }: Props = $props();
 
 	// Local states for this panel
 	let searchQuery = $state('');
@@ -152,7 +153,7 @@
 			</div>
 		{:else}
 			{#each filteredLogs as log, i}
-				<LogLine {log} index={i} {searchQuery} />
+				<LogLine {log} index={i} {searchQuery} {wrapText} />
 			{/each}
 		{/if}
 	</div>

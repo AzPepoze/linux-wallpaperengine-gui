@@ -2,6 +2,7 @@
 	import MarkdownIt from 'markdown-it';
 	import { formatBytes, formatDate } from '@/utils/formatHelper';
 	import type { Wallpaper } from '@shared/types';
+	import { t } from '@/i18n';
 
 	interface InfoItem {
 		label: string;
@@ -74,25 +75,25 @@
 
 	// Build engagement stats array
 	$: engagementStats = [
-		{ label: 'Views', value: views },
-		{ label: 'Subs', value: subs },
-		{ label: 'Favorites', value: favorites },
-		{ label: 'Upvotes', value: upvotes }
+		{ label: $t('sidebar.workshop.views'), value: views },
+		{ label: $t('sidebar.workshop.subs'), value: subs },
+		{ label: $t('sidebar.workshop.favorites'), value: favorites },
+		{ label: $t('sidebar.workshop.upvotes'), value: upvotes }
 	].filter((s: any) => s.value > 0) as EngagementStat[];
 
 	// Build file info array
 	$: fileInfo = [
 		...(displayFileSize
-			? [{ label: 'File Size', value: formatBytes(displayFileSize) }]
+			? [{ label: $t('sidebar.workshop.fileSize'), value: formatBytes(displayFileSize) }]
 			: []),
 		...(createdDate
-			? [{ label: 'Created', value: formatDate(createdDate) }]
+			? [{ label: $t('sidebar.workshop.created'), value: formatDate(createdDate) }]
 			: []),
 		...(updatedDate
-			? [{ label: 'Updated', value: formatDate(updatedDate) }]
+			? [{ label: $t('sidebar.workshop.updated'), value: formatDate(updatedDate) }]
 			: []),
-		...(projectData.banned ? [{ label: 'Status', value: 'Banned' }] : [])
-	] as InfoItem[];
+		...(projectData.banned ? [{ label: $t('sidebar.workshop.status'), value: $t('sidebar.workshop.banned'), banned: true }] : [])
+	] as (InfoItem & { banned?: boolean })[];
 
 	// Check if sections should be visible
 	$: hasContent = {
@@ -128,7 +129,7 @@
 	<!-- Tags -->
 	{#if hasContent.tags}
 		<div class="section content-section">
-			<h4 class="section-title">Tags</h4>
+			<h4 class="section-title">{$t('sidebar.workshop.tags')}</h4>
 			{#if projectData?.tags?.length}
 				<div class="tags-container">
 					{#each projectData.tags as tag (tag)}
@@ -142,7 +143,7 @@
 	<!-- Description -->
 	{#if hasContent.description}
 		<div class="section description-section">
-			<h4 class="section-title">Description</h4>
+			<h4 class="section-title">{$t('sidebar.workshop.description')}</h4>
 			<div class="description-content">
 				{@html renderMarkdown(description)}
 			</div>
@@ -152,7 +153,7 @@
 	<!-- Engagement Stats -->
 	{#if hasContent.stats}
 		<div class="section stats-section">
-			<h4 class="section-title">Engagement</h4>
+			<h4 class="section-title">{$t('sidebar.workshop.engagement')}</h4>
 			<div class="stats-grid">
 				{#each engagementStats as stat (stat.label)}
 					<div class="stat-card">
@@ -169,14 +170,14 @@
 	<!-- File Information -->
 	{#if hasContent.fileInfo}
 		<div class="section info-section">
-			<h4 class="section-title">File Info</h4>
+			<h4 class="section-title">{$t('sidebar.workshop.fileInfo')}</h4>
 			<div class="info-list">
 				{#each fileInfo as item (item.label)}
 					<div class="info-item">
 						<span class="info-label">{item.label}:</span>
 						<span
 							class="info-value"
-							class:banned={item.value === 'Banned'}
+							class:banned={item.banned}
 							>{item.value}</span
 						>
 					</div>

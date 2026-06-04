@@ -5,9 +5,10 @@
 		log: ParsedLog;
 		index: number;
 		searchQuery: string;
+		wrapText: boolean;
 	}
 
-	let { log, index, searchQuery }: Props = $props();
+	let { log, index, searchQuery, wrapText }: Props = $props();
 </script>
 
 <div class="log-line {log.level}">
@@ -19,7 +20,7 @@
 	{:else}
 		<span class="log-prefix-placeholder"></span>
 	{/if}
-	<span class="line-content">{@html highlightText(colorizeMessage(log.message), searchQuery)}</span>
+	<span class="line-content" class:wrap={wrapText}>{@html highlightText(colorizeMessage(log.message), searchQuery)}</span>
 </div>
 
 <style lang="scss">
@@ -136,10 +137,15 @@
 
 	.line-content {
 		flex: 1;
-		white-space: pre-wrap;
-		word-break: break-all;
+		white-space: pre;
+		word-break: normal;
 		color: var(--text-color);
 		text-align: left;
+
+		&.wrap {
+			white-space: pre-wrap;
+			word-break: break-all;
+		}
 
 		:global(.status-error) {
 			color: var(--error-color, #ff3131);

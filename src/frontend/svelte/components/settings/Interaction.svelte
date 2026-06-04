@@ -2,13 +2,14 @@
 	import SettingItem from '@/components/shared/ui/SettingItem.svelte';
 	import Toggle from '@/components/shared/ui/Toggle.svelte';
 	import { settingsStore } from '@/scripts/settings/settings';
+	import { t } from '@/i18n';
 </script>
 
 {#if $settingsStore}
 	<SettingItem
-		label="Disable Mouse"
+		label={$t('settings.interaction.disableMouse')}
 		id="disableMouse"
-		description="Ignore mouse movement and clicks."
+		description={$t('settings.interaction.disableMouseDesc')}
 	>
 		<Toggle
 			id="disableMouse"
@@ -17,9 +18,9 @@
 	</SettingItem>
 
 	<SettingItem
-		label="Disable Parallax"
+		label={$t('settings.interaction.disableParallax')}
 		id="disableParallax"
-		description="Turn off mouse-following parallax effects."
+		description={$t('settings.interaction.disableParallaxDesc')}
 	>
 		<Toggle
 			id="disableParallax"
