@@ -34,6 +34,13 @@
 			: projectData.fileSize);
 
 	$: description = projectData.description || '';
+	
+	$: installDate = wallpaper?.installDate ? wallpaper.installDate * 1000 : undefined;
+	
+	const formatDate = (dateNum: number) => {
+		const d = new Date(dateNum);
+		return d.toLocaleDateString() + ' ' + d.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+	};
 </script>
 
 <div class="local-sidebar">
@@ -67,6 +74,12 @@
 				<div class="info-item">
 					<span class="info-label">{$t('sidebar.local.rating')}</span>
 					<span class="info-value">{projectData.contentrating}</span>
+				</div>
+			{/if}
+			{#if installDate}
+				<div class="info-item">
+					<span class="info-label">{$t('sidebar.local.installed')}</span>
+					<span class="info-value">{formatDate(installDate)}</span>
 				</div>
 			{/if}
 		</div>

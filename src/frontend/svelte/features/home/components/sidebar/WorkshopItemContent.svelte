@@ -54,6 +54,7 @@
 		: projectData.timeUpdated
 			? projectData.timeUpdated * 1000
 			: undefined;
+	$: installDate = wallpaper?.installDate ? wallpaper.installDate * 1000 : undefined;
 
 	// Stats
 	$: stats = projectData.statistics || {};
@@ -91,6 +92,9 @@
 			: []),
 		...(updatedDate
 			? [{ label: $t('sidebar.workshop.updated'), value: formatDate(updatedDate) }]
+			: []),
+		...(installDate
+			? [{ label: $t('sidebar.workshop.installed'), value: formatDate(installDate) }]
 			: []),
 		...(projectData.banned ? [{ label: $t('sidebar.workshop.status'), value: $t('sidebar.workshop.banned'), banned: true }] : [])
 	] as (InfoItem & { banned?: boolean })[];
