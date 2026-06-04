@@ -18,6 +18,7 @@
 		percent: number;
 		isWorkshop: boolean;
 		handleSelect: () => void;
+		handleContextMenu: (e: MouseEvent) => void;
 	}
 
 	let {
@@ -31,7 +32,8 @@
 		isDownloading,
 		percent,
 		isWorkshop,
-		handleSelect
+		handleSelect,
+		handleContextMenu
 	}: Props = $props();
 </script>
 
@@ -44,6 +46,7 @@
 	class:is-downloaded={isWorkshop && isDownloaded}
 	class:is-downloading={isWorkshop && isDownloading && !isDownloaded}
 	onclick={handleSelect}
+	oncontextmenu={handleContextMenu}
 	onkeydown={(e) => (e.key === 'Enter' || e.key === ' ') && handleSelect()}
 	in:scale={{ start: 0.98, duration: 200, easing: backOut }}
 >

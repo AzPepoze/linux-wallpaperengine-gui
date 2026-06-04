@@ -18,6 +18,7 @@
 		isWorkshop: boolean;
 		index: number;
 		handleSelect: () => void;
+		handleContextMenu: (e: MouseEvent) => void;
 	}
 
 	let {
@@ -32,7 +33,8 @@
 		percent,
 		isWorkshop,
 		index,
-		handleSelect
+		handleSelect,
+		handleContextMenu
 	}: Props = $props();
 </script>
 
@@ -45,6 +47,7 @@
 	class:is-downloaded={isWorkshopItem && isDownloaded}
 	class:is-downloading={isWorkshopItem && isDownloading && !isDownloaded}
 	onclick={handleSelect}
+	oncontextmenu={handleContextMenu}
 	onkeydown={(e) => (e.key === 'Enter' || e.key === ' ') && handleSelect()}
 	in:fade={{ duration: isWorkshop ? 0 : 300 }}
 	style="animation-delay: {10 + index * 50}ms"

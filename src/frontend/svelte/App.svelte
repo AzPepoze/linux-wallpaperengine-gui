@@ -17,6 +17,7 @@
 	import { applyDynamicTheme } from '@/scripts/shared/theme';
 	import Topbar from '@/components/shared/layout/Topbar.svelte';
 	import Toast from '@/components/shared/ui/Toast.svelte';
+	import ContextMenu from '@/components/shared/ui/ContextMenu.svelte';
 	import { toastStore } from '@/scripts/shared/toastStore';
 	import { setLocale } from '@/i18n';
 
@@ -85,6 +86,8 @@
 {#if $toastStore}
 	<Toast message={$toastStore.message} type={$toastStore.type} />
 {/if}
+
+<ContextMenu />
 
 <style lang="scss">
 	.app-container {
