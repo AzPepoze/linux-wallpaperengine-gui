@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"os"
+	"math"
 
 	"linux-wallpaperengine-gui/src/backend/internal/core/wallpaper"
 )
@@ -96,7 +97,11 @@ func UpdatePlaylistIntervalConfig(name string, intervalMinutes float64) error {
 	}
 	for i := range playlists {
 		if playlists[i].Name == name {
-			playlists[i].Settings.Delay = int(intervalMinutes * 60)
+			seconds := int(math.Round(intervalMinutes * 60))
+			if intervalMinutes > 0 && seconds == 0 {
+				seconds = 1
+			}
+			playlists[i].Settings.Delay = seconds
 			break
 		}
 	}

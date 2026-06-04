@@ -133,11 +133,8 @@ func (handler *Handler) HandlePlaylist(request models.Request) models.Response {
 					appConfig.PlaylistInterval = parameters.IntervalMinutes
 					_ = config.WriteConfig(appConfig)
 				}
-				if err := handler.playlistService.UpdatePlaylistInterval(screenName, parameters.IntervalMinutes); err != nil {
-					response.Error = err.Error()
-				} else {
-					response.Result = map[string]bool{"success": true}
-				}
+				_ = handler.playlistService.UpdatePlaylistInterval(screenName, parameters.IntervalMinutes)
+				response.Result = map[string]bool{"success": true}
 			}
 		}
 	case "get-playlist-status":

@@ -1,6 +1,7 @@
 <script lang="ts">
 	import { onMount } from 'svelte';
 	import { fly, fade } from 'svelte/transition';
+	import { portal } from '@/core/utils/portal';
 
 	export let value: string;
 	export let options: { value: string; label: string }[] = [];
@@ -9,13 +10,29 @@
 
 	let isOpen = false;
 	let container: HTMLDivElement;
+	let dropdownContainer: HTMLDivElement;
+	let dropdownRect = { top: 0, left: 0, width: 0, centerX: 0 };
 
 	$: selectedLabel =
 		options.find((o) => o.value === value)?.label || 'Select option...';
 
+	function updateRect() {
+		if (!container) return;
+		const rect = container.getBoundingClientRect();
+		dropdownRect = {
+			top: rect.bottom + 8,
+			left: rect.left,
+			width: rect.width,
+			centerX: rect.left + rect.width / 2
+		};
+	}
+
 	function toggle() {
 		if (options.length === 0) return;
 		isOpen = !isOpen;
+		if (isOpen) {
+			updateRect();
+		}
 	}
 
 	function selectOption(optionValue: string) {
@@ -25,15 +42,31 @@
 	}
 
 	function handleClickOutside(event: MouseEvent) {
-		if (container && !container.contains(event.target as Node)) {
+		const target = event.target as Node;
+		const clickedOutsideContainer = container && !container.contains(target);
+		const clickedOutsideDropdown = !dropdownContainer || !dropdownContainer.contains(target);
+		
+		if (clickedOutsideContainer && clickedOutsideDropdown) {
 			isOpen = false;
 		}
 	}
 
+	function handleCloseEvent(event: Event) {
+		if (!isOpen) return;
+		if (event.type === 'scroll' && dropdownContainer && dropdownContainer.contains(event.target as Node)) {
+			return;
+		}
+		isOpen = false;
+	}
+
 	onMount(() => {
 		window.addEventListener('click', handleClickOutside);
+		window.addEventListener('scroll', handleCloseEvent, true);
+		window.addEventListener('resize', handleCloseEvent);
 		return () => {
 			window.removeEventListener('click', handleClickOutside);
+			window.removeEventListener('scroll', handleCloseEvent, true);
+			window.removeEventListener('resize', handleCloseEvent);
 		};
 	});
 </script>
@@ -64,11 +97,18 @@
 
 	{#if isOpen}
 		<div
-			class="options-dropdown"
-			in:fly={{ y: -10, duration: 200 }}
-			out:fade={{ duration: 150 }}
+			use:portal
+			bind:this={dropdownContainer}
+			class="dropdown-wrapper"
+			style="top: {dropdownRect.top}px; left: {dropdownRect.centerX}px; transform: translateX(-50%);"
 		>
-			{#each options as option}
+			<div
+				class="options-dropdown"
+				style="min-width: {dropdownRect.width}px; width: max-content;"
+				in:fly={{ y: -10, duration: 200 }}
+				out:fade={{ duration: 150 }}
+			>
+				{#each options as option}
 				<button
 					class="option-item"
 					class:selected={option.value === value}
@@ -95,6 +135,7 @@
 					{/if}
 				</button>
 			{/each}
+			</div>
 		</div>
 	{/if}
 </div>
@@ -163,11 +204,12 @@
 		}
 	}
 
+	.dropdown-wrapper {
+		position: fixed;
+		z-index: 1000;
+	}
+
 	.options-dropdown {
-		position: absolute;
-		top: calc(100% + 8px);
-		left: 0;
-		width: 100%;
 		box-sizing: border-box;
 		background: var(--bg-app);
 		border: 1px solid var(--border-color-hover);
@@ -176,6 +218,23 @@
 		z-index: 1000;
 		box-shadow: var(--shadow-lg);
 		backdrop-filter: none;
+		max-height: 300px;
+		overflow-y: auto;
+
+		&::-webkit-scrollbar {
+			width: 6px;
+		}
+		&::-webkit-scrollbar-track {
+			background: transparent;
+			margin: 8px 0;
+		}
+		&::-webkit-scrollbar-thumb {
+			background: rgba(255, 255, 255, 0.1);
+			border-radius: 10px;
+		}
+		&::-webkit-scrollbar-thumb:hover {
+			background: rgba(255, 255, 255, 0.2);
+		}
 	}
 
 	.option-item {
