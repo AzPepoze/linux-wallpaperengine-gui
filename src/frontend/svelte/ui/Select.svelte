@@ -6,6 +6,7 @@
 	export let value: string;
 	export let options: { value: string; label: string }[] = [];
 	export let id: string = '';
+	export let style: string = '';
 	export let onChange: (value: string) => void = () => {};
 
 	let isOpen = false;
@@ -71,7 +72,7 @@
 	});
 </script>
 
-<div class="select-container" {id} bind:this={container} class:is-open={isOpen}>
+<div class="select-container" {id} {style} bind:this={container} class:is-open={isOpen}>
 	<button
 		class="select-trigger"
 		class:active={isOpen}

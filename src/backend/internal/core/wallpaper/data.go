@@ -54,9 +54,15 @@ func GetWallpapers() (map[string]WallpaperData, error) {
 			previewPath = fmt.Sprintf("wallpaper://%s", filepath.Join(basePath, folderName, projectData.Preview))
 		}
 
+		var installDate int64
+		if info, err := entry.Info(); err == nil {
+			installDate = info.ModTime().Unix()
+		}
+
 		wallpapers[folderName] = WallpaperData{
 			ProjectData: &projectData,
 			PreviewPath: previewPath,
+			InstallDate: installDate,
 		}
 	}
 

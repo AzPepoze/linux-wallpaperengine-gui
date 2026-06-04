@@ -7,6 +7,12 @@
 		"displayBtn": "Display",
 		"cloneMode": "Clone mode"
 	},
+	"sort": {
+		"dateDesc": "Date (Newest)",
+		"dateAsc": "Date (Oldest)",
+		"nameAsc": "Name (A-Z)",
+		"nameDesc": "Name (Z-A)"
+	},
 	"properties": {
 		"title": "Properties",
 		"loading": "Loading properties...",
