@@ -1,7 +1,7 @@
 import fs from 'fs';
 import path from 'path';
 
-const i18nDir = path.resolve(process.cwd(), 'src/frontend/svelte/i18n');
+const i18nDir = path.resolve(process.cwd(), 'src/frontend/svelte/core/i18n');
 const localesDir = path.join(i18nDir, 'locales');
 const enDir = path.join(localesDir, 'en');
 

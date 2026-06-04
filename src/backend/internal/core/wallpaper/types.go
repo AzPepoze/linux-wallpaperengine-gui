@@ -44,6 +44,7 @@ type WallpaperProjectData struct {
 type WallpaperData struct {
 	ProjectData *WallpaperProjectData `json:"projectData"`
 	PreviewPath string                `json:"previewPath,omitempty"`
+	InstallDate int64                 `json:"installDate,omitempty"`
 }
 
 type Wallpaper struct {
