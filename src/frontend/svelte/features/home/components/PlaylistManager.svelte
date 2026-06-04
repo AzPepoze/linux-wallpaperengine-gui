@@ -1,25 +1,25 @@
 <script lang="ts">
+	import { t } from '@/core/i18n';
+	import { showToast } from '@/core/toastStore';
+	import { settingsStore } from '@/features/settings/scripts/settings';
+	import type { Playlist, WallpaperData } from '@shared/types';
 	import { onMount } from 'svelte';
 	import { fly } from 'svelte/transition';
-	import { settingsStore } from '@/features/settings/scripts/settings';
-	import { showToast } from '@/core/toastStore';
-	import type { Playlist, WallpaperData } from '@shared/types';
-	import PlaylistSettingsPanel from './PlaylistSettingsPanel.svelte';
-	import PlaylistWallpapersPanel from './PlaylistWallpapersPanel.svelte';
-	import { t } from '@/core/i18n';
 	import {
-		getPlaylistOptions,
+		createPlaylist,
+		deletePlaylist,
 		fetchPlaylists,
+		getPlaylistOptions,
+		parseWallpaperIdFromPath,
+		removePlaylistItem,
+		renamePlaylist,
 		startPlaylist,
 		stopPlaylist,
-		createPlaylist,
-		renamePlaylist,
-		deletePlaylist,
-		updatePlaylistInterval,
-		removePlaylistItem,
-		parseWallpaperIdFromPath,
-		toggleWallpaperInPlaylist
+		toggleWallpaperInPlaylist,
+		updatePlaylistInterval
 	} from './PlaylistManager.svelte.ts';
+	import PlaylistSettingsPanel from './PlaylistSettingsPanel.svelte';
+	import PlaylistWallpapersPanel from './PlaylistWallpapersPanel.svelte';
 
 	export let wallpapers: Record<string, WallpaperData> = {};
 	export let onSelect: (
@@ -62,7 +62,7 @@
 			if (activePlaylist) {
 				tempInterval =
 					$settingsStore.playlistInterval ||
-					activePlaylist.settings.delay / 60;
+					parseFloat((activePlaylist.settings.delay / 60).toFixed(2));
 			}
 		}
 	}
@@ -70,7 +70,7 @@
 	async function handlePlaylistChange() {
 		if ($settingsStore) {
 			if (activePlaylist) {
-				tempInterval = activePlaylist.settings.delay / 60;
+				tempInterval = parseFloat((activePlaylist.settings.delay / 60).toFixed(2));
 				$settingsStore.playlistInterval = tempInterval;
 			} else if ($settingsStore.playlist === 'Random All') {
 				// Default interval for Random All if not set
@@ -85,15 +85,34 @@
 			await window.electronAPI.saveConfig($settingsStore);
 
 			if (activePlaylist && activePlaylist.items.length > 0) {
-				await startPlaylist(activePlaylist.name, tempInterval, cloneMode, selectedScreen);
+				await startPlaylist(
+					activePlaylist.name,
+					tempInterval,
+					cloneMode,
+					selectedScreen
+				);
 				showToast(
-					$t('playlist.messages.startedPlaylist', { display: cloneMode ? 'all displays' : selectedScreen || 'display', name: activePlaylist.name }),
+					$t('playlist.messages.startedPlaylist', {
+						display: cloneMode
+							? 'all displays'
+							: selectedScreen || 'display',
+						name: activePlaylist.name
+					}),
 					'success'
 				);
 			} else if ($settingsStore.playlist === 'Random All') {
-				await startPlaylist('Random All', tempInterval, cloneMode, selectedScreen);
+				await startPlaylist(
+					'Random All',
+					tempInterval,
+					cloneMode,
+					selectedScreen
+				);
 				showToast(
-					$t('playlist.messages.startedRandom', { display: cloneMode ? 'all displays' : selectedScreen || 'display' }),
+					$t('playlist.messages.startedRandom', {
+						display: cloneMode
+							? 'all displays'
+							: selectedScreen || 'display'
+					}),
 					'success'
 				);
 			} else {
@@ -123,7 +142,10 @@
 
 	async function handleRenamePlaylist() {
 		if (!newPlaylistName.trim() || !activePlaylist) return;
-		const success = await renamePlaylist(activePlaylist.name, newPlaylistName.trim());
+		const success = await renamePlaylist(
+			activePlaylist.name,
+			newPlaylistName.trim()
+		);
 		if (success) {
 			if ($settingsStore) {
 				$settingsStore.playlist = newPlaylistName.trim();
@@ -160,19 +182,32 @@
 				$settingsStore
 			) {
 				$settingsStore.playlistInterval = tempInterval;
+				
+				if (activePlaylist) {
+					let seconds = Math.round(tempInterval * 60);
+					if (tempInterval > 0 && seconds === 0) seconds = 1;
+					activePlaylist.settings.delay = seconds;
+				}
+
 				await updatePlaylistInterval(
 					activePlaylist?.name || 'Random All',
 					tempInterval,
 					cloneMode,
 					selectedScreen
 				);
+				await window.electronAPI.saveConfig($settingsStore);
+				showToast($t('playlist.messages.renamed') ? $t('playlist.settings.interval') + ' updated' : 'Interval updated', 'success');
 			}
 		}, 500);
 	}
 
 	async function removeItem(index: number) {
 		if (!activePlaylist) return;
-		const newItems = await removePlaylistItem(activePlaylist.name, activePlaylist.items, index);
+		const newItems = await removePlaylistItem(
+			activePlaylist.name,
+			activePlaylist.items,
+			index
+		);
 		if (newItems) {
 			activePlaylist.items = newItems;
 			playlists = playlists.map((p) =>
@@ -201,7 +236,7 @@
 			if (activePlaylist) {
 				tempInterval =
 					$settingsStore.playlistInterval ||
-					activePlaylist.settings.delay / 60;
+					parseFloat((activePlaylist.settings.delay / 60).toFixed(2));
 			} else if (currentInStore === 'Random All') {
 				tempInterval = $settingsStore.playlistInterval || 1;
 			}
@@ -220,7 +255,11 @@
 		const wpInfo = wallpapers[folderName];
 		if (!wpInfo) return;
 
-		const newItems = await toggleWallpaperInPlaylist(activePlaylist, folderName, wpInfo);
+		const newItems = await toggleWallpaperInPlaylist(
+			activePlaylist,
+			folderName,
+			wpInfo
+		);
 		if (newItems) {
 			activePlaylist.items = newItems;
 			playlists = playlists.map((p) =>

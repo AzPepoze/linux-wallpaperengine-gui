@@ -1,11 +1,11 @@
 <script lang="ts">
-	import Input from '@/ui/Input.svelte';
-	import Select from '@/ui/Select.svelte';
+	import { t } from '@/core/i18n';
+	import { settingsStore } from '@/features/settings/scripts/settings';
 	import Button from '@/ui/Button.svelte';
 	import Icon from '@/ui/Icon.svelte';
-	import { settingsStore } from '@/features/settings/scripts/settings';
+	import Input from '@/ui/Input.svelte';
+	import Select from '@/ui/Select.svelte';
 	import type { Playlist } from '@shared/types';
-	import { t } from '@/core/i18n';
 
 	export let playlistOptions: { value: string; label: string }[] = [];
 	export let activePlaylist: Playlist | null = null;
@@ -74,20 +74,22 @@
 					<span>{$t('playlist.settings.delete')}</span>
 				</Button>
 			{:else if $settingsStore?.playlist === 'Random All'}
-				<span class="info-tag">{$t('playlist.settings.dynamicPlaylist')}</span>
+				<span class="info-tag"
+					>{$t('playlist.settings.dynamicPlaylist')}</span
+				>
 			{/if}
 		</div>
 
 		{#if activePlaylist || $settingsStore?.playlist === 'Random All'}
 			<div class="interval-row">
-				<span class="label">{$t('playlist.settings.interval')}</span>
+				<span class="label">{$t('playlist.settings.interval')}</span
+				>
 				<Input
 					type="number"
 					step="any"
 					min={0}
 					bind:value={tempInterval}
 					on:input={onIntervalInput}
-					style="width: 80px;"
 				/>
 			</div>
 		{/if}
@@ -133,14 +135,14 @@
 		.interval-row {
 			display: flex;
 			align-items: center;
-			justify-content: space-between;
+			justify-content: flex-start;
 			gap: 10px;
 			.label {
 				color: var(--text-muted);
 			}
 
 			:global(.input-wrapper) {
-				width: auto !important;
+				flex: 1;
 			}
 		}
 

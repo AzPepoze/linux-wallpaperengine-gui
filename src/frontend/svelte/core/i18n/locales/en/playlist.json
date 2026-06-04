@@ -8,7 +8,7 @@
 		"rename": "Rename",
 		"delete": "Delete",
 		"dynamicPlaylist": "Dynamic Playlist",
-		"interval": "Interval (min):",
+		"interval": "Interval (minute):",
 		"none": "None",
 		"randomAll": "Random All (Dynamic)"
 	},
