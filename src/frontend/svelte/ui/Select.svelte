@@ -212,13 +212,14 @@
 
 	.options-dropdown {
 		box-sizing: border-box;
-		background: var(--bg-app);
+		background: var(--bg-overlay);
 		border: 1px solid var(--border-color-hover);
 		border-radius: var(--radius-xl);
 		padding: 8px;
 		z-index: 1000;
 		box-shadow: var(--shadow-lg);
-		backdrop-filter: none;
+		backdrop-filter: blur(20px);
+		-webkit-backdrop-filter: blur(20px);
 		max-height: 300px;
 		overflow-y: auto;
 

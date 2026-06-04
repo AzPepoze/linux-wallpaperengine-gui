@@ -37,8 +37,8 @@ export async function applyDynamicTheme(
                 `color-mix(in srgb, rgb(${cappedBgColor.join(',')}), ${mixColorBg} 10%)`
             );
             root.style.setProperty(
-                '--bg-dropdown',
-                `color-mix(in srgb, rgb(${cappedBgColor.join(',')}), black 40%)`
+                '--bg-overlay',
+                `rgba(${cappedBgColor.join(',')}, 0.8)`
             );
 
             // Interactive surfaces
@@ -109,7 +109,7 @@ export function resetTheme(settings: SettingsState | null) {
     root.style.removeProperty('--bg-surface-hover');
     root.style.removeProperty('--bg-surface-active');
     root.style.removeProperty('--bg-modal');
-    root.style.removeProperty('--bg-dropdown');
+    root.style.removeProperty('--bg-overlay');
     root.style.removeProperty('--btn-primary-bg');
     root.style.removeProperty('--btn-primary-hover-bg');
     root.style.removeProperty('--btn-secondary-bg');
