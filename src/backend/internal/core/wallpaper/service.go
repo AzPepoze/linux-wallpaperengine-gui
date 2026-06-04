@@ -5,6 +5,7 @@ import (
 	"os"
 	"os/exec"
 	"path/filepath"
+	"strconv"
 	"strings"
 
 	"linux-wallpaperengine-gui/src/backend/internal/config"
@@ -49,6 +50,8 @@ func (service *Service) ApplyWallpapers() error {
 
 	desiredWallpapers := []struct {
 		Screen  string
+		Exec    string
+		Args    []string
 		Command string
 	}{}
 
@@ -58,11 +61,13 @@ func (service *Service) ApplyWallpapers() error {
 			continue
 		}
 
-		command := service.buildWallpaperCommand(appConfig, screen.Name, wallpaperID)
+		execPath, args, cmdStr := service.buildWallpaperCommand(appConfig, screen.Name, wallpaperID)
 		desiredWallpapers = append(desiredWallpapers, struct {
 			Screen  string
+			Exec    string
+			Args    []string
 			Command string
-		}{Screen: screen.Name, Command: command})
+		}{Screen: screen.Name, Exec: execPath, Args: args, Command: cmdStr})
 	}
 
 	service.processManager.UpdateWallpapers(desiredWallpapers)
@@ -103,7 +108,14 @@ func (service *Service) ApplyWallpapers() error {
 			logger.Printf("Running hook command for %s on %s: %s", wallpaperID, screen.Name, cmd)
 
 			go func(c, id, screenName string) {
-				out, err := exec.Command("sh", "-c", c).CombinedOutput()
+				parts := strings.Fields(c)
+				if len(parts) == 0 {
+					logger.Printf("hook command empty for %s on %s", id, screenName)
+					return
+				}
+				execPath := parts[0]
+				args := parts[1:]
+				out, err := exec.Command(execPath, args...).CombinedOutput()
 				if err != nil {
 					logger.Printf("hook command failed for %s on %s: %v\n%s", id, screenName, err, string(out))
 				} else {
@@ -175,7 +187,7 @@ func (service *Service) getEffectiveWallpaperID(appConfig config.AppConfig, scre
 	return ""
 }
 
-func (service *Service) buildWallpaperCommand(appConfig config.AppConfig, screenName string, wallpaperID string) string {
+func (service *Service) buildWallpaperCommand(appConfig config.AppConfig, screenName string, wallpaperID string) (string, []string, string) {
 	fps := appConfig.FPS
 	if fps == 0 {
 		fps = 60
@@ -186,17 +198,18 @@ func (service *Service) buildWallpaperCommand(appConfig config.AppConfig, screen
 		executable = "linux-wallpaperengine"
 	}
 
-	wallpaperPath := fmt.Sprintf("\"%s\"", wallpaperID)
+	wallpaperPath := wallpaperID
 	if config.WorkshopPath != "" {
-		wallpaperPath = fmt.Sprintf("\"%s\"", filepath.Join(config.WorkshopPath, wallpaperID))
+		wallpaperPath = filepath.Join(config.WorkshopPath, wallpaperID)
 	}
 
-	arguments := []string{wallpaperPath, "-r", screenName, fmt.Sprintf("-f %d", fps)}
+	// Build arguments as a slice to avoid shell interpolation
+	arguments := []string{wallpaperPath, "-r", screenName, "-f", strconv.Itoa(fps)}
 
 	if appConfig.Silence {
 		arguments = append(arguments, "-s")
 	} else if appConfig.Volume != nil {
-		arguments = append(arguments, fmt.Sprintf("--volume %d", int(*appConfig.Volume)))
+		arguments = append(arguments, "--volume", strconv.Itoa(int(*appConfig.Volume)))
 	}
 
 	if appConfig.NoAutomute {
@@ -206,10 +219,10 @@ func (service *Service) buildWallpaperCommand(appConfig config.AppConfig, screen
 		arguments = append(arguments, "--no-audio-processing")
 	}
 	if appConfig.Scaling != "" {
-		arguments = append(arguments, fmt.Sprintf("--scaling %s", appConfig.Scaling))
+		arguments = append(arguments, "--scaling", appConfig.Scaling)
 	}
 	if appConfig.Clamping != "" {
-		arguments = append(arguments, fmt.Sprintf("--clamp %s", appConfig.Clamping))
+		arguments = append(arguments, "--clamp", appConfig.Clamping)
 	}
 	if appConfig.DisableMouse {
 		arguments = append(arguments, "--disable-mouse")
@@ -228,21 +241,21 @@ func (service *Service) buildWallpaperCommand(appConfig config.AppConfig, screen
 	}
 
 	for _, applicationID := range appConfig.FullscreenPauseIgnoreAppIds {
-		arguments = append(arguments, fmt.Sprintf("--fullscreen-pause-ignore-appid %s", applicationID))
+		arguments = append(arguments, "--fullscreen-pause-ignore-appid", applicationID)
 	}
 
 	if appConfig.Screenshot != "" {
-		arguments = append(arguments, fmt.Sprintf("--screenshot \"%s\"", appConfig.Screenshot))
+		arguments = append(arguments, "--screenshot", appConfig.Screenshot)
 
 		if appConfig.ScreenshotDelay != 0 {
-			arguments = append(arguments, fmt.Sprintf("--screenshot-delay %d", appConfig.ScreenshotDelay))
+			arguments = append(arguments, "--screenshot-delay", strconv.Itoa(appConfig.ScreenshotDelay))
 		}
 	}
 
 	if appConfig.WallpaperEngineDir != "" {
-		arguments = append(arguments, fmt.Sprintf("--assets-dir \"%s\"", appConfig.WallpaperEngineDir+"/assets"))
+		arguments = append(arguments, "--assets-dir", appConfig.WallpaperEngineDir+"/assets")
 	} else if config.WallpaperEnginePath != "" {
-		arguments = append(arguments, fmt.Sprintf("--assets-dir \"%s\"", config.WallpaperEnginePath+"/assets"))
+		arguments = append(arguments, "--assets-dir", config.WallpaperEnginePath+"/assets")
 	}
 
 	if appConfig.DumpStructure {
@@ -256,14 +269,17 @@ func (service *Service) buildWallpaperCommand(appConfig config.AppConfig, screen
 	}
 
 	for key, value := range properties {
-		arguments = append(arguments, fmt.Sprintf("--set-property %s=\"%s\"", key, value))
+		arguments = append(arguments, "--set-property", fmt.Sprintf("%s=%s", key, value))
 	}
 
+	// Parse custom args using simple whitespace splitting. Note: quoted args not fully supported.
 	if appConfig.CustomArgsEnabled && appConfig.CustomArgs != "" {
-		arguments = append(arguments, appConfig.CustomArgs)
+		customParts := strings.Fields(appConfig.CustomArgs)
+		arguments = append(arguments, customParts...)
 	}
 
-	return fmt.Sprintf("%s %s", executable, strings.Join(arguments, " "))
+	cmdStr := fmt.Sprintf("%s %s", executable, strings.Join(arguments, " "))
+	return executable, arguments, cmdStr
 }
 
 func (service *Service) LoadWallpapers() (map[string]interface{}, error) {
@@ -319,5 +335,3 @@ func (service *Service) LoadWallpapers() (map[string]interface{}, error) {
 		"wallpaperEnginePathValid": wallpaperEnginePathValid,
 	}, nil
 }
-
-
