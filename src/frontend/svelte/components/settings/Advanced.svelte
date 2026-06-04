@@ -85,8 +85,8 @@
 				<table class="variable-table">
 					<thead>
 						<tr>
-							<th>Variable</th>
-							<th>Description</th>
+							<th>{$t('settings.advanced.hooks.variable')}</th>
+							<th>{$t('settings.advanced.hooks.description')}</th>
 						</tr>
 					</thead>
 					<tbody>
@@ -94,43 +94,43 @@
 							<td>
 								<CopyableCode code="$PREVIEW_PATH" />
 							</td>
-							<td>Absolute path to the wallpaper's preview image.</td>
+							<td>{$t('settings.advanced.hooks.previewPathDesc')}</td>
 						</tr>
 						<tr>
 							<td>
 								<CopyableCode code="$VIDEO_PATH" />
 							</td>
-							<td>Absolute path to the main media file (video/html).</td>
+							<td>{$t('settings.advanced.hooks.videoPathDesc')}</td>
 						</tr>
 						<tr>
 							<td>
 								<CopyableCode code="$IS_VIDEO" />
 							</td>
-							<td>Boolean indicating if wallpaper is video.</td>
+							<td>{$t('settings.advanced.hooks.isVideoDesc')}</td>
 						</tr>
 						<tr>
 							<td>
 								<CopyableCode code="$WALLPAPER_TITLE" />
 							</td>
-							<td>Display name or title of the wallpaper.</td>
+							<td>{$t('settings.advanced.hooks.wallpaperTitleDesc')}</td>
 						</tr>
 						<tr>
 							<td>
 								<CopyableCode code="$WALLPAPER_TYPE" />
 							</td>
-							<td>Type of the wallpaper (video, web, scene).</td>
+							<td>{$t('settings.advanced.hooks.wallpaperTypeDesc')}</td>
 						</tr>
 						<tr>
 							<td>
 								<CopyableCode code="$WALLPAPER_ID" />
 							</td>
-							<td>Unique Steam Workshop ID.</td>
+							<td>{$t('settings.advanced.hooks.wallpaperIdDesc')}</td>
 						</tr>
 						<tr>
 							<td>
 								<CopyableCode code="$SCREEN_NAME" />
 							</td>
-							<td>Monitor/screen name (e.g., DP-1).</td>
+							<td>{$t('settings.advanced.hooks.screenNameDesc')}</td>
 						</tr>
 					</tbody>
 				</table>
@@ -138,7 +138,7 @@
 			<Input
 				id="wallpaperChangeCommand"
 				bind:value={$settingsStore.wallpaperChangeCommand}
-				placeholder="e.g. matugen image '$PREVIEW_PATH' -j"
+				placeholder={$t('settings.advanced.hooks.commandPlaceholder')}
 			/>
 		</SettingItem>
 	{/if}

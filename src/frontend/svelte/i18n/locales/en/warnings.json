@@ -1,0 +1,13 @@
+{
+	"path": {
+		"workshopTitle": "Steam Workshop path not found",
+		"workshopDesc": "The application couldn't find your Wallpaper Engine workshop content. Please check your Steam Search Paths in Settings.",
+		"workshopAction": "Configure Search Paths",
+		"assetsTitle": "Wallpaper Engine Assets not found",
+		"assetsDesc": "Optional assets for some wallpapers (like effects or shaders) couldn't be auto-detected. Some wallpapers might not look right.",
+		"assetsAction": "Fix Assets Path",
+		"weConfigTitle": "Wallpaper Engine Config not found",
+		"weConfigDesc": "Wallpaper Engine configuration not found. Please run Wallpaper Engine at least once to initialize it.",
+		"weConfigAction": "Open Steam"
+	}
+}

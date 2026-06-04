@@ -1,0 +1,19 @@
+{
+	"viewer": {
+		"systemLogs": "系统日志",
+		"backgroundLogs": "后台日志",
+		"uiLogs": "UI 日志",
+		"wallpaperLogs": "壁纸日志",
+		"clearAll": "清空全部",
+		"allHidden": "所有列已隐藏",
+		"allHiddenDesc": "从上方开关启用至少一个日志类别以查看日志。"
+	},
+	"toolbar": {
+		"searchPlaceholder": "搜索日志...",
+		"allLevels": "所有级别",
+		"info": "信息",
+		"success": "成功",
+		"warning": "警告",
+		"error": "错误"
+	}
+}

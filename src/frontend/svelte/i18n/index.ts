@@ -1,10 +1,23 @@
 import { writable, derived } from 'svelte/store';
-import en from './en.json';
-import zh from './zh.json';
+import type { I18nKey } from './types';
 
 type Dict = Record<string, any>;
 
-const dictionaries: Record<string, Dict> = { en, zh };
+const modules = import.meta.glob('./locales/*/*.json', { eager: true });
+const dictionaries: Record<string, Dict> = {};
+
+for (const path in modules) {
+	const parts = path.split('/');
+	if (parts.length >= 4) {
+		const lang = parts[2];
+		const namespace = parts[3].replace('.json', '');
+		
+		if (!dictionaries[lang]) {
+			dictionaries[lang] = {};
+		}
+		dictionaries[lang][namespace] = (modules[path] as any).default;
+	}
+}
 
 export const locale = writable<string>('en');
 
@@ -26,13 +39,13 @@ function interpolate(text: string, params?: Record<string, any>): string {
 }
 
 export const t = derived(locale, ($locale) => {
-	const dict = dictionaries[$locale] || dictionaries.en;
-	const enDict = dictionaries.en;
-	return (key: string, params?: Record<string, any>): string => {
-		const text = resolveValue(dict, key);
+	const dict = dictionaries[$locale] || dictionaries.en || {};
+	const enDict = dictionaries.en || {};
+	return (key: I18nKey, params?: Record<string, any>): string => {
+		const text = resolveValue(dict, key as string);
 		if (text !== null) return interpolate(text, params);
-		const fallback = resolveValue(enDict, key);
-		return interpolate(fallback !== null ? fallback : key, params);
+		const fallback = resolveValue(enDict, key as string);
+		return interpolate(fallback !== null ? fallback : (key as string), params);
 	};
 });
 

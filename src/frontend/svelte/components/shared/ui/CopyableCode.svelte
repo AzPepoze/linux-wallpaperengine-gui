@@ -1,23 +1,24 @@
 <script lang="ts">
 	import Icon from './Icon.svelte';
 	import { showToast } from '@/scripts/shared/toastStore';
+	import { t } from '@/i18n';
 
 	export let code: string;
 
 	async function copyToClipboard() {
 		try {
 			await navigator.clipboard.writeText(code);
-			showToast('Copied to clipboard!', 'success');
+			showToast($t('ui.copiedToClipboard'), 'success');
 		} catch (err) {
 			console.error('Failed to copy text: ', err);
-			showToast('Failed to copy text.', 'error');
+			showToast($t('ui.failedToCopyText'), 'error');
 		}
 	}
 </script>
 
 <div class="copyable">
 	<code>{code}</code>
-	<button class="copy-btn" on:click={copyToClipboard} title="Copy">
+	<button class="copy-btn" on:click={copyToClipboard} title={$t('ui.copy')}>
 		<Icon name="content_copy" size={14} />
 	</button>
 </div>
