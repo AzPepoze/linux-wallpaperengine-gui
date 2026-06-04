@@ -50,18 +50,7 @@
 	});
 
 	async function loadPlaylists() {
-		let realPlaylists = await fetchPlaylists();
-		
-		// --- MOCK DATA FOR ISSUE #44 TESTING ---
-		const mockPlaylists = Array.from({ length: 20 }, (_, i) => ({
-			name: `Mock Playlist ${i + 1}`,
-			items: [],
-			settings: { delay: 60 }
-		})) as Playlist[];
-		
-		playlists = [...realPlaylists, ...mockPlaylists];
-		// ---------------------------------------
-
+		playlists = await fetchPlaylists();
 		playlistOptions = getPlaylistOptions(playlists);
 	}
 
