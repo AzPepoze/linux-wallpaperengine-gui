@@ -83,6 +83,7 @@
 		/>
 	</SettingItem>
 
+
 	<SettingItem
 		label={$t('settings.general.transparentUi')}
 		id="transparentUi"

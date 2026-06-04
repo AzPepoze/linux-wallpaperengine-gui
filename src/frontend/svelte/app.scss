@@ -209,3 +209,8 @@ hr {
 .spin {
      animation: spin 1s linear infinite;
 }
+
+::selection {
+	background-color: var(--bg-app);
+	color: var(--text-inverse);
+}

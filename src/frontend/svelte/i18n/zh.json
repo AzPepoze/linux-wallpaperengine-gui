@@ -78,7 +78,11 @@
 			"customCommandArgsDesc": "向后端传递原始参数。",
 			"customArgsPlaceholder": "例如 --window 0x0x1920x1080",
 			"commonOptionsDoc": "通用选项文档",
-			"restartConfirm": "更改 Wayland 支持需要重启。是否立即重启？"
+			"restartConfirm": "更改 Wayland 支持需要重启。是否立即重启？",
+			"enableHooks": "启用钩子",
+			"enableHooksDesc": "启用钩子功能。",
+			"wallpaperChangeCommand": "壁纸更改时",
+			"wallpaperChangeCommandDesc": "应用壁纸时要执行的 Shell 命令。"
 		},
 		"executable": {
 			"binaryLocation": "二进制文件位置",

@@ -78,7 +78,11 @@
 			"customCommandArgsDesc": "Pass raw arguments to the backend.",
 			"customArgsPlaceholder": "e.g. --window 0x0x1920x1080",
 			"commonOptionsDoc": "Common Options Documentation",
-			"restartConfirm": "Changing Wayland support requires a restart. Do you want to restart now?"
+			"restartConfirm": "Changing Wayland support requires a restart. Do you want to restart now?",
+			"enableHooks": "Enable Hooks",
+			"enableHooksDesc": "Enable hooks.",
+			"wallpaperChangeCommand": "On wallpaper change",
+			"wallpaperChangeCommandDesc": "Shell command to execute when a wallpaper is applied."
 		},
 		"executable": {
 			"binaryLocation": "Binary Location",
