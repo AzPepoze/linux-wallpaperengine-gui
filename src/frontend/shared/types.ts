@@ -63,6 +63,8 @@ export type AppConfig = {
 	transparentUi?: boolean;
 	uiTransparency?: number;
 	steamPaths?: string[];
+	hookEnabled?: boolean;
+	wallpaperChangeCommand?: string;
 };
 
 export type PropertyType =

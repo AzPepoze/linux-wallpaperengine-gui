@@ -47,6 +47,8 @@ func init() {
 		TransparentUi:       true,
 		UiTransparency:      90,
 		EnableScrollMask:    true,
+		HookEnabled:              false,
+		WallpaperChangeCommand:   "",
 		SteamPaths: []string{
 			".local/share/Steam",
 			".var/app/com.valvesoftware.Steam/.local/share/Steam",

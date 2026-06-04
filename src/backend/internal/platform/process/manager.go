@@ -29,6 +29,8 @@ func NewManager() *Manager {
 
 func (manager *Manager) UpdateWallpapers(desiredWallpapers []struct {
 	Screen  string
+	Exec    string
+	Args    []string
 	Command string
 }) {
 	manager.mutex.Lock()
@@ -58,8 +60,8 @@ func (manager *Manager) UpdateWallpapers(desiredWallpapers []struct {
 			manager.killWallpaperInternal(desiredWallpaper.Screen)
 		}
 
-		logger.Printf("Starting wallpaper for %s... (%s)", desiredWallpaper.Screen, desiredWallpaper.Command)
-		manager.spawnWallpaper(desiredWallpaper.Screen, desiredWallpaper.Command)
+		logger.Printf("Starting wallpaper for %s... (%s %v)", desiredWallpaper.Screen, desiredWallpaper.Exec, desiredWallpaper.Args)
+		manager.spawnWallpaper(desiredWallpaper.Screen, desiredWallpaper.Exec, desiredWallpaper.Args, desiredWallpaper.Command)
 	}
 }
 
@@ -98,8 +100,8 @@ func (manager *Manager) KillByFolderName(folderName string) {
 	}
 }
 
-func (manager *Manager) spawnWallpaper(screen string, fullCommand string) {
-	command := exec.Command("sh", "-c", fullCommand)
+func (manager *Manager) spawnWallpaper(screen string, execPath string, args []string, fullCommand string) {
+	command := exec.Command(execPath, args...)
 	command.SysProcAttr = &syscall.SysProcAttr{Setpgid: true}
 
 	stdout, _ := command.StdoutPipe()
