@@ -181,12 +181,6 @@
 		}
 
 		&.valid {
-			background: linear-gradient(
-				90deg,
-				rgba(40, 167, 69, 0.05) 0%,
-				transparent 100%
-			);
-
 			.status-badge {
 				background: rgba(40, 167, 69, 0.15);
 				color: #81c784;
@@ -195,12 +189,8 @@
 		}
 
 		&:not(.valid) {
-			border-left: 4px solid var(--error-bg);
-			background: linear-gradient(
-				90deg,
-				rgba(220, 53, 69, 0.05) 0%,
-				transparent 100%
-			);
+			border-color: rgba(220, 53, 69, 0.3);
+			background: rgba(220, 53, 69, 0.02);
 
 			.status-badge {
 				background: rgba(220, 53, 69, 0.15);
@@ -221,11 +211,9 @@
 			align-items: center;
 			gap: 6px;
 			padding: 4px 10px;
-			border-radius: var(--radius-full);
-			font-size: 0.75em;
-			font-weight: 800;
-			text-transform: uppercase;
-			letter-spacing: 0.05em;
+			border-radius: var(--radius-sm);
+			font-size: 0.85em;
+			font-weight: 500;
 		}
 
 		.path-content {
@@ -235,11 +223,9 @@
 		}
 
 		.path-label {
-			font-size: 0.75em;
-			font-weight: 700;
+			font-size: 0.85em;
+			font-weight: 500;
 			color: var(--text-muted);
-			text-transform: uppercase;
-			letter-spacing: 0.05em;
 			text-align: left;
 		}
 
@@ -249,7 +235,7 @@
 			color: var(--text-color);
 			word-break: break-all;
 			opacity: 0.9;
-			padding: 8px;
+			padding: 8px 10px;
 			background: rgba(0, 0, 0, 0.2);
 			border-radius: var(--radius-sm);
 			border: 1px solid rgba(255, 255, 255, 0.05);

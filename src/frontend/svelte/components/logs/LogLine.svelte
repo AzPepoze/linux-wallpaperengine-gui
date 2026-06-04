@@ -27,19 +27,18 @@
 	.log-line {
 		display: flex;
 		padding: 2px 8px;
-		border-left: 3px solid transparent;
+		border-radius: 2px;
 		transition: background-color 0.1s ease;
 		font-family: 'JetBrains Mono', 'Fira Code', 'Fira Mono', Consolas, Monaco, monospace;
 		font-size: 0.75rem;
 		line-height: 1.5;
 
 		&:hover {
-			background-color: rgba(255, 255, 255, 0.02);
+			background-color: rgba(255, 255, 255, 0.04);
 		}
 
 		&.error {
-			border-left-color: var(--error-bg, #dc3545);
-			background-color: var(--error-bg-translucent, rgba(220, 53, 69, 0.1));
+			background-color: var(--error-bg-translucent, rgba(220, 53, 69, 0.15));
 			
 			&:hover {
 				background-color: color-mix(in srgb, var(--error-bg, #dc3545), transparent 80%);
@@ -51,11 +50,10 @@
 		}
 
 		&.warning {
-			border-left-color: var(--warn-bg, #ffc107);
-			background-color: color-mix(in srgb, var(--warn-bg, #ffc107), transparent 96%);
+			background-color: color-mix(in srgb, var(--warn-bg, #ffc107), transparent 85%);
 			
 			&:hover {
-				background-color: color-mix(in srgb, var(--warn-bg, #ffc107), transparent 90%);
+				background-color: color-mix(in srgb, var(--warn-bg, #ffc107), transparent 80%);
 			}
 			
 			.line-content {
@@ -64,15 +62,18 @@
 		}
 
 		&.success {
-			border-left-color: var(--success-bg, #28a745);
+			background-color: color-mix(in srgb, var(--success-bg, #28a745), transparent 85%);
 			
+			&:hover {
+				background-color: color-mix(in srgb, var(--success-bg, #28a745), transparent 80%);
+			}
+
 			.line-content {
 				color: color-mix(in srgb, var(--success-bg, #28a745), white 30%);
 			}
 		}
 
 		&.info {
-			border-left-color: rgba(255, 255, 255, 0.1);
 		}
 	}
 

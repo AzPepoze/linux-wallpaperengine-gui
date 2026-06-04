@@ -56,7 +56,7 @@
 		
 		:global(.search-icon) {
 			position: absolute;
-			left: 8px;
+			left: 10px;
 			color: var(--text-muted) !important;
 			pointer-events: none;
 		}
@@ -65,11 +65,11 @@
 			width: 100%;
 			background: rgba(255, 255, 255, 0.03);
 			border: 1px solid rgba(255, 255, 255, 0.06);
-			border-radius: 4px;
-			padding: 4px 24px 4px 26px;
+			border-radius: var(--radius-md, 6px);
+			padding: 4px 24px 4px 30px;
 			color: var(--text-color);
 			font-size: 0.75rem;
-			height: 24px;
+			height: 28px;
 			box-sizing: border-box;
 			transition: all 0.2s;
 			
@@ -110,10 +110,10 @@
 		flex-shrink: 0;
 
 		:global(.select-trigger) {
-			height: 24px;
+			height: 28px;
 			padding: 0px 8px 0px 10px;
 			font-size: 0.75rem;
-			border-radius: 4px;
+			border-radius: var(--radius-md, 6px);
 			background: rgba(255, 255, 255, 0.03);
 			border: 1px solid rgba(255, 255, 255, 0.06);
 

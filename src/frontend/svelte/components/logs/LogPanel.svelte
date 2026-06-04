@@ -203,7 +203,7 @@
 	.panel-badge {
 		font-size: 0.75rem;
 		padding: 1px 6px;
-		border-radius: 10px;
+		border-radius: var(--radius-sm, 4px);
 		background: rgba(255, 255, 255, 0.08);
 		color: var(--text-muted);
 	}
@@ -214,11 +214,11 @@
 	}
 
 	.icon-btn {
-		background: transparent;
-		border: none;
+		background: rgba(255, 255, 255, 0.04);
+		border: 1px solid rgba(255, 255, 255, 0.06);
 		color: var(--text-muted);
-		padding: 4px;
-		border-radius: 4px;
+		padding: 6px;
+		border-radius: var(--radius-md, 6px);
 		cursor: pointer;
 		display: flex;
 		align-items: center;
@@ -227,12 +227,14 @@
 		
 		&:hover {
 			color: var(--text-color);
-			background: rgba(255, 255, 255, 0.06);
+			background: rgba(255, 255, 255, 0.1);
+			border-color: rgba(255, 255, 255, 0.15);
 		}
 		
 		&.danger:hover {
 			color: var(--error-color, #ff3131);
-			background: var(--error-bg-translucent, rgba(239, 68, 68, 0.1));
+			background: var(--error-bg-translucent, rgba(239, 68, 68, 0.15));
+			border-color: var(--error-border, rgba(220, 53, 69, 0.3));
 		}
 	}
 
@@ -301,24 +303,11 @@
 		gap: 6px;
 		box-shadow: 0 4px 12px rgba(0, 0, 0, 0.5), 0 0 0 1px rgba(255, 255, 255, 0.1);
 		transition: all 0.2s;
-		animation: pulse 2s infinite;
 		z-index: 10;
 		
 		&:hover {
 			transform: translateY(-1px);
 			box-shadow: 0 6px 16px rgba(0, 0, 0, 0.6), 0 0 0 1px rgba(255, 255, 255, 0.2);
-		}
-	}
-
-	@keyframes pulse {
-		0% {
-			box-shadow: 0 4px 12px rgba(var(--primary-raw-rgb), 0.4);
-		}
-		50% {
-			box-shadow: 0 4px 12px rgba(var(--primary-raw-rgb), 0.8), 0 0 10px rgba(var(--primary-raw-rgb), 0.4);
-		}
-		100% {
-			box-shadow: 0 4px 12px rgba(var(--primary-raw-rgb), 0.4);
 		}
 	}
 </style>

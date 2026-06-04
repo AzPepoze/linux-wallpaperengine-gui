@@ -164,7 +164,8 @@
 		border-radius: var(--radius-md);
 		padding: 8px;
 		border: 1px solid var(--border-color);
-		max-height: 200px;
+		min-height: 120px;
+		max-height: 350px;
 		overflow-y: auto;
 	}
 
@@ -172,14 +173,19 @@
 		display: flex;
 		align-items: center;
 		justify-content: space-between;
-		padding: 8px 12px;
+		padding: 12px 14px;
 		background: var(--bg-modal);
-		border-radius: var(--radius-sm);
+		border-radius: var(--radius-md, 6px);
 		border: 1px solid var(--border-color);
 		transition: var(--transition-base);
 
+		&:hover {
+			background: var(--bg-surface-active);
+			border-color: var(--border-color-hover);
+		}
+
 		&.editing {
-			padding: 4px;
+			padding: 8px;
 			background: var(--bg-surface-active);
 			border-color: var(--btn-primary-bg);
 		}
@@ -218,35 +224,38 @@
 		}
 
 		.action-btn {
-			background: transparent;
-			border: none;
+			background: rgba(255, 255, 255, 0.04);
+			border: 1px solid rgba(255, 255, 255, 0.06);
 			color: var(--text-muted);
 			cursor: pointer;
-			padding: 6px;
+			padding: 8px;
 			display: flex;
 			align-items: center;
 			justify-content: center;
-			border-radius: 4px;
+			border-radius: var(--radius-md, 6px);
 			transition: var(--transition-base);
 
 			&:hover {
-				background: rgba(255, 255, 255, 0.05);
+				background: rgba(255, 255, 255, 0.1);
+				border-color: rgba(255, 255, 255, 0.15);
 				color: var(--text-color);
 			}
 
 			&.remove:hover {
 				color: var(--error-color);
 				background: var(--error-bg-translucent);
+				border-color: var(--error-border, rgba(220, 53, 69, 0.3));
 			}
 
 			&.save:hover {
 				color: var(--success-bg);
-				background: rgba(40, 167, 69, 0.1);
+				background: rgba(40, 167, 69, 0.15);
+				border-color: rgba(40, 167, 69, 0.3);
 			}
 
 			&.cancel:hover {
 				color: var(--text-muted);
-				background: rgba(255, 255, 255, 0.1);
+				background: rgba(255, 255, 255, 0.15);
 			}
 		}
 	}
@@ -263,9 +272,15 @@
 	.add-row {
 		display: flex;
 		gap: 8px;
+		align-items: stretch;
 
-		:global(.input-container) {
+		:global(.input-wrapper) {
 			flex: 1;
+		}
+
+		:global(.btn) {
+			border-radius: var(--radius-md, 6px);
+			padding: 0 24px;
 		}
 	}
 </style>
