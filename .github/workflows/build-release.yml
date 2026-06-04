@@ -6,6 +6,9 @@ on:
              - 'v*'
      workflow_dispatch:
 
+concurrency:
+     group: release-${{ github.ref }}
+     cancel-in-progress: false
 
 permissions:
      contents: write
@@ -13,18 +16,51 @@ permissions:
 jobs:
      build_release:
           runs-on: ubuntu-latest
+          timeout-minutes: 30
 
           steps:
              - uses: actions/checkout@v4
+
              - name: Setup Bun
                uses: oven-sh/setup-bun@v2
                with:
                     bun-version: '1'
 
+             - name: Setup Go
+               uses: actions/setup-go@v5
+               with:
+                    go-version: 'stable'
+                    cache-dependency-path: src/backend/go.sum
+
              - name: Get version from package.json
                run: |
                     VERSION=$(grep -Po '"version"\s*:\s*"\K[^"]+' package.json)
                     echo "PACKAGE_VERSION=${VERSION}" >> $GITHUB_ENV
+
+             - name: Cache Bun dependencies
+               uses: actions/cache@v4
+               with:
+                    path: ~/.bun/install/cache
+                    key: bun-${{ runner.os }}-${{ hashFiles('bun.lock') }}
+                    restore-keys: |
+                         bun-${{ runner.os }}-
+
+             - name: Cache Electron & electron-builder
+               uses: actions/cache@v4
+               with:
+                    path: |
+                         ~/.cache/electron
+                         ~/.cache/electron-builder
+                    key: electron-${{ runner.os }}-${{ hashFiles('package.json') }}
+                    restore-keys: |
+                         electron-${{ runner.os }}-
+
+             - name: Cache APT packages
+               uses: actions/cache@v4
+               id: apt-cache
+               with:
+                    path: /var/cache/apt/archives
+                    key: apt-release-${{ runner.os }}-rpm-libarchive-gtk3-appindicator
 
              - name: Install system dependencies (Linux)
                run: |
@@ -46,7 +82,7 @@ jobs:
                     cd ..
 
              - name: Upload Release Assets
-               uses: softprops/action-gh-release@v1
+               uses: softprops/action-gh-release@v2
                with:
                     generate_release_notes: true
                     files: |
