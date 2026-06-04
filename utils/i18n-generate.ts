@@ -19,7 +19,7 @@ function generateKeys(obj: any, prefix = ''): string[] {
 	return keys;
 }
 
-function syncObjects(source: any, target: any): any {
+function syncObjects(source: any, target: any, lang: string): any {
 	if (typeof source !== 'object' || source === null) {
 		return source;
 	}
@@ -28,15 +28,28 @@ function syncObjects(source: any, target: any): any {
 	}
 	
 	const result: any = {};
+	const prefix = `[NYT_${lang.toUpperCase()}] `;
+
 	for (const key of Object.keys(source)) {
 		if (target && Object.prototype.hasOwnProperty.call(target, key)) {
 			if (typeof source[key] === 'object' && source[key] !== null) {
-				result[key] = syncObjects(source[key], target[key]);
+				result[key] = syncObjects(source[key], target[key], lang);
 			} else {
-				result[key] = target[key];
+				let targetVal = target[key];
+				const sourceVal = source[key];
+				if (typeof targetVal === 'string' && typeof sourceVal === 'string' && targetVal === sourceVal) {
+					targetVal = prefix + sourceVal;
+				}
+				result[key] = targetVal;
 			}
 		} else {
-			result[key] = JSON.parse(JSON.stringify(source[key]));
+			if (typeof source[key] === 'string') {
+				result[key] = prefix + source[key];
+			} else if (typeof source[key] === 'object' && source[key] !== null) {
+				result[key] = syncObjects(source[key], {}, lang);
+			} else {
+				result[key] = source[key];
+			}
 		}
 	}
 	return result;
@@ -69,11 +82,12 @@ for (const lang of allLangs) {
 		const enData = JSON.parse(fs.readFileSync(enPath, 'utf-8'));
 		
 		if (!fs.existsSync(langPath)) {
-			fs.writeFileSync(langPath, JSON.stringify(enData, null, '\t') + '\n', 'utf-8');
-			console.log(`Copied missing file: ${lang}/${file}`);
+			const syncedData = syncObjects(enData, {}, lang);
+			fs.writeFileSync(langPath, JSON.stringify(syncedData, null, '\t') + '\n', 'utf-8');
+			console.log(`Created and synced missing file: ${lang}/${file}`);
 		} else {
 			const langData = JSON.parse(fs.readFileSync(langPath, 'utf-8'));
-			const syncedData = syncObjects(enData, langData);
+			const syncedData = syncObjects(enData, langData, lang);
 			fs.writeFileSync(langPath, JSON.stringify(syncedData, null, '\t') + '\n', 'utf-8');
 		}
 	}

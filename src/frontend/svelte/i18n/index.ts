@@ -42,9 +42,16 @@ export const t = derived(locale, ($locale) => {
 	const dict = dictionaries[$locale] || dictionaries.en || {};
 	const enDict = dictionaries.en || {};
 	return (key: I18nKey, params?: Record<string, any>): string => {
-		const text = resolveValue(dict, key as string);
-		if (text !== null) return interpolate(text, params);
-		const fallback = resolveValue(enDict, key as string);
+		let text = resolveValue(dict, key as string);
+		if (text !== null) {
+			text = text.replace(/^\[NYT_[A-Z]+\]\s*/, '');
+			return interpolate(text, params);
+		}
+		
+		let fallback = resolveValue(enDict, key as string);
+		if (fallback !== null) {
+			fallback = fallback.replace(/^\[NYT_[A-Z]+\]\s*/, '');
+		}
 		return interpolate(fallback !== null ? fallback : (key as string), params);
 	};
 });

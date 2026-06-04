@@ -9,8 +9,8 @@
 	"openConfig": "打开配置文件",
 	"loading": "正在加载设置...",
 	"general": {
-		"language": "Language / 语言",
-		"languageDesc": "Select display language / 选择显示语言",
+		"language": "[NYT_ZH] Language / 语言",
+		"languageDesc": "[NYT_ZH] Select display language / 选择显示语言",
 		"autostart": "开机自启动",
 		"autostartDesc": "开机后在后台运行本程序以应用壁纸。",
 		"dynamicTheme": "动态 UI 主题",
@@ -75,16 +75,16 @@
 		"wallpaperChangeCommand": "壁纸更改时",
 		"wallpaperChangeCommandDesc": "应用壁纸时要执行的 Shell 命令。",
 		"hooks": {
-			"variable": "Variable",
-			"description": "Description",
-			"previewPathDesc": "Absolute path to the wallpaper's preview image.",
-			"videoPathDesc": "Absolute path to the main media file (video/html).",
-			"isVideoDesc": "Boolean indicating if wallpaper is video.",
-			"wallpaperTitleDesc": "Display name or title of the wallpaper.",
-			"wallpaperTypeDesc": "Type of the wallpaper (video, web, scene).",
-			"wallpaperIdDesc": "Unique Steam Workshop ID.",
-			"screenNameDesc": "Monitor/screen name (e.g., DP-1).",
-			"commandPlaceholder": "e.g. matugen image '$PREVIEW_PATH' -j"
+			"variable": "[NYT_ZH] Variable",
+			"description": "[NYT_ZH] Description",
+			"previewPathDesc": "[NYT_ZH] Absolute path to the wallpaper's preview image.",
+			"videoPathDesc": "[NYT_ZH] Absolute path to the main media file (video/html).",
+			"isVideoDesc": "[NYT_ZH] Boolean indicating if wallpaper is video.",
+			"wallpaperTitleDesc": "[NYT_ZH] Display name or title of the wallpaper.",
+			"wallpaperTypeDesc": "[NYT_ZH] Type of the wallpaper (video, web, scene).",
+			"wallpaperIdDesc": "[NYT_ZH] Unique Steam Workshop ID.",
+			"screenNameDesc": "[NYT_ZH] Monitor/screen name (e.g., DP-1).",
+			"commandPlaceholder": "[NYT_ZH] e.g. matugen image '$PREVIEW_PATH' -j"
 		}
 	},
 	"executable": {
