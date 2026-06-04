@@ -1,0 +1,156 @@
+<script lang="ts">
+	import Input from '@/ui/Input.svelte';
+	import Select from '@/ui/Select.svelte';
+	import Button from '@/ui/Button.svelte';
+	import Icon from '@/ui/Icon.svelte';
+	import { settingsStore } from '@/features/settings/scripts/settings';
+	import type { Playlist } from '@shared/types';
+	import { t } from '@/core/i18n';
+
+	export let playlistOptions: { value: string; label: string }[] = [];
+	export let activePlaylist: Playlist | null = null;
+	export let tempInterval: number = 0;
+	export let isCreating: boolean = false;
+	export let isRenaming: boolean = false;
+	export let newPlaylistName: string = '';
+
+	export let onCreate: () => void;
+	export let onRename: () => void;
+	export let onDelete: () => void;
+	export let onCancel: () => void;
+	export let onChange: () => void;
+	export let onIntervalInput: () => void;
+	export let startCreating: () => void;
+	export let startRenaming: () => void;
+</script>
+
+<div class="panel left-panel">
+	<div class="header">{$t('playlist.settings.title')}</div>
+
+	{#if isCreating || isRenaming}
+		<div class="form-group">
+			<Input
+				bind:value={newPlaylistName}
+				placeholder={$t('playlist.settings.namePlaceholder')}
+				autoFocus
+			/>
+			<div class="actions">
+				<Button
+					variant="primary"
+					on:click={isCreating ? onCreate : onRename}
+				>
+					<Icon name="save" size={18} />
+					<span>{$t('playlist.settings.save')}</span>
+				</Button>
+				<Button on:click={onCancel}>
+					<Icon name="close" size={18} />
+					<span>{$t('playlist.settings.cancel')}</span>
+				</Button>
+			</div>
+		</div>
+	{:else}
+		<div class="dropdown-row">
+			{#if $settingsStore}
+				<Select
+					id="playlist-select"
+					bind:value={$settingsStore.playlist}
+					options={playlistOptions}
+					{onChange}
+				/>
+			{/if}
+		</div>
+		<div class="controls-row">
+			<Button variant="secondary" on:click={startCreating}>
+				<Icon name="add" size={18} />
+				<span>{$t('playlist.settings.new')}</span>
+			</Button>
+			{#if activePlaylist}
+				<Button variant="secondary" on:click={startRenaming}>
+					<Icon name="edit" size={18} />
+					<span>{$t('playlist.settings.rename')}</span>
+				</Button>
+				<Button variant="danger" on:click={onDelete}>
+					<Icon name="delete" size={18} />
+					<span>{$t('playlist.settings.delete')}</span>
+				</Button>
+			{:else if $settingsStore?.playlist === 'Random All'}
+				<span class="info-tag">{$t('playlist.settings.dynamicPlaylist')}</span>
+			{/if}
+		</div>
+
+		{#if activePlaylist || $settingsStore?.playlist === 'Random All'}
+			<div class="interval-row">
+				<span class="label">{$t('playlist.settings.interval')}</span>
+				<Input
+					type="number"
+					step="any"
+					min={0}
+					bind:value={tempInterval}
+					on:input={onIntervalInput}
+					style="width: 80px;"
+				/>
+			</div>
+		{/if}
+	{/if}
+</div>
+
+<style lang="scss">
+	.panel {
+		display: flex;
+		flex-direction: column;
+		gap: 12px;
+	}
+
+	.header {
+		font-weight: 600;
+		color: var(--text-color);
+		font-size: 1.1em;
+		border-bottom: 1px solid var(--border-color);
+		padding-bottom: 8px;
+		margin-bottom: 4px;
+	}
+
+	.left-panel {
+		flex: 0 0 300px;
+		border-right: 1px solid var(--border-color);
+		padding-right: 20px;
+
+		.form-group {
+			display: flex;
+			flex-direction: column;
+			gap: 10px;
+			.actions {
+				display: flex;
+				gap: 10px;
+			}
+		}
+
+		.controls-row {
+			display: flex;
+			gap: 8px;
+		}
+
+		.interval-row {
+			display: flex;
+			align-items: center;
+			justify-content: space-between;
+			gap: 10px;
+			.label {
+				color: var(--text-muted);
+			}
+
+			:global(.input-wrapper) {
+				width: auto !important;
+			}
+		}
+
+		.info-tag {
+			font-size: 0.8em;
+			color: var(--btn-primary-bg);
+			background: var(--btn-primary-bg-alpha);
+			padding: 4px 8px;
+			border-radius: 4px;
+			font-weight: 600;
+		}
+	}
+</style>

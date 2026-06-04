@@ -1,25 +1,25 @@
 <script lang="ts">
-	import WallpaperView from '@/views/WallpaperView.svelte';
-	import WorkshopView from '@/views/WorkshopView.svelte';
-	import LogsView from '@/views/LogsView.svelte';
-	import SettingsView from '@/views/SettingsView.svelte';
-	import { activeView } from '@/scripts/shared/ui';
+	import WallpaperView from '@/features/home/WallpaperView.svelte';
+	import WorkshopView from '@/features/workshop/WorkshopView.svelte';
+	import LogsView from '@/features/logs/LogsView.svelte';
+	import SettingsView from '@/features/settings/SettingsView.svelte';
+	import { activeView } from '@/core/ui';
 	import { onMount } from 'svelte';
 	import { backOut, cubicOut } from 'svelte/easing';
 	import { fly, fade } from 'svelte/transition';
-	import { initLogger } from '@/scripts/shared/logger';
-	import { loadSettings, settingsStore } from '@/scripts/settings/settings';
+	import { initLogger } from '@/core/logger';
+	import { loadSettings, settingsStore } from '@/features/settings/scripts/settings';
 	import { 
 		initializeApp, 
 		setupGlobalListeners 
-	} from '@/scripts/shared/appService';
-	import { selectedWallpaper } from '@/scripts/home/wallpaperStore';
-	import { applyDynamicTheme } from '@/scripts/shared/theme';
-	import Topbar from '@/components/shared/layout/Topbar.svelte';
-	import Toast from '@/components/shared/ui/Toast.svelte';
-	import ContextMenu from '@/components/shared/ui/ContextMenu.svelte';
-	import { toastStore } from '@/scripts/shared/toastStore';
-	import { setLocale } from '@/i18n';
+	} from '@/core/appService';
+	import { selectedWallpaper } from '@/features/home/scripts/wallpaperStore';
+	import { applyDynamicTheme } from '@/core/theme';
+	import Topbar from '@/ui/layout/Topbar.svelte';
+	import Toast from '@/ui/Toast.svelte';
+	import ContextMenu from '@/ui/ContextMenu.svelte';
+	import { toastStore } from '@/core/toastStore';
+	import { setLocale } from '@/core/i18n';
 
 	const viewComponents = {
 		wallpapers: WallpaperView,
