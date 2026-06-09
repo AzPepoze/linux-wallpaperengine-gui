@@ -103,6 +103,17 @@ func onExit() {
 	// Cleanup if needed
 }
 
+// UpdateTitle sets or hides the tray label at runtime (no restart needed).
+func UpdateTitle(hide bool) {
+	if hide {
+		systray.SetTitle("")
+		systray.SetTooltip("")
+	} else {
+		systray.SetTooltip("Linux Wallpaper Engine GUI")
+		systray.SetTitle("Linux Wallpaper Engine GUI")
+	}
+}
+
 func Quit() {
 	systray.Quit()
 }
