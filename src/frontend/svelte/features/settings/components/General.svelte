@@ -181,4 +181,15 @@
 			bind:checked={$settingsStore.enableScrollMask}
 		/>
 	</SettingItem>
+
+	<SettingItem
+		label={$t('settings.general.hideTrayLabel')}
+		id="hideTrayLabel"
+		description={$t('settings.general.hideTrayLabelDesc')}
+	>
+		<Toggle
+			id="hideTrayLabel"
+			bind:checked={$settingsStore.hideTrayLabel}
+		/>
+	</SettingItem>
 {/if}

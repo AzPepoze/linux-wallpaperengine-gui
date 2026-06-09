@@ -32,7 +32,9 @@
 		"disableParticles": "禁用粒子效果",
 		"disableParticlesDesc": "关闭粒子效果以节省资源。",
 		"scrollMask": "滚动遮罩效果",
-		"scrollMaskDesc": "在滚动区域的顶部和底部启用平滑淡入淡出效果。（注意：可能影响部分系统性能）"
+		"scrollMaskDesc": "在滚动区域的顶部和底部启用平滑淡入淡出效果。（注意：可能影响部分系统性能）",
+		"hideTrayLabel": "隐藏托盘标签",
+		"hideTrayLabelDesc": "在系统托盘中仅显示图标，隐藏\"Linux Wallpaper Engine\"文字。"
 	},
 	"generalScaling": {
 		"default": "默认",
