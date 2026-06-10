@@ -6,6 +6,7 @@
 	"sectionInteraction": "交互",
 	"sectionAdvanced": "高级",
 	"sectionExecutable": "可执行文件",
+	"sectionAbout": "关于",
 	"openConfig": "打开配置文件",
 	"loading": "正在加载设置...",
 	"general": {

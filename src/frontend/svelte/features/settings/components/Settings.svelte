@@ -5,6 +5,7 @@
 	import Interaction from '@/features/settings/components/Interaction.svelte';
 	import Advanced from '@/features/settings/components/Advanced.svelte';
 	import Executable from '@/features/settings/components/Executable.svelte';
+	import About from '@/features/settings/components/About.svelte';
 	import {
 		settingsStore,
 		loadSettings,
@@ -45,6 +46,12 @@
 			labelKey: 'settings.sectionExecutable',
 			icon: 'folder',
 			component: Executable
+		},
+		{
+			id: 'about',
+			labelKey: 'settings.sectionAbout',
+			icon: 'info',
+			component: About
 		}
 	];
 

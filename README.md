@@ -4,7 +4,7 @@
 </h1>
 
 <p align="center">
-  <strong>◈ A graphical user interface for managing wallpapers on Linux ◈</strong>
+  <strong>◈ A graphical user interface for managing wallpapers for [linux-wallpaperengine](https://github.com/Almamu/linux-wallpaperengine) ◈</strong>
   <br>
   <strong>◈ Powered by Go (Backend) and Electron (Frontend) ◈</strong>
 </p>

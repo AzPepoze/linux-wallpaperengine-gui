@@ -42,7 +42,7 @@
 </script>
 
 <div class="capsule-container" bind:this={container}>
-	<div class="sliding-indicator" bind:this={indicator} />
+	<div class="sliding-indicator" bind:this={indicator}></div>
 	{#each options as option, i (option.id)}
 		<button
 			class="capsule-item"

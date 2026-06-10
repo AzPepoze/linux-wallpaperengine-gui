@@ -17,6 +17,7 @@ export type I18nKey =
 	| 'settings.sectionInteraction'
 	| 'settings.sectionAdvanced'
 	| 'settings.sectionExecutable'
+	| 'settings.sectionAbout'
 	| 'settings.openConfig'
 	| 'settings.loading'
 	| 'settings.general.language'

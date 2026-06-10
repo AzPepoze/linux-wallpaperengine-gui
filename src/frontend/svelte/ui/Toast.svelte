@@ -87,7 +87,7 @@
 		<div 
 			class="progress-fill" 
 			style="width: {progress}%; background: {typeColors[type]}"
-		/>
+		></div>
 	</div>
 </div>
 
@@ -134,42 +134,42 @@
 			border-left: 4px solid var(--info-bg);
 			.icon-wrap { color: var(--info-bg); }
 		}
-	}
 
-	.icon-wrap {
-		display: flex;
-		align-items: center;
-		justify-content: center;
-		flex-shrink: 0;
-	}
-
-	.content {
-		flex-grow: 1;
-		
-		.message {
-			color: #fff;
-			font-weight: 600;
-			font-size: 0.95em;
-			line-height: 1.4;
+		.icon-wrap {
+			display: flex;
+			align-items: center;
+			justify-content: center;
+			flex-shrink: 0;
 		}
-	}
 
-	.close-btn {
-		background: transparent;
-		border: none;
-		color: rgba(255, 255, 255, 0.4);
-		cursor: pointer;
-		padding: 4px;
-		display: flex;
-		align-items: center;
-		justify-content: center;
-		border-radius: 4px;
-		transition: all 0.2s ease;
-		margin-left: 4px;
+		.content {
+			flex-grow: 1;
+			
+			.message {
+				color: #fff;
+				font-weight: 600;
+				font-size: 0.95em;
+				line-height: 1.4;
+			}
+		}
 
-		&:hover {
-			color: #fff;
-			background: rgba(255, 255, 255, 0.1);
+		.close-btn {
+			background: transparent;
+			border: none;
+			color: rgba(255, 255, 255, 0.4);
+			cursor: pointer;
+			padding: 4px;
+			display: flex;
+			align-items: center;
+			justify-content: center;
+			border-radius: 4px;
+			transition: all 0.2s ease;
+			margin-left: 4px;
+
+			&:hover {
+				color: #fff;
+				background: rgba(255, 255, 255, 0.1);
+			}
 		}
 	}
 
