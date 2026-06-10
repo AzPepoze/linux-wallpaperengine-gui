@@ -46,35 +46,24 @@ jobs:
                     
                     echo "PACKAGE_VERSION=${VERSION}" >> $GITHUB_ENV
 
-             - name: Cache Bun dependencies
-               uses: actions/cache@v4
-               with:
-                    path: ~/.bun/install/cache
-                    key: bun-${{ runner.os }}-${{ hashFiles('bun.lock') }}
-                    restore-keys: |
-                         bun-${{ runner.os }}-
-
-             - name: Cache Electron & electron-builder
+             - name: Cache dependencies
                uses: actions/cache@v4
                with:
                     path: |
+                         ~/.bun/install/cache
                          ~/.cache/electron
                          ~/.cache/electron-builder
-                    key: electron-${{ runner.os }}-${{ hashFiles('package.json') }}
+                    key: ${{ runner.os }}-deps-${{ hashFiles('bun.lock', 'package.json') }}
                     restore-keys: |
-                         electron-${{ runner.os }}-
-
-             - name: Cache APT packages
-               uses: actions/cache@v4
-               id: apt-cache
-               with:
-                    path: /var/cache/apt/archives
-                    key: apt-release-${{ runner.os }}-rpm-libarchive-gtk3-appindicator
+                         ${{ runner.os }}-deps-
 
              - name: Install system dependencies (Linux)
                run: |
                     sudo apt-get update
-                    sudo apt-get install -y rpm libarchive-tools libgtk-3-dev libayatana-appindicator3-dev
+                    sudo apt-get install -y --no-install-recommends \
+                      rpm libarchive-tools libgtk-3-dev libayatana-appindicator3-dev
+               env:
+                    DEBIAN_FRONTEND: noninteractive
 
              - name: Install dependencies
                run: bun install --frozen-lockfile
@@ -82,13 +71,11 @@ jobs:
              - name: Build App
                run: bun run build:all
                env:
-                    GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+                    GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
              - name: Zip linux-unpacked
                run: |
-                    cd dist
-                    zip -r "linux-wallpaperengine-gui.zip" linux-unpacked
-                    cd ..
+                    zip -r "dist/linux-wallpaperengine-gui.zip" dist/linux-unpacked
 
              - name: Upload Release Assets
                uses: softprops/action-gh-release@v2
