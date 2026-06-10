@@ -40,7 +40,7 @@ jobs:
                     if [[ $TAG_NAME == v* ]]; then
                       VERSION=${TAG_NAME#v}
                       echo "Updating package.json to version $VERSION"
-                      sed -i "s/\"version\": \".*\"/\"version\": \"$VERSION\"/" package.json
+                      sed -i "0,/\"version\": \".*\"/s//\"version\": \"$VERSION\"/" package.json
                     else
                       VERSION=$(grep -Po '"version"\s*:\s*"\K[^"]+' package.json)
                     fi
