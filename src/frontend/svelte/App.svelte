@@ -7,6 +7,7 @@
 	import { onMount } from 'svelte';
 	import { backOut, cubicOut } from 'svelte/easing';
 	import { fly, fade } from 'svelte/transition';
+	import { flip } from 'svelte/animate';
 	import { initLogger } from '@/core/logger';
 	import { loadSettings, settingsStore } from '@/features/settings/scripts/settings';
 	import { 
@@ -83,9 +84,18 @@
 	</div>
 {/if}
 
-{#if $toastStore}
-	<Toast message={$toastStore.message} type={$toastStore.type} />
-{/if}
+<div class="toast-stack">
+	{#each $toastStore as toast (toast.id)}
+		<div animate:flip={{ duration: 300 }}>
+			<Toast 
+				id={toast.id}
+				message={toast.message} 
+				type={toast.type} 
+				duration={toast.duration}
+			/>
+		</div>
+	{/each}
+</div>
 
 <ContextMenu />
 
@@ -103,5 +113,17 @@
 		flex-grow: 1;
 		padding: 10px;
 		position: relative;
+	}
+
+	.toast-stack {
+		position: fixed;
+		bottom: 32px;
+		right: 32px;
+		z-index: 2000;
+		display: flex;
+		flex-direction: column-reverse;
+		gap: 12px;
+		pointer-events: none;
+		align-items: flex-end;
 	}
 </style>
