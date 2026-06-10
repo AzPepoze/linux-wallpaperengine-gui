@@ -30,6 +30,7 @@ jobs:
                uses: actions/setup-go@v5
                with:
                     go-version: 'stable'
+                    cache: true
                     cache-dependency-path: src/backend/go.sum
 
              - name: Update version from tag
