@@ -80,7 +80,6 @@ contextBridge.exposeInMainWorld("electronAPI", {
 	unsubscribeWorkshopItem: createInvokeMethod("unsubscribe-workshop-item"),
 	getWorkshopItemDownloadInfo: createInvokeMethod("get-workshop-item-download-info"),
 	getWorkshopItemInstallInfo: createInvokeMethod("get-workshop-item-install-info"),
-	getAllWorkshopInstallInfo: createInvokeMethod("get-all-workshop-install-info"),
 	isSteamRunning: createInvokeMethod("is-steam-running"),
 	getAllDownloadingItems: createInvokeMethod("get-all-downloading-items"),
 	getSubscribedItems: createInvokeMethod("get-subscribed-items"),

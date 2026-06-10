@@ -59,14 +59,12 @@
 	let weConfigError = false;
 	let playlists: Playlist[] = [];
 	let containerElement: HTMLElement | null = null;
-	let steamInstallDates: Record<string, number> = {};
 
 	$: combinedWallpapers = getCombinedWallpapers(
 		wallpapers,
 		$subscribedIds,
 		$downloadingMetadata,
-		steamRunning,
-		steamInstallDates
+		steamRunning
 	);
 
 	// Reactive filtering of wallpapers
@@ -108,12 +106,7 @@
 
 		// Check Steam status
 		async function updateSteamStatus() {
-			const wasRunning = steamRunning;
 			steamRunning = await checkSteamStatus();
-			
-			if (steamRunning && !wasRunning) {
-				steamInstallDates = await window.electronAPI.getAllWorkshopInstallInfo();
-			}
 		}
 		updateSteamStatus();
 		const steamInterval = setInterval(updateSteamStatus, 5000);
@@ -170,10 +163,6 @@
 		wallpapers = result.wallpapers;
 		workshopPathValid = result.workshopPathValid;
 		wallpaperEnginePathValid = result.wallpaperEnginePathValid;
-		
-		if (steamRunning) {
-			steamInstallDates = await window.electronAPI.getAllWorkshopInstallInfo();
-		}
 
 		onWallpapersRefresh(result.wallpapers);
 	}

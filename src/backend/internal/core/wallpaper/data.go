@@ -6,6 +6,7 @@ import (
 	"os"
 	"path/filepath"
 	"strings"
+	"syscall"
 
 	"linux-wallpaperengine-gui/src/backend/internal/config"
 )
@@ -56,7 +57,11 @@ func GetWallpapers() (map[string]WallpaperData, error) {
 
 		var installDate int64
 		if info, err := entry.Info(); err == nil {
-			installDate = info.ModTime().Unix()
+			if stat, ok := info.Sys().(*syscall.Stat_t); ok {
+				installDate = stat.Ctim.Sec
+			} else {
+				installDate = info.ModTime().Unix()
+			}
 		}
 
 		wallpapers[folderName] = WallpaperData{

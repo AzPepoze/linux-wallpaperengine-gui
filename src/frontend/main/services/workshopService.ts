@@ -364,24 +364,4 @@ export function registerWorkshopService() {
 			return null;
 		}
 	});
-
-	ipcMain.handle("get-all-workshop-install-info", async () => {
-		const client = getSteamworksClient();
-		if (!client) return {};
-
-		try {
-			const subscribedItems = client.workshop.getSubscribedItems();
-			const result: Record<string, number> = {};
-			for (const fileId of subscribedItems) {
-				const info = client.workshop.installInfo(fileId);
-				if (info) {
-					result[fileId.toString()] = info.timestamp;
-				}
-			}
-			return result;
-		} catch (error) {
-			logger.error("Error fetching all install info:", error);
-			return {};
-		}
-	});
 }
