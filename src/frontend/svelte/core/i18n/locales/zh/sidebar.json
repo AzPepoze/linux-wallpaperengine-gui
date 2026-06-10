@@ -8,7 +8,7 @@
 		"rating": "评级：",
 		"description": "描述",
 		"properties": "属性",
-		"installed": "[NYT_ZH] Installed:"
+		"installed": "已安装"
 	},
 	"workshop": {
 		"tags": "标签",
@@ -24,6 +24,6 @@
 		"updated": "更新",
 		"status": "状态",
 		"banned": "已封禁",
-		"installed": "[NYT_ZH] Installed"
+		"installed": "已安装"
 	}
 }
