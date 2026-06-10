@@ -22,6 +22,7 @@
 		Playlist,
 		FilterConfig
 	} from '@shared/types';
+	import { DEFAULT_INSTALLED_FILTER_CONFIG } from '@shared/filterConstants';
 	import { filterWallpapers } from '@/core/utils/wallpaperFilter';
 	import {
 		checkSteamStatus,
@@ -196,14 +197,13 @@
 	{/if}
 
 	<div class="content-area">
-		{#if showFilterPanel && installedFilters}
-			<FilterPanel
-				config={installedFilters}
-				onSave={saveFilters}
-				onChange={handleFilterChange}
-				onClose={() => (showFilterPanel = false)}
-			/>
-		{/if}
+		<FilterPanel
+			show={showFilterPanel && !!installedFilters}
+			config={installedFilters || DEFAULT_INSTALLED_FILTER_CONFIG}
+			onSave={saveFilters}
+			onChange={handleFilterChange}
+			onClose={() => (showFilterPanel = false)}
+		/>
 
 		<div
 			class="wallpaper-container"

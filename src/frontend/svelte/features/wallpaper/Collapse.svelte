@@ -1,6 +1,6 @@
 <script lang="ts">
-	import { slide } from 'svelte/transition';
 	import Icon from '@/ui/Icon.svelte';
+	import { slide } from 'svelte/transition';
 
 	export let title: string;
 	export let isExpanded: boolean = false;
@@ -14,7 +14,10 @@
 	<button class="collapse-header" on:click={toggleExpanded}>
 		<div class="collapse-title">
 			<span class="collapse-icon">
-				<Icon name={isExpanded ? 'expand_more' : 'chevron_right'} size={18} />
+				<Icon
+					name={isExpanded ? 'expand_more' : 'chevron_right'}
+					size={18}
+				/>
 			</span>
 			<span>{title}</span>
 		</div>
@@ -98,9 +101,7 @@
 			background: rgba(var(--primary-raw-rgb), 0.15);
 			border-radius: var(--radius-md);
 			padding: 8px 12px;
-			margin: 0 -20px;
 			padding-left: 32px;
-			padding-right: 32px;
 		}
 
 		.collapse-content {
