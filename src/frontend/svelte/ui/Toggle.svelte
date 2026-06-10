@@ -60,9 +60,12 @@
 	}
 
 	input:checked + .slider {
-		background: linear-gradient(135deg, var(--btn-primary-bg) 0%, var(--btn-primary-hover-bg) 100%);
+		background: linear-gradient(
+			135deg,
+			var(--btn-primary-bg) 0%,
+			var(--btn-primary-hover-bg) 100%
+		);
 		border-color: transparent;
-		box-shadow: 0 0 10px var(--shadow-primary);
 
 		&:before {
 			transform: translateX(22px);
