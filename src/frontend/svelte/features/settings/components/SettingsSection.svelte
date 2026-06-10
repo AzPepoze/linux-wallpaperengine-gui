@@ -53,7 +53,10 @@
 	.section-content {
 		display: flex;
 		flex-direction: column;
-		gap: 16px;
+		
+		> :global(* + *) {
+			margin-top: 16px;
+		}
 	}
 
 	@keyframes fade-in {

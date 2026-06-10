@@ -5,6 +5,7 @@
 	import Input from '@/ui/Input.svelte';
 	import SettingItem from '@/ui/SettingItem.svelte';
 	import Toggle from '@/ui/Toggle.svelte';
+	import { slide } from 'svelte/transition';
 	import { settingsStore, saveSettings } from '@/features/settings/scripts/settings';
 	import { t } from '@/core/i18n';
 
@@ -42,31 +43,36 @@
 	</SettingItem>
 
 	{#if $settingsStore.customArgsEnabled}
-		<SettingItem
-			label={$t('settings.advanced.customCommandArgs')}
-			id="customArgs"
-			vertical
-			description={$t('settings.advanced.customCommandArgsDesc')}
+		<div 
+			transition:slide={{ duration: 300 }}
+			style="display: flex; flex-direction: column; gap: 16px;"
 		>
-			<Input
-				type="text"
+			<SettingItem
+				label={$t('settings.advanced.customCommandArgs')}
 				id="customArgs"
-				bind:value={$settingsStore.customArgs}
-				placeholder={$t('settings.advanced.customArgsPlaceholder')}
-			/>
-			<div class="doc-actions">
-				<Button
-					variant="ghost"
-					on:click={() =>
-						window.electronAPI.openExternal(
-							'https://github.com/Almamu/linux-wallpaperengine?tab=readme-ov-file#-common-options'
-						)}
-				>
-					<Icon name="open_in_new" size={14} />
-					<span>{$t('settings.advanced.commonOptionsDoc')}</span>
-				</Button>
-			</div>
-		</SettingItem>
+				vertical
+				description={$t('settings.advanced.customCommandArgsDesc')}
+			>
+				<Input
+					type="text"
+					id="customArgs"
+					bind:value={$settingsStore.customArgs}
+					placeholder={$t('settings.advanced.customArgsPlaceholder')}
+				/>
+				<div class="doc-actions">
+					<Button
+						variant="ghost"
+						on:click={() =>
+							window.electronAPI.openExternal(
+								'https://github.com/Almamu/linux-wallpaperengine?tab=readme-ov-file#-common-options'
+							)}
+					>
+						<Icon name="open_in_new" size={14} />
+						<span>{$t('settings.advanced.commonOptionsDoc')}</span>
+					</Button>
+				</div>
+			</SettingItem>
+		</div>
 	{/if}
 
 	<!-- Hooks: add more hook items below as needed -->
@@ -75,72 +81,77 @@
 	</SettingItem>
 
 	{#if $settingsStore.hookEnabled}
-		<SettingItem
-			label={$t('settings.advanced.wallpaperChangeCommand')}
-			id="wallpaperChangeCommand"
-			vertical
-			description={$t('settings.advanced.wallpaperChangeCommandDesc')}
+		<div 
+			transition:slide={{ duration: 300 }}
+			style="display: flex; flex-direction: column; gap: 16px;"
 		>
-			<div class="table-container">
-				<table class="variable-table">
-					<thead>
-						<tr>
-							<th>{$t('settings.advanced.hooks.variable')}</th>
-							<th>{$t('settings.advanced.hooks.description')}</th>
-						</tr>
-					</thead>
-					<tbody>
-						<tr>
-							<td>
-								<CopyableCode code="$PREVIEW_PATH" />
-							</td>
-							<td>{$t('settings.advanced.hooks.previewPathDesc')}</td>
-						</tr>
-						<tr>
-							<td>
-								<CopyableCode code="$VIDEO_PATH" />
-							</td>
-							<td>{$t('settings.advanced.hooks.videoPathDesc')}</td>
-						</tr>
-						<tr>
-							<td>
-								<CopyableCode code="$IS_VIDEO" />
-							</td>
-							<td>{$t('settings.advanced.hooks.isVideoDesc')}</td>
-						</tr>
-						<tr>
-							<td>
-								<CopyableCode code="$WALLPAPER_TITLE" />
-							</td>
-							<td>{$t('settings.advanced.hooks.wallpaperTitleDesc')}</td>
-						</tr>
-						<tr>
-							<td>
-								<CopyableCode code="$WALLPAPER_TYPE" />
-							</td>
-							<td>{$t('settings.advanced.hooks.wallpaperTypeDesc')}</td>
-						</tr>
-						<tr>
-							<td>
-								<CopyableCode code="$WALLPAPER_ID" />
-							</td>
-							<td>{$t('settings.advanced.hooks.wallpaperIdDesc')}</td>
-						</tr>
-						<tr>
-							<td>
-								<CopyableCode code="$SCREEN_NAME" />
-							</td>
-							<td>{$t('settings.advanced.hooks.screenNameDesc')}</td>
-						</tr>
-					</tbody>
-				</table>
-			</div>
-			<Input
+			<SettingItem
+				label={$t('settings.advanced.wallpaperChangeCommand')}
 				id="wallpaperChangeCommand"
-				bind:value={$settingsStore.wallpaperChangeCommand}
-				placeholder={$t('settings.advanced.hooks.commandPlaceholder')}
-			/>
-		</SettingItem>
+				vertical
+				description={$t('settings.advanced.wallpaperChangeCommandDesc')}
+			>
+				<div class="table-container">
+					<table class="variable-table">
+						<thead>
+							<tr>
+								<th>{$t('settings.advanced.hooks.variable')}</th>
+								<th>{$t('settings.advanced.hooks.description')}</th>
+							</tr>
+						</thead>
+						<tbody>
+							<tr>
+								<td>
+									<CopyableCode code="$PREVIEW_PATH" />
+								</td>
+								<td>{$t('settings.advanced.hooks.previewPathDesc')}</td>
+							</tr>
+							<tr>
+								<td>
+									<CopyableCode code="$VIDEO_PATH" />
+								</td>
+								<td>{$t('settings.advanced.hooks.videoPathDesc')}</td>
+							</tr>
+							<tr>
+								<td>
+									<CopyableCode code="$IS_VIDEO" />
+								</td>
+								<td>{$t('settings.advanced.hooks.isVideoDesc')}</td>
+							</tr>
+							<tr>
+								<td>
+									<CopyableCode code="$WALLPAPER_TITLE" />
+								</td>
+								<td>{$t('settings.advanced.hooks.wallpaperTitleDesc')}</td>
+							</tr>
+							<tr>
+								<td>
+									<CopyableCode code="$WALLPAPER_TYPE" />
+								</td>
+								<td>{$t('settings.advanced.hooks.wallpaperTypeDesc')}</td>
+							</tr>
+							<tr>
+								<td>
+									<CopyableCode code="$WALLPAPER_ID" />
+								</td>
+								<td>{$t('settings.advanced.hooks.wallpaperIdDesc')}</td>
+							</tr>
+							<tr>
+								<td>
+									<CopyableCode code="$SCREEN_NAME" />
+								</td>
+								<td>{$t('settings.advanced.hooks.screenNameDesc')}</td>
+							</tr>
+						</tbody>
+					</table>
+				</div>
+				<Input
+					id="wallpaperChangeCommand"
+					bind:value={$settingsStore.wallpaperChangeCommand}
+					placeholder={$t('settings.advanced.hooks.commandPlaceholder')}
+				/>
+			</SettingItem>
+		</div>
 	{/if}
 {/if}
 

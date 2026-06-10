@@ -4,6 +4,7 @@
 	import Input from '@/ui/Input.svelte';
 	import Select from '@/ui/Select.svelte';
 	import Range from '@/ui/Range.svelte';
+	import { slide } from 'svelte/transition';
 	import { settingsStore, saveSettings, handleAutostart } from '@/features/settings/scripts/settings';
 	import { t, locale, setLocale } from '@/core/i18n';
 
@@ -97,19 +98,24 @@
 	</SettingItem>
 
 	{#if $settingsStore.transparentUi}
-		<SettingItem
-			label={$t('settings.general.uiTransparency')}
-			id="uiTransparency"
-			description={$t('settings.general.uiTransparencyDesc')}
+		<div 
+			transition:slide={{ duration: 300 }}
+			style="display: flex; flex-direction: column; gap: 16px;"
 		>
-			<Range
+			<SettingItem
+				label={$t('settings.general.uiTransparency')}
 				id="uiTransparency"
-				bind:value={$settingsStore.uiTransparency}
-				min={10}
-				max={100}
-				step={5}
-			/>
-		</SettingItem>
+				description={$t('settings.general.uiTransparencyDesc')}
+			>
+				<Range
+					id="uiTransparency"
+					bind:value={$settingsStore.uiTransparency}
+					min={10}
+					max={100}
+					step={5}
+				/>
+			</SettingItem>
+		</div>
 	{/if}
 
 	<SettingItem
