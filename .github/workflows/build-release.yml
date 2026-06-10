@@ -32,9 +32,18 @@ jobs:
                     go-version: 'stable'
                     cache-dependency-path: src/backend/go.sum
 
-             - name: Get version from package.json
+             - name: Update version from tag
                run: |
-                    VERSION=$(grep -Po '"version"\s*:\s*"\K[^"]+' package.json)
+                    TAG_NAME=${{ github.ref_name }}
+
+                    if [[ $TAG_NAME == v* ]]; then
+                      VERSION=${TAG_NAME#v}
+                      echo "Updating package.json to version $VERSION"
+                      sed -i "s/\"version\": \".*\"/\"version\": \"$VERSION\"/" package.json
+                    else
+                      VERSION=$(grep -Po '"version"\s*:\s*"\K[^"]+' package.json)
+                    fi
+                    
                     echo "PACKAGE_VERSION=${VERSION}" >> $GITHUB_ENV
 
              - name: Cache Bun dependencies
