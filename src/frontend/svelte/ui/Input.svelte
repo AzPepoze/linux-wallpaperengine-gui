@@ -50,7 +50,6 @@
 			border-color: var(--btn-primary-bg);
 			background-color: var(--bg-surface-active);
 			box-shadow: 0 0 0 4px var(--focus-ring-light);
-			transform: translateY(-1px);
 		}
 
 		&::placeholder {

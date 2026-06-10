@@ -88,8 +88,7 @@ export function getCombinedWallpapers(
 	wallpapers: Record<string, WallpaperData>,
 	subscribedIdsSet: Set<string>,
 	downloadingMetadataMap: Record<string, WallpaperData>,
-	steamRunning: boolean,
-	steamInstallDates: Record<string, number> = {}
+	steamRunning: boolean
 ): Record<string, WallpaperData> {
 	const combined: Record<string, WallpaperData> = { ...wallpapers };
 	const subscribedList = Array.from(subscribedIdsSet);
@@ -109,10 +108,6 @@ export function getCombinedWallpapers(
 
 		if (isWorkshop) {
 			if (!steamRunning || subscribedIdsSet.has(id)) {
-				// Use steamworks timestamp if available, fallback to local ModTime
-				if (steamInstallDates[id]) {
-					data = { ...data, installDate: steamInstallDates[id] };
-				}
 				result[id] = data;
 			}
 		} else {

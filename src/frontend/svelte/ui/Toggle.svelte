@@ -44,6 +44,25 @@
 		border-radius: var(--radius-full);
 		border: 1px solid var(--border-color);
 		box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.2);
+		overflow: hidden;
+
+		/* Background overlay for smooth gradient transition */
+		&::after {
+			content: '';
+			position: absolute;
+			top: 0;
+			left: 0;
+			right: 0;
+			bottom: 0;
+			background: linear-gradient(
+				135deg,
+				var(--btn-primary-bg) 0%,
+				var(--btn-primary-hover-bg) 100%
+			);
+			opacity: 0;
+			transition: opacity 0.3s ease;
+			z-index: 0;
+		}
 
 		&:before {
 			position: absolute;
@@ -56,13 +75,16 @@
 			transition: all 0.3s cubic-bezier(0.68, -0.55, 0.265, 1.55);
 			border-radius: 50%;
 			box-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+			z-index: 1;
 		}
 	}
 
 	input:checked + .slider {
-		background: linear-gradient(135deg, var(--btn-primary-bg) 0%, var(--btn-primary-hover-bg) 100%);
 		border-color: transparent;
-		box-shadow: 0 0 10px var(--shadow-primary);
+
+		&::after {
+			opacity: 1;
+		}
 
 		&:before {
 			transform: translateX(22px);

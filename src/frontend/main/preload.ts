@@ -28,6 +28,7 @@ contextBridge.exposeInMainWorld("electronAPI", {
 	selectDir: createInvokeMethod("select-dir"),
 	selectFile: createInvokeMethod("select-file"),
 	openExternal: createInvokeMethod("open-external"),
+	getVersion: createInvokeMethod("get-version"),
 	openPath: createInvokeMethod("open-path"),
 
 	// File system
@@ -80,7 +81,6 @@ contextBridge.exposeInMainWorld("electronAPI", {
 	unsubscribeWorkshopItem: createInvokeMethod("unsubscribe-workshop-item"),
 	getWorkshopItemDownloadInfo: createInvokeMethod("get-workshop-item-download-info"),
 	getWorkshopItemInstallInfo: createInvokeMethod("get-workshop-item-install-info"),
-	getAllWorkshopInstallInfo: createInvokeMethod("get-all-workshop-install-info"),
 	isSteamRunning: createInvokeMethod("is-steam-running"),
 	getAllDownloadingItems: createInvokeMethod("get-all-downloading-items"),
 	getSubscribedItems: createInvokeMethod("get-subscribed-items"),

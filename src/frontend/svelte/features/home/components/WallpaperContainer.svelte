@@ -22,6 +22,7 @@
 		Playlist,
 		FilterConfig
 	} from '@shared/types';
+	import { DEFAULT_INSTALLED_FILTER_CONFIG } from '@shared/filterConstants';
 	import { filterWallpapers } from '@/core/utils/wallpaperFilter';
 	import {
 		checkSteamStatus,
@@ -59,14 +60,12 @@
 	let weConfigError = false;
 	let playlists: Playlist[] = [];
 	let containerElement: HTMLElement | null = null;
-	let steamInstallDates: Record<string, number> = {};
 
 	$: combinedWallpapers = getCombinedWallpapers(
 		wallpapers,
 		$subscribedIds,
 		$downloadingMetadata,
-		steamRunning,
-		steamInstallDates
+		steamRunning
 	);
 
 	// Reactive filtering of wallpapers
@@ -108,12 +107,7 @@
 
 		// Check Steam status
 		async function updateSteamStatus() {
-			const wasRunning = steamRunning;
 			steamRunning = await checkSteamStatus();
-			
-			if (steamRunning && !wasRunning) {
-				steamInstallDates = await window.electronAPI.getAllWorkshopInstallInfo();
-			}
 		}
 		updateSteamStatus();
 		const steamInterval = setInterval(updateSteamStatus, 5000);
@@ -170,10 +164,6 @@
 		wallpapers = result.wallpapers;
 		workshopPathValid = result.workshopPathValid;
 		wallpaperEnginePathValid = result.wallpaperEnginePathValid;
-		
-		if (steamRunning) {
-			steamInstallDates = await window.electronAPI.getAllWorkshopInstallInfo();
-		}
 
 		onWallpapersRefresh(result.wallpapers);
 	}
@@ -207,14 +197,13 @@
 	{/if}
 
 	<div class="content-area">
-		{#if showFilterPanel && installedFilters}
-			<FilterPanel
-				config={installedFilters}
-				onSave={saveFilters}
-				onChange={handleFilterChange}
-				onClose={() => (showFilterPanel = false)}
-			/>
-		{/if}
+		<FilterPanel
+			show={showFilterPanel && !!installedFilters}
+			config={installedFilters || DEFAULT_INSTALLED_FILTER_CONFIG}
+			onSave={saveFilters}
+			onChange={handleFilterChange}
+			onClose={() => (showFilterPanel = false)}
+		/>
 
 		<div
 			class="wallpaper-container"

@@ -1,13 +1,13 @@
 <script lang="ts">
 	import { sidebarWidth } from '@/core/ui';
-	import { settingsStore } from '@/features/settings/scripts/settings';
 	import {
 		calculateSidebarTheme,
 		DEFAULT_THEME,
 		type SidebarTheme
 	} from '@/features/home/scripts/sidebarTheme';
-	import type { Wallpaper } from '@shared/types';
+	import { settingsStore } from '@/features/settings/scripts/settings';
 	import ResizeHandle from '@/ui/ResizeHandle.svelte';
+	import type { Wallpaper } from '@shared/types';
 
 	export let selectedWallpaper: Wallpaper | null = null;
 	export let onClose: () => void = () => {};
@@ -285,20 +285,6 @@
 					transparent 60%
 				);
 				transform: translateY(-2px);
-			}
-		}
-
-		:global(input[type='range']) {
-			background: var(
-				--palette-track,
-				var(--btn-primary-bg)
-			) !important;
-
-			&:hover {
-				background: var(
-					--palette-track,
-					var(--btn-primary-hover-bg)
-				) !important;
 			}
 		}
 	}

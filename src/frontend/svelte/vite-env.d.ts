@@ -20,6 +20,7 @@ interface ElectronAPI {
 	execCommand: (command: string, args?: string[], show_log?: boolean) => Promise<any>;
 	getEnv: (key: string) => Promise<string | undefined>;
 	getHomeDir: () => Promise<string>;
+	getVersion: () => Promise<string>;
 	openExternal: (url: string) => Promise<void>;
 	openPath: (path: string) => Promise<string>;
 
@@ -89,7 +90,6 @@ interface ElectronAPI {
 	getWorkshopItemInstallInfo: (
 		fileId: string,
 	) => Promise<{ folder: string; sizeOnDisk: string; timestamp: number } | null>;
-	getAllWorkshopInstallInfo: () => Promise<Record<string, number>>;
 
 	// Steam Filters
 	getInstalledFilters: () => Promise<{ success: boolean; filters: FilterConfig; error?: string }>;

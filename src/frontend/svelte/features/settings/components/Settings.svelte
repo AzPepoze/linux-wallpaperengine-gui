@@ -5,6 +5,7 @@
 	import Interaction from '@/features/settings/components/Interaction.svelte';
 	import Advanced from '@/features/settings/components/Advanced.svelte';
 	import Executable from '@/features/settings/components/Executable.svelte';
+	import About from '@/features/settings/components/About.svelte';
 	import {
 		settingsStore,
 		loadSettings,
@@ -45,6 +46,12 @@
 			labelKey: 'settings.sectionExecutable',
 			icon: 'folder',
 			component: Executable
+		},
+		{
+			id: 'about',
+			labelKey: 'settings.sectionAbout',
+			icon: 'info',
+			component: About
 		}
 	];
 
@@ -134,7 +141,11 @@
 		</div>
 	</aside>
 
-	<main class="settings-main" bind:this={contentElement}>
+	<main 
+		class="settings-main" 
+		class:scroll-mask={$settingsStore?.enableScrollMask}
+		bind:this={contentElement}
+	>
 		{#if $settingsStore}
 			<div class="content-wrapper">
 				{#each sections as section}
@@ -273,6 +284,16 @@
 			rgba(var(--primary-raw-rgb), 0.05),
 			transparent 40%
 		);
+
+		&.scroll-mask {
+			mask-image: linear-gradient(
+				to bottom,
+				transparent,
+				black 60px,
+				black 95%,
+				transparent
+			);
+		}
 
 		.content-wrapper {
 			max-width: 850px;

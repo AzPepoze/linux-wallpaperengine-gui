@@ -16,6 +16,7 @@
 	import { filterPanelWidth } from '@/core/ui';
 
 	export let config: FilterConfig;
+	export let show: boolean = true;
 	export let onSave: ((config: FilterConfig) => void) | undefined =
 		undefined;
 	export let onChange: ((config: FilterConfig) => void) | undefined =
@@ -103,72 +104,74 @@
 
 <div
 	class="filter-panel"
+	class:open={show}
 	class:resizing={isResizing}
-	transition:fly={{ x: -260, duration: 250, opacity: 1 }}
-	style="width: {$filterPanelWidth}px;"
+	style="--panel-width: {$filterPanelWidth}px;"
 >
-	<ResizeHandle
-		bind:isResizing
-		position="right"
-		minWidth={200}
-		maxWidth={600}
-		width={$filterPanelWidth}
-		onResize={(w) => filterPanelWidth.set(w)}
-		calculateWidth={(clientX) => {
-			const panel = document.querySelector('.filter-panel');
-			if (panel) {
-				const rect = panel.getBoundingClientRect();
-				return clientX - rect.left;
-			}
-			return clientX;
-		}}
-	/>
+	{#if show}
+		<ResizeHandle
+			bind:isResizing
+			position="right"
+			minWidth={200}
+			maxWidth={600}
+			width={$filterPanelWidth}
+			onResize={(w) => filterPanelWidth.set(w)}
+			calculateWidth={(clientX) => {
+				const panel = document.querySelector('.filter-panel');
+				if (panel) {
+					const rect = panel.getBoundingClientRect();
+					return clientX - rect.left;
+				}
+				return clientX;
+			}}
+		/>
 
-	<div class="panel-inner">
-		<div class="panel-header">
-			<h3>{$t('filter.ui.filters')}</h3>
-			<div class="header-actions">
-				<Button
-					variant="secondary"
-					on:click={handleReset}
-					style="padding: 4px 8px; font-size: 0.8em;"
-				>
-					<Icon name="restart_alt" size={16} />
-					<span>{$t('filter.ui.reset')}</span>
-				</Button>
-				{#if onSave}
+		<div class="panel-inner" transition:fly={{ x: -20, duration: 400, opacity: 0 }}>
+			<div class="panel-header">
+				<h3>{$t('filter.ui.filters')}</h3>
+				<div class="header-actions">
 					<Button
-						variant="primary"
-						on:click={handleSave}
-						style="padding: 4px 12px; font-size: 0.8em;"
+						variant="secondary"
+						on:click={handleReset}
+						style="padding: 4px 8px; font-size: 0.8em;"
 					>
-						<Icon name="done" size={16} />
-						<span>{$t('filter.ui.apply')}</span>
+						<Icon name="restart_alt" size={16} />
+						<span>{$t('filter.ui.reset')}</span>
 					</Button>
-				{/if}
-				<Button
-					variant="secondary"
-					on:click={onClose}
-					style="padding: 4px; display: flex; align-items: center; justify-content: center;"
-				>
-					<Icon name="close" size={16} />
-				</Button>
+					{#if onSave}
+						<Button
+							variant="primary"
+							on:click={handleSave}
+							style="padding: 4px 12px; font-size: 0.8em;"
+						>
+							<Icon name="done" size={16} />
+							<span>{$t('filter.ui.apply')}</span>
+						</Button>
+					{/if}
+					<Button
+						variant="secondary"
+						on:click={onClose}
+						style="padding: 4px; display: flex; align-items: center; justify-content: center;"
+					>
+						<Icon name="close" size={16} />
+					</Button>
+				</div>
+			</div>
+
+			<div class="panel-content">
+				{#each filterCategories as category (category.name)}
+					<FilterCategorySection
+						{category}
+						{localConfig}
+						bind:isExpanded={expandedCategories[category.name]}
+						onToggleTag={handleToggleTag}
+						onSetGroupState={handleSetGroupState}
+						onSetCategoryState={handleSetCategoryState}
+					/>
+				{/each}
 			</div>
 		</div>
-
-		<div class="panel-content">
-			{#each filterCategories as category (category.name)}
-				<FilterCategorySection
-					{category}
-					{localConfig}
-					bind:isExpanded={expandedCategories[category.name]}
-					onToggleTag={handleToggleTag}
-					onSetGroupState={handleSetGroupState}
-					onSetCategoryState={handleSetCategoryState}
-				/>
-			{/each}
-		</div>
-	</div>
+	{/if}
 </div>
 
 <style lang="scss">
@@ -176,20 +179,31 @@
 		position: relative;
 		flex-shrink: 0;
 		background: var(--bg-surface);
-		border-right: 1px solid var(--border-color);
+		border-right: 0px solid transparent;
 		display: flex;
 		flex-direction: column;
-		overflow: visible;
+		overflow: hidden;
 		border-radius: var(--radius-md);
-		margin-right: 15px;
 		margin-top: 15px;
 		margin-bottom: 15px;
-		transition:
-			transform var(--transition-base),
-			opacity var(--transition-base),
-			width var(--transition-base);
-		min-width: 270px;
-		max-width: 500px;
+		
+		width: 0;
+		min-width: 0;
+		opacity: 0;
+		margin-right: 0;
+		
+		transition: 
+			width 0.35s cubic-bezier(0.4, 0, 0.2, 1),
+			opacity 0.35s cubic-bezier(0.4, 0, 0.2, 1),
+			margin-right 0.35s cubic-bezier(0.4, 0, 0.2, 1),
+			border-right 0.35s cubic-bezier(0.4, 0, 0.2, 1);
+
+		&.open {
+			width: var(--panel-width);
+			opacity: 1;
+			margin-right: 15px;
+			border-right: 1px solid var(--border-color);
+		}
 
 		&.resizing {
 			transition: none;
@@ -202,7 +216,7 @@
 			overflow: hidden;
 			border-radius: inherit;
 			height: 100%;
-			width: 100%;
+			width: var(--panel-width);
 		}
 
 		.panel-header {

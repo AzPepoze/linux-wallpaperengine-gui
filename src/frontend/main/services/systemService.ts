@@ -12,6 +12,11 @@ export function registerSystemService() {
 		return app.getPath("home");
 	});
 
+	ipcMain.handle("get-version", () => {
+		logger.ipcReceived("get-version");
+		return app.getVersion();
+	});
+
 	ipcMain.handle("open-external", async (_, url: string) => {
 		logger.ipcReceived("open-external", url);
 		await shell.openExternal(url);

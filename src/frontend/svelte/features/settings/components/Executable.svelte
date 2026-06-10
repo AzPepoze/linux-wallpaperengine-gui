@@ -2,7 +2,7 @@
 	import SettingItem from '@/ui/SettingItem.svelte';
 	import Browse from '@/ui/Browse.svelte';
 	import Button from '@/ui/Button.svelte';
-	import ListEditor from '@/ui/ListEditor.svelte';
+	import PathListEditor from '@/ui/PathListEditor.svelte';
 	import Icon from '@/ui/Icon.svelte';
 	import { t } from '@/core/i18n';
 	import {
@@ -155,7 +155,7 @@
 		vertical
 		description={$t('settings.executable.steamSearchPathsDesc')}
 	>
-		<ListEditor
+		<PathListEditor
 			bind:items={$settingsStore.steamPaths}
 			placeholder={$t('settings.executable.steamPathsPlaceholder')}
 		/>
