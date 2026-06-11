@@ -50,6 +50,7 @@
     },
     "build": 
     {
+        "icon": "src/public/icon.png",
         "directories": 
         {
             "output": "dist"
