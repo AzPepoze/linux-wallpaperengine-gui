@@ -136,9 +136,11 @@ linux-wallpaperengine-gui [options]
 
 ### [Options]
 
-- `--minimized`: Starts the application minimized in the system tray.
-- `--native-wayland`: Makes electron use native Wayland instead of XWayland to solve fractional scaling issues (only works on Wayland sessions)
-- `--debug-mode`: Enables debug mode for the application.
+| Option | Description |
+|--------|-------------|
+| `--minimized` | Starts the application minimized in the system tray. |
+| `--native-wayland` | Makes electron use native Wayland instead of XWayland to solve fractional scaling issues (only works on Wayland sessions) |
+| `--debug-mode` | Enables debug mode for the application. |
 
 ## BUILD FROM SOURCE
 
