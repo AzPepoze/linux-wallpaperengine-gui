@@ -46,6 +46,7 @@ export interface SettingsState {
 	steamPaths: string[];
 	enableScrollMask: boolean;
 	hookEnabled: boolean;
+	hideTrayLabel: boolean;
 	wallpaperChangeCommand: string;
 }
 
@@ -86,6 +87,7 @@ const configFieldMap: Record<string, string> = {
 	steamPaths: "steamPaths",
 	enableScrollMask: "enableScrollMask",
 	hookEnabled: "hookEnabled",
+	hideTrayLabel: "hideTrayLabel",
 	wallpaperChangeCommand: "wallpaperChangeCommand",
 };
 

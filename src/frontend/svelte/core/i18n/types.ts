@@ -44,6 +44,8 @@ export type I18nKey =
 	| 'settings.general.disableParticlesDesc'
 	| 'settings.general.scrollMask'
 	| 'settings.general.scrollMaskDesc'
+	| 'settings.general.hideTrayLabel'
+	| 'settings.general.hideTrayLabelDesc'
 	| 'settings.generalScaling.default'
 	| 'settings.generalScaling.stretch'
 	| 'settings.generalScaling.fit'
