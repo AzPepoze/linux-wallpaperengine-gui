@@ -68,6 +68,7 @@ type AppConfig struct {
 	SteamPaths               []string       `json:"steamPaths,omitempty"`
 	EnableScrollMask         bool           `json:"enableScrollMask"`
 	HookEnabled              bool           `json:"hookEnabled"`
+	HideTrayLabel            bool           `json:"hideTrayLabel"`
 	WallpaperChangeCommand   string         `json:"wallpaperChangeCommand,omitempty"`
 
 	// Fixed Filters
