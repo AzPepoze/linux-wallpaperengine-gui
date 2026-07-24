@@ -32,19 +32,7 @@ export async function startPlaylist(
 	selectedScreen: string | null
 ) {
 	const screenName = cloneMode ? 'Global' : selectedScreen || '';
-	if (playlistName === 'Random All') {
-		await window.electronAPI.startPlaylist('Random All', interval, screenName);
-		showToast(
-			`Started dynamic random rotation on ${cloneMode ? 'all displays' : selectedScreen || 'display'}`,
-			'success'
-		);
-	} else {
-		await window.electronAPI.startPlaylist(playlistName, interval, screenName);
-		showToast(
-			`Started playlist on ${cloneMode ? 'all displays' : selectedScreen || 'display'}: ${playlistName}`,
-			'success'
-		);
-	}
+	await window.electronAPI.startPlaylist(playlistName, interval, screenName);
 }
 
 export async function stopPlaylist(cloneMode: boolean, selectedScreen: string | null) {
@@ -55,7 +43,6 @@ export async function stopPlaylist(cloneMode: boolean, selectedScreen: string | 
 export async function createPlaylist(name: string): Promise<boolean> {
 	try {
 		await window.electronAPI.createPlaylist(name);
-		showToast('Playlist created', 'success');
 		return true;
 	} catch (e) {
 		showToast('Failed to create playlist', 'error');
@@ -66,7 +53,6 @@ export async function createPlaylist(name: string): Promise<boolean> {
 export async function renamePlaylist(oldName: string, newName: string): Promise<boolean> {
 	try {
 		await window.electronAPI.renamePlaylist(oldName, newName);
-		showToast('Playlist renamed', 'success');
 		return true;
 	} catch (e) {
 		showToast('Failed to rename playlist', 'error');
@@ -77,7 +63,6 @@ export async function renamePlaylist(oldName: string, newName: string): Promise<
 export async function deletePlaylist(name: string): Promise<boolean> {
 	try {
 		await window.electronAPI.deletePlaylist(name);
-		showToast('Playlist deleted', 'success');
 		return true;
 	} catch (e) {
 		showToast('Failed to delete playlist', 'error');
