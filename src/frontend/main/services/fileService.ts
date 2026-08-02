@@ -1,9 +1,20 @@
 import { ipcMain, dialog, BrowserWindow } from "electron";
 import fs from "node:fs/promises";
+import path from "node:path";
 import { logger } from "../logger";
 import { normalizePath } from "../utils/pathHelper";
 
 export function registerFileService() {
+	ipcMain.handle("get-app-icon", async () => {
+		const iconPath = path.join(process.env.VITE_PUBLIC || "", "icon.png");
+		const buffer = await fs.readFile(iconPath);
+
+		return buffer.buffer.slice(
+			buffer.byteOffset,
+			buffer.byteOffset + buffer.byteLength,
+		);
+	});
+
 	ipcMain.handle("select-dir", async (event) => {
 		logger.ipcReceived("select-dir");
 		const win = BrowserWindow.fromWebContents(event.sender);
@@ -60,7 +71,10 @@ export function registerFileService() {
 		logger.ipcReceived("fs-read-binary", filePath);
 		filePath = normalizePath(filePath);
 		const buffer = await fs.readFile(filePath);
-		return buffer.buffer;
+		return buffer.buffer.slice(
+			buffer.byteOffset,
+			buffer.byteOffset + buffer.byteLength,
+		);
 	});
 
 	ipcMain.handle("fs-exists", async (_, filePath: string) => {

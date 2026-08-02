@@ -1,8 +1,8 @@
-import { writable } from "svelte/store";
-import type { Writable } from "svelte/store";
-import { EXECUTABLE_NAME } from "@shared/constants";
 import { logger } from "@/core/logger";
 import { showToast } from "@/core/toastStore";
+import { EXECUTABLE_NAME } from "@shared/constants";
+import type { Writable } from "svelte/store";
+import { writable } from "svelte/store";
 
 // Helper function for error handling
 function getErrorMessage(error: unknown): string {
@@ -132,6 +132,7 @@ export async function saveSettings(
 
 		const result = await window.electronAPI.saveConfig(configData);
 		if (result.success) {
+			await updateDetectedPaths();
 			if (!silent) {
 				showToast("Settings saved successfully!", "success");
 			}

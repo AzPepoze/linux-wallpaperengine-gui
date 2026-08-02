@@ -74,7 +74,7 @@
 		"commonOptionsDoc": "Common Options Documentation",
 		"restartConfirm": "Changing Wayland support requires a restart. Do you want to restart now?",
 		"enableHooks": "Enable Hooks",
-		"enableHooksDesc": "Enable hooks.",
+		"enableHooksDesc": "Run the configured command after wallpapers are applied, once for each screen. The variables below are replaced with the current wallpaper details.",
 		"wallpaperChangeCommand": "On wallpaper change",
 		"wallpaperChangeCommandDesc": "Shell command to execute when a wallpaper is applied.",
 		"hooks": {
