@@ -1,0 +1,42 @@
+name: Update Main Development Version
+
+on:
+  push:
+    branches:
+      - main
+
+concurrency:
+  group: main-version
+  cancel-in-progress: true
+
+permissions:
+  contents: write
+
+jobs:
+  update_version:
+    if: github.actor != 'github-actions[bot]'
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - uses: oven-sh/setup-bun@v2
+        with:
+          bun-version: '1'
+
+      - name: Set development version from the latest release
+        run: bun utils/set-package-version.ts --mode=main
+
+      - name: Commit package version when it changed
+        run: |
+          if git diff --quiet -- package.json; then
+            exit 0
+          fi
+
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add package.json
+          git commit -m 'chore: update development version'
+          git push
