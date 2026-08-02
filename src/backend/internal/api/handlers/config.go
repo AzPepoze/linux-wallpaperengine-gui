@@ -5,6 +5,7 @@ import (
 
 	"linux-wallpaperengine-gui/src/backend/internal/api/models"
 	"linux-wallpaperengine-gui/src/backend/internal/config"
+	"linux-wallpaperengine-gui/src/backend/internal/ui/tray"
 )
 
 func (handler *Handler) HandleConfig(request models.Request) models.Response {
@@ -27,6 +28,7 @@ func (handler *Handler) HandleConfig(request models.Request) models.Response {
 			if err := config.WriteConfig(appConfig); err != nil {
 				response.Error = err.Error()
 			} else {
+				tray.UpdateTitle(appConfig.HideTrayLabel)
 				response.Result = map[string]bool{"success": true}
 			}
 		}

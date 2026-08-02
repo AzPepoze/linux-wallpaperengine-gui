@@ -1,5 +1,6 @@
 import { app, BrowserWindow, protocol, net } from "electron";
 import path from "node:path";
+import os from "node:os";
 import { fileURLToPath } from "node:url";
 import { spawn } from "node:child_process";
 import fs from "node:fs";
@@ -16,6 +17,12 @@ import { registerWorkshopService } from "./services/workshopService";
 import { registerImageService } from "./services/imageService";
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
+
+const xdgCacheHome = process.env.XDG_CACHE_HOME || path.join(os.homedir(), ".cache");
+const cacheDir = path.join(xdgCacheHome, "linux-wallpaperengine-gui");
+app.setPath("cache", cacheDir);
+app.setPath("sessionData", cacheDir);
+app.setPath("crashDumps", cacheDir);
 
 app.commandLine.appendSwitch("--js-flags", "--max-old-space-size=512");
 app.commandLine.appendSwitch("--no-zygote");

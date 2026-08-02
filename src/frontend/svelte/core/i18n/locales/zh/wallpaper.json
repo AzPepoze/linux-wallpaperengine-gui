@@ -8,10 +8,10 @@
 		"cloneMode": "克隆模式"
 	},
 	"sort": {
-		"dateDesc": "[NYT_ZH] Date (Newest)",
-		"dateAsc": "[NYT_ZH] Date (Oldest)",
-		"nameAsc": "[NYT_ZH] Name (A-Z)",
-		"nameDesc": "[NYT_ZH] Name (Z-A)"
+		"dateDesc": "日期（最新）",
+		"dateAsc": "日期（最旧）",
+		"nameAsc": "名称 (A-Z)",
+		"nameDesc": "名称 (Z-A)"
 	},
 	"properties": {
 		"title": "属性",

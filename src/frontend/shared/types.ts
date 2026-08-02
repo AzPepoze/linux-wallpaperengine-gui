@@ -65,6 +65,7 @@ export type AppConfig = {
 	uiTransparency?: number;
 	steamPaths?: string[];
 	hookEnabled?: boolean;
+	hideTrayLabel?: boolean;
 	wallpaperChangeCommand?: string;
 };
 

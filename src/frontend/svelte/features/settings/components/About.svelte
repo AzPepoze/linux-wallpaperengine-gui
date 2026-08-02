@@ -4,10 +4,28 @@
 	import { onMount } from 'svelte';
 
 	let version = '...';
+	let logoUrl = 'icon.png';
 
 	onMount(async () => {
 		version = await window.electronAPI.getVersion();
 	});
+
+	async function handleLogoError() {
+		try {
+			const data = await window.electronAPI.readBinaryFile('icon.png');
+			if (data) {
+				const base64 = btoa(
+					new Uint8Array(data).reduce(
+						(data, byte) => data + String.fromCharCode(byte),
+						''
+					)
+				);
+				logoUrl = `data:image/png;base64,${base64}`;
+			}
+		} catch (e) {
+			console.error('Failed to load logo fallback:', e);
+		}
+	}
 
 	const links = [
 		{
@@ -40,7 +58,11 @@
 <div class="about-container">
 	<div class="app-info-card">
 		<div class="app-logo">
-			<img src="icon.png" alt="App Logo" />
+			<img
+				src={logoUrl}
+				alt="App Logo"
+				on:error={handleLogoError}
+			/>
 		</div>
 		<div class="app-details">
 			<h3>Linux Wallpaper Engine GUI</h3>
@@ -143,10 +165,11 @@
 			height: 120px;
 			flex-shrink: 0;
 			background: var(--bg-surface);
-			padding: 20px;
+			padding: 0;
 			border-radius: 30px;
 			box-shadow: 0 12px 32px rgba(0, 0, 0, 0.3);
 			border: 1px solid var(--border-color);
+			overflow: hidden;
 
 			img {
 				width: 100%;

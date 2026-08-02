@@ -5,6 +5,8 @@ import (
 	"os"
 	"path/filepath"
 
+	"linux-wallpaperengine-gui/src/backend/internal/config"
+
 	"github.com/getlantern/systray"
 )
 
@@ -57,8 +59,15 @@ func onReady() {
 		fmt.Printf("[BACKEND] ERROR: Tray icon not found. Searched in: %v\n", iconPaths)
 	}
 
-	systray.SetTooltip("Linux Wallpaper Engine GUI")
-	systray.SetTitle("Linux Wallpaper Engine GUI")
+	// Optionally hide the tray label per user config
+	appConfig, err := config.ReadConfig()
+	if err == nil && appConfig.HideTrayLabel {
+		systray.SetTitle("")
+		systray.SetTooltip("")
+	} else {
+		systray.SetTooltip("Linux Wallpaper Engine GUI")
+		systray.SetTitle("Linux Wallpaper Engine GUI")
+	}
 
 	mShow := systray.AddMenuItem("Show", "Open the GUI")
 	mClose := systray.AddMenuItem("Hide", "Hide the GUI to system tray")
@@ -92,6 +101,17 @@ func onReady() {
 
 func onExit() {
 	// Cleanup if needed
+}
+
+// UpdateTitle sets or hides the tray label at runtime (no restart needed).
+func UpdateTitle(hide bool) {
+	if hide {
+		systray.SetTitle("")
+		systray.SetTooltip("")
+	} else {
+		systray.SetTooltip("Linux Wallpaper Engine GUI")
+		systray.SetTitle("Linux Wallpaper Engine GUI")
+	}
 }
 
 func Quit() {

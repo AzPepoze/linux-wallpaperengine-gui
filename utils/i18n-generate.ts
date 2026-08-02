@@ -36,10 +36,6 @@ function syncObjects(source: any, target: any, lang: string): any {
 				result[key] = syncObjects(source[key], target[key], lang);
 			} else {
 				let targetVal = target[key];
-				const sourceVal = source[key];
-				if (typeof targetVal === 'string' && typeof sourceVal === 'string' && targetVal === sourceVal) {
-					targetVal = prefix + sourceVal;
-				}
 				result[key] = targetVal;
 			}
 		} else {

@@ -39,6 +39,7 @@
   - [Other Distributions](#other-distributions)
 - [USAGE](#usage)
   - [\[Options\]](#options)
+- [MIGRATION](#migration)
 - [BUILD FROM SOURCE](#build-from-source)
 - [DEVELOPMENT](#development)
 - [STONKS!](#stonks)
@@ -136,9 +137,22 @@ linux-wallpaperengine-gui [options]
 
 ### [Options]
 
-- `--minimized`: Starts the application minimized in the system tray.
-- `--native-wayland`: Makes electron use native Wayland instead of XWayland to solve fractional scaling issues (only works on Wayland sessions)
-- `--debug-mode`: Enables debug mode for the application.
+| Option | Description |
+|--------|-------------|
+| `--minimized` | Starts the application minimized in the system tray. |
+| `--native-wayland` | Makes electron use native Wayland instead of XWayland to solve fractional scaling issues (only works on Wayland sessions) |
+| `--debug-mode` | Enables debug mode for the application. |
+
+## MIGRATION
+
+> [!NOTE]
+> Users upgrading from versions prior to `v0.4.8` can safely remove legacy cache directories under `~/.config/linux-wallpaperengine-gui/` to free up disk space:
+
+```bash
+rm -rf ~/.config/linux-wallpaperengine-gui/{Cache,Code\ Cache,GPUCache,DawnGraphiteCache,DawnWebGPUCache,blob_storage,Local\ Storage,Session\ Storage,Crashpad,SharedStorage,Dictionaries,Shared\ Dictionary,DIPS}
+```
+
+Thanks to [@CrasAtHeri](https://github.com/CrasAtHeri).
 
 ## BUILD FROM SOURCE
 

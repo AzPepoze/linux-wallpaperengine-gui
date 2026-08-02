@@ -48,6 +48,7 @@ func init() {
 		UiTransparency:      90,
 		EnableScrollMask:    true,
 		HookEnabled:              false,
+		HideTrayLabel:            false,
 		WallpaperChangeCommand:   "",
 		SteamPaths: []string{
 			".local/share/Steam",

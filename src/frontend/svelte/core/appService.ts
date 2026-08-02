@@ -9,6 +9,7 @@ import {
 } from '@/features/home/scripts/wallpaperStore';
 import { get } from 'svelte/store';
 import { selectedScreen, screens } from '@/features/home/scripts/display';
+import { showToast } from '@/core/toastStore';
 
 export async function initializeApp() {
 	loading.set(true);
@@ -63,9 +64,7 @@ export function setupGlobalListeners() {
 			type: 'success' | 'error' | 'warn' | 'info';
 			duration?: number;
 		}) => {
-			import('@/core/toastStore').then(({ showToast }) => {
-				showToast(data.message, data.type, data.duration);
-			});
+			showToast(data.message, data.type, data.duration);
 		}
 	);
 

@@ -33,7 +33,9 @@
 		"disableParticles": "Disable Particles",
 		"disableParticlesDesc": "Turn off particle effects to save resources.",
 		"scrollMask": "Scroll Mask Effect",
-		"scrollMaskDesc": "Enable smooth fade effect at the top and bottom of scroll areas. (Note: May impact performance on some systems)"
+		"scrollMaskDesc": "Enable smooth fade effect at the top and bottom of scroll areas. (Note: May impact performance on some systems)",
+		"hideTrayLabel": "Hide Tray Label",
+		"hideTrayLabelDesc": "Show only the icon in the system tray, hiding the \"Linux Wallpaper Engine\" text."
 	},
 	"generalScaling": {
 		"default": "Default",

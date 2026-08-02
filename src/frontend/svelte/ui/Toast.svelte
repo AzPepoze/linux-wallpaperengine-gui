@@ -64,8 +64,7 @@
 
 <!-- svelte-ignore a11y_no_static_element_interactions -->
 <div
-	class="toast-card"
-	class:{type}
+	class="toast-card {type}"
 	in:fly={{ y: 20, duration: 400, easing: backOut }}
 	out:scale={{ duration: 300, start: 0.9, easing: cubicOut, opacity: 0 }}
 	on:mouseenter={handleMouseEnter}
