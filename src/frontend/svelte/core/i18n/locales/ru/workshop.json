@@ -1,0 +1,31 @@
+{
+	"actions": {
+		"viewOnWorkshop": "Открыть в Мастерской",
+		"subscribe": "Подписаться",
+		"unsubscribe": "Отписаться",
+		"downloading": "Загрузка {percent}%"
+	},
+	"controls": {
+		"filter": "Фильтр",
+		"search": "Поиск",
+		"sort": "СОРТИРОВКА :",
+		"type": "ТИП :",
+		"page": "НА СТРАНИЦЕ :",
+		"infinite": "Без ограничения",
+		"itemsFound": "Найдено: {count}",
+		"searchPlaceholder": "Поиск обоев…",
+		"sortTrend": "В тренде",
+		"sortRecent": "Недавно добавленные",
+		"sortPopular": "Популярные",
+		"sortSubscriptions": "По числу подписок",
+		"sortVotedUp": "По голосам «за»",
+		"sortLastUpdated": "Недавно обновлённые",
+		"typeAll": "Все",
+		"typeItems": "Обои",
+		"typeCollections": "Коллекции",
+		"page50": "50 шт.",
+		"page100": "100 шт.",
+		"page150": "150 шт.",
+		"page200": "200 шт."
+	}
+}
