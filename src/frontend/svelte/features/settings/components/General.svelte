@@ -6,12 +6,9 @@
 	import Range from '@/ui/Range.svelte';
 	import { slide } from 'svelte/transition';
 	import { settingsStore, saveSettings, handleAutostart } from '@/features/settings/scripts/settings';
-	import { t, locale, setLocale } from '@/core/i18n';
+	import { t, locale, setLocale, availableLocales } from '@/core/i18n';
 
-	const langOptions = [
-		{ value: 'en', label: 'English' },
-		{ value: 'zh', label: '中文' }
-	];
+	const langOptions = availableLocales;
 
 	$: scalingOptions = [
 		{ value: 'default', label: $t('settings.generalScaling.default') },

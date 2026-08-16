@@ -1,0 +1,29 @@
+{
+	"local": {
+		"folder": "Папка:",
+		"fileInfo": "О файле",
+		"size": "Размер:",
+		"type": "Тип:",
+		"version": "Версия:",
+		"rating": "Возрастной рейтинг:",
+		"description": "Описание",
+		"properties": "Свойства",
+		"installed": "Установлено:"
+	},
+	"workshop": {
+		"tags": "Метки",
+		"description": "Описание",
+		"engagement": "Статистика",
+		"views": "Просмотры",
+		"subs": "Подписки",
+		"favorites": "В избранном",
+		"upvotes": "Голоса «за»",
+		"fileInfo": "О файле",
+		"fileSize": "Размер файла",
+		"created": "Создано",
+		"updated": "Обновлено",
+		"status": "Состояние",
+		"banned": "Заблокировано",
+		"installed": "Установлено"
+	}
+}

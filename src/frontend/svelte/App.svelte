@@ -20,7 +20,7 @@
 	import Toast from '@/ui/Toast.svelte';
 	import ContextMenu from '@/ui/ContextMenu.svelte';
 	import { toastStore } from '@/core/toastStore';
-	import { setLocale } from '@/core/i18n';
+	import { detectLocale, setLocale } from '@/core/i18n';
 
 	const viewComponents = {
 		wallpapers: WallpaperView,
@@ -55,8 +55,7 @@
 		const cleanup = setupGlobalListeners();
 		initLogger();
 
-		const lang = navigator.language?.startsWith('zh') ? 'zh' : 'en';
-		setLocale(lang);
+		setLocale(detectLocale());
 
 		async function init() {
 			await loadSettings();
