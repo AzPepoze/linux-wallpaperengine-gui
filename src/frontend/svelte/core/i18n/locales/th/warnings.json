@@ -1,0 +1,13 @@
+{
+	"path": {
+		"workshopTitle": "ไม่พบตำแหน่ง Steam Workshop",
+		"workshopDesc": "แอปไม่พบเนื้อหา Wallpaper Engine จาก Steam Workshop โปรดตรวจสอบตำแหน่งค้นหา Steam ในการตั้งค่า",
+		"workshopAction": "ตั้งค่าตำแหน่งค้นหา",
+		"assetsTitle": "ไม่พบ Assets ของ Wallpaper Engine",
+		"assetsDesc": "ไม่สามารถตรวจหา Assets เสริมของวอลเปเปอร์บางรายการ เช่น เอฟเฟกต์หรือเชดเดอร์ ได้อัตโนมัติ วอลเปเปอร์บางรายการอาจแสดงผลไม่ถูกต้อง",
+		"assetsAction": "แก้ไขตำแหน่ง Assets",
+		"weConfigTitle": "ไม่พบ Config ของ Wallpaper Engine",
+		"weConfigDesc": "ไม่พบการตั้งค่า Wallpaper Engine โปรดเปิด Wallpaper Engine อย่างน้อยหนึ่งครั้งเพื่อเริ่มต้นการตั้งค่า",
+		"weConfigAction": "เปิด Steam"
+	}
+}

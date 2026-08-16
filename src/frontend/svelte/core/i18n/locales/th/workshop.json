@@ -1,0 +1,31 @@
+{
+	"actions": {
+		"viewOnWorkshop": "ดูบน Steam Workshop",
+		"subscribe": "ติดตาม",
+		"unsubscribe": "เลิกติดตาม",
+		"downloading": "กำลังดาวน์โหลด {percent}%"
+	},
+	"controls": {
+		"filter": "ตัวกรอง",
+		"search": "ค้นหา",
+		"sort": "เรียงตาม :",
+		"type": "ประเภท :",
+		"page": "หน้า :",
+		"infinite": "ไม่จำกัด",
+		"itemsFound": "พบ {count} รายการ",
+		"searchPlaceholder": "ค้นหาวอลเปเปอร์...",
+		"sortTrend": "กำลังนิยม",
+		"sortRecent": "ล่าสุด",
+		"sortPopular": "ยอดนิยม",
+		"sortSubscriptions": "ที่ติดตามไว้",
+		"sortVotedUp": "ที่กดถูกใจ",
+		"sortLastUpdated": "อัปเดตล่าสุด",
+		"typeAll": "ทั้งหมด",
+		"typeItems": "รายการ",
+		"typeCollections": "คอลเลกชัน",
+		"page50": "50 รายการ",
+		"page100": "100 รายการ",
+		"page150": "150 รายการ",
+		"page200": "200 รายการ"
+	}
+}

@@ -21,6 +21,34 @@ for (const path in modules) {
 
 export const locale = writable<string>('en');
 
+/**
+ * Native names of the shipped languages, used to build the language picker.
+ * Adding a language only requires a folder in ./locales and one entry here.
+ */
+const localeNames: Record<string, string> = {
+	en: 'English',
+	ru: 'Русский',
+	th: 'ไทย',
+	zh: '中文'
+};
+
+export const availableLocales: { value: string; label: string }[] = Object.keys(dictionaries)
+	.sort()
+	.map((code) => ({ value: code, label: localeNames[code] ?? code }));
+
+/**
+ * Picks the best shipped language for the given preferences (browser locales by
+ * default), matching on the primary subtag. Falls back to English.
+ */
+export function detectLocale(preferred: readonly string[] = navigator.languages ?? []): string {
+	const candidates = preferred.length > 0 ? preferred : [navigator.language ?? 'en'];
+	for (const tag of candidates) {
+		const primary = tag?.split('-')[0]?.toLowerCase();
+		if (primary && dictionaries[primary]) return primary;
+	}
+	return 'en';
+}
+
 function resolveValue(dict: Dict, key: string): string | null {
 	const keys = key.split('.');
 	let result: any = dict;
@@ -38,10 +66,18 @@ function interpolate(text: string, params?: Record<string, any>): string {
 	});
 }
 
+const englishOnlyText: Partial<Record<I18nKey, string>> = {
+	'settings.general.language': 'Language',
+	'settings.general.languageDesc': 'Select display language'
+};
+
 export const t = derived(locale, ($locale) => {
 	const dict = dictionaries[$locale] || dictionaries.en || {};
 	const enDict = dictionaries.en || {};
 	return (key: I18nKey, params?: Record<string, any>): string => {
+		const fixedEnglish = englishOnlyText[key];
+		if (fixedEnglish !== undefined) return interpolate(fixedEnglish, params);
+
 		let text = resolveValue(dict, key as string);
 		if (text !== null) {
 			text = text.replace(/^\[NYT_[A-Z]+\]\s*/, '');

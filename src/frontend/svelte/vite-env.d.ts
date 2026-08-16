@@ -21,6 +21,7 @@ interface ElectronAPI {
 	getEnv: (key: string) => Promise<string | undefined>;
 	getHomeDir: () => Promise<string>;
 	getVersion: () => Promise<string>;
+	getAppIcon: () => Promise<ArrayBuffer>;
 	openExternal: (url: string) => Promise<void>;
 	openPath: (path: string) => Promise<string>;
 

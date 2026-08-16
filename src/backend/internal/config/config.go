@@ -2,10 +2,12 @@ package config
 
 import (
 	"encoding/json"
+	"errors"
 	"os"
 	"os/exec"
 	"path/filepath"
 	"strings"
+	"sync"
 )
 
 var (
@@ -15,6 +17,11 @@ var (
 	WorkshopPath        string
 	WallpaperEnginePath string
 	DefaultConfig       AppConfig
+
+	corruptConfigPrompt struct {
+		sync.Mutex
+		displayed bool
+	}
 )
 
 func init() {
@@ -81,20 +88,79 @@ func init() {
 	}
 }
 
-func showRecreatePrompt() bool {
-	// Try zenity first (common on GNOME/GTK environments)
-	cmd := exec.Command("zenity", "--question", "--title=Config Error", "--text=Config file is corrupted. Recreate with defaults?")
-	if err := cmd.Run(); err == nil {
-		return true
+type corruptConfigAction int
+
+const (
+	cancelCorruptConfigAction corruptConfigAction = iota
+	resetCorruptConfigAction
+	openCorruptConfigInEditorAction
+)
+
+func showCorruptConfigPrompt() corruptConfigAction {
+	const editorButton = "Open in editor"
+	const message = "Config file is corrupted. Reset it to defaults or open it in an editor to fix it manually?"
+
+	// Try zenity first (common on GNOME/GTK environments). Its extra button
+	// writes its label to stdout, while the primary button writes nothing.
+	if _, err := exec.LookPath("zenity"); err == nil {
+		output, err := exec.Command(
+			"zenity",
+			"--question",
+			"--title=Config Error",
+			"--text="+message,
+			"--ok-label=Reset to defaults",
+			"--cancel-label=Cancel",
+			"--extra-button="+editorButton,
+		).Output()
+		if err != nil {
+			return cancelCorruptConfigAction
+		}
+		if strings.TrimSpace(string(output)) == editorButton {
+			return openCorruptConfigInEditorAction
+		}
+		return resetCorruptConfigAction
 	}
 
-	// Try kdialog (common on KDE)
-	cmd = exec.Command("kdialog", "--title", "Config Error", "--yesno", "Config file is corrupted. Recreate with defaults?")
-	if err := cmd.Run(); err == nil {
-		return true
+	// Fall back to kdialog on KDE. "No" is repurposed as the editor option.
+	if _, err := exec.LookPath("kdialog"); err == nil {
+		cmd := exec.Command(
+			"kdialog",
+			"--title", "Config Error",
+			"--yesnocancel", message,
+			"--yes-label", "Reset to defaults",
+			"--no-label", editorButton,
+			"--cancel-label", "Cancel",
+		)
+		if err := cmd.Run(); err == nil {
+			return resetCorruptConfigAction
+		} else {
+			var exitErr *exec.ExitError
+			if errors.As(err, &exitErr) && exitErr.ExitCode() == 1 {
+				return openCorruptConfigInEditorAction
+			}
+		}
 	}
 
-	return false
+	return cancelCorruptConfigAction
+}
+
+func showCorruptConfigPromptOnce() corruptConfigAction {
+	corruptConfigPrompt.Lock()
+	defer corruptConfigPrompt.Unlock()
+
+	if corruptConfigPrompt.displayed {
+		return cancelCorruptConfigAction
+	}
+
+	corruptConfigPrompt.displayed = true
+	return showCorruptConfigPrompt()
+}
+
+func clearCorruptConfigPrompt() {
+	corruptConfigPrompt.Lock()
+	defer corruptConfigPrompt.Unlock()
+
+	corruptConfigPrompt.displayed = false
 }
 
 func newFloat(f float64) *float64 {
@@ -184,6 +250,7 @@ func ReadConfig() (AppConfig, error) {
 			if werr := WriteConfig(DefaultConfig); werr != nil {
 				return DefaultConfig, werr
 			}
+			clearCorruptConfigPrompt()
 			return DefaultConfig, nil
 		}
 		return DefaultConfig, err
@@ -191,11 +258,15 @@ func ReadConfig() (AppConfig, error) {
 
 	conf := DefaultConfig
 	if err := json.Unmarshal(data, &conf); err != nil {
-		if strings.Contains(err.Error(), "unexpected end of JSON input") {
-			if showRecreatePrompt() {
-				if werr := WriteConfig(DefaultConfig); werr == nil {
-					return DefaultConfig, nil
-				}
+		switch showCorruptConfigPromptOnce() {
+		case resetCorruptConfigAction:
+			if werr := WriteConfig(DefaultConfig); werr == nil {
+				clearCorruptConfigPrompt()
+				return DefaultConfig, nil
+			}
+		case openCorruptConfigInEditorAction:
+			if openErr := OpenConfigEditor(); openErr != nil {
+				return DefaultConfig, openErr
 			}
 		}
 		return DefaultConfig, err
@@ -206,6 +277,7 @@ func ReadConfig() (AppConfig, error) {
 		conf.FPS = 60
 	}
 
+	clearCorruptConfigPrompt()
 	return conf, nil
 }
 

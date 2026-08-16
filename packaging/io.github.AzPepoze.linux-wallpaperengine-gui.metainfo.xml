@@ -1,0 +1,132 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<component type="desktop-application">
+  <id>io.github.AzPepoze.linux-wallpaperengine-gui</id>
+
+  <metadata_license>FSFAP</metadata_license>
+  <project_license>GPL-3.0-only</project_license>
+
+  <name>Linux Wallpaper Engine GUI</name>
+
+  <summary>Manage animated wallpapers with linux-wallpaperengine</summary>
+  <summary xml:lang="ru">Управление живыми обоями через linux-wallpaperengine</summary>
+
+  <developer id="io.github.azpepoze">
+    <name>AzPepoze</name>
+  </developer>
+
+  <description>
+    <p>
+      A graphical front end for linux-wallpaperengine, the Linux player for
+      Wallpaper Engine wallpapers. It finds the wallpapers already installed
+      through Steam, shows them with their previews, and applies them to the
+      screens of your choice.
+    </p>
+    <p xml:lang="ru">
+      Графическая оболочка для linux-wallpaperengine — проигрывателя обоев
+      Wallpaper Engine под Linux. Она находит обои, уже установленные через
+      Steam, показывает их вместе с изображениями предпросмотра и применяет
+      к выбранным мониторам.
+    </p>
+    <p>Features:</p>
+    <p xml:lang="ru">Возможности:</p>
+    <ul>
+      <li>a separate wallpaper for every monitor, or one shared across all of them;</li>
+      <li xml:lang="ru">отдельные обои для каждого монитора или одни на все;</li>
+      <li>playlists with timed or random rotation;</li>
+      <li xml:lang="ru">плейлисты с ротацией по времени или в случайном порядке;</li>
+      <li>browsing and subscribing to the Steam Workshop without leaving the application;</li>
+      <li xml:lang="ru">просмотр Мастерской Steam и подписка на обои, не выходя из программы;</li>
+      <li>filtering by type, genre, resolution and age rating;</li>
+      <li xml:lang="ru">фильтры по типу, жанру, разрешению и возрастному рейтингу;</li>
+      <li>per-wallpaper properties, volume, frame rate limit and scaling;</li>
+      <li xml:lang="ru">свойства отдельных обоев, громкость, ограничение частоты кадров и масштабирование;</li>
+      <li>a shell command that runs on every wallpaper change, for colour schemes and the like;</li>
+      <li xml:lang="ru">команда оболочки при каждой смене обоев — например, для подстройки цветовой схемы;</li>
+      <li>a system tray icon and optional start on login.</li>
+      <li xml:lang="ru">значок в системном лотке и запуск при входе в систему.</li>
+    </ul>
+    <p>
+      Wallpaper Engine itself is not part of this application: its wallpapers and
+      assets have to be installed through Steam beforehand.
+    </p>
+    <p xml:lang="ru">
+      Сам Wallpaper Engine в состав программы не входит: обои и ресурсы к ним
+      нужно заранее установить через Steam.
+    </p>
+  </description>
+
+  <launchable type="desktop-id">linux-wallpaperengine-gui.desktop</launchable>
+
+  <categories>
+    <category>Utility</category>
+  </categories>
+
+  <screenshots>
+    <screenshot type="default">
+      <caption>The wallpaper library with previews</caption>
+      <caption xml:lang="ru">Библиотека обоев с предпросмотром</caption>
+      <image type="source" width="1918" height="1078">https://raw.githubusercontent.com/AzPepoze/linux-wallpaperengine-gui/main/showcase/main.png</image>
+    </screenshot>
+    <screenshot>
+      <caption>The same library as a detailed list</caption>
+      <caption xml:lang="ru">Та же библиотека в виде подробного списка</caption>
+      <image type="source" width="1918" height="1078">https://raw.githubusercontent.com/AzPepoze/linux-wallpaperengine-gui/main/showcase/main-list.png</image>
+    </screenshot>
+    <screenshot>
+      <caption>Browsing the Steam Workshop</caption>
+      <caption xml:lang="ru">Просмотр Мастерской Steam</caption>
+      <image type="source" width="1918" height="1078">https://raw.githubusercontent.com/AzPepoze/linux-wallpaperengine-gui/main/showcase/workshop.png</image>
+    </screenshot>
+    <screenshot>
+      <caption>Playlists</caption>
+      <caption xml:lang="ru">Плейлисты</caption>
+      <image type="source" width="1918" height="1078">https://raw.githubusercontent.com/AzPepoze/linux-wallpaperengine-gui/main/showcase/playlist.png</image>
+    </screenshot>
+    <screenshot>
+      <caption>Choosing which wallpaper goes on which monitor</caption>
+      <caption xml:lang="ru">Выбор обоев для каждого монитора</caption>
+      <image type="source" width="1917" height="1078">https://raw.githubusercontent.com/AzPepoze/linux-wallpaperengine-gui/main/showcase/display.png</image>
+    </screenshot>
+    <screenshot>
+      <caption>Settings</caption>
+      <caption xml:lang="ru">Настройки</caption>
+      <image type="source" width="1918" height="1078">https://raw.githubusercontent.com/AzPepoze/linux-wallpaperengine-gui/main/showcase/setting.png</image>
+    </screenshot>
+  </screenshots>
+
+  <url type="homepage">https://github.com/AzPepoze/linux-wallpaperengine-gui</url>
+  <url type="bugtracker">https://github.com/AzPepoze/linux-wallpaperengine-gui/issues</url>
+  <url type="vcs-browser">https://github.com/AzPepoze/linux-wallpaperengine-gui</url>
+
+  <provides>
+    <binary>linux-wallpaperengine-gui</binary>
+  </provides>
+
+  <!--
+    The application itself contains none of the below. It browses the Steam
+    Workshop for Wallpaper Engine, and that catalogue is third-party content
+    rated by its own authors: an uploader can mark a wallpaper as "Full
+    nudity" or "Adult content" (sexual acts) and as "Severe non-real Gore or
+    Violence", which puts it under the Workshop's "R - Mature" tag. Such items
+    are hidden by default, the age-rating filter starts on "Everyone" alone,
+    but the user can switch them on, and the OARS generator is explicit about
+    that case: "If the user is able to enable NSFW or adult content, then this
+    should be included in the assessment even if it is turned off by default."
+    Real-life nudity and real-life violence are forbidden by the Workshop
+    rules, hence violence-realistic stays at "none".
+  -->
+  <content_rating type="oars-1.1">
+    <content_attribute id="sex-nudity">intense</content_attribute>
+    <content_attribute id="sex-themes">intense</content_attribute>
+    <content_attribute id="violence-cartoon">intense</content_attribute>
+    <content_attribute id="violence-fantasy">intense</content_attribute>
+    <content_attribute id="violence-bloodshed">intense</content_attribute>
+    <content_attribute id="social-info">mild</content_attribute>
+  </content_rating>
+
+  <releases>
+    <release version="0.4.8" date="2026-08-02"/>
+    <release version="0.4.7" date="2026-06-10"/>
+    <release version="0.4.6" date="2026-06-04"/>
+  </releases>
+</component>

@@ -1,0 +1,13 @@
+{
+	"path": {
+		"workshopTitle": "Не найден каталог Мастерской Steam",
+		"workshopDesc": "Не удалось найти содержимое Мастерской Wallpaper Engine. Проверьте пути поиска Steam в настройках.",
+		"workshopAction": "Настроить пути поиска",
+		"assetsTitle": "Не найдены ресурсы Wallpaper Engine",
+		"assetsDesc": "Не удалось автоматически найти дополнительные ресурсы (например, эффекты и шейдеры), нужные некоторым обоям. Часть обоев может отображаться неправильно.",
+		"assetsAction": "Указать путь к ресурсам",
+		"weConfigTitle": "Не найдена конфигурация Wallpaper Engine",
+		"weConfigDesc": "Конфигурация Wallpaper Engine не найдена. Запустите Wallpaper Engine хотя бы один раз, чтобы она была создана.",
+		"weConfigAction": "Открыть Steam"
+	}
+}

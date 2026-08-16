@@ -74,7 +74,7 @@
 		"commonOptionsDoc": "通用选项文档",
 		"restartConfirm": "更改 Wayland 支持需要重启。是否立即重启？",
 		"enableHooks": "启用钩子",
-		"enableHooksDesc": "启用钩子功能。",
+		"enableHooksDesc": "应用壁纸后，为每个屏幕运行配置的命令。下方变量会替换为当前壁纸的详细信息。",
 		"wallpaperChangeCommand": "壁纸更改时",
 		"wallpaperChangeCommandDesc": "应用壁纸时要执行的 Shell 命令。",
 		"hooks": {

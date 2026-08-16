@@ -1,0 +1,21 @@
+{
+	"toolbar": {
+		"playlist": "เพลย์ลิสต์",
+		"filter": "ตัวกรอง",
+		"currentlyUsing": "กำลังใช้อยู่ :",
+		"display": "จอภาพ :",
+		"displayBtn": "จอภาพ",
+		"cloneMode": "ใช้วอลเปเปอร์เดียวกันทุกจอ"
+	},
+	"sort": {
+		"dateDesc": "วันที่ (ใหม่สุด)",
+		"dateAsc": "วันที่ (เก่าสุด)",
+		"nameAsc": "ชื่อ (A-Z)",
+		"nameDesc": "ชื่อ (Z-A)"
+	},
+	"properties": {
+		"title": "คุณสมบัติ",
+		"loading": "กำลังโหลดคุณสมบัติ...",
+		"noConfigurable": "ไม่มีคุณสมบัติที่ปรับแต่งได้"
+	}
+}

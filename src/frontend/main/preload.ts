@@ -29,6 +29,7 @@ contextBridge.exposeInMainWorld("electronAPI", {
 	selectFile: createInvokeMethod("select-file"),
 	openExternal: createInvokeMethod("open-external"),
 	getVersion: createInvokeMethod("get-version"),
+	getAppIcon: createInvokeMethod("get-app-icon"),
 	openPath: createInvokeMethod("open-path"),
 
 	// File system
