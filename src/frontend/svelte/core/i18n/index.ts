@@ -28,6 +28,7 @@ export const locale = writable<string>('en');
 const localeNames: Record<string, string> = {
 	en: 'English',
 	ru: 'Русский',
+	th: 'ไทย',
 	zh: '中文'
 };
 
@@ -65,10 +66,18 @@ function interpolate(text: string, params?: Record<string, any>): string {
 	});
 }
 
+const englishOnlyText: Partial<Record<I18nKey, string>> = {
+	'settings.general.language': 'Language',
+	'settings.general.languageDesc': 'Select display language'
+};
+
 export const t = derived(locale, ($locale) => {
 	const dict = dictionaries[$locale] || dictionaries.en || {};
 	const enDict = dictionaries.en || {};
 	return (key: I18nKey, params?: Record<string, any>): string => {
+		const fixedEnglish = englishOnlyText[key];
+		if (fixedEnglish !== undefined) return interpolate(fixedEnglish, params);
+
 		let text = resolveValue(dict, key as string);
 		if (text !== null) {
 			text = text.replace(/^\[NYT_[A-Z]+\]\s*/, '');
