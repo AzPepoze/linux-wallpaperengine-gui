@@ -91,6 +91,10 @@ jobs:
              - name: Update AppStream release history
                if: startsWith(github.ref, 'refs/tags/v')
                run: |
+                    # The release-version step intentionally modifies package.json for the build.
+                    # Restore it before switching from the tag checkout to the dev branch.
+                    git restore -- package.json
+
                     git fetch origin dev
                     git checkout -B dev origin/dev
 
