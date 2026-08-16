@@ -1,0 +1,29 @@
+{
+	"settings": {
+		"title": "การตั้งค่าเพลย์ลิสต์",
+		"namePlaceholder": "ชื่อเพลย์ลิสต์",
+		"save": "บันทึก",
+		"cancel": "ยกเลิก",
+		"new": "ใหม่",
+		"rename": "เปลี่ยนชื่อ",
+		"delete": "ลบ",
+		"dynamicPlaylist": "เพลย์ลิสต์แบบไดนามิก",
+		"interval": "ช่วงเวลา (นาที):",
+		"none": "ไม่มี",
+		"randomAll": "สุ่มจากทั้งหมด (ไดนามิก)"
+	},
+	"messages": {
+		"startedPlaylist": "เริ่มเพลย์ลิสต์บน {display}: {name}",
+		"startedRandom": "เริ่มการสุ่มแบบไดนามิกบน {display}",
+		"created": "สร้างเพลย์ลิสต์แล้ว",
+		"renamed": "เปลี่ยนชื่อเพลย์ลิสต์แล้ว",
+		"deleted": "ลบเพลย์ลิสต์แล้ว",
+		"itemRemoved": "นำรายการออกแล้ว",
+		"cannotAddToRandom": "ไม่สามารถเพิ่มไปยัง “สุ่มทั้งหมด” ได้ เพราะมีวอลเปเปอร์ทั้งหมดอยู่แล้ว",
+		"selectPlaylistFirst": "เลือกเพลย์ลิสต์ก่อนเพื่อเพิ่มวอลเปเปอร์",
+		"noItemsFound": "ไม่พบรายการ",
+		"errorSearching": "เกิดข้อผิดพลาดขณะค้นหา: {message}",
+		"errorBrowsing": "เกิดข้อผิดพลาดขณะเปิดดู Steam Workshop: {message}",
+		"restartRequired": "การเปลี่ยนการตั้งค่านี้ต้องรีสตาร์ต ต้องการรีสตาร์ตตอนนี้หรือไม่?"
+	}
+}

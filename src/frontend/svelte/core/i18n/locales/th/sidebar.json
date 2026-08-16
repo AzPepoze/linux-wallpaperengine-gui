@@ -1,0 +1,29 @@
+{
+	"local": {
+		"folder": "โฟลเดอร์:",
+		"fileInfo": "ข้อมูลไฟล์",
+		"size": "ขนาด:",
+		"type": "ประเภท:",
+		"version": "เวอร์ชัน:",
+		"rating": "เรตติ้ง:",
+		"description": "คำอธิบาย",
+		"properties": "คุณสมบัติ",
+		"installed": "ติดตั้งแล้ว:"
+	},
+	"workshop": {
+		"tags": "แท็ก",
+		"description": "คำอธิบาย",
+		"engagement": "สถิติ",
+		"views": "ยอดเข้าชม",
+		"subs": "ผู้สมัครสมาชิก",
+		"favorites": "รายการโปรด",
+		"upvotes": "โหวตถูกใจ",
+		"fileInfo": "ข้อมูลไฟล์",
+		"fileSize": "ขนาดไฟล์",
+		"created": "สร้างเมื่อ",
+		"updated": "อัปเดตเมื่อ",
+		"status": "สถานะ",
+		"banned": "ถูกแบน",
+		"installed": "ติดตั้งแล้ว"
+	}
+}
