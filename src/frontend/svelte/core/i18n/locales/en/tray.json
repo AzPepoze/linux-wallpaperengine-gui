@@ -1,0 +1,12 @@
+{
+	"menu": {
+		"show": "Show",
+		"showTooltip": "Open the GUI",
+		"hide": "Hide",
+		"hideTooltip": "Hide the GUI to system tray",
+		"restartWallpaper": "Restart Wallpaper",
+		"restartWallpaperTooltip": "Restart the current wallpapers",
+		"quit": "Quit",
+		"quitTooltip": "Exit completely"
+	}
+}

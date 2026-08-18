@@ -1,0 +1,14 @@
+{
+	"tray": {
+		"menu": {
+			"show": "[NYT_ZH] Show",
+			"showTooltip": "[NYT_ZH] Open the GUI",
+			"hide": "[NYT_ZH] Hide",
+			"hideTooltip": "[NYT_ZH] Hide the GUI to system tray",
+			"restartWallpaper": "[NYT_ZH] Restart Wallpaper",
+			"restartWallpaperTooltip": "[NYT_ZH] Restart the current wallpapers",
+			"quit": "[NYT_ZH] Quit",
+			"quitTooltip": "[NYT_ZH] Exit completely"
+		}
+	}
+}
