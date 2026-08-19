@@ -7,7 +7,6 @@
 
 	import { activeView, showPlaylistManager } from '@/core/ui';
 	import { settingsStore } from '@/features/settings/scripts/settings';
-	import { cloneMode, toggleCloneMode, spanMode, toggleSpanMode } from '@/features/home/scripts/display';
 	import { get } from 'svelte/store';
 	import { onMount } from 'svelte';
 	import { logger } from '@/core/logger';
@@ -168,22 +167,6 @@
 		onWallpapersRefresh(result.wallpapers);
 	}
 
-	async function handleToggleCloneMode() {
-		const newMode = !$cloneMode;
-		await toggleCloneMode(
-			newMode,
-			selectedWallpaper?.folderName || activeWallpaper?.folderName
-		);
-	}
-
-	async function handleToggleSpanMode() {
-		const newMode = !$spanMode;
-		await toggleSpanMode(
-			newMode,
-			selectedWallpaper?.folderName || activeWallpaper?.folderName
-		);
-	}
-
 	// Hide sidebar when loading
 	$: if (loading) {
 		selectedWallpaper = null;
@@ -199,8 +182,6 @@
 			bind:viewMode
 			bind:sortMethod
 			onRefresh={refreshWallpapers}
-			onToggleCloneMode={handleToggleCloneMode}
-			onToggleSpanMode={handleToggleSpanMode}
 			onLoadPlaylists={loadPlaylists}
 		/>
 	{/if}

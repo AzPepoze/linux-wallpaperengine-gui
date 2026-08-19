@@ -5,8 +5,11 @@
 	import {
 		screens,
 		selectedScreen,
+		cloneMode,
+		spanMode,
 		refreshScreens
 	} from '@/features/home/scripts/display';
+	import { activeFolderName } from '@/features/home/scripts/wallpaperStore';
 	import type { WallpaperData } from '@shared/types';
 	import { t } from '@/core/i18n';
 
@@ -19,6 +22,13 @@
 	async function handleScreenChange(screen: string) {
 		selectedScreen.set(screen);
 	}
+
+	$: isUnifiedMode = $cloneMode || $spanMode;
+
+	$: unifiedWallpaperId =
+		$activeFolderName ||
+		Object.values($screens).find((v) => !!v) ||
+		null;
 
 	const scrollOffset = 10;
 	function handleWheel(event: WheelEvent) {
@@ -37,6 +47,7 @@
 {#if Object.keys($screens).length > 0}
 	<div class="screens-list" on:wheel={handleWheel}>
 		{#each Object.keys($screens) as screen (screen)}
+			{@const currentId = isUnifiedMode ? unifiedWallpaperId : $screens[screen]}
 			<!-- svelte-ignore a11y-click-events-have-key-events -->
 			<div
 				class="screen-item"
@@ -49,15 +60,16 @@
 				animate:flip={{ duration: 300 }}
 			>
 				<div class="screen-preview">
-					{#if $screens[screen]}
-						<img
-							src={wallpapers[$screens[screen]]
-								?.previewPath}
-							alt={screen}
-						/>
-					{:else}
-						<div class="placeholder">{$t('display.noWallpaper')}</div>
-					{/if}
+					{#key `${screen}-${isUnifiedMode}-${currentId}`}
+						{#if currentId && wallpapers[currentId]?.previewPath}
+							<img
+								src={wallpapers[currentId].previewPath}
+								alt={screen}
+							/>
+						{:else}
+							<div class="placeholder">{$t('display.noWallpaper')}</div>
+						{/if}
+					{/key}
 				</div>
 				<div class="screen-name">{screen}</div>
 			</div>

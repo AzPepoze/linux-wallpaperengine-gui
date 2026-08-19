@@ -3,10 +3,11 @@
 		"playlist": "เพลย์ลิสต์",
 		"filter": "ตัวกรอง",
 		"currentlyUsing": "กำลังใช้อยู่ :",
-		"display": "จอภาพ :",
-		"displayBtn": "จอภาพ",
-		"cloneMode": "ใช้วอลเปเปอร์เดียวกันทุกจอ",
-		"spanMode": "ขยายภาพรวมทุกจอ"
+		"display": "จอแสดงผล :",
+		"displayBtn": "เลือกจอ",
+		"individualMode": "แยกแต่ละจอ",
+		"cloneMode": "โคลนทุกจอ (Clone)",
+		"spanMode": "รวมทุกจอ (Span)"
 	},
 	"sort": {
 		"dateDesc": "วันที่ (ใหม่สุด)",

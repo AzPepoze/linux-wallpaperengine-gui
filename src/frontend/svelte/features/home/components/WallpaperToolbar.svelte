@@ -10,7 +10,8 @@
 		showDisplayManager, 
 		showPlaylistManager 
 	} from '@/core/ui';
-	import { cloneMode, spanMode } from '@/features/home/scripts/display';
+	import { cloneMode, spanMode, toggleCloneMode, toggleSpanMode, refreshScreens } from '@/features/home/scripts/display';
+	import { activeFolderName } from '@/features/home/scripts/wallpaperStore';
 	import type { Wallpaper } from '@shared/types';
 	import { t } from '@/core/i18n';
 
@@ -20,9 +21,32 @@
 	export let viewMode: 'grid' | 'list' | 'detail' = 'grid';
 	export let sortMethod: 'date-desc' | 'date-asc' | 'name-asc' | 'name-desc' = 'date-desc';
 	export let onRefresh: () => void;
-	export let onToggleCloneMode: () => void;
-	export let onToggleSpanMode: () => void;
 	export let onLoadPlaylists: () => void;
+
+	$: displayModeValue = $spanMode ? 'span' : $cloneMode ? 'clone' : 'individual';
+
+	$: displayModeOptions = [
+		{ value: 'individual', label: $t('wallpaper.toolbar.individualMode') },
+		{ value: 'clone', label: $t('wallpaper.toolbar.cloneMode') },
+		{ value: 'span', label: $t('wallpaper.toolbar.spanMode') }
+	];
+
+	async function handleDisplayModeChange(mode: string) {
+		const targetWallpaper = activeWallpaper?.folderName || $activeFolderName;
+		if (mode === 'clone') {
+			if ($spanMode) await toggleSpanMode(false, targetWallpaper);
+			if (!$cloneMode) await toggleCloneMode(true, targetWallpaper);
+		} else if (mode === 'span') {
+			if ($cloneMode) await toggleCloneMode(false, targetWallpaper);
+			if (!$spanMode) await toggleSpanMode(true, targetWallpaper);
+		} else {
+			// individual
+			if ($cloneMode) await toggleCloneMode(false, targetWallpaper);
+			if ($spanMode) await toggleSpanMode(false, targetWallpaper);
+			showDisplayManager.set(true);
+		}
+		await refreshScreens();
+	}
 </script>
 
 <Toolbar>
@@ -73,44 +97,22 @@
 		</div>
 		<div class="status-item">
 			<span class="label">{$t('wallpaper.toolbar.display')}</span>
-			{#if selectedScreen || $cloneMode || $spanMode}
-				<span
-					in:fly={{ y: 20, duration: 300 }}
-					out:fly={{ y: -20, duration: 300 }}
-					class="value"
-				>
-					{$spanMode ? 'SPAN' : ($cloneMode ? 'ALL' : selectedScreen)}
-				</span>
-			{/if}
+			<Select
+				id="display-mode-select"
+				value={displayModeValue}
+				options={displayModeOptions}
+				onChange={handleDisplayModeChange}
+				style="width: 140px;"
+			/>
 
 			<Button
 				variant={$showDisplayManager ? 'primary' : 'secondary'}
 				on:click={() => showDisplayManager.update((v) => !v)}
-				title="Toggle Display Manager"
-				style="padding: 8px; border-radius: 10px;"
+				title={selectedScreen ? `Toggle Display Manager (${selectedScreen})` : 'Toggle Display Manager'}
+				style="padding: 8px 10px; border-radius: 10px;"
 			>
-				<Icon name="monitor" size={20} />
+				<Icon name="monitor" size={18} />
 				<span>{$t('wallpaper.toolbar.displayBtn')}</span>
-			</Button>
-
-			<Button
-				variant={$cloneMode ? 'primary' : 'secondary'}
-				on:click={onToggleCloneMode}
-				title="Clone mode (Apply same wallpaper to all displays)"
-				style="padding: 8px; border-radius: 10px;"
-			>
-				<Icon name="layers" size={20} />
-				<span>{$t('wallpaper.toolbar.cloneMode')}</span>
-			</Button>
-
-			<Button
-				variant={$spanMode ? 'primary' : 'secondary'}
-				on:click={onToggleSpanMode}
-				title="Span mode (Stretch one wallpaper across all displays)"
-				style="padding: 8px; border-radius: 10px;"
-			>
-				<Icon name="crop_landscape" size={20} />
-				<span>{$t('wallpaper.toolbar.spanMode')}</span>
 			</Button>
 		</div>
 	</div>

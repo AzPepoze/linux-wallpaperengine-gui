@@ -271,6 +271,7 @@ export type I18nKey =
 	| 'wallpaper.toolbar.currentlyUsing'
 	| 'wallpaper.toolbar.display'
 	| 'wallpaper.toolbar.displayBtn'
+	| 'wallpaper.toolbar.individualMode'
 	| 'wallpaper.toolbar.cloneMode'
 	| 'wallpaper.toolbar.spanMode'
 	| 'wallpaper.sort.dateDesc'
