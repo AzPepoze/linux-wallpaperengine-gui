@@ -433,3 +433,30 @@ func (service *Service) LoadWallpapers() (map[string]interface{}, error) {
 		"wallpaperEnginePathValid": wallpaperEnginePathValid,
 	}, nil
 }
+
+func (service *Service) StartPreview(wallpaperID string, geometry string) error {
+	if geometry == "" {
+		geometry = "0x0x1280x720"
+	}
+
+	appConfig, err := config.ReadConfig()
+	if err != nil {
+		return err
+	}
+
+	screenArgs := []string{"-w", geometry}
+	execPath, args, cmdStr := service.buildWallpaperCommandInternal(appConfig, screenArgs, wallpaperID)
+
+	logger.Printf("Starting wallpaper preview for %s... (%s)", wallpaperID, cmdStr)
+	service.processManager.UpdatePreview(execPath, args, cmdStr)
+	return nil
+}
+
+func (service *Service) StopPreview() error {
+	service.processManager.StopPreview()
+	return nil
+}
+
+func (service *Service) IsPreviewRunning() bool {
+	return service.processManager.IsPreviewRunning()
+}

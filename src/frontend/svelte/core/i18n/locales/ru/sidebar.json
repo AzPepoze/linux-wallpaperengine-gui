@@ -8,7 +8,9 @@
 		"rating": "Возрастной рейтинг:",
 		"description": "Описание",
 		"properties": "Свойства",
-		"installed": "Установлено:"
+		"installed": "Установлено:",
+		"livePreview": "Предпросмотр в окне",
+		"stopPreview": "Остановить предпросмотр"
 	},
 	"workshop": {
 		"tags": "Метки",

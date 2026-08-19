@@ -16,6 +16,7 @@
 	import { get } from 'svelte/store';
 	import { screens, selectedScreen, cloneMode, spanMode } from '@/features/home/scripts/display';
 	import { activeFolderName, selectedFolderName } from '@/features/home/scripts/wallpaperStore';
+	import { previewingWallpaperId, startWallpaperPreview, stopWallpaperPreview } from '@/features/wallpaper/scripts/preview';
 
 	export let folderName: string;
 	export let wallpaper: WallpaperData;
@@ -167,6 +168,18 @@
 					}))
 				});
 			}
+
+			menuItems.push({
+				label: get(previewingWallpaperId) === folderName ? 'Stop Live Preview' : 'Live Preview (Window)',
+				icon: get(previewingWallpaperId) === folderName ? 'stop' : 'open_in_browser',
+				action: () => {
+					if (get(previewingWallpaperId) === folderName) {
+						stopWallpaperPreview();
+					} else {
+						startWallpaperPreview(folderName);
+					}
+				}
+			});
 
 			menuItems.push({ divider: true });
 

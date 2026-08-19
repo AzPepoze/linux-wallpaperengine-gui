@@ -152,6 +152,8 @@ export type I18nKey =
 	| 'sidebar.local.description'
 	| 'sidebar.local.properties'
 	| 'sidebar.local.installed'
+	| 'sidebar.local.livePreview'
+	| 'sidebar.local.stopPreview'
 	| 'sidebar.workshop.tags'
 	| 'sidebar.workshop.description'
 	| 'sidebar.workshop.engagement'

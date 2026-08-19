@@ -8,6 +8,12 @@
 	import Icon from '@/ui/Icon.svelte';
 	import { logger } from '@/core/logger';
 
+	import {
+		previewingWallpaperId,
+		startWallpaperPreview,
+		stopWallpaperPreview
+	} from '@/features/wallpaper/scripts/preview';
+
 	export let wallpaper: Wallpaper;
 	export let fileSize: number | null = null;
 	export let textColor: string = 'var(--text-color)';
@@ -55,20 +61,40 @@
 			logger.error('Failed to open wallpaper folder:', e);
 		}
 	}
+
+	function handleTogglePreview() {
+		if ($previewingWallpaperId === folderName) {
+			stopWallpaperPreview();
+		} else if (folderName) {
+			startWallpaperPreview(folderName);
+		}
+	}
 </script>
 
 <div class="local-sidebar">
 	<div class="section header-section">
 		<h3 class="title">{projectData?.title || folderName}</h3>
-		<Button
-			variant="ghost"
-			class="folder-btn"
-			on:click={handleOpenFolder}
-			title="Open folder location"
-		>
-			<Icon name="folder_open" size={14} />
-			<span class="folder-name">{$t('sidebar.local.folder')} {folderName}</span>
-		</Button>
+		<div class="actions-row">
+			<Button
+				variant="ghost"
+				class="pill-btn folder-btn"
+				on:click={handleOpenFolder}
+				title="Open folder location"
+			>
+				<Icon name="folder_open" size={14} />
+				<span class="folder-name">{$t('sidebar.local.folder')} {folderName}</span>
+			</Button>
+
+			<Button
+				variant="ghost"
+				class="pill-btn preview-btn {$previewingWallpaperId === folderName ? 'active' : ''}"
+				on:click={handleTogglePreview}
+				title={$previewingWallpaperId === folderName ? $t('sidebar.local.stopPreview') : $t('sidebar.local.livePreview')}
+			>
+				<Icon name={$previewingWallpaperId === folderName ? 'stop' : 'open_in_browser'} size={14} />
+				<span>{$previewingWallpaperId === folderName ? $t('sidebar.local.stopPreview') : $t('sidebar.local.livePreview')}</span>
+			</Button>
+		</div>
 	</div>
 
 	<div class="section info-section">
@@ -147,9 +173,16 @@
 				font-weight: 600;
 			}
 
-			:global(.folder-btn) {
+			.actions-row {
+				display: flex;
+				align-items: center;
+				flex-wrap: wrap;
+				gap: 8px;
+				margin-top: 8px;
+			}
+
+			:global(.pill-btn) {
 				padding: 4px 12px;
-				margin-top: 6px;
 				width: fit-content;
 				border-radius: 9999px;
 				gap: 6px;
@@ -165,6 +198,16 @@
 					background: var(--bg-surface-hover);
 					border-color: var(--border-color-hover);
 					color: var(--text-color);
+				}
+			}
+
+			:global(.pill-btn.active) {
+				background: var(--danger-color, #ef4444);
+				border-color: var(--danger-color, #ef4444);
+				color: #fff;
+
+				&:hover:not(:disabled) {
+					filter: brightness(1.1);
 				}
 			}
 

@@ -178,4 +178,22 @@ export function registerWallpaperService() {
 		logger.ipcReceived("save-workshop-filters");
 		return await socketClient.send("save-workshop-filters", filters);
 	});
+
+	ipcMain.handle("start-preview", async (_, wallpaperId: string, geometry?: string) => {
+		logger.ipcReceived("start-preview", wallpaperId, geometry);
+		return await socketClient.send("start-preview", {
+			wallpaperId,
+			geometry: geometry || "0x0x1280x720",
+		});
+	});
+
+	ipcMain.handle("stop-preview", async () => {
+		logger.ipcReceived("stop-preview");
+		return await socketClient.send("stop-preview");
+	});
+
+	ipcMain.handle("is-preview-running", async () => {
+		logger.ipcReceived("is-preview-running");
+		return await socketClient.send("is-preview-running");
+	});
 }

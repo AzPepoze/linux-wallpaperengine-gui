@@ -41,8 +41,11 @@ func (manager *Manager) UpdateWallpapers(desiredWallpapers []struct {
 		desiredScreens[desiredWallpaper.Screen] = true
 	}
 
-	// Kill wallpapers no longer desired
+	// Kill wallpapers no longer desired (excluding __PREVIEW__)
 	for screen := range manager.activeWallpapers {
+		if screen == "__PREVIEW__" {
+			continue
+		}
 		if !desiredScreens[screen] {
 			manager.killWallpaperInternal(screen)
 		}
@@ -153,4 +156,33 @@ func (manager *Manager) KillAll() {
 	if err := exec.Command("killall", "-e", "linux-wallpaperengine").Run(); err != nil {
 		logger.Printf("killall linux-wallpaperengine failed: %v", err)
 	}
+}
+
+func (manager *Manager) UpdatePreview(execPath string, args []string, fullCommand string) {
+	manager.mutex.Lock()
+	defer manager.mutex.Unlock()
+
+	if _, exists := manager.activeWallpapers["__PREVIEW__"]; exists {
+		manager.killWallpaperInternal("__PREVIEW__")
+	}
+
+	logger.Printf("Starting preview window... (%s %v)", execPath, args)
+	manager.spawnWallpaper("__PREVIEW__", execPath, args, fullCommand)
+}
+
+func (manager *Manager) StopPreview() {
+	manager.mutex.Lock()
+	defer manager.mutex.Unlock()
+
+	if _, exists := manager.activeWallpapers["__PREVIEW__"]; exists {
+		manager.killWallpaperInternal("__PREVIEW__")
+	}
+}
+
+func (manager *Manager) IsPreviewRunning() bool {
+	manager.mutex.Lock()
+	defer manager.mutex.Unlock()
+
+	_, exists := manager.activeWallpapers["__PREVIEW__"]
+	return exists
 }
