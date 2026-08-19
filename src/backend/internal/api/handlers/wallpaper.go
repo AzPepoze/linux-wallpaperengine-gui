@@ -75,6 +75,21 @@ func (handler *Handler) HandleWallpaper(request models.Request) models.Response 
 			handler.wallpaperService.KillWallpaperByFolderName(parameters.FolderName)
 			response.Result = map[string]bool{"success": true}
 		}
+	case "take-screenshot":
+		var parameters struct {
+			WallpaperID string `json:"wallpaperId"`
+			OutputPath  string `json:"outputPath"`
+			Delay       int    `json:"delay"`
+		}
+		if err := json.Unmarshal(request.Params, &parameters); err != nil {
+			response.Error = err.Error()
+		} else {
+			if err := handler.wallpaperService.TakeScreenshot(parameters.WallpaperID, parameters.OutputPath, parameters.Delay); err != nil {
+				response.Error = err.Error()
+			} else {
+				response.Result = map[string]interface{}{"success": true, "outputPath": parameters.OutputPath}
+			}
+		}
 	}
 
 	return response

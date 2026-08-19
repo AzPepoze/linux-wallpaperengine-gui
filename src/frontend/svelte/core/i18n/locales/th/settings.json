@@ -28,8 +28,16 @@
 		"scalingModeDesc": "กำหนดวิธีให้วอลเปเปอร์พอดีกับหน้าจอ",
 		"clampingMode": "การจัดการขอบภาพ",
 		"clampingModeDesc": "กำหนดการแสดงผลของภาพเมื่อเกินขอบ",
+		"layer": "ระดับ Layer บน Wayland",
+		"layerDesc": "กำหนดระดับ Layer surface ของหน้าต่างวอลเปเปอร์ (เช่น background สำหรับ Niri place-within-backdrop)",
 		"noFullscreenPause": "ไม่หยุดเมื่อมีแอปเต็มจอ",
 		"noFullscreenPauseDesc": "ให้วอลเปเปอร์ทำงานต่อเมื่อแอปอื่นอยู่ในโหมดเต็มจอ",
+		"fullscreenPauseOnlyActive": "หยุดเมื่อหน้าต่างที่โฟกัสอยู่เต็มจอเท่านั้น",
+		"fullscreenPauseOnlyActiveDesc": "หยุดวอลเปเปอร์เฉพาะเมื่อหน้าต่างที่กำลังทำงานและโฟกัสอยู่เป็นแบบเต็มจอ",
+		"fullscreenPauseIgnoreAppIds": "App ID ที่ยกเว้นการหยุดเมื่อเต็มจอ",
+		"fullscreenPauseIgnoreAppIdsDesc": "รายการ App ID/Class ที่จะไม่สั่งให้วอลเปเปอร์หยุดเมื่อเปิดเต็มจอ สำหรับผู้ใช้ Hyprland สามารถดูชื่อได้จากคำสั่ง `hyprctl clients` ในฟิลด์ `class:` (เช่น `steam_app_123`, `firefox`, `mpv`)",
+		"fullscreenPauseIgnoreAppIdsHelp": "บน Wayland/X11 หน้าต่างจะมี app_id/class สำหรับ Hyprland สามารถรัน `hyprctl clients` ในเทอร์มินัล แล้วนำค่าจาก `class:` มาใส่",
+		"fullscreenPauseIgnoreAppIdsPlaceholder": "เพิ่ม App ID (เช่น steam_app_123)...",
 		"disableParticles": "ปิดเอฟเฟกต์อนุภาค",
 		"disableParticlesDesc": "ปิดเอฟเฟกต์อนุภาคเพื่อประหยัดทรัพยากร",
 		"scrollMask": "เอฟเฟกต์มาสก์การเลื่อน",
@@ -47,6 +55,12 @@
 		"clamp": "ค้างที่ขอบ",
 		"border": "ใช้สีขอบ",
 		"repeat": "วนซ้ำ"
+	},
+	"generalLayer": {
+		"bottom": "ล่างสุด (Bottom - ค่าเริ่มต้น)",
+		"background": "พื้นหลัง (Background)",
+		"top": "ด้านบน (Top)",
+		"overlay": "ซ้อนทับ (Overlay)"
 	},
 	"audio": {
 		"silenceWallpaper": "ปิดเสียงวอลเปเปอร์",
@@ -67,6 +81,8 @@
 	"advanced": {
 		"useNativeWayland": "ใช้ Native Wayland",
 		"useNativeWaylandDesc": "เรียกใช้ GUI ด้วยการรองรับ Wayland แบบ Native (ต้องรีสตาร์ต)",
+		"dumpStructure": "ดัมป์โครงสร้างวอลเปเปอร์ (Dump Structure)",
+		"dumpStructureDesc": "บันทึกลำดับชั้น Node และโครงสร้างภายในของวอลเปเปอร์ลง Log เพื่อการ Debug",
 		"enableCustomArgs": "เปิดใช้อาร์กิวเมนต์เพิ่มเติม",
 		"customCommandArgs": "อาร์กิวเมนต์เพิ่มเติม",
 		"customCommandArgsDesc": "ส่งอาร์กิวเมนต์โดยตรงไปยัง backend",

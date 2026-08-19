@@ -4,6 +4,7 @@
 	import Input from '@/ui/Input.svelte';
 	import Select from '@/ui/Select.svelte';
 	import Range from '@/ui/Range.svelte';
+	import ListEditor from '@/ui/ListEditor.svelte';
 	import { slide } from 'svelte/transition';
 	import { settingsStore, saveSettings, handleAutostart } from '@/features/settings/scripts/settings';
 	import { t, locale, setLocale, availableLocales } from '@/core/i18n';
@@ -21,6 +22,13 @@
 		{ value: 'clamp', label: $t('settings.generalClamping.clamp') },
 		{ value: 'border', label: $t('settings.generalClamping.border') },
 		{ value: 'repeat', label: $t('settings.generalClamping.repeat') }
+	];
+
+	$: layerOptions = [
+		{ value: 'bottom', label: $t('settings.generalLayer.bottom') },
+		{ value: 'background', label: $t('settings.generalLayer.background') },
+		{ value: 'top', label: $t('settings.generalLayer.top') },
+		{ value: 'overlay', label: $t('settings.generalLayer.overlay') }
 	];
 
 	async function handleRestart() {
@@ -153,6 +161,18 @@
 	</SettingItem>
 
 	<SettingItem
+		label={$t('settings.general.layer')}
+		id="layer"
+		description={$t('settings.general.layerDesc')}
+	>
+		<Select
+			id="layer"
+			bind:value={$settingsStore.layer}
+			options={layerOptions}
+		/>
+	</SettingItem>
+
+	<SettingItem
 		label={$t('settings.general.noFullscreenPause')}
 		id="noFullscreenPause"
 		description={$t('settings.general.noFullscreenPauseDesc')}
@@ -162,6 +182,41 @@
 			bind:checked={$settingsStore.noFullscreenPause}
 		/>
 	</SettingItem>
+
+	{#if !$settingsStore.noFullscreenPause}
+		<div 
+			transition:slide={{ duration: 300 }}
+			style="display: flex; flex-direction: column; gap: 16px;"
+		>
+			<SettingItem
+				label={$t('settings.general.fullscreenPauseOnlyActive')}
+				id="fullscreenPauseOnlyActive"
+				description={$t('settings.general.fullscreenPauseOnlyActiveDesc')}
+			>
+				<Toggle
+					id="fullscreenPauseOnlyActive"
+					bind:checked={$settingsStore.fullscreenPauseOnlyActive}
+				/>
+			</SettingItem>
+
+			<SettingItem
+				label={$t('settings.general.fullscreenPauseIgnoreAppIds')}
+				id="fullscreenPauseIgnoreAppIds"
+				vertical
+				description={$t('settings.general.fullscreenPauseIgnoreAppIdsDesc')}
+			>
+				<ListEditor
+					items={$settingsStore.fullscreenPauseIgnoreAppIds || []}
+					placeholder={$t('settings.general.fullscreenPauseIgnoreAppIdsPlaceholder')}
+					on:change={(e) => {
+						if ($settingsStore) {
+							$settingsStore.fullscreenPauseIgnoreAppIds = e.detail;
+						}
+					}}
+				/>
+			</SettingItem>
+		</div>
+	{/if}
 
 	<SettingItem
 		label={$t('settings.general.disableParticles')}

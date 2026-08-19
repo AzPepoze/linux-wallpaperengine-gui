@@ -5,7 +5,8 @@
 		"currentlyUsing": "CURRENTLY USING :",
 		"display": "DISPLAY :",
 		"displayBtn": "Display",
-		"cloneMode": "Clone mode"
+		"cloneMode": "Clone mode",
+		"spanMode": "Span displays"
 	},
 	"sort": {
 		"dateDesc": "Date (Newest)",

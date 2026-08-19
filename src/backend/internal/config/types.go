@@ -26,6 +26,7 @@ type AppConfig struct {
 	// Display & Rendering
 	Scaling          string  `json:"scaling,omitempty"`
 	Clamping         string  `json:"clamping,omitempty"`
+	Layer            string  `json:"layer,omitempty"`
 	Playlist         string  `json:"playlist"`
 	PlaylistInterval float64 `json:"playlistInterval,omitempty"`
 
@@ -56,6 +57,7 @@ type AppConfig struct {
 	// --- GUI / Internal Settings ---
 	Screens                  []ScreenConfig `json:"screens,omitempty"`
 	CloneMode                bool           `json:"cloneMode,omitempty"`
+	SpanMode                 bool           `json:"spanMode,omitempty"`
 	GlobalWallpaper          *string        `json:"globalWallpaper,omitempty"`
 	CustomExecutableLocation string         `json:"customExecutableLocation,omitempty"`
 	WorkshopDir              string         `json:"workshopDir,omitempty"`

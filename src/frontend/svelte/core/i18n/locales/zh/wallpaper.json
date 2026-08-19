@@ -5,7 +5,8 @@
 		"currentlyUsing": "当前使用：",
 		"display": "显示器：",
 		"displayBtn": "显示器",
-		"cloneMode": "克隆模式"
+		"cloneMode": "克隆模式",
+		"spanMode": "跨屏合并模式"
 	},
 	"sort": {
 		"dateDesc": "日期（最新）",

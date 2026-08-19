@@ -14,7 +14,7 @@
 	import { showToast } from '@/core/toastStore';
 	import { logger } from '@/core/logger';
 	import { get } from 'svelte/store';
-	import { screens, selectedScreen, cloneMode } from '@/features/home/scripts/display';
+	import { screens, selectedScreen, cloneMode, spanMode } from '@/features/home/scripts/display';
 	import { activeFolderName, selectedFolderName } from '@/features/home/scripts/wallpaperStore';
 
 	export let folderName: string;
@@ -72,7 +72,8 @@
 
 			if (screen) {
 				const isClone = get(cloneMode);
-				if (isClone && !targetScreen) {
+				const isSpan = get(spanMode);
+				if ((isClone || isSpan) && !targetScreen) {
 					for (const s of allScreens) {
 						await window.electronAPI.setWallpaper(s, folderName);
 					}
@@ -185,6 +186,24 @@
 					const basePath = await window.electronAPI.getWallpaperBasePath();
 					navigator.clipboard.writeText(`${basePath}/${folderName}`);
 					showToast('Path copied to clipboard', 'info');
+				}
+			});
+
+			menuItems.push({
+				label: 'Take Screenshot',
+				icon: 'photo_camera',
+				action: async () => {
+					showToast('Capturing screenshot...', 'info');
+					try {
+						const res = await window.electronAPI.takeScreenshot(folderName);
+						if (res?.success) {
+							showToast(`Screenshot saved to ${res.outputPath}`, 'success');
+						} else {
+							showToast(`Screenshot failed: ${res?.error}`, 'error');
+						}
+					} catch (err: any) {
+						showToast(`Screenshot failed: ${err?.message || err}`, 'error');
+					}
 				}
 			});
 

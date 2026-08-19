@@ -10,7 +10,7 @@
 		showDisplayManager, 
 		showPlaylistManager 
 	} from '@/core/ui';
-	import { cloneMode } from '@/features/home/scripts/display';
+	import { cloneMode, spanMode } from '@/features/home/scripts/display';
 	import type { Wallpaper } from '@shared/types';
 	import { t } from '@/core/i18n';
 
@@ -21,6 +21,7 @@
 	export let sortMethod: 'date-desc' | 'date-asc' | 'name-asc' | 'name-desc' = 'date-desc';
 	export let onRefresh: () => void;
 	export let onToggleCloneMode: () => void;
+	export let onToggleSpanMode: () => void;
 	export let onLoadPlaylists: () => void;
 </script>
 
@@ -72,13 +73,13 @@
 		</div>
 		<div class="status-item">
 			<span class="label">{$t('wallpaper.toolbar.display')}</span>
-			{#if selectedScreen || $cloneMode}
+			{#if selectedScreen || $cloneMode || $spanMode}
 				<span
 					in:fly={{ y: 20, duration: 300 }}
 					out:fly={{ y: -20, duration: 300 }}
 					class="value"
 				>
-					{$cloneMode ? 'ALL' : selectedScreen}
+					{$spanMode ? 'SPAN' : ($cloneMode ? 'ALL' : selectedScreen)}
 				</span>
 			{/if}
 
@@ -95,11 +96,21 @@
 			<Button
 				variant={$cloneMode ? 'primary' : 'secondary'}
 				on:click={onToggleCloneMode}
-				title="Clone mode (Apply to all displays)"
+				title="Clone mode (Apply same wallpaper to all displays)"
 				style="padding: 8px; border-radius: 10px;"
 			>
 				<Icon name="layers" size={20} />
 				<span>{$t('wallpaper.toolbar.cloneMode')}</span>
+			</Button>
+
+			<Button
+				variant={$spanMode ? 'primary' : 'secondary'}
+				on:click={onToggleSpanMode}
+				title="Span mode (Stretch one wallpaper across all displays)"
+				style="padding: 8px; border-radius: 10px;"
+			>
+				<Icon name="crop_landscape" size={20} />
+				<span>{$t('wallpaper.toolbar.spanMode')}</span>
 			</Button>
 		</div>
 	</div>

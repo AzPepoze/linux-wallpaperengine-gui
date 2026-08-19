@@ -28,8 +28,16 @@
 		"scalingModeDesc": "Как обои вписываются в экран.",
 		"clampingMode": "Режим наложения текстуры",
 		"clampingModeDesc": "Поведение текстуры за краями кадра.",
+		"layer": "Слой Wayland",
+		"layerDesc": "Уровень поверхности слоя Wayland (например, background для Niri place-within-backdrop).",
 		"noFullscreenPause": "Не приостанавливать в полноэкранном режиме",
 		"noFullscreenPauseDesc": "Продолжать проигрывать обои, когда другие программы развёрнуты на весь экран.",
+		"fullscreenPauseOnlyActive": "Приостанавливать только при активном полноэкранном окне",
+		"fullscreenPauseOnlyActiveDesc": "Приостанавливать обои, только если активное окно находится в полноэкранном режиме.",
+		"fullscreenPauseIgnoreAppIds": "Игнорируемые App ID в полноэкранном режиме",
+		"fullscreenPauseIgnoreAppIdsDesc": "Список идентификаторов/классов приложений, которые не ставят обои на паузу в полноэкранном режиме. Для Hyprland используйте значение `class:` из команды `hyprctl clients` (например, `steam_app_123`, `firefox`, `mpv`).",
+		"fullscreenPauseIgnoreAppIdsHelp": "В Wayland/X11 окна имеют app_id/class. В Hyprland запустите `hyprctl clients` и скопируйте значение из поля `class:`.",
+		"fullscreenPauseIgnoreAppIdsPlaceholder": "Добавить App ID (например, steam_app_123)...",
 		"disableParticles": "Отключить частицы",
 		"disableParticlesDesc": "Отключить эффекты частиц ради экономии ресурсов.",
 		"scrollMask": "Затухание по краям при прокрутке",
@@ -47,6 +55,12 @@
 		"clamp": "Обрезка",
 		"border": "Граница",
 		"repeat": "Повтор"
+	},
+	"generalLayer": {
+		"bottom": "Снизу (По умолчанию)",
+		"background": "Фон (Background)",
+		"top": "Сверху (Top)",
+		"overlay": "Поверх всех (Overlay)"
 	},
 	"audio": {
 		"silenceWallpaper": "Обои без звука",
@@ -67,6 +81,8 @@
 	"advanced": {
 		"useNativeWayland": "Использовать Wayland напрямую",
 		"useNativeWaylandDesc": "Запускать интерфейс со встроенной поддержкой Wayland (требуется перезапуск).",
+		"dumpStructure": "Дамп структуры обоев",
+		"dumpStructureDesc": "Выводить структуру сцены и объектов обоев в лог при запуске.",
 		"enableCustomArgs": "Свои параметры запуска",
 		"customCommandArgs": "Параметры командной строки",
 		"customCommandArgsDesc": "Передать параметры движку обоев без изменений.",

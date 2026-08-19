@@ -4,8 +4,9 @@
 		"filter": "Фильтр",
 		"currentlyUsing": "СЕЙЧАС НА ЭКРАНЕ :",
 		"display": "МОНИТОР :",
-		"displayBtn": "Монитор",
-		"cloneMode": "Режим клонирования"
+		"displayBtn": "Дисплей",
+		"cloneMode": "Режим клонирования",
+		"spanMode": "Растянуть на все экраны"
 	},
 	"sort": {
 		"dateDesc": "По дате (сначала новые)",

@@ -1,4 +1,4 @@
-import { ipcMain } from "electron";
+import { ipcMain, app } from "electron";
 import { socketClient } from "../socket-client";
 import { logger } from "../logger";
 import {
@@ -24,7 +24,7 @@ export function registerWallpaperService() {
 			);
 			await updateScreenConfig(screenName, wallpaperFolderName);
 			const config = await getConfig();
-			if (config.cloneMode) {
+			if (config.cloneMode || config.spanMode) {
 				await updateConfig({
 					globalWallpaper: wallpaperFolderName,
 				});
@@ -42,6 +42,29 @@ export function registerWallpaperService() {
 				globalWallpaper,
 			);
 			const updateData: any = { cloneMode: enabled };
+			if (enabled) {
+				updateData.spanMode = false;
+			}
+			if (globalWallpaper !== undefined) {
+				updateData.globalWallpaper = globalWallpaper;
+			}
+			await updateConfig(updateData);
+			return await socketClient.send("apply-wallpapers");
+		},
+	);
+
+	ipcMain.handle(
+		"toggle-span-mode",
+		async (_, enabled: boolean, globalWallpaper?: string | null) => {
+			logger.ipcReceived(
+				"toggle-span-mode",
+				enabled,
+				globalWallpaper,
+			);
+			const updateData: any = { spanMode: enabled };
+			if (enabled) {
+				updateData.cloneMode = false;
+			}
 			if (globalWallpaper !== undefined) {
 				updateData.globalWallpaper = globalWallpaper;
 			}
@@ -155,4 +178,21 @@ export function registerWallpaperService() {
 		logger.ipcReceived("save-workshop-filters");
 		return await socketClient.send("save-workshop-filters", filters);
 	});
+
+	ipcMain.handle(
+		"take-screenshot",
+		async (_, wallpaperId: string, outputPath?: string, delay?: number) => {
+			logger.ipcReceived("take-screenshot", wallpaperId, outputPath, delay);
+			if (!outputPath) {
+				const picturesDir = app.getPath("pictures") || app.getPath("home");
+				const sanitizedId = wallpaperId.replace(/[^a-zA-Z0-9_-]/g, "_");
+				outputPath = `${picturesDir}/wallpaper_${sanitizedId}_${Date.now()}.png`;
+			}
+			return await socketClient.send("take-screenshot", {
+				wallpaperId,
+				outputPath,
+				delay: delay || 5,
+			});
+		},
+	);
 }
