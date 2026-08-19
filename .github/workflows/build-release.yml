@@ -19,7 +19,7 @@ jobs:
           timeout-minutes: 30
 
           steps:
-             - uses: actions/checkout@v4
+             - uses: actions/checkout@v6
 
              - name: Setup Bun
                uses: oven-sh/setup-bun@v2
@@ -27,7 +27,7 @@ jobs:
                     bun-version: '1'
 
              - name: Setup Go
-               uses: actions/setup-go@v5
+               uses: actions/setup-go@v7
                with:
                     go-version: 'stable'
                     cache: true
@@ -37,7 +37,7 @@ jobs:
                run: bun utils/set-package-version.ts --mode=release
 
              - name: Cache dependencies
-               uses: actions/cache@v4
+               uses: actions/cache@v5
                with:
                     path: |
                          ~/.bun/install/cache
@@ -51,7 +51,7 @@ jobs:
                run: |
                     sudo apt-get update
                     sudo apt-get install -y --no-install-recommends \
-                      rpm libarchive-tools libgtk-3-dev libayatana-appindicator3-dev
+                      rpm libopenjp2-tools libgtk-3-dev libayatana-appindicator3-dev
                env:
                     DEBIAN_FRONTEND: noninteractive
 
