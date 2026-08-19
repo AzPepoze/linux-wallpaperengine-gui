@@ -11,6 +11,7 @@
 	import { showContextMenu, hideContextMenu, contextMenuStore } from '@/core/contextMenuStore';
 	import { unsubscribe } from '@/features/workshop/scripts/workshop';
 	import { showToast } from '@/core/toastStore';
+	import { logger } from '@/core/logger';
 	import { get } from 'svelte/store';
 
 	export let folderName: string;
@@ -34,20 +35,12 @@
 	const downloadState = getDownloadState(folderName);
 	$: ({ isSubscribed, isDownloaded, isDownloading, percent } = $downloadState);
 
-	let playlists: any[] = [];
-
-	onMount(async () => {
+	onMount(() => {
 		if (
 			(isWorkshop || isWorkshopItem) &&
 			($downloadStatus[folderName] === undefined || isSubscribed)
 		) {
 			isWallpaperFolderExist(folderName);
-		}
-
-		// Pre-fetch playlists for the context menu
-		const res = await window.electronAPI.getPlaylists();
-		if (res.success) {
-			playlists = res.playlists;
 		}
 	});
 
@@ -62,6 +55,16 @@
 		if (get(contextMenuStore).visible) {
 			hideContextMenu();
 			return;
+		}
+
+		let playlists: any[] = [];
+		try {
+			const res = await window.electronAPI.getPlaylists();
+			if (res?.success && Array.isArray(res.playlists)) {
+				playlists = res.playlists;
+			}
+		} catch (err) {
+			logger.error('Failed to load playlists for context menu:', err);
 		}
 
 		let menuItems: any[] = [
