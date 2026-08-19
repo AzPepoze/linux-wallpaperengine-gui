@@ -10,6 +10,7 @@
 		refreshScreens
 	} from '@/features/home/scripts/display';
 	import { activeFolderName } from '@/features/home/scripts/wallpaperStore';
+	import ScreenPreview from './ScreenPreview.svelte';
 	import type { WallpaperData } from '@shared/types';
 	import { t } from '@/core/i18n';
 
@@ -48,6 +49,7 @@
 	<div class="screens-list" on:wheel={handleWheel}>
 		{#each Object.keys($screens) as screen (screen)}
 			{@const currentId = isUnifiedMode ? unifiedWallpaperId : $screens[screen]}
+			{@const previewSrc = currentId ? wallpapers[currentId]?.previewPath : undefined}
 			<!-- svelte-ignore a11y-click-events-have-key-events -->
 			<div
 				class="screen-item"
@@ -59,18 +61,11 @@
 				out:fade={{ duration: 200 }}
 				animate:flip={{ duration: 300 }}
 			>
-				<div class="screen-preview">
-					{#key `${screen}-${isUnifiedMode}-${currentId}`}
-						{#if currentId && wallpapers[currentId]?.previewPath}
-							<img
-								src={wallpapers[currentId].previewPath}
-								alt={screen}
-							/>
-						{:else}
-							<div class="placeholder">{$t('display.noWallpaper')}</div>
-						{/if}
-					{/key}
-				</div>
+				<ScreenPreview
+					src={previewSrc}
+					alt={screen}
+					placeholder={$t('display.noWallpaper')}
+				/>
 				<div class="screen-name">{screen}</div>
 			</div>
 		{/each}
@@ -117,31 +112,6 @@
 						var(--btn-primary-bg),
 						transparent 70%
 					);
-			}
-
-			.screen-preview {
-				--size: 150px;
-
-				width: var(--size);
-				height: var(--size);
-				background-color: var(--preview-placeholder-bg);
-				margin-bottom: 8px;
-				display: flex;
-				align-items: center;
-				justify-content: center;
-				border-radius: var(--radius-sm);
-				overflow: hidden;
-
-				img {
-					width: 100%;
-					height: 100%;
-					object-fit: cover;
-				}
-
-				.placeholder {
-					font-size: 0.8em;
-					color: var(--text-muted);
-				}
 			}
 
 			.screen-name {
