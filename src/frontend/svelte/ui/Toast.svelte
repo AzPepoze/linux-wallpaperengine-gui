@@ -99,7 +99,6 @@
 		max-width: 450px;
 		padding: 14px 16px 14px 20px;
 		background: rgba(30, 30, 30, 0.95);
-		backdrop-filter: blur(12px);
 		border: 1px solid rgba(255, 255, 255, 0.1);
 		border-radius: var(--radius-lg);
 		box-shadow: 0 12px 32px rgba(0, 0, 0, 0.4);

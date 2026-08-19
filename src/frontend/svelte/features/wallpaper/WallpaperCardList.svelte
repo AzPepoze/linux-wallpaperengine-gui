@@ -385,9 +385,7 @@
 				width: 36px;
 				height: 36px;
 				border-radius: 50%;
-				background: rgba(255, 255, 255, 0.08);
-				backdrop-filter: blur(8px);
-				-webkit-backdrop-filter: blur(8px);
+				background: rgba(255, 255, 255, 0.12);
 				color: var(--text-main);
 				display: flex;
 				align-items: center;

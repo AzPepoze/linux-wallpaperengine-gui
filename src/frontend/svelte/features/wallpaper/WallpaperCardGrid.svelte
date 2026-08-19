@@ -288,9 +288,7 @@
 			width: 32px;
 			height: 32px;
 			border-radius: 50%;
-			background: rgba(0, 0, 0, 0.65);
-			backdrop-filter: blur(8px);
-			-webkit-backdrop-filter: blur(8px);
+			background: rgba(0, 0, 0, 0.85);
 			color: white;
 			display: flex;
 			align-items: center;
