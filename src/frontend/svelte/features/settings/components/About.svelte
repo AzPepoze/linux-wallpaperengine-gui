@@ -2,31 +2,15 @@
 	import Icon from '@/ui/Icon.svelte';
 	import GithubIcon from '@/ui/icons/GithubIcon.svelte';
 	import { onMount } from 'svelte';
-	import { logger } from '@/core/logger';
+	import appLogo from '@/ui/icons/icon.png';
 
 	let version = '...';
-	let logoUrl = '/icon.png';
 
 	onMount(async () => {
 		try {
 			version = await window.electronAPI.getVersion();
 		} catch {}
-		await loadLogo();
 	});
-
-	async function loadLogo() {
-		try {
-			const data = await window.electronAPI.getAppIcon();
-			if (data && data.byteLength > 0) {
-				logoUrl = URL.createObjectURL(new Blob([data], { type: 'image/png' }));
-			} else {
-				logoUrl = '/icon.png';
-			}
-		} catch (e) {
-			logger.warn('Failed to load application logo via IPC, using static asset:', e);
-			logoUrl = '/icon.png';
-		}
-	}
 
 	const links = [
 		{
@@ -59,9 +43,7 @@
 <div class="about-container">
 	<div class="app-info-card">
 		<div class="app-logo">
-			{#if logoUrl}
-				<img src={logoUrl} alt="App Logo" />
-			{/if}
+			<img src={appLogo} alt="App Logo" />
 		</div>
 		<div class="app-details">
 			<h3>Linux Wallpaper Engine GUI</h3>

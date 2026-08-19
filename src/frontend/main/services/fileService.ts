@@ -6,26 +6,21 @@ import { normalizePath } from "../utils/pathHelper";
 
 export function registerFileService() {
 	ipcMain.handle("get-app-icon", async () => {
-		const candidates = [
-			path.join(process.env.VITE_PUBLIC || "", "icon.png"),
-			path.join(process.cwd(), "src/public", "icon.png"),
-			path.join(__dirname, "../icon.png"),
-			path.join(__dirname, "../../src/public/icon.png"),
-			path.join(process.resourcesPath || "", "icon.png"),
-		];
+		const iconPath = path.join(
+			process.env.VITE_PUBLIC || path.join(process.cwd(), "src/public"),
+			"icon.png",
+		);
 
-		for (const candidate of candidates) {
-			try {
-				const buffer = await fs.readFile(candidate);
-				return buffer.buffer.slice(
-					buffer.byteOffset,
-					buffer.byteOffset + buffer.byteLength,
-				);
-			} catch {}
+		try {
+			const buffer = await fs.readFile(iconPath);
+			return buffer.buffer.slice(
+				buffer.byteOffset,
+				buffer.byteOffset + buffer.byteLength,
+			);
+		} catch (e) {
+			logger.warn("Could not find icon.png at path:", iconPath, e);
+			return new ArrayBuffer(0);
 		}
-
-		logger.warn("Could not find icon.png in candidate paths");
-		return new ArrayBuffer(0);
 	});
 
 	ipcMain.handle("select-dir", async (event) => {
