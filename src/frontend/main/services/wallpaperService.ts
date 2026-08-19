@@ -24,7 +24,7 @@ export function registerWallpaperService() {
 			);
 			await updateScreenConfig(screenName, wallpaperFolderName);
 			const config = await getConfig();
-			if (config.cloneMode) {
+			if (config.cloneMode || config.spanMode) {
 				await updateConfig({
 					globalWallpaper: wallpaperFolderName,
 				});
@@ -42,6 +42,29 @@ export function registerWallpaperService() {
 				globalWallpaper,
 			);
 			const updateData: any = { cloneMode: enabled };
+			if (enabled) {
+				updateData.spanMode = false;
+			}
+			if (globalWallpaper !== undefined) {
+				updateData.globalWallpaper = globalWallpaper;
+			}
+			await updateConfig(updateData);
+			return await socketClient.send("apply-wallpapers");
+		},
+	);
+
+	ipcMain.handle(
+		"toggle-span-mode",
+		async (_, enabled: boolean, globalWallpaper?: string | null) => {
+			logger.ipcReceived(
+				"toggle-span-mode",
+				enabled,
+				globalWallpaper,
+			);
+			const updateData: any = { spanMode: enabled };
+			if (enabled) {
+				updateData.cloneMode = false;
+			}
 			if (globalWallpaper !== undefined) {
 				updateData.globalWallpaper = globalWallpaper;
 			}
@@ -154,5 +177,23 @@ export function registerWallpaperService() {
 	ipcMain.handle("save-workshop-filters", async (_, filters: any) => {
 		logger.ipcReceived("save-workshop-filters");
 		return await socketClient.send("save-workshop-filters", filters);
+	});
+
+	ipcMain.handle("start-preview", async (_, wallpaperId: string, geometry?: string) => {
+		logger.ipcReceived("start-preview", wallpaperId, geometry);
+		return await socketClient.send("start-preview", {
+			wallpaperId,
+			geometry: geometry || "0x0x1280x720",
+		});
+	});
+
+	ipcMain.handle("stop-preview", async () => {
+		logger.ipcReceived("stop-preview");
+		return await socketClient.send("stop-preview");
+	});
+
+	ipcMain.handle("is-preview-running", async () => {
+		logger.ipcReceived("is-preview-running");
+		return await socketClient.send("is-preview-running");
 	});
 }

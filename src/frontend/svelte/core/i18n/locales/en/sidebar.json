@@ -8,7 +8,9 @@
 		"rating": "Rating:",
 		"description": "Description",
 		"properties": "Properties",
-		"installed": "Installed:"
+		"installed": "Installed:",
+		"livePreview": "Live Preview",
+		"stopPreview": "Stop Preview"
 	},
 	"workshop": {
 		"tags": "Tags",

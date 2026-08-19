@@ -37,7 +37,7 @@ protocol.registerSchemesAsPrivileged([
 
 process.env.DIST = path.join(__dirname, "../");
 process.env.VITE_PUBLIC = process.env.VITE_DEV_SERVER_URL
-	? path.join(process.env.DIST, "../public")
+	? path.join(process.cwd(), "src/public")
 	: process.env.DIST;
 
 let win: BrowserWindow | null = null;

@@ -13,6 +13,7 @@ export interface ContextMenuItem {
 export interface ContextMenuState {
 	x: number;
 	y: number;
+	title?: string;
 	items: ContextMenuItem[];
 	visible: boolean;
 }
@@ -20,12 +21,13 @@ export interface ContextMenuState {
 export const contextMenuStore = writable<ContextMenuState>({
 	x: 0,
 	y: 0,
+	title: undefined,
 	items: [],
 	visible: false
 });
 
-export function showContextMenu(x: number, y: number, items: ContextMenuItem[]) {
-	contextMenuStore.set({ x, y, items, visible: true });
+export function showContextMenu(x: number, y: number, items: ContextMenuItem[], title?: string) {
+	contextMenuStore.set({ x, y, title, items, visible: true });
 }
 
 export function hideContextMenu() {

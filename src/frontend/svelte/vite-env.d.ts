@@ -51,12 +51,16 @@ interface ElectronAPI {
 	applyWallpapers: () => Promise<{ success: boolean; error?: string }>;
 	setWallpaper: (screenName: string, wallpaperFolderName: string | null) => Promise<{ success: boolean; error?: string }>;
 	toggleCloneMode: (enabled: boolean, globalWallpaper?: string | null) => Promise<{ success: boolean; error?: string }>;
+	toggleSpanMode: (enabled: boolean, globalWallpaper?: string | null) => Promise<{ success: boolean; error?: string }>;
 	clearAllWallpapers: () => Promise<{ success: boolean; error?: string }>;
 	loadWallpapers: () => Promise<{ wallpapers: Record<string, any>; error: string | null; workshopPathValid: boolean; wallpaperEnginePathValid: boolean; selectedWallpaper: any | null }>;
 	getWallpaperPreview: (path: string) => Promise<{ success: boolean; data?: string; error?: string }>;
 	getWallpaperProjectData: (id: string) => Promise<{ success: boolean; properties?: Record<string, any>; error?: string }>;
 	getWallpaperProperties: (id: string) => Promise<any[]>;
 	saveWallpaperProperty: (id: string, key: string, value: string) => Promise<{ success: boolean; error?: string }>;
+	startPreview: (wallpaperId: string, geometry?: string) => Promise<{ success: boolean; error?: string }>;
+	stopPreview: () => Promise<{ success: boolean; error?: string }>;
+	isPreviewRunning: () => Promise<{ running: boolean }>;
 
 	// Playlist management
 	getPlaylists: () => Promise<{ success: boolean; playlists: any[]; error?: string }>;

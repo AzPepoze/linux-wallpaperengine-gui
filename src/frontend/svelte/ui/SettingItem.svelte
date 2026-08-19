@@ -1,5 +1,5 @@
 <script lang="ts">
-	export let label: string;
+	export let label: string = '';
 	export let id: string = '';
 	export let vertical: boolean = false;
 	export let description: string = '';

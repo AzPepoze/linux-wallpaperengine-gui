@@ -1,9 +1,11 @@
 import { writable, get } from "svelte/store";
 import { logger } from "@/core/logger";
+import { showToast } from "@/core/toastStore";
 
 export const screens = writable<Record<string, string | null>>({});
 export const selectedScreen = writable<string | null>(null);
 export const cloneMode = writable<boolean>(false);
+export const spanMode = writable<boolean>(false);
 
 export async function refreshScreens() {
 	logger.log("Refreshing screens...");
@@ -23,6 +25,7 @@ export async function refreshScreens() {
 	const configResult = await window.electronAPI.getConfig();
 	if (configResult.success) {
 		cloneMode.set(configResult.cloneMode || false);
+		spanMode.set(configResult.spanMode || false);
 
 		if (configResult.screens) {
 			configResult.screens.forEach((s: any) => {
@@ -50,6 +53,21 @@ export async function toggleCloneMode(
 	currentWallpaper?: string | null
 ) {
 	await window.electronAPI.toggleCloneMode(enabled, currentWallpaper);
+	await refreshScreens();
+}
+
+export async function toggleSpanMode(
+	enabled: boolean,
+	currentWallpaper?: string | null
+) {
+	if (enabled && Object.keys(get(screens)).length < 2) {
+		showToast("Screen span requires at least 2 connected displays.", "error");
+		return;
+	}
+	const result = await window.electronAPI.toggleSpanMode(enabled, currentWallpaper);
+	if (result && !result.success && result.error) {
+		showToast(result.error, "error");
+	}
 	await refreshScreens();
 }
 

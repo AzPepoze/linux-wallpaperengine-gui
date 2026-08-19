@@ -75,6 +75,29 @@ func (handler *Handler) HandleWallpaper(request models.Request) models.Response 
 			handler.wallpaperService.KillWallpaperByFolderName(parameters.FolderName)
 			response.Result = map[string]bool{"success": true}
 		}
+	case "start-preview":
+		var parameters struct {
+			WallpaperID string `json:"wallpaperId"`
+			Geometry    string `json:"geometry"`
+		}
+		if err := json.Unmarshal(request.Params, &parameters); err != nil {
+			response.Error = err.Error()
+		} else {
+			if err := handler.wallpaperService.StartPreview(parameters.WallpaperID, parameters.Geometry); err != nil {
+				response.Error = err.Error()
+			} else {
+				response.Result = map[string]bool{"success": true}
+			}
+		}
+	case "stop-preview":
+		if err := handler.wallpaperService.StopPreview(); err != nil {
+			response.Error = err.Error()
+		} else {
+			response.Result = map[string]bool{"success": true}
+		}
+	case "is-preview-running":
+		running := handler.wallpaperService.IsPreviewRunning()
+		response.Result = map[string]bool{"running": running}
 	}
 
 	return response

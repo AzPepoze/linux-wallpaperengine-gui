@@ -3,9 +3,11 @@
 		"playlist": "播放列表",
 		"filter": "筛选",
 		"currentlyUsing": "当前使用：",
-		"display": "显示器：",
+		"display": "显示模式：",
 		"displayBtn": "显示器",
-		"cloneMode": "克隆模式"
+		"individualMode": "单独显示",
+		"cloneMode": "克隆",
+		"spanMode": "跨屏拼接"
 	},
 	"sort": {
 		"dateDesc": "日期（最新）",

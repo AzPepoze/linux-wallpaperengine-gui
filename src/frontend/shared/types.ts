@@ -40,12 +40,14 @@ export type AppConfig = {
 	noAudioProcessing?: boolean;
 	scaling?: string;
 	clamping?: string;
+	layer?: string;
 	disableMouse?: boolean;
 	disableParallax?: boolean;
 	disableParticles?: boolean;
 	noFullscreenPause?: boolean;
 	customExecutableLocation?: string;
 	cloneMode?: boolean;
+	spanMode?: boolean;
 	globalWallpaper?: string | null;
 	fullscreenPauseOnlyActive?: boolean;
 	fullscreenPauseIgnoreAppIds?: string[];

@@ -211,6 +211,6 @@ hr {
 }
 
 ::selection {
-	background-color: var(--bg-app);
-	color: var(--text-inverse);
+	background-color: var(--btn-primary-bg, #007bff);
+	color: #ffffff;
 }

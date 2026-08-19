@@ -1,27 +1,67 @@
 <script lang="ts">
+	import { t } from '@/core/i18n';
+	import { showDisplayManager, showPlaylistManager } from '@/core/ui';
+	import {
+		cloneMode,
+		refreshScreens,
+		spanMode,
+		toggleCloneMode,
+		toggleSpanMode
+	} from '@/features/home/scripts/display';
+	import { activeFolderName } from '@/features/home/scripts/wallpaperStore';
+	import Button from '@/ui/Button.svelte';
 	import Icon from '@/ui/Icon.svelte';
 	import Refresh from '@/ui/Refresh.svelte';
-	import Button from '@/ui/Button.svelte';
 	import Select from '@/ui/Select.svelte';
 	import ViewToggle from '@/ui/ViewToggle.svelte';
 	import Toolbar from '@/ui/layout/Toolbar.svelte';
-	import { fly } from 'svelte/transition';
-	import { 
-		showDisplayManager, 
-		showPlaylistManager 
-	} from '@/core/ui';
-	import { cloneMode } from '@/features/home/scripts/display';
 	import type { Wallpaper } from '@shared/types';
-	import { t } from '@/core/i18n';
+	import { fly } from 'svelte/transition';
 
 	export let activeWallpaper: Wallpaper | null = null;
 	export let selectedScreen: string | null = null;
 	export let showFilterPanel: boolean = false;
 	export let viewMode: 'grid' | 'list' | 'detail' = 'grid';
-	export let sortMethod: 'date-desc' | 'date-asc' | 'name-asc' | 'name-desc' = 'date-desc';
+	export let sortMethod:
+		| 'date-desc'
+		| 'date-asc'
+		| 'name-asc'
+		| 'name-desc' = 'date-desc';
 	export let onRefresh: () => void;
-	export let onToggleCloneMode: () => void;
 	export let onLoadPlaylists: () => void;
+
+	$: displayModeValue = $spanMode
+		? 'span'
+		: $cloneMode
+			? 'clone'
+			: 'individual';
+
+	$: displayModeOptions = [
+		{
+			value: 'individual',
+			label: $t('wallpaper.toolbar.individualMode')
+		},
+		{ value: 'clone', label: $t('wallpaper.toolbar.cloneMode') },
+		{ value: 'span', label: $t('wallpaper.toolbar.spanMode') }
+	];
+
+	async function handleDisplayModeChange(mode: string) {
+		const targetWallpaper =
+			activeWallpaper?.folderName || $activeFolderName;
+		if (mode === 'clone') {
+			if ($spanMode) await toggleSpanMode(false, targetWallpaper);
+			if (!$cloneMode) await toggleCloneMode(true, targetWallpaper);
+		} else if (mode === 'span') {
+			if ($cloneMode) await toggleCloneMode(false, targetWallpaper);
+			if (!$spanMode) await toggleSpanMode(true, targetWallpaper);
+		} else {
+			// individual
+			if ($cloneMode) await toggleCloneMode(false, targetWallpaper);
+			if ($spanMode) await toggleSpanMode(false, targetWallpaper);
+			showDisplayManager.set(true);
+		}
+		await refreshScreens();
+	}
 </script>
 
 <Toolbar>
@@ -52,7 +92,9 @@
 
 	<div slot="center" class="status-info">
 		<div class="status-item truncate-item">
-			<span class="label">{$t('wallpaper.toolbar.currentlyUsing')}</span>
+			<span class="label"
+				>{$t('wallpaper.toolbar.currentlyUsing')}</span
+			>
 			{#if activeWallpaper}
 				<div class="value-container">
 					{#key activeWallpaper.projectData?.title || activeWallpaper.folderName}
@@ -72,34 +114,24 @@
 		</div>
 		<div class="status-item">
 			<span class="label">{$t('wallpaper.toolbar.display')}</span>
-			{#if selectedScreen || $cloneMode}
-				<span
-					in:fly={{ y: 20, duration: 300 }}
-					out:fly={{ y: -20, duration: 300 }}
-					class="value"
-				>
-					{$cloneMode ? 'ALL' : selectedScreen}
-				</span>
-			{/if}
+			<Select
+				id="display-mode-select"
+				value={displayModeValue}
+				options={displayModeOptions}
+				onChange={handleDisplayModeChange}
+				style="width: 140px;"
+			/>
 
 			<Button
 				variant={$showDisplayManager ? 'primary' : 'secondary'}
 				on:click={() => showDisplayManager.update((v) => !v)}
-				title="Toggle Display Manager"
-				style="padding: 8px; border-radius: 10px;"
+				title={selectedScreen
+					? `Toggle Display Manager (${selectedScreen})`
+					: 'Toggle Display Manager'}
+				style="padding: 8px 10px; border-radius: 10px;"
 			>
-				<Icon name="monitor" size={20} />
+				<Icon name="monitor" size={18} />
 				<span>{$t('wallpaper.toolbar.displayBtn')}</span>
-			</Button>
-
-			<Button
-				variant={$cloneMode ? 'primary' : 'secondary'}
-				on:click={onToggleCloneMode}
-				title="Clone mode (Apply to all displays)"
-				style="padding: 8px; border-radius: 10px;"
-			>
-				<Icon name="layers" size={20} />
-				<span>{$t('wallpaper.toolbar.cloneMode')}</span>
 			</Button>
 		</div>
 	</div>
@@ -109,7 +141,10 @@
 			id="sort-select"
 			bind:value={sortMethod}
 			options={[
-				{ value: 'date-desc', label: $t('wallpaper.sort.dateDesc') },
+				{
+					value: 'date-desc',
+					label: $t('wallpaper.sort.dateDesc')
+				},
 				{ value: 'date-asc', label: $t('wallpaper.sort.dateAsc') },
 				{ value: 'name-asc', label: $t('wallpaper.sort.nameAsc') },
 				{ value: 'name-desc', label: $t('wallpaper.sort.nameDesc') }

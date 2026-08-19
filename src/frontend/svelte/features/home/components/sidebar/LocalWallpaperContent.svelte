@@ -4,6 +4,15 @@
 	import type { Wallpaper } from '@shared/types';
 	import WallpaperProperties from '../WallpaperProperties.svelte';
 	import { t } from '@/core/i18n';
+	import Button from '@/ui/Button.svelte';
+	import Icon from '@/ui/Icon.svelte';
+	import { logger } from '@/core/logger';
+
+	import {
+		previewingWallpaperId,
+		startWallpaperPreview,
+		stopWallpaperPreview
+	} from '@/features/wallpaper/scripts/preview';
 
 	export let wallpaper: Wallpaper;
 	export let fileSize: number | null = null;
@@ -41,12 +50,51 @@
 		const d = new Date(dateNum);
 		return d.toLocaleDateString() + ' ' + d.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
 	};
+
+	async function handleOpenFolder() {
+		try {
+			const basePath = await window.electronAPI.getWallpaperBasePath();
+			if (basePath && folderName) {
+				await window.electronAPI.openPath(`${basePath}/${folderName}`);
+			}
+		} catch (e) {
+			logger.error('Failed to open wallpaper folder:', e);
+		}
+	}
+
+	function handleTogglePreview() {
+		if ($previewingWallpaperId === folderName) {
+			stopWallpaperPreview();
+		} else if (folderName) {
+			startWallpaperPreview(folderName);
+		}
+	}
 </script>
 
 <div class="local-sidebar">
 	<div class="section header-section">
 		<h3 class="title">{projectData?.title || folderName}</h3>
-		<p class="folder-name">{$t('sidebar.local.folder')} {folderName}</p>
+		<div class="actions-row">
+			<Button
+				variant="ghost"
+				class="pill-btn folder-btn"
+				on:click={handleOpenFolder}
+				title="Open folder location"
+			>
+				<Icon name="folder_open" size={14} />
+				<span class="folder-name">{$t('sidebar.local.folder')} {folderName}</span>
+			</Button>
+
+			<Button
+				variant="ghost"
+				class="pill-btn preview-btn {$previewingWallpaperId === folderName ? 'active' : ''}"
+				on:click={handleTogglePreview}
+				title={$previewingWallpaperId === folderName ? $t('sidebar.local.stopPreview') : $t('sidebar.local.livePreview')}
+			>
+				<Icon name={$previewingWallpaperId === folderName ? 'stop' : 'open_in_browser'} size={14} />
+				<span>{$previewingWallpaperId === folderName ? $t('sidebar.local.stopPreview') : $t('sidebar.local.livePreview')}</span>
+			</Button>
+		</div>
 	</div>
 
 	<div class="section info-section">
@@ -125,11 +173,46 @@
 				font-weight: 600;
 			}
 
+			.actions-row {
+				display: flex;
+				align-items: center;
+				flex-wrap: wrap;
+				gap: 8px;
+				margin-top: 8px;
+			}
+
+			:global(.pill-btn) {
+				padding: 4px 12px;
+				width: fit-content;
+				border-radius: 9999px;
+				gap: 6px;
+				font-size: 0.85rem;
+				font-style: normal;
+				font-weight: 500;
+				color: var(--text-color);
+				background: var(--bg-surface);
+				border: 1px solid var(--border-color);
+				transition: var(--transition-base);
+
+				&:hover:not(:disabled) {
+					background: var(--bg-surface-hover);
+					border-color: var(--border-color-hover);
+					color: var(--text-color);
+				}
+			}
+
+			:global(.pill-btn.active) {
+				background: var(--danger-color, #ef4444);
+				border-color: var(--danger-color, #ef4444);
+				color: #fff;
+
+				&:hover:not(:disabled) {
+					filter: brightness(1.1);
+				}
+			}
+
 			.folder-name {
 				margin: 0;
-				font-size: 0.85rem;
-				color: var(--text-muted);
-				font-style: italic;
 			}
 		}
 

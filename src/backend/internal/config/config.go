@@ -44,6 +44,7 @@ func init() {
 		NoAudioProcessing:   false,
 		Scaling:             "default",
 		Clamping:            "clamp",
+		Layer:               "bottom",
 		ScreenshotDelay:     5,
 		Properties:          make(map[string]string),
 		WallpaperProperties: make(map[string]map[string]string),

@@ -35,7 +35,8 @@ func (handler *Handler) HandleIPC(request models.Request, encoder *json.Encoder)
 		return handler.HandleDisplay(request)
 
 	case "apply-wallpapers", "load-wallpapers", "get-wallpaper-project-data",
-		"get-wallpaper-base-path", "get-assets-base-path", "kill-all-wallpapers", "kill-wallpaper":
+		"get-wallpaper-base-path", "get-assets-base-path", "kill-all-wallpapers", "kill-wallpaper",
+		"start-preview", "stop-preview", "is-preview-running":
 		return handler.HandleWallpaper(request)
 
 	case "get-playlists", "create-playlist", "rename-playlist", "delete-playlist",

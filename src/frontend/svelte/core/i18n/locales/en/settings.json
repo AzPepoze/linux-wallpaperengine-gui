@@ -28,8 +28,16 @@
 		"scalingModeDesc": "How the wallpaper fits the screen.",
 		"clampingMode": "Clamping Mode",
 		"clampingModeDesc": "Texture wrapping behavior.",
+		"layer": "Wayland Layer",
+		"layerDesc": "Select the Wayland layer surface level (e.g. background for Niri place-within-backdrop).",
 		"noFullscreenPause": "No Fullscreen Pause",
 		"noFullscreenPauseDesc": "Keep running when other apps are fullscreen.",
+		"fullscreenPauseOnlyActive": "Pause Only When Active Window Is Fullscreen",
+		"fullscreenPauseOnlyActiveDesc": "Pause wallpaper only when the focused active window is in fullscreen mode.",
+		"fullscreenPauseIgnoreAppIds": "Ignored Fullscreen App IDs",
+		"fullscreenPauseIgnoreAppIdsDesc": "Application IDs/classes that should not trigger wallpaper pausing when fullscreen. For Hyprland users, find the value via `hyprctl clients` under the `class:` field (e.g. `steam_app_123`, `firefox`, `mpv`).",
+		"fullscreenPauseIgnoreAppIdsHelp": "On Wayland/X11, windows have an app_id/class. In Hyprland, run `hyprctl clients` and use the `class:` string of your target application.",
+		"fullscreenPauseIgnoreAppIdsPlaceholder": "Add App ID (e.g. steam_app_123)...",
 		"disableParticles": "Disable Particles",
 		"disableParticlesDesc": "Turn off particle effects to save resources.",
 		"scrollMask": "Scroll Mask Effect",
@@ -47,6 +55,12 @@
 		"clamp": "Clamp",
 		"border": "Border",
 		"repeat": "Repeat"
+	},
+	"generalLayer": {
+		"bottom": "Bottom (Default)",
+		"background": "Background",
+		"top": "Top",
+		"overlay": "Overlay"
 	},
 	"audio": {
 		"silenceWallpaper": "Silence Wallpaper",

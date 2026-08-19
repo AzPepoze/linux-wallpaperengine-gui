@@ -55,19 +55,51 @@ func (service *Service) ApplyWallpapers() error {
 		Command string
 	}{}
 
-	for _, screen := range activeScreens {
-		wallpaperID := service.getEffectiveWallpaperID(appConfig, screen)
-		if wallpaperID == "" {
-			continue
+	if appConfig.SpanMode {
+		var screenNames []string
+		for _, screen := range activeScreens {
+			screenNames = append(screenNames, screen.Name)
+		}
+		if len(screenNames) < 2 {
+			return fmt.Errorf("screen span requires at least two connected displays (found %d)", len(screenNames))
 		}
 
-		execPath, args, cmdStr := service.buildWallpaperCommand(appConfig, screen.Name, wallpaperID)
-		desiredWallpapers = append(desiredWallpapers, struct {
-			Screen  string
-			Exec    string
-			Args    []string
-			Command string
-		}{Screen: screen.Name, Exec: execPath, Args: args, Command: cmdStr})
+		wallpaperID := ""
+		if appConfig.GlobalWallpaper != nil && *appConfig.GlobalWallpaper != "" {
+			wallpaperID = *appConfig.GlobalWallpaper
+		} else {
+			for _, screen := range activeScreens {
+				if screen.Wallpaper != nil && *screen.Wallpaper != "" {
+					wallpaperID = *screen.Wallpaper
+					break
+				}
+			}
+		}
+
+		if wallpaperID != "" {
+			execPath, args, cmdStr := service.buildSpanWallpaperCommand(appConfig, screenNames, wallpaperID)
+			desiredWallpapers = append(desiredWallpapers, struct {
+				Screen  string
+				Exec    string
+				Args    []string
+				Command string
+			}{Screen: "__SPAN__", Exec: execPath, Args: args, Command: cmdStr})
+		}
+	} else {
+		for _, screen := range activeScreens {
+			wallpaperID := service.getEffectiveWallpaperID(appConfig, screen)
+			if wallpaperID == "" {
+				continue
+			}
+
+			execPath, args, cmdStr := service.buildWallpaperCommand(appConfig, screen.Name, wallpaperID)
+			desiredWallpapers = append(desiredWallpapers, struct {
+				Screen  string
+				Exec    string
+				Args    []string
+				Command string
+			}{Screen: screen.Name, Exec: execPath, Args: args, Command: cmdStr})
+		}
 	}
 
 	service.processManager.UpdateWallpapers(desiredWallpapers)
@@ -77,55 +109,96 @@ func (service *Service) ApplyWallpapers() error {
 			service.wallpapers, _ = GetWallpapers()
 		}
 
-		for _, screen := range activeScreens {
-			wallpaperID := service.getEffectiveWallpaperID(appConfig, screen)
-			if wallpaperID == "" {
-				continue
+		if appConfig.SpanMode {
+			var screenNames []string
+			for _, screen := range activeScreens {
+				screenNames = append(screenNames, screen.Name)
+			}
+			spanScreenNames := strings.Join(screenNames, ",")
+			wallpaperID := ""
+			if appConfig.GlobalWallpaper != nil && *appConfig.GlobalWallpaper != "" {
+				wallpaperID = *appConfig.GlobalWallpaper
+			} else if len(activeScreens) > 0 && activeScreens[0].Wallpaper != nil {
+				wallpaperID = *activeScreens[0].Wallpaper
 			}
 
-			wd, ok := service.wallpapers[wallpaperID]
-			if !ok || wd.ProjectData == nil || wd.ProjectData.Preview == "" {
-				continue
-			}
-			pd := wd.ProjectData
+			if wallpaperID != "" {
+				if wd, ok := service.wallpapers[wallpaperID]; ok && wd.ProjectData != nil && wd.ProjectData.Preview != "" {
+					pd := wd.ProjectData
+					previewPath := filepath.Join(config.WorkshopPath, wallpaperID, pd.Preview)
+					var videoPath string
+					isVideo := "false"
+					if pd.Type == "Video" && pd.File != "" {
+						videoPath = filepath.Join(config.WorkshopPath, wallpaperID, pd.File)
+						isVideo = "true"
+					}
 
-			previewPath := filepath.Join(config.WorkshopPath, wallpaperID, pd.Preview)
-			var videoPath string
-			isVideo := "false"
-			if pd.Type == "Video" && pd.File != "" {
-				videoPath = filepath.Join(config.WorkshopPath, wallpaperID, pd.File)
-				isVideo = "true"
-			}
+					cmd := appConfig.WallpaperChangeCommand
+					cmd = strings.ReplaceAll(cmd, "$PREVIEW_PATH", previewPath)
+					cmd = strings.ReplaceAll(cmd, "$VIDEO_PATH", videoPath)
+					cmd = strings.ReplaceAll(cmd, "$IS_VIDEO", isVideo)
+					cmd = strings.ReplaceAll(cmd, "$WALLPAPER_TITLE", pd.Title)
+					cmd = strings.ReplaceAll(cmd, "$WALLPAPER_TYPE", pd.Type)
+					cmd = strings.ReplaceAll(cmd, "$WALLPAPER_ID", wallpaperID)
+					cmd = strings.ReplaceAll(cmd, "$SCREEN_NAME", spanScreenNames)
+					logger.Printf("Running hook command for span wallpaper %s on %s: %s", wallpaperID, spanScreenNames, cmd)
 
-			cmd := appConfig.WallpaperChangeCommand
-			cmd = strings.ReplaceAll(cmd, "$PREVIEW_PATH", previewPath)
-			cmd = strings.ReplaceAll(cmd, "$VIDEO_PATH", videoPath)
-			cmd = strings.ReplaceAll(cmd, "$IS_VIDEO", isVideo)
-			cmd = strings.ReplaceAll(cmd, "$WALLPAPER_TITLE", pd.Title)
-			cmd = strings.ReplaceAll(cmd, "$WALLPAPER_TYPE", pd.Type)
-			cmd = strings.ReplaceAll(cmd, "$WALLPAPER_ID", wallpaperID)
-			cmd = strings.ReplaceAll(cmd, "$SCREEN_NAME", screen.Name)
-			logger.Printf("Running hook command for %s on %s: %s", wallpaperID, screen.Name, cmd)
-
-			go func(c, id, screenName string) {
-				parts := strings.Fields(c)
-				if len(parts) == 0 {
-					logger.Printf("hook command empty for %s on %s", id, screenName)
-					return
+					go service.runHookCommand(cmd, wallpaperID, spanScreenNames)
 				}
-				execPath := parts[0]
-				args := parts[1:]
-				out, err := exec.Command(execPath, args...).CombinedOutput()
-				if err != nil {
-					logger.Printf("hook command failed for %s on %s: %v\n%s", id, screenName, err, string(out))
-				} else {
-					logger.Printf("hook command succeeded for %s on %s\n%s", id, screenName, string(out))
+			}
+		} else {
+			for _, screen := range activeScreens {
+				wallpaperID := service.getEffectiveWallpaperID(appConfig, screen)
+				if wallpaperID == "" {
+					continue
 				}
-			}(cmd, wallpaperID, screen.Name)
+
+				wd, ok := service.wallpapers[wallpaperID]
+				if !ok || wd.ProjectData == nil || wd.ProjectData.Preview == "" {
+					continue
+				}
+				pd := wd.ProjectData
+
+				previewPath := filepath.Join(config.WorkshopPath, wallpaperID, pd.Preview)
+				var videoPath string
+				isVideo := "false"
+				if pd.Type == "Video" && pd.File != "" {
+					videoPath = filepath.Join(config.WorkshopPath, wallpaperID, pd.File)
+					isVideo = "true"
+				}
+
+				cmd := appConfig.WallpaperChangeCommand
+				cmd = strings.ReplaceAll(cmd, "$PREVIEW_PATH", previewPath)
+				cmd = strings.ReplaceAll(cmd, "$VIDEO_PATH", videoPath)
+				cmd = strings.ReplaceAll(cmd, "$IS_VIDEO", isVideo)
+				cmd = strings.ReplaceAll(cmd, "$WALLPAPER_TITLE", pd.Title)
+				cmd = strings.ReplaceAll(cmd, "$WALLPAPER_TYPE", pd.Type)
+				cmd = strings.ReplaceAll(cmd, "$WALLPAPER_ID", wallpaperID)
+				cmd = strings.ReplaceAll(cmd, "$SCREEN_NAME", screen.Name)
+				logger.Printf("Running hook command for %s on %s: %s", wallpaperID, screen.Name, cmd)
+
+				go service.runHookCommand(cmd, wallpaperID, screen.Name)
+			}
 		}
 	}
 
 	return nil
+}
+
+func (service *Service) runHookCommand(cmd, id, screenName string) {
+	parts := strings.Fields(cmd)
+	if len(parts) == 0 {
+		logger.Printf("hook command empty for %s on %s", id, screenName)
+		return
+	}
+	execPath := parts[0]
+	args := parts[1:]
+	out, err := exec.Command(execPath, args...).CombinedOutput()
+	if err != nil {
+		logger.Printf("hook command failed for %s on %s: %v\n%s", id, screenName, err, string(out))
+	} else {
+		logger.Printf("hook command succeeded for %s on %s\n%s", id, screenName, string(out))
+	}
 }
 
 func (service *Service) ensureScreensConfig(appConfig *config.AppConfig, availableScreens []string) {
@@ -187,7 +260,16 @@ func (service *Service) getEffectiveWallpaperID(appConfig config.AppConfig, scre
 	return ""
 }
 
+func (service *Service) buildSpanWallpaperCommand(appConfig config.AppConfig, screenNames []string, wallpaperID string) (string, []string, string) {
+	screenSpanArg := strings.Join(screenNames, ",")
+	return service.buildWallpaperCommandInternal(appConfig, []string{"--screen-span", screenSpanArg}, wallpaperID)
+}
+
 func (service *Service) buildWallpaperCommand(appConfig config.AppConfig, screenName string, wallpaperID string) (string, []string, string) {
+	return service.buildWallpaperCommandInternal(appConfig, []string{"-r", screenName}, wallpaperID)
+}
+
+func (service *Service) buildWallpaperCommandInternal(appConfig config.AppConfig, screenArgs []string, wallpaperID string) (string, []string, string) {
 	fps := appConfig.FPS
 	if fps == 0 {
 		fps = 60
@@ -204,7 +286,8 @@ func (service *Service) buildWallpaperCommand(appConfig config.AppConfig, screen
 	}
 
 	// Build arguments as a slice to avoid shell interpolation
-	arguments := []string{wallpaperPath, "-r", screenName, "-f", strconv.Itoa(fps)}
+	arguments := append([]string{wallpaperPath}, screenArgs...)
+	arguments = append(arguments, "-f", strconv.Itoa(fps))
 
 	if appConfig.Silence {
 		arguments = append(arguments, "-s")
@@ -223,6 +306,9 @@ func (service *Service) buildWallpaperCommand(appConfig config.AppConfig, screen
 	}
 	if appConfig.Clamping != "" {
 		arguments = append(arguments, "--clamp", appConfig.Clamping)
+	}
+	if appConfig.Layer != "" {
+		arguments = append(arguments, "--layer", appConfig.Layer)
 	}
 	if appConfig.DisableMouse {
 		arguments = append(arguments, "--disable-mouse")
@@ -311,15 +397,27 @@ func (service *Service) LoadWallpapers() (map[string]interface{}, error) {
 	}
 
 	var initialWallpaper interface{}
-	for _, screen := range appConfig.Screens {
-		if connectedSet[screen.Name] && screen.Wallpaper != nil {
-			if data, ok := wallpapers[*screen.Wallpaper]; ok {
-				initialWallpaper = map[string]interface{}{
-					"projectData": data.ProjectData,
-					"previewPath": data.PreviewPath,
-					"folderName":  *screen.Wallpaper,
+	if (appConfig.SpanMode || appConfig.CloneMode) && appConfig.GlobalWallpaper != nil {
+		if data, ok := wallpapers[*appConfig.GlobalWallpaper]; ok {
+			initialWallpaper = map[string]interface{}{
+				"projectData": data.ProjectData,
+				"previewPath": data.PreviewPath,
+				"folderName":  *appConfig.GlobalWallpaper,
+			}
+		}
+	}
+
+	if initialWallpaper == nil {
+		for _, screen := range appConfig.Screens {
+			if connectedSet[screen.Name] && screen.Wallpaper != nil {
+				if data, ok := wallpapers[*screen.Wallpaper]; ok {
+					initialWallpaper = map[string]interface{}{
+						"projectData": data.ProjectData,
+						"previewPath": data.PreviewPath,
+						"folderName":  *screen.Wallpaper,
+					}
+					break
 				}
-				break
 			}
 		}
 	}
@@ -334,4 +432,31 @@ func (service *Service) LoadWallpapers() (map[string]interface{}, error) {
 		"workshopPathValid":        workshopPathValid,
 		"wallpaperEnginePathValid": wallpaperEnginePathValid,
 	}, nil
+}
+
+func (service *Service) StartPreview(wallpaperID string, geometry string) error {
+	if geometry == "" {
+		geometry = "0x0x1280x720"
+	}
+
+	appConfig, err := config.ReadConfig()
+	if err != nil {
+		return err
+	}
+
+	screenArgs := []string{"-w", geometry}
+	execPath, args, cmdStr := service.buildWallpaperCommandInternal(appConfig, screenArgs, wallpaperID)
+
+	logger.Printf("Starting wallpaper preview for %s... (%s)", wallpaperID, cmdStr)
+	service.processManager.UpdatePreview(execPath, args, cmdStr)
+	return nil
+}
+
+func (service *Service) StopPreview() error {
+	service.processManager.StopPreview()
+	return nil
+}
+
+func (service *Service) IsPreviewRunning() bool {
+	return service.processManager.IsPreviewRunning()
 }

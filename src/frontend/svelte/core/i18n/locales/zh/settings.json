@@ -28,8 +28,16 @@
 		"scalingModeDesc": "壁纸如何适配屏幕。",
 		"clampingMode": "纹理环绕模式",
 		"clampingModeDesc": "纹理包裹行为。",
+		"layer": "Wayland 图层 (Layer)",
+		"layerDesc": "选择 Wayland layer surface 层级（例如配合 Niri place-within-backdrop 的 background）。",
 		"noFullscreenPause": "全屏不暂停",
 		"noFullscreenPauseDesc": "其他应用全屏时继续运行。",
+		"fullscreenPauseOnlyActive": "仅当活动窗口全屏时暂停",
+		"fullscreenPauseOnlyActiveDesc": "仅在当前聚焦的活动窗口处于全屏模式时暂停壁纸。",
+		"fullscreenPauseIgnoreAppIds": "全屏忽略应用 ID",
+		"fullscreenPauseIgnoreAppIdsDesc": "全屏时不应触发壁纸暂停的应用 ID/Class 列表。Hyprland 用户可通过运行 `hyprctl clients` 命令查看窗口的 `class:` 属性（例如 `steam_app_123`, `firefox`, `mpv`）。",
+		"fullscreenPauseIgnoreAppIdsHelp": "在 Wayland (Hyprland, Niri, Sway) 或 X11 环境下，窗口具有 app_id/class。可在终端运行 `hyprctl clients` 获取对应应用的 `class:` 名称。",
+		"fullscreenPauseIgnoreAppIdsPlaceholder": "添加应用 ID (例如 steam_app_123)...",
 		"disableParticles": "禁用粒子效果",
 		"disableParticlesDesc": "关闭粒子效果以节省资源。",
 		"scrollMask": "滚动遮罩效果",
@@ -47,6 +55,12 @@
 		"clamp": "箝位",
 		"border": "边框",
 		"repeat": "重复"
+	},
+	"generalLayer": {
+		"bottom": "底部 (默认)",
+		"background": "背景 (Background)",
+		"top": "顶部 (Top)",
+		"overlay": "覆盖层 (Overlay)"
 	},
 	"audio": {
 		"silenceWallpaper": "静音壁纸",

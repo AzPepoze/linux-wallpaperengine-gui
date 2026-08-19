@@ -6,13 +6,21 @@ import { normalizePath } from "../utils/pathHelper";
 
 export function registerFileService() {
 	ipcMain.handle("get-app-icon", async () => {
-		const iconPath = path.join(process.env.VITE_PUBLIC || "", "icon.png");
-		const buffer = await fs.readFile(iconPath);
-
-		return buffer.buffer.slice(
-			buffer.byteOffset,
-			buffer.byteOffset + buffer.byteLength,
+		const iconPath = path.join(
+			process.env.VITE_PUBLIC || path.join(process.cwd(), "src/public"),
+			"icon.png",
 		);
+
+		try {
+			const buffer = await fs.readFile(iconPath);
+			return buffer.buffer.slice(
+				buffer.byteOffset,
+				buffer.byteOffset + buffer.byteLength,
+			);
+		} catch (e) {
+			logger.warn("Could not find icon.png at path:", iconPath, e);
+			return new ArrayBuffer(0);
+		}
 	});
 
 	ipcMain.handle("select-dir", async (event) => {

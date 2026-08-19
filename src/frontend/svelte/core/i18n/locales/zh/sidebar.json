@@ -7,8 +7,10 @@
 		"version": "版本：",
 		"rating": "评级：",
 		"description": "描述",
-		"properties": "属性",
-		"installed": "已安装"
+		"properties": "属性设置",
+		"installed": "安装日期:",
+		"livePreview": "窗口实时预览",
+		"stopPreview": "停止预览"
 	},
 	"workshop": {
 		"tags": "标签",

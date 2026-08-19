@@ -2,23 +2,15 @@
 	import Icon from '@/ui/Icon.svelte';
 	import GithubIcon from '@/ui/icons/GithubIcon.svelte';
 	import { onMount } from 'svelte';
+	import appLogo from '@/ui/icons/icon.png';
 
 	let version = '...';
-	let logoUrl = '';
 
 	onMount(async () => {
-		version = await window.electronAPI.getVersion();
-		await loadLogo();
-	});
-
-	async function loadLogo() {
 		try {
-			const data = await window.electronAPI.getAppIcon();
-			logoUrl = URL.createObjectURL(new Blob([data], { type: 'image/png' }));
-		} catch (e) {
-			console.error('Failed to load application logo:', e);
-		}
-	}
+			version = await window.electronAPI.getVersion();
+		} catch {}
+	});
 
 	const links = [
 		{
@@ -51,9 +43,7 @@
 <div class="about-container">
 	<div class="app-info-card">
 		<div class="app-logo">
-			{#if logoUrl}
-				<img src={logoUrl} alt="App Logo" />
-			{/if}
+			<img src={appLogo} alt="App Logo" />
 		</div>
 		<div class="app-details">
 			<h3>Linux Wallpaper Engine GUI</h3>

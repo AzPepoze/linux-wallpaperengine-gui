@@ -3,9 +3,11 @@
 		"playlist": "Плейлист",
 		"filter": "Фильтр",
 		"currentlyUsing": "СЕЙЧАС НА ЭКРАНЕ :",
-		"display": "МОНИТОР :",
-		"displayBtn": "Монитор",
-		"cloneMode": "Режим клонирования"
+		"display": "РЕЖИМ ЭКРАНА :",
+		"displayBtn": "Экраны",
+		"individualMode": "Отдельно",
+		"cloneMode": "Клонировать",
+		"spanMode": "Растянуть"
 	},
 	"sort": {
 		"dateDesc": "По дате (сначала новые)",

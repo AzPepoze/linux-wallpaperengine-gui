@@ -8,7 +8,9 @@
 		"rating": "เรตติ้ง:",
 		"description": "คำอธิบาย",
 		"properties": "คุณสมบัติ",
-		"installed": "ติดตั้งแล้ว:"
+		"installed": "ติดตั้งแล้ว:",
+		"livePreview": "พรีวิวในหน้าต่างแยก",
+		"stopPreview": "หยุดพรีวิว"
 	},
 	"workshop": {
 		"tags": "แท็ก",

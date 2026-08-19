@@ -44,7 +44,6 @@
 		gap: 20px;
 		align-items: center;
 		justify-content: center;
-		backdrop-filter: blur(8px);
 		width: 100%;
 		text-align: center;
 		margin: 0 auto;

@@ -21,6 +21,7 @@ export interface SettingsState {
 	noAudioProcessing: boolean;
 	scaling: string;
 	clamping: string;
+	layer: string;
 	disableMouse: boolean;
 	disableParallax: boolean;
 	noFullscreenPause: boolean;
@@ -62,6 +63,7 @@ const configFieldMap: Record<string, string> = {
 	noAudioProcessing: "noAudioProcessing",
 	scaling: "scaling",
 	clamping: "clamping",
+	layer: "layer",
 	disableMouse: "disableMouse",
 	disableParallax: "disableParallax",
 	noFullscreenPause: "noFullscreenPause",
@@ -106,7 +108,9 @@ export async function loadSettings(): Promise<void> {
 				}
 			}
 
-			// Ensure playlist defaults
+			// Ensure defaults
+			if (settings.layer === undefined) settings.layer = 'bottom';
+			if (settings.fullscreenPauseIgnoreAppIds === undefined) settings.fullscreenPauseIgnoreAppIds = [];
 			if (settings.playlist === undefined) settings.playlist = '';
 			if (settings.playlistInterval === undefined) settings.playlistInterval = 0;
 

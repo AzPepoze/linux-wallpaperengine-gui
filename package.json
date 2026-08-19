@@ -24,6 +24,9 @@
         "i18n:check": "bun utils/i18n-check.ts",
         "i18n:generate": "bun utils/i18n-generate.ts"
     },
+    "trustedDependencies": [
+        "electron"
+    ],
     "devDependencies": 
     {
         "@sveltejs/vite-plugin-svelte": "^7.0.0",

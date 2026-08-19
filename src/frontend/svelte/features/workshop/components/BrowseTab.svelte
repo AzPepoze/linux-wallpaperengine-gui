@@ -125,6 +125,7 @@
 							{selectedWallpaper}
 							onSelect={handleItemSelect}
 							container={contentElement}
+							isWorkshop={true}
 						/>
 					{:else}
 						<WallpaperItemList
@@ -134,6 +135,7 @@
 							{selectedWallpaper}
 							onSelect={handleItemSelect}
 							container={contentElement}
+							isWorkshop={true}
 						/>
 					{/if}
 

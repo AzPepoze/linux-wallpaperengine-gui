@@ -5,8 +5,15 @@
 	import {
 		screens,
 		selectedScreen,
+		cloneMode,
+		spanMode,
 		refreshScreens
 	} from '@/features/home/scripts/display';
+	import {
+		activeFolderName,
+		selectedFolderName
+	} from '@/features/home/scripts/wallpaperStore';
+	import ScreenPreview from './ScreenPreview.svelte';
 	import type { WallpaperData } from '@shared/types';
 	import { t } from '@/core/i18n';
 
@@ -18,7 +25,22 @@
 
 	async function handleScreenChange(screen: string) {
 		selectedScreen.set(screen);
+		const currentWallpaperId = isUnifiedMode ? unifiedWallpaperId : $screens[screen];
+		if (currentWallpaperId) {
+			activeFolderName.set(currentWallpaperId);
+			selectedFolderName.set(currentWallpaperId);
+		} else {
+			activeFolderName.set(null);
+			selectedFolderName.set(null);
+		}
 	}
+
+	$: isUnifiedMode = $cloneMode || $spanMode;
+
+	$: unifiedWallpaperId =
+		$activeFolderName ||
+		Object.values($screens).find((v) => !!v) ||
+		null;
 
 	const scrollOffset = 10;
 	function handleWheel(event: WheelEvent) {
@@ -37,6 +59,8 @@
 {#if Object.keys($screens).length > 0}
 	<div class="screens-list" on:wheel={handleWheel}>
 		{#each Object.keys($screens) as screen (screen)}
+			{@const currentId = isUnifiedMode ? unifiedWallpaperId : $screens[screen]}
+			{@const previewSrc = currentId ? wallpapers[currentId]?.previewPath : undefined}
 			<!-- svelte-ignore a11y-click-events-have-key-events -->
 			<div
 				class="screen-item"
@@ -48,17 +72,11 @@
 				out:fade={{ duration: 200 }}
 				animate:flip={{ duration: 300 }}
 			>
-				<div class="screen-preview">
-					{#if $screens[screen]}
-						<img
-							src={wallpapers[$screens[screen]]
-								?.previewPath}
-							alt={screen}
-						/>
-					{:else}
-						<div class="placeholder">{$t('display.noWallpaper')}</div>
-					{/if}
-				</div>
+				<ScreenPreview
+					src={previewSrc}
+					alt={screen}
+					placeholder={$t('display.noWallpaper')}
+				/>
 				<div class="screen-name">{screen}</div>
 			</div>
 		{/each}
@@ -105,31 +123,6 @@
 						var(--btn-primary-bg),
 						transparent 70%
 					);
-			}
-
-			.screen-preview {
-				--size: 150px;
-
-				width: var(--size);
-				height: var(--size);
-				background-color: var(--preview-placeholder-bg);
-				margin-bottom: 8px;
-				display: flex;
-				align-items: center;
-				justify-content: center;
-				border-radius: var(--radius-sm);
-				overflow: hidden;
-
-				img {
-					width: 100%;
-					height: 100%;
-					object-fit: cover;
-				}
-
-				.placeholder {
-					font-size: 0.8em;
-					color: var(--text-muted);
-				}
 			}
 
 			.screen-name {
