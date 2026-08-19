@@ -60,28 +60,30 @@ func (service *Service) ApplyWallpapers() error {
 		for _, screen := range activeScreens {
 			screenNames = append(screenNames, screen.Name)
 		}
-		if len(screenNames) > 0 {
-			wallpaperID := ""
-			if appConfig.GlobalWallpaper != nil && *appConfig.GlobalWallpaper != "" {
-				wallpaperID = *appConfig.GlobalWallpaper
-			} else {
-				for _, screen := range activeScreens {
-					if screen.Wallpaper != nil && *screen.Wallpaper != "" {
-						wallpaperID = *screen.Wallpaper
-						break
-					}
+		if len(screenNames) < 2 {
+			return fmt.Errorf("screen span requires at least two connected displays (found %d)", len(screenNames))
+		}
+
+		wallpaperID := ""
+		if appConfig.GlobalWallpaper != nil && *appConfig.GlobalWallpaper != "" {
+			wallpaperID = *appConfig.GlobalWallpaper
+		} else {
+			for _, screen := range activeScreens {
+				if screen.Wallpaper != nil && *screen.Wallpaper != "" {
+					wallpaperID = *screen.Wallpaper
+					break
 				}
 			}
+		}
 
-			if wallpaperID != "" {
-				execPath, args, cmdStr := service.buildSpanWallpaperCommand(appConfig, screenNames, wallpaperID)
-				desiredWallpapers = append(desiredWallpapers, struct {
-					Screen  string
-					Exec    string
-					Args    []string
-					Command string
-				}{Screen: "__SPAN__", Exec: execPath, Args: args, Command: cmdStr})
-			}
+		if wallpaperID != "" {
+			execPath, args, cmdStr := service.buildSpanWallpaperCommand(appConfig, screenNames, wallpaperID)
+			desiredWallpapers = append(desiredWallpapers, struct {
+				Screen  string
+				Exec    string
+				Args    []string
+				Command string
+			}{Screen: "__SPAN__", Exec: execPath, Args: args, Command: cmdStr})
 		}
 	} else {
 		for _, screen := range activeScreens {
