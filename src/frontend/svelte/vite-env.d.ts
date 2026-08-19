@@ -58,7 +58,6 @@ interface ElectronAPI {
 	getWallpaperProjectData: (id: string) => Promise<{ success: boolean; properties?: Record<string, any>; error?: string }>;
 	getWallpaperProperties: (id: string) => Promise<any[]>;
 	saveWallpaperProperty: (id: string, key: string, value: string) => Promise<{ success: boolean; error?: string }>;
-	takeScreenshot: (wallpaperId: string, outputPath?: string, delay?: number) => Promise<{ success: boolean; outputPath?: string; error?: string }>;
 
 	// Playlist management
 	getPlaylists: () => Promise<{ success: boolean; playlists: any[]; error?: string }>;

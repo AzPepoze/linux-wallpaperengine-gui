@@ -81,8 +81,6 @@
 	"advanced": {
 		"useNativeWayland": "Use Native Wayland",
 		"useNativeWaylandDesc": "Run the GUI with native Wayland support (requires restart).",
-		"dumpStructure": "Dump Wallpaper Structure",
-		"dumpStructureDesc": "Log internal scene and object structure when starting wallpapers.",
 		"enableCustomArgs": "Enable Custom Arguments",
 		"customCommandArgs": "Custom Command Args",
 		"customCommandArgsDesc": "Pass raw arguments to the backend.",

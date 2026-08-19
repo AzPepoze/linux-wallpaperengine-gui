@@ -79,8 +79,6 @@ export type I18nKey =
 	| 'settings.interaction.disableParallaxDesc'
 	| 'settings.advanced.useNativeWayland'
 	| 'settings.advanced.useNativeWaylandDesc'
-	| 'settings.advanced.dumpStructure'
-	| 'settings.advanced.dumpStructureDesc'
 	| 'settings.advanced.enableCustomArgs'
 	| 'settings.advanced.customCommandArgs'
 	| 'settings.advanced.customCommandArgsDesc'

@@ -189,24 +189,6 @@
 				}
 			});
 
-			menuItems.push({
-				label: 'Take Screenshot',
-				icon: 'photo_camera',
-				action: async () => {
-					showToast('Capturing screenshot...', 'info');
-					try {
-						const res = await window.electronAPI.takeScreenshot(folderName);
-						if (res?.success) {
-							showToast(`Screenshot saved to ${res.outputPath}`, 'success');
-						} else {
-							showToast(`Screenshot failed: ${res?.error}`, 'error');
-						}
-					} catch (err: any) {
-						showToast(`Screenshot failed: ${err?.message || err}`, 'error');
-					}
-				}
-			});
-
 			if (isWorkshopItem) {
 				menuItems.push({
 					label: 'Copy Workshop Link',

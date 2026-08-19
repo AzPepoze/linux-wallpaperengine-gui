@@ -79,11 +79,9 @@
 		"disableParallaxDesc": "Отключить смещение изображения вслед за указателем мыши."
 	},
 	"advanced": {
-		"useNativeWayland": "Использовать Wayland напрямую",
-		"useNativeWaylandDesc": "Запускать интерфейс со встроенной поддержкой Wayland (требуется перезапуск).",
-		"dumpStructure": "Дамп структуры обоев",
-		"dumpStructureDesc": "Выводить структуру сцены и объектов обоев в лог при запуске.",
-		"enableCustomArgs": "Свои параметры запуска",
+		"useNativeWayland": "Использовать Native Wayland",
+		"useNativeWaylandDesc": "Запускать GUI с поддержкой Wayland (требуется перезапуск).",
+		"enableCustomArgs": "Включить дополнительные аргументы",
 		"customCommandArgs": "Параметры командной строки",
 		"customCommandArgsDesc": "Передать параметры движку обоев без изменений.",
 		"customArgsPlaceholder": "например, --window 0x0x1920x1080",

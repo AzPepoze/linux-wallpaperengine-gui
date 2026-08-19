@@ -81,8 +81,6 @@
 	"advanced": {
 		"useNativeWayland": "ใช้ Native Wayland",
 		"useNativeWaylandDesc": "เรียกใช้ GUI ด้วยการรองรับ Wayland แบบ Native (ต้องรีสตาร์ต)",
-		"dumpStructure": "ดัมป์โครงสร้างวอลเปเปอร์ (Dump Structure)",
-		"dumpStructureDesc": "บันทึกลำดับชั้น Node และโครงสร้างภายในของวอลเปเปอร์ลง Log เพื่อการ Debug",
 		"enableCustomArgs": "เปิดใช้อาร์กิวเมนต์เพิ่มเติม",
 		"customCommandArgs": "อาร์กิวเมนต์เพิ่มเติม",
 		"customCommandArgsDesc": "ส่งอาร์กิวเมนต์โดยตรงไปยัง backend",

@@ -1,4 +1,4 @@
-import { ipcMain, app } from "electron";
+import { ipcMain } from "electron";
 import { socketClient } from "../socket-client";
 import { logger } from "../logger";
 import {
@@ -178,21 +178,4 @@ export function registerWallpaperService() {
 		logger.ipcReceived("save-workshop-filters");
 		return await socketClient.send("save-workshop-filters", filters);
 	});
-
-	ipcMain.handle(
-		"take-screenshot",
-		async (_, wallpaperId: string, outputPath?: string, delay?: number) => {
-			logger.ipcReceived("take-screenshot", wallpaperId, outputPath, delay);
-			if (!outputPath) {
-				const picturesDir = app.getPath("pictures") || app.getPath("home");
-				const sanitizedId = wallpaperId.replace(/[^a-zA-Z0-9_-]/g, "_");
-				outputPath = `${picturesDir}/wallpaper_${sanitizedId}_${Date.now()}.png`;
-			}
-			return await socketClient.send("take-screenshot", {
-				wallpaperId,
-				outputPath,
-				delay: delay || 5,
-			});
-		},
-	);
 }

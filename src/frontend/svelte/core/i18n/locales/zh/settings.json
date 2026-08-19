@@ -81,8 +81,6 @@
 	"advanced": {
 		"useNativeWayland": "使用原生 Wayland",
 		"useNativeWaylandDesc": "以原生 Wayland 支持运行 GUI（需要重启）。",
-		"dumpStructure": "转储壁纸结构 (Dump Structure)",
-		"dumpStructureDesc": "启动壁纸时在日志中记录内部场景和对象结构。",
 		"enableCustomArgs": "启用自定义参数",
 		"customCommandArgs": "自定义命令参数",
 		"customCommandArgsDesc": "向后端传递原始参数。",

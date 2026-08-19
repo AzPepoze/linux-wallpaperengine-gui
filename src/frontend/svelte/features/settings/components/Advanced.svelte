@@ -33,17 +33,6 @@
 	</SettingItem>
 
 	<SettingItem
-		label={$t('settings.advanced.dumpStructure')}
-		id="dumpStructure"
-		description={$t('settings.advanced.dumpStructureDesc')}
-	>
-		<Toggle
-			id="dumpStructure"
-			bind:checked={$settingsStore.dumpStructure}
-		/>
-	</SettingItem>
-
-	<SettingItem
 		label={$t('settings.advanced.enableCustomArgs')}
 		id="customArgsEnabled"
 	>
