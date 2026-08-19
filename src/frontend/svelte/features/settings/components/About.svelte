@@ -2,21 +2,29 @@
 	import Icon from '@/ui/Icon.svelte';
 	import GithubIcon from '@/ui/icons/GithubIcon.svelte';
 	import { onMount } from 'svelte';
+	import { logger } from '@/core/logger';
 
 	let version = '...';
-	let logoUrl = '';
+	let logoUrl = '/icon.png';
 
 	onMount(async () => {
-		version = await window.electronAPI.getVersion();
+		try {
+			version = await window.electronAPI.getVersion();
+		} catch {}
 		await loadLogo();
 	});
 
 	async function loadLogo() {
 		try {
 			const data = await window.electronAPI.getAppIcon();
-			logoUrl = URL.createObjectURL(new Blob([data], { type: 'image/png' }));
+			if (data && data.byteLength > 0) {
+				logoUrl = URL.createObjectURL(new Blob([data], { type: 'image/png' }));
+			} else {
+				logoUrl = '/icon.png';
+			}
 		} catch (e) {
-			console.error('Failed to load application logo:', e);
+			logger.warn('Failed to load application logo via IPC, using static asset:', e);
+			logoUrl = '/icon.png';
 		}
 	}
 

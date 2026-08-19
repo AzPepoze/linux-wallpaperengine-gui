@@ -360,13 +360,14 @@
 
 		.actions {
 			flex-shrink: 0;
-			width: 80px;
+			width: 48px;
 			display: flex;
-			justify-content: flex-end;
+			justify-content: center;
 			align-items: center;
-			padding-right: 8px;
 
 			.status-icon {
+				width: 36px;
+				height: 36px;
 				display: flex;
 				align-items: center;
 				justify-content: center;
@@ -412,8 +413,8 @@
 			}
 
 			.list-progress {
-				width: 50px;
-				height: 50px;
+				width: 36px;
+				height: 36px;
 				border-radius: 50%;
 				position: relative;
 				overflow: hidden;
@@ -436,7 +437,7 @@
 					align-items: center;
 					justify-content: center;
 					font-weight: 800;
-					font-size: 0.8rem;
+					font-size: 0.75rem;
 					z-index: 2;
 					color: white;
 					text-shadow: 0 1px 2px rgba(0, 0, 0, 0.5);
@@ -444,6 +445,11 @@
 			}
 
 			.active-indicator {
+				width: 36px;
+				height: 36px;
+				display: flex;
+				align-items: center;
+				justify-content: center;
 				color: var(--btn-primary-bg);
 				filter: drop-shadow(0 0 8px var(--shadow-primary-glow));
 			}
