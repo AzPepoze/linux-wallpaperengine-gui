@@ -23,6 +23,7 @@ export interface SettingsState {
 	clamping: string;
 	disableMouse: boolean;
 	disableParallax: boolean;
+	protonStop: boolean;
 	noFullscreenPause: boolean;
 	disableParticles: boolean;
 	binaryLocation: string;
@@ -64,6 +65,7 @@ const configFieldMap: Record<string, string> = {
 	clamping: "clamping",
 	disableMouse: "disableMouse",
 	disableParallax: "disableParallax",
+	protonStop: "protonStop",
 	noFullscreenPause: "noFullscreenPause",
 	disableParticles: "disableParticles",
 	binaryLocation: "customExecutableLocation",

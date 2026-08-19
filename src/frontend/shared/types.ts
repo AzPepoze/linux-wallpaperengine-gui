@@ -43,6 +43,7 @@ export type AppConfig = {
 	disableMouse?: boolean;
 	disableParallax?: boolean;
 	disableParticles?: boolean;
+	protonStop?: boolean;
 	noFullscreenPause?: boolean;
 	customExecutableLocation?: string;
 	cloneMode?: boolean;

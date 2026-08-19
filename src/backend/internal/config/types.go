@@ -19,6 +19,7 @@ type AppConfig struct {
 	Silence           bool `json:"SILENCE"`
 	NoAutomute        bool `json:"noAutomute"`
 	NoAudioProcessing bool `json:"noAudioProcessing"`
+	ProtonStop        bool `json:"protonStop"`
 	NoFullscreenPause bool `json:"noFullscreenPause"`
 	DisableParticles  bool `json:"disableParticles"`
 	DumpStructure     bool `json:"dumpStructure"`

@@ -28,6 +28,8 @@
 		"scalingModeDesc": "How the wallpaper fits the screen.",
 		"clampingMode": "Clamping Mode",
 		"clampingModeDesc": "Texture wrapping behavior.",
+		"protonStop": "Stop when Proton is detected.",
+		"protonStopDesc": "Stop all wallpapers when a game is running under Proton.",
 		"noFullscreenPause": "No Fullscreen Pause",
 		"noFullscreenPauseDesc": "Keep running when other apps are fullscreen.",
 		"disableParticles": "Disable Particles",

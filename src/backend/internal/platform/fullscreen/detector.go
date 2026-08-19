@@ -38,7 +38,8 @@ func StartDetector(callback func(bool)) {
 			}
 
 			// If NoFullscreenPause is enabled, we don't need to detect
-			if conf.NoFullscreenPause {
+			// ProtonStop should be the only detector running if enabled
+			if conf.NoFullscreenPause || conf.ProtonStop {
 				if isFullscreenDetected {
 					isFullscreenDetected = false
 					if statusChangeCallback != nil {

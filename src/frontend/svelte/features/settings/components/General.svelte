@@ -153,6 +153,17 @@
 	</SettingItem>
 
 	<SettingItem
+		label={$t('settings.general.protonStop')}
+		id="protonStop"
+		description={$t('settings.general.protonStopDesc')}
+	>
+		<Toggle
+			id="protonStop"
+			bind:checked={$settingsStore.protonStop}
+		/>
+	</SettingItem>
+
+	<SettingItem
 		label={$t('settings.general.noFullscreenPause')}
 		id="noFullscreenPause"
 		description={$t('settings.general.noFullscreenPauseDesc')}
