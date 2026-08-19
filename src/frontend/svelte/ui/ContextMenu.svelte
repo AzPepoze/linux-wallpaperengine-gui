@@ -44,7 +44,9 @@
 	);
 	
 	// approximate height
-	let menuHeight = $derived($contextMenuStore.items.length * itemHeight + 16);
+	let menuHeight = $derived(
+		$contextMenuStore.items.length * itemHeight + ($contextMenuStore.title ? 34 : 0) + 16
+	);
 	let safeY = $derived(
 		Math.min($contextMenuStore.y, Math.max(0, windowHeight - menuHeight - 10))
 	);
@@ -82,6 +84,13 @@
 		oncontextmenu={(e) => e.preventDefault()}
 	>
 		<div class="menu-box">
+			{#if $contextMenuStore.title}
+				<div class="menu-header" title={$contextMenuStore.title}>
+					<span class="header-title">{$contextMenuStore.title}</span>
+				</div>
+				<div class="divider"></div>
+			{/if}
+
 			{#each $contextMenuStore.items as item, index}
 				{#if item.divider}
 					<div class="divider"></div>
@@ -172,6 +181,28 @@
 		height: 1px;
 		background: rgba(255, 255, 255, 0.1);
 		margin: 4px 0;
+	}
+
+	.menu-header {
+		padding: 6px 10px 4px 10px;
+		display: flex;
+		align-items: center;
+		justify-content: flex-start;
+		user-select: none;
+		min-width: 0;
+	}
+
+	.header-title {
+		font-size: 0.75rem;
+		font-weight: 700;
+		color: var(--text-muted, rgba(255, 255, 255, 0.6));
+		text-transform: uppercase;
+		letter-spacing: 0.5px;
+		white-space: nowrap;
+		overflow: hidden;
+		text-overflow: ellipsis;
+		width: 100%;
+		text-align: left;
 	}
 
 	.menu-item {

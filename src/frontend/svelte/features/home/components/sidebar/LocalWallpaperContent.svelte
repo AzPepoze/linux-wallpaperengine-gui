@@ -4,6 +4,9 @@
 	import type { Wallpaper } from '@shared/types';
 	import WallpaperProperties from '../WallpaperProperties.svelte';
 	import { t } from '@/core/i18n';
+	import Button from '@/ui/Button.svelte';
+	import Icon from '@/ui/Icon.svelte';
+	import { logger } from '@/core/logger';
 
 	export let wallpaper: Wallpaper;
 	export let fileSize: number | null = null;
@@ -41,12 +44,31 @@
 		const d = new Date(dateNum);
 		return d.toLocaleDateString() + ' ' + d.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
 	};
+
+	async function handleOpenFolder() {
+		try {
+			const basePath = await window.electronAPI.getWallpaperBasePath();
+			if (basePath && folderName) {
+				await window.electronAPI.openPath(`${basePath}/${folderName}`);
+			}
+		} catch (e) {
+			logger.error('Failed to open wallpaper folder:', e);
+		}
+	}
 </script>
 
 <div class="local-sidebar">
 	<div class="section header-section">
 		<h3 class="title">{projectData?.title || folderName}</h3>
-		<p class="folder-name">{$t('sidebar.local.folder')} {folderName}</p>
+		<Button
+			variant="ghost"
+			class="folder-btn"
+			on:click={handleOpenFolder}
+			title="Open folder location"
+		>
+			<Icon name="folder_open" size={14} />
+			<span class="folder-name">{$t('sidebar.local.folder')} {folderName}</span>
+		</Button>
 	</div>
 
 	<div class="section info-section">
@@ -125,11 +147,29 @@
 				font-weight: 600;
 			}
 
+			:global(.folder-btn) {
+				padding: 4px 12px;
+				margin-top: 6px;
+				width: fit-content;
+				border-radius: 9999px;
+				gap: 6px;
+				font-size: 0.85rem;
+				font-style: normal;
+				font-weight: 500;
+				color: var(--text-color);
+				background: var(--bg-surface);
+				border: 1px solid var(--border-color);
+				transition: var(--transition-base);
+
+				&:hover:not(:disabled) {
+					background: var(--bg-surface-hover);
+					border-color: var(--border-color-hover);
+					color: var(--text-color);
+				}
+			}
+
 			.folder-name {
 				margin: 0;
-				font-size: 0.85rem;
-				color: var(--text-muted);
-				font-style: italic;
 			}
 		}
 

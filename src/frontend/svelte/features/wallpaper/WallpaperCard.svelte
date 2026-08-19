@@ -136,7 +136,8 @@
 			});
 		}
 
-		showContextMenu(e.clientX, e.clientY, menuItems);
+		const title = wallpaper.projectData?.title || folderName;
+		showContextMenu(e.clientX, e.clientY, menuItems, title);
 	}
 </script>
 
