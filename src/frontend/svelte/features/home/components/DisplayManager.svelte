@@ -9,7 +9,10 @@
 		spanMode,
 		refreshScreens
 	} from '@/features/home/scripts/display';
-	import { activeFolderName } from '@/features/home/scripts/wallpaperStore';
+	import {
+		activeFolderName,
+		selectedFolderName
+	} from '@/features/home/scripts/wallpaperStore';
 	import ScreenPreview from './ScreenPreview.svelte';
 	import type { WallpaperData } from '@shared/types';
 	import { t } from '@/core/i18n';
@@ -22,6 +25,14 @@
 
 	async function handleScreenChange(screen: string) {
 		selectedScreen.set(screen);
+		const currentWallpaperId = isUnifiedMode ? unifiedWallpaperId : $screens[screen];
+		if (currentWallpaperId) {
+			activeFolderName.set(currentWallpaperId);
+			selectedFolderName.set(currentWallpaperId);
+		} else {
+			activeFolderName.set(null);
+			selectedFolderName.set(null);
+		}
 	}
 
 	$: isUnifiedMode = $cloneMode || $spanMode;
