@@ -5,6 +5,7 @@
 	import Icon from '@/ui/Icon.svelte';
 	import { subscribe } from '@/features/workshop/scripts/workshop';
 	import { formatBytes } from '@/core/utils/formatHelper';
+	import DownloadedBadge from './DownloadedBadge.svelte';
 
 	interface Props {
 		folderName: string;
@@ -43,8 +44,8 @@
 	class="wallpaper-card list"
 	class:selected
 	class:in-playlist={inPlaylist}
-	class:is-downloaded={isWorkshop && isDownloaded}
-	class:is-downloading={isWorkshop && isDownloading && !isDownloaded}
+	class:is-downloaded={(isWorkshop || isWorkshopItem) && isDownloaded}
+	class:is-downloading={(isWorkshop || isWorkshopItem) && isDownloading && !isDownloaded}
 	onclick={handleSelect}
 	oncontextmenu={handleContextMenu}
 	onkeydown={(e) => (e.key === 'Enter' || e.key === ' ') && handleSelect()}
@@ -58,13 +59,8 @@
 				<Icon name="image_not_supported" size={24} />
 			</div>
 		{/if}
-		{#if isWorkshop && isSubscribed && isDownloaded}
-			<div
-				class="badge-overlay"
-				in:scale={{ duration: 300, easing: backOut }}
-			>
-				<Icon name="check" size={14} />
-			</div>
+		{#if (isWorkshop || isWorkshopItem) && isSubscribed && isDownloaded}
+			<DownloadedBadge size={14} />
 		{/if}
 
 		{#if wallpaper.projectData?.approved}
@@ -140,7 +136,7 @@
 	</div>
 
 	<div class="actions">
-		{#if isWorkshop}
+		{#if isWorkshop || isWorkshopItem}
 			{#if isDownloading && !isDownloaded}
 				<div class="list-progress" in:fade>
 					<div class="wave-bg" style="height: {percent}%"></div>
@@ -152,15 +148,13 @@
 						{/if}
 					</div>
 				</div>
-			{:else if isSubscribed && isDownloaded}
-				<div class="status-icon downloaded" in:scale>
+			{:else if isDownloaded}
+				<div class="status-icon downloaded" in:scale title="Downloaded">
 					<Icon name="cloud_done" size={22} />
 				</div>
 			{:else if isSubscribed}
-				<div class="status-icon subscribed" in:scale>
-					<div in:scale>
-						<Icon name="cloud_download" size={22} />
-					</div>
+				<div class="status-icon subscribed" in:scale title="Subscribed">
+					<Icon name="cloud_download" size={22} />
 				</div>
 			{:else}
 				<button
@@ -180,13 +174,9 @@
 					<Icon name="add" size={22} />
 				</button>
 			{/if}
-		{:else}
-			<div class="local-actions">
-				{#if selected}
-					<div class="active-indicator" in:scale>
-						<Icon name="play_circle" size={24} />
-					</div>
-				{/if}
+		{:else if selected}
+			<div class="active-indicator" in:scale>
+				<Icon name="play_circle" size={24} />
 			</div>
 		{/if}
 	</div>
@@ -210,6 +200,32 @@
 		&:hover {
 			background: var(--bg-surface-hover, rgba(255, 255, 255, 0.05));
 			border-color: var(--border-color-hover, rgba(255, 255, 255, 0.1));
+
+			.download-btn-circle {
+				opacity: 1;
+				transform: scale(1);
+			}
+		}
+
+		&.is-downloaded {
+			border-color: rgba(76, 175, 80, 0.35);
+			background: linear-gradient(
+				90deg,
+				rgba(76, 175, 80, 0.12) 0%,
+				rgba(76, 175, 80, 0.03) 60%,
+				rgba(255, 255, 255, 0.02) 100%
+			);
+
+			&:hover {
+				border-color: rgba(76, 175, 80, 0.55);
+				background: linear-gradient(
+					90deg,
+					rgba(76, 175, 80, 0.18) 0%,
+					rgba(76, 175, 80, 0.06) 60%,
+					rgba(255, 255, 255, 0.05) 100%
+				);
+				box-shadow: 0 0 12px rgba(76, 175, 80, 0.15);
+			}
 		}
 
 		&.selected {
@@ -222,8 +238,7 @@
 			.stat-item { background: rgba(255, 255, 255, 0.2); }
 			.local-info .type-badge { background: white; color: var(--btn-primary-bg); }
 			.local-info .tag { background: rgba(255, 255, 255, 0.2); color: white; }
-			.status-icon { color: white; }
-			.download-btn-circle { color: white; border-color: rgba(255, 255, 255, 0.3); }
+			.download-btn-circle { opacity: 1; transform: scale(1); color: white; border-color: rgba(255, 255, 255, 0.3); }
 			.active-indicator { color: white; filter: none; }
 		}
 
@@ -241,18 +256,6 @@
 				object-fit: cover;
 				border-radius: var(--radius-sm, 6px);
 			}
-
-			.badge-overlay {
-				position: absolute;
-				top: -4px;
-				right: -4px;
-				background: var(--success-bg, #4caf50);
-				color: white;
-				border-radius: 50%;
-				padding: 2px;
-				border: 2px solid var(--bg-surface);
-				z-index: 2;
-			}
 		}
 
 		.info {
@@ -261,14 +264,24 @@
 			display: flex;
 			flex-direction: column;
 			gap: 8px;
+			overflow: hidden;
 
-			.title {
-				font-weight: 600;
-				font-size: 1.1rem;
-				color: var(--text-main);
-				white-space: nowrap;
+			.title-row {
+				width: 100%;
+				min-width: 0;
 				overflow: hidden;
-				text-overflow: ellipsis;
+
+				.title {
+					display: block;
+					width: 100%;
+					min-width: 0;
+					font-weight: 600;
+					font-size: 1.1rem;
+					color: var(--text-main);
+					white-space: nowrap;
+					overflow: hidden;
+					text-overflow: ellipsis;
+				}
 			}
 
 			.meta {
@@ -346,6 +359,7 @@
 		}
 
 		.actions {
+			flex-shrink: 0;
 			width: 80px;
 			display: flex;
 			justify-content: flex-end;
@@ -353,30 +367,47 @@
 			padding-right: 8px;
 
 			.status-icon {
+				display: flex;
+				align-items: center;
+				justify-content: center;
+
 				&.downloaded {
 					color: #4caf50;
 				}
 				&.subscribed {
 					color: var(--btn-primary-bg);
-					opacity: 0.7;
+					opacity: 0.8;
 				}
 			}
 
 			.download-btn-circle {
 				width: 36px;
 				height: 36px;
-				border-radius: var(--radius-md, 6px);
-				background: rgba(255, 255, 255, 0.05);
+				border-radius: 50%;
+				background: rgba(255, 255, 255, 0.08);
+				backdrop-filter: blur(8px);
+				-webkit-backdrop-filter: blur(8px);
 				color: var(--text-main);
 				display: flex;
 				align-items: center;
 				justify-content: center;
-				transition: all 0.15s ease;
-				border: 1px solid rgba(255, 255, 255, 0.1);
+				opacity: 0.7;
+				transform: scale(0.95);
+				transition: all 0.25s cubic-bezier(0.34, 1.56, 0.64, 1);
+				border: 1px solid rgba(255, 255, 255, 0.15);
+				cursor: pointer;
 
 				&:hover {
+					opacity: 1;
 					background: var(--btn-primary-bg);
-					border-color: var(--btn-primary-bg);
+					border-color: var(--btn-primary-hover-bg);
+					color: white;
+					transform: scale(1.1);
+					box-shadow: 0 4px 12px var(--shadow-primary-glow);
+				}
+
+				&:active {
+					transform: scale(0.95);
 				}
 			}
 

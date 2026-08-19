@@ -217,14 +217,13 @@
 				onRetry={handleRetryConnection}
 			/>
 		{:else}
-			{#if showFilterPanel && workshopFilters}
-				<FilterPanel
-					config={workshopFilters}
-					onSave={handleSaveFilters}
-					onChange={handleFilterChange}
-					onClose={() => (showFilterPanel = false)}
-				/>
-			{/if}
+			<FilterPanel
+				show={showFilterPanel && !!workshopFilters}
+				config={workshopFilters || DEFAULT_WORKSHOP_FILTER_CONFIG}
+				onSave={handleSaveFilters}
+				onChange={handleFilterChange}
+				onClose={() => (showFilterPanel = false)}
+			/>
 
 			<BrowseTab
 				{browseItems}

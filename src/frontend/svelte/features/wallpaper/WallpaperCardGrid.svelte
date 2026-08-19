@@ -4,6 +4,7 @@
 	import type { WallpaperData } from '@shared/types';
 	import Icon from '@/ui/Icon.svelte';
 	import { subscribe } from '@/features/workshop/scripts/workshop';
+	import DownloadedBadge from './DownloadedBadge.svelte';
 
 	interface Props {
 		folderName: string;
@@ -74,17 +75,7 @@
 		{/if}
 
 		{#if isWorkshopItem && isDownloaded && isSubscribed}
-			<div
-				class="badge downloaded"
-				in:scale={{
-					start: 0.8,
-					duration: 300,
-					easing: backOut
-				}}
-				out:scale={{ start: 0.5, duration: 200 }}
-			>
-				<Icon name="check" size={16} />
-			</div>
+			<DownloadedBadge size={16} />
 		{/if}
 
 		{#if isWorkshopItem && isDownloading && !isDownloaded}
@@ -212,6 +203,10 @@
 				opacity: 1;
 				bottom: 10px;
 			}
+			.download-btn {
+				opacity: 1;
+				transform: scale(1) translateY(0);
+			}
 		}
 
 		.badge {
@@ -228,15 +223,6 @@
 				left: 5px;
 				filter: drop-shadow(0 0 5px rgba(0, 0, 0, 0.8))
 					drop-shadow(0 0 2px rgba(141, 255, 112, 0.8));
-			}
-
-			&.downloaded {
-				top: 5px;
-				right: 5px;
-				background: #4caf50;
-				color: white;
-				border: 2px solid white;
-				border-radius: 50%;
 			}
 		}
 
@@ -299,11 +285,31 @@
 			top: 8px;
 			right: 8px;
 			z-index: 10;
-			background: var(--badge-bg);
-			padding: 6px;
-			border-radius: 10px;
+			width: 32px;
+			height: 32px;
+			border-radius: 50%;
+			background: rgba(0, 0, 0, 0.65);
+			backdrop-filter: blur(8px);
+			-webkit-backdrop-filter: blur(8px);
+			color: white;
+			display: flex;
+			align-items: center;
+			justify-content: center;
+			opacity: 0;
+			transform: scale(0.8) translateY(-4px);
+			transition: all 0.25s cubic-bezier(0.34, 1.56, 0.64, 1);
+			cursor: pointer;
+			border: 1px solid rgba(255, 255, 255, 0.15);
+
 			&:hover {
 				background: var(--btn-primary-bg);
+				border-color: var(--btn-primary-hover-bg);
+				transform: scale(1.1) translateY(0);
+				box-shadow: 0 4px 12px var(--shadow-primary-glow);
+			}
+
+			&:active {
+				transform: scale(0.95);
 			}
 		}
 	}
