@@ -306,4 +306,12 @@ export type I18nKey =
 	| 'workshop.controls.page100'
 	| 'workshop.controls.page150'
 	| 'workshop.controls.page200'
+	| 'tray.menu.show'
+	| 'tray.menu.showTooltip'
+	| 'tray.menu.hide'
+	| 'tray.menu.hideTooltip'
+	| 'tray.menu.restartWallpaper'
+	| 'tray.menu.restartWallpaperTooltip'
+	| 'tray.menu.quit'
+	| 'tray.menu.quitTooltip'
 	| (string & {});
