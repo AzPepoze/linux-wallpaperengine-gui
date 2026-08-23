@@ -100,14 +100,6 @@ func Query(options QueryOptions) (QueryResult, error) {
 	if err := ensure(); err != nil {
 		return QueryResult{}, err
 	}
-	queryType := options.QueryType
-	if queryType == 0 {
-		queryType = 13
-	}
-	itemType := options.ItemType
-	if itemType == 0 {
-		itemType = 13
-	}
 	page := options.Page
 	if page <= 0 {
 		page = 1
@@ -125,7 +117,7 @@ func Query(options QueryOptions) (QueryResult, error) {
 		matchAny = 0
 	}
 	ptr := C.lwe_steam_query_json(
-		C.int(queryType), C.int(itemType), C.uint32_t(page),
+		C.int(options.QueryType), C.int(options.ItemType), C.uint32_t(page),
 		search, required, excluded, matchAny, 0,
 	)
 	var result QueryResult
