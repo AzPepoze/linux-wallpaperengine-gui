@@ -1,7 +1,7 @@
 /// <reference types="svelte" />
 /// <reference types="vite/client" />
 
-interface ElectronAPI {
+interface RuntimeAPI {
 	// Event handling
 	on: (channel: string, callback: (data: any) => void) => void;
 	sendLog: (type: string, ...args: any[]) => void;
@@ -84,29 +84,31 @@ interface ElectronAPI {
 		match_all_tags?: boolean;
 		search_text?: string;
 		item_type?: number;
-	}) => Promise<{ items: any[]; total: number; nextCursor?: string; error?: string }>;
+	}) => Promise<{ items: any[]; total: number; nextCursor?: string | null; error?: string }>;
 	getUGCFileDetails: (ugcId: string, steamId?: string) => Promise<any | null>;
 	fetchImage: (url: string) => Promise<string>;
 	subscribeWorkshopItem: (fileId: string) => Promise<{ success: boolean }>;
 	unsubscribeWorkshopItem: (fileId: string) => Promise<{ success: boolean }>;
-	getWorkshopItemDownloadInfo: (
-		fileId: string,
-	) => Promise<{ current: string; total: string } | null>;
-	getWorkshopItemInstallInfo: (
-		fileId: string,
-	) => Promise<{ folder: string; sizeOnDisk: string; timestamp: number } | null>;
+	getWorkshopItemDownloadInfo: (fileId: string) => Promise<{ current: string; total: string } | null>;
+	getWorkshopItemInstallInfo: (fileId: string) => Promise<{ folder: string; sizeOnDisk: string; timestamp: number } | null>;
+	isSteamRunning: () => Promise<boolean>;
+	getAllDownloadingItems: () => Promise<any[]>;
+	getSubscribedItems: () => Promise<string[]>;
 
-	// Steam Filters
+	// Filters
 	getInstalledFilters: () => Promise<{ success: boolean; filters: FilterConfig; error?: string }>;
 	saveInstalledFilters: (filters: FilterConfig) => Promise<{ success: boolean; error?: string }>;
 	getWorkshopFilters: () => Promise<{ success: boolean; filters: FilterConfig; error?: string }>;
 	saveWorkshopFilters: (filters: FilterConfig) => Promise<{ success: boolean; error?: string }>;
-	isSteamRunning: () => Promise<boolean>;
-	getAllDownloadingItems: () => Promise<any[]>;
+
 	killWallpaper: (params: { folderName: string }) => Promise<{ success: boolean }>;
-	getSubscribedItems: () => Promise<string[]>;
 }
 
+// Transitional alias: existing Svelte code can migrate from electronAPI to runtimeAPI
+// without keeping Electron in the application runtime.
+type ElectronAPI = RuntimeAPI;
+
 interface Window {
-	electronAPI: ElectronAPI;
+	runtimeAPI: RuntimeAPI;
+	electronAPI: RuntimeAPI;
 }
