@@ -3,6 +3,7 @@ package process
 import (
 	"bufio"
 	"io"
+	"os"
 	"os/exec"
 	"strings"
 	"sync"
@@ -27,6 +28,23 @@ func NewManager() *Manager {
 	}
 }
 
+func inFlatpak() bool {
+	return os.Getenv("FLATPAK_ID") != ""
+}
+
+func hostCommand(executable string, args ...string) *exec.Cmd {
+	if !inFlatpak() {
+		return exec.Command(executable, args...)
+	}
+
+	// flatpak-spawn waits for the host process and forwards termination signals,
+	// so the existing process lifecycle remains usable from the sandbox.
+	hostArgs := make([]string, 0, len(args)+2)
+	hostArgs = append(hostArgs, "--host", executable)
+	hostArgs = append(hostArgs, args...)
+	return exec.Command("flatpak-spawn", hostArgs...)
+}
+
 func (manager *Manager) UpdateWallpapers(desiredWallpapers []struct {
 	Screen  string
 	Exec    string
@@ -41,7 +59,6 @@ func (manager *Manager) UpdateWallpapers(desiredWallpapers []struct {
 		desiredScreens[desiredWallpaper.Screen] = true
 	}
 
-	// Kill wallpapers no longer desired (excluding __PREVIEW__)
 	for screen := range manager.activeWallpapers {
 		if screen == "__PREVIEW__" {
 			continue
@@ -51,7 +68,6 @@ func (manager *Manager) UpdateWallpapers(desiredWallpapers []struct {
 		}
 	}
 
-	// Start or update wallpapers
 	for _, desiredWallpaper := range desiredWallpapers {
 		active, exists := manager.activeWallpapers[desiredWallpaper.Screen]
 		if exists {
@@ -76,7 +92,6 @@ func (manager *Manager) killWallpaperInternal(screen string) {
 
 	logger.Printf("Killing wallpaper for %s", screen)
 	if active.Cmd.Process != nil {
-		// Try to kill process group
 		processGroupID, err := syscall.Getpgid(active.Cmd.Process.Pid)
 		if err == nil {
 			if err := syscall.Kill(-processGroupID, syscall.SIGTERM); err != nil {
@@ -104,7 +119,7 @@ func (manager *Manager) KillByFolderName(folderName string) {
 }
 
 func (manager *Manager) spawnWallpaper(screen string, execPath string, args []string, fullCommand string) {
-	command := exec.Command(execPath, args...)
+	command := hostCommand(execPath, args...)
 	command.SysProcAttr = &syscall.SysProcAttr{Setpgid: true}
 
 	stdout, _ := command.StdoutPipe()
@@ -120,9 +135,7 @@ func (manager *Manager) spawnWallpaper(screen string, execPath string, args []st
 		Command: fullCommand,
 	}
 
-	// Handle stdout
 	go manager.captureOutput(screen, stdout)
-	// Handle stderr
 	go manager.captureOutput(screen, stderr)
 
 	go func() {
@@ -153,7 +166,7 @@ func (manager *Manager) KillAll() {
 	for screen := range manager.activeWallpapers {
 		manager.killWallpaperInternal(screen)
 	}
-	if err := exec.Command("killall", "-e", "linux-wallpaperengine").Run(); err != nil {
+	if err := hostCommand("killall", "-e", "linux-wallpaperengine").Run(); err != nil {
 		logger.Printf("killall linux-wallpaperengine failed: %v", err)
 	}
 }
