@@ -5,11 +5,8 @@
 #include <QCommandLineOption>
 #include <QCommandLineParser>
 #include <QFileInfo>
-#include <QIcon>
-#include <QSurfaceFormat>
 #include <QUrl>
 #include <QWebChannel>
-#include <QWebEnginePage>
 #include <QWebEngineProfile>
 #include <QWebEngineSettings>
 #include <QWebEngineUrlScheme>
@@ -30,10 +27,20 @@ void registerWallpaperScheme() {
                     QWebEngineUrlScheme::CorsEnabled);
     QWebEngineUrlScheme::registerScheme(scheme);
 }
+
+bool hasRawArgument(int argc, char **argv, const char *name) {
+    for (int i = 1; i < argc; ++i) {
+        if (QByteArray(argv[i]) == name) return true;
+    }
+    return false;
+}
 }
 
 int main(int argc, char **argv) {
     registerWallpaperScheme();
+    if (hasRawArgument(argc, argv, "--debug-mode")) {
+        qputenv("QTWEBENGINE_REMOTE_DEBUGGING", QByteArrayLiteral("9222"));
+    }
 
     QApplication app(argc, argv);
     app.setApplicationName(QStringLiteral("linux-wallpaperengine-gui"));
@@ -55,8 +62,7 @@ int main(int argc, char **argv) {
     view->setWindowTitle(QStringLiteral("Linux Wallpaper Engine GUI"));
     view->resize(1200, 800);
 
-    const bool transparent = parser.isSet(QStringLiteral("transparent"));
-    if (transparent) {
+    if (parser.isSet(QStringLiteral("transparent"))) {
         view->setAttribute(Qt::WA_TranslucentBackground, true);
         view->setStyleSheet(QStringLiteral("background: transparent;"));
         view->page()->setBackgroundColor(Qt::transparent);
@@ -77,10 +83,6 @@ int main(int argc, char **argv) {
     channel->registerObject(QStringLiteral("runtimeBridge"), bridge);
     view->page()->setWebChannel(channel);
     bridge->connectBackend();
-
-    if (parser.isSet(QStringLiteral("debug-mode"))) {
-        qputenv("QTWEBENGINE_REMOTE_DEBUGGING", QByteArrayLiteral("9222"));
-    }
 
     const QString devUrl = parser.value(QStringLiteral("url"));
     if (!devUrl.isEmpty()) {
