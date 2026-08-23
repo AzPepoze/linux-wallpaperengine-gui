@@ -1,7 +1,6 @@
 #include "bridge.h"
 
 #include <dlfcn.h>
-#include <unistd.h>
 
 #include <algorithm>
 #include <chrono>
@@ -143,6 +142,65 @@ void setError(const std::string &message) {
     lastError = message;
 }
 
+bool loadCoreSymbols() {
+    api.init = symbol<InitFn>("SteamAPI_Init");
+    api.shutdown = symbol<ShutdownFn>("SteamAPI_Shutdown");
+    api.isSteamRunning = symbol<IsSteamRunningFn>("SteamAPI_IsSteamRunning");
+    api.runCallbacks = symbol<RunCallbacksFn>("SteamAPI_RunCallbacks");
+    if (!api.init || !api.shutdown || !api.isSteamRunning || !api.runCallbacks) {
+        setError("Steamworks core symbols are incomplete");
+        return false;
+    }
+    return true;
+}
+
+bool loadRuntimeSymbols() {
+#define LOAD_REQUIRED(field, type, name) \
+    api.field = symbol<type>(name); \
+    if (!api.field) { setError(std::string("Steamworks symbol missing: ") + name); return false; }
+
+    InterfaceFn ugcAccessor = symbol<InterfaceFn>("SteamAPI_SteamUGC_v021");
+    if (!ugcAccessor) ugcAccessor = symbol<InterfaceFn>("SteamAPI_SteamUGC_v020");
+    if (!ugcAccessor) { setError("Steamworks UGC v020/v021 interface is unavailable"); return false; }
+    InterfaceFn utilsAccessor = symbol<InterfaceFn>("SteamAPI_SteamUtils_v011");
+    if (!utilsAccessor) utilsAccessor = symbol<InterfaceFn>("SteamAPI_SteamUtils_v010");
+    if (!utilsAccessor) { setError("Steamworks Utils v010/v011 interface is unavailable"); return false; }
+
+    LOAD_REQUIRED(isCallCompleted, IsAPICallCompletedFn, "SteamAPI_ISteamUtils_IsAPICallCompleted");
+    LOAD_REQUIRED(getCallResult, GetAPICallResultFn, "SteamAPI_ISteamUtils_GetAPICallResult");
+    LOAD_REQUIRED(createQueryAll, CreateQueryAllFn, "SteamAPI_ISteamUGC_CreateQueryAllUGCRequestPage");
+    LOAD_REQUIRED(createDetailsQuery, CreateDetailsQueryFn, "SteamAPI_ISteamUGC_CreateQueryUGCDetailsRequest");
+    LOAD_REQUIRED(sendQuery, SendQueryFn, "SteamAPI_ISteamUGC_SendQueryUGCRequest");
+    LOAD_REQUIRED(getQueryResult, GetQueryResultFn, "SteamAPI_ISteamUGC_GetQueryUGCResult");
+    LOAD_REQUIRED(getPreviewUrl, GetPreviewUrlFn, "SteamAPI_ISteamUGC_GetQueryUGCPreviewURL");
+    LOAD_REQUIRED(getStatistic, GetStatisticFn, "SteamAPI_ISteamUGC_GetQueryUGCStatistic");
+    LOAD_REQUIRED(releaseQuery, ReleaseQueryFn, "SteamAPI_ISteamUGC_ReleaseQueryUGCRequest");
+    LOAD_REQUIRED(addRequiredTag, AddTagFn, "SteamAPI_ISteamUGC_AddRequiredTag");
+    LOAD_REQUIRED(addExcludedTag, AddTagFn, "SteamAPI_ISteamUGC_AddExcludedTag");
+    LOAD_REQUIRED(setMatchAnyTag, SetBoolQueryFn, "SteamAPI_ISteamUGC_SetMatchAnyTag");
+    LOAD_REQUIRED(setReturnMetadata, SetBoolQueryFn, "SteamAPI_ISteamUGC_SetReturnMetadata");
+    LOAD_REQUIRED(setReturnAdditionalPreviews, SetBoolQueryFn, "SteamAPI_ISteamUGC_SetReturnAdditionalPreviews");
+    LOAD_REQUIRED(setReturnLongDescription, SetBoolQueryFn, "SteamAPI_ISteamUGC_SetReturnLongDescription");
+    LOAD_REQUIRED(setSearchText, SetSearchTextFn, "SteamAPI_ISteamUGC_SetSearchText");
+    LOAD_REQUIRED(setAllowCachedResponse, SetCachedFn, "SteamAPI_ISteamUGC_SetAllowCachedResponse");
+    LOAD_REQUIRED(subscribe, SubscribeFn, "SteamAPI_ISteamUGC_SubscribeItem");
+    LOAD_REQUIRED(unsubscribe, SubscribeFn, "SteamAPI_ISteamUGC_UnsubscribeItem");
+    LOAD_REQUIRED(getNumSubscribed, GetNumSubscribedFn, "SteamAPI_ISteamUGC_GetNumSubscribedItems");
+    LOAD_REQUIRED(getSubscribed, GetSubscribedFn, "SteamAPI_ISteamUGC_GetSubscribedItems");
+    LOAD_REQUIRED(getItemState, GetItemStateFn, "SteamAPI_ISteamUGC_GetItemState");
+    LOAD_REQUIRED(getInstallInfo, GetInstallInfoFn, "SteamAPI_ISteamUGC_GetItemInstallInfo");
+    LOAD_REQUIRED(getDownloadInfo, GetDownloadInfoFn, "SteamAPI_ISteamUGC_GetItemDownloadInfo");
+#undef LOAD_REQUIRED
+
+    api.ugc = ugcAccessor();
+    api.utils = utilsAccessor();
+    if (!api.ugc || !api.utils) {
+        setError("Steamworks returned a null UGC/Utils interface after initialization");
+        return false;
+    }
+    return true;
+}
+
 std::string jsonEscape(const char *value) {
     if (!value) return {};
     std::ostringstream out;
@@ -173,8 +231,8 @@ std::vector<std::string> splitTags(const char *value) {
     std::string source(value);
     size_t start = 0;
     while (start <= source.size()) {
-        size_t end = source.find('\n', start);
-        std::string tag = source.substr(start, end == std::string::npos ? std::string::npos : end - start);
+        const size_t end = source.find('\n', start);
+        const std::string tag = source.substr(start, end == std::string::npos ? std::string::npos : end - start);
         if (!tag.empty()) result.push_back(tag);
         if (end == std::string::npos) break;
         start = end + 1;
@@ -212,9 +270,7 @@ char *copyResult(const std::string &value) {
 
 std::vector<std::string> libraryCandidates() {
     std::vector<std::string> candidates;
-    if (const char *custom = std::getenv("LWE_STEAM_API_LIBRARY"); custom && *custom) {
-        candidates.emplace_back(custom);
-    }
+    if (const char *custom = std::getenv("LWE_STEAM_API_LIBRARY"); custom && *custom) candidates.emplace_back(custom);
     candidates.emplace_back("libsteam_api.so");
     candidates.emplace_back("libsteam_api64.so");
 
@@ -231,60 +287,6 @@ std::vector<std::string> libraryCandidates() {
         for (const auto &path : known) candidates.push_back(path.string());
     }
     return candidates;
-}
-
-bool loadRequiredSymbols() {
-#define LOAD_REQUIRED(field, type, name) \
-    api.field = symbol<type>(name); \
-    if (!api.field) { setError(std::string("Steamworks symbol missing: ") + name); return false; }
-
-    LOAD_REQUIRED(init, InitFn, "SteamAPI_Init");
-    LOAD_REQUIRED(shutdown, ShutdownFn, "SteamAPI_Shutdown");
-    LOAD_REQUIRED(isSteamRunning, IsSteamRunningFn, "SteamAPI_IsSteamRunning");
-    LOAD_REQUIRED(runCallbacks, RunCallbacksFn, "SteamAPI_RunCallbacks");
-
-    InterfaceFn ugcAccessor = symbol<InterfaceFn>("SteamAPI_SteamUGC_v021");
-    if (!ugcAccessor) ugcAccessor = symbol<InterfaceFn>("SteamAPI_SteamUGC_v020");
-    if (!ugcAccessor) { setError("Steamworks UGC v020/v021 interface is unavailable"); return false; }
-    InterfaceFn utilsAccessor = symbol<InterfaceFn>("SteamAPI_SteamUtils_v011");
-    if (!utilsAccessor) utilsAccessor = symbol<InterfaceFn>("SteamAPI_SteamUtils_v010");
-    if (!utilsAccessor) { setError("Steamworks Utils v010/v011 interface is unavailable"); return false; }
-
-    LOAD_REQUIRED(isCallCompleted, IsAPICallCompletedFn, "SteamAPI_ISteamUtils_IsAPICallCompleted");
-    LOAD_REQUIRED(getCallResult, GetAPICallResultFn, "SteamAPI_ISteamUtils_GetAPICallResult");
-
-    LOAD_REQUIRED(createQueryAll, CreateQueryAllFn, "SteamAPI_ISteamUGC_CreateQueryAllUGCRequestPage");
-    LOAD_REQUIRED(createDetailsQuery, CreateDetailsQueryFn, "SteamAPI_ISteamUGC_CreateQueryUGCDetailsRequest");
-    LOAD_REQUIRED(sendQuery, SendQueryFn, "SteamAPI_ISteamUGC_SendQueryUGCRequest");
-    LOAD_REQUIRED(getQueryResult, GetQueryResultFn, "SteamAPI_ISteamUGC_GetQueryUGCResult");
-    LOAD_REQUIRED(getPreviewUrl, GetPreviewUrlFn, "SteamAPI_ISteamUGC_GetQueryUGCPreviewURL");
-    LOAD_REQUIRED(getStatistic, GetStatisticFn, "SteamAPI_ISteamUGC_GetQueryUGCStatistic");
-    LOAD_REQUIRED(releaseQuery, ReleaseQueryFn, "SteamAPI_ISteamUGC_ReleaseQueryUGCRequest");
-    LOAD_REQUIRED(addRequiredTag, AddTagFn, "SteamAPI_ISteamUGC_AddRequiredTag");
-    LOAD_REQUIRED(addExcludedTag, AddTagFn, "SteamAPI_ISteamUGC_AddExcludedTag");
-    LOAD_REQUIRED(setMatchAnyTag, SetBoolQueryFn, "SteamAPI_ISteamUGC_SetMatchAnyTag");
-    LOAD_REQUIRED(setReturnMetadata, SetBoolQueryFn, "SteamAPI_ISteamUGC_SetReturnMetadata");
-    LOAD_REQUIRED(setReturnAdditionalPreviews, SetBoolQueryFn, "SteamAPI_ISteamUGC_SetReturnAdditionalPreviews");
-    LOAD_REQUIRED(setReturnLongDescription, SetBoolQueryFn, "SteamAPI_ISteamUGC_SetReturnLongDescription");
-    LOAD_REQUIRED(setSearchText, SetSearchTextFn, "SteamAPI_ISteamUGC_SetSearchText");
-    LOAD_REQUIRED(setAllowCachedResponse, SetCachedFn, "SteamAPI_ISteamUGC_SetAllowCachedResponse");
-
-    LOAD_REQUIRED(subscribe, SubscribeFn, "SteamAPI_ISteamUGC_SubscribeItem");
-    LOAD_REQUIRED(unsubscribe, SubscribeFn, "SteamAPI_ISteamUGC_UnsubscribeItem");
-    LOAD_REQUIRED(getNumSubscribed, GetNumSubscribedFn, "SteamAPI_ISteamUGC_GetNumSubscribedItems");
-    LOAD_REQUIRED(getSubscribed, GetSubscribedFn, "SteamAPI_ISteamUGC_GetSubscribedItems");
-    LOAD_REQUIRED(getItemState, GetItemStateFn, "SteamAPI_ISteamUGC_GetItemState");
-    LOAD_REQUIRED(getInstallInfo, GetInstallInfoFn, "SteamAPI_ISteamUGC_GetItemInstallInfo");
-    LOAD_REQUIRED(getDownloadInfo, GetDownloadInfoFn, "SteamAPI_ISteamUGC_GetItemDownloadInfo");
-#undef LOAD_REQUIRED
-
-    api.ugc = ugcAccessor();
-    api.utils = utilsAccessor();
-    if (!api.ugc || !api.utils) {
-        setError("Steamworks returned a null UGC/Utils interface");
-        return false;
-    }
-    return true;
 }
 
 bool waitForCall(uint64_t call, SteamUGCQueryCompleted &completed) {
@@ -332,14 +334,14 @@ std::string itemJson(uint64_t handle, uint32_t index, const SteamUGCDetails &det
 
     std::ostringstream out;
     out << '{'
-        << "\"publishedfileid\":\"" << details.publishedFileId << "\"," 
-        << "\"publishedFileId\":\"" << details.publishedFileId << "\"," 
+        << "\"publishedfileid\":\"" << details.publishedFileId << "\","
+        << "\"publishedFileId\":\"" << details.publishedFileId << "\","
         << "\"result\":1,"
-        << "\"title\":\"" << jsonEscape(details.title) << "\"," 
-        << "\"description\":\"" << jsonEscape(details.description) << "\"," 
-        << "\"preview_url\":\"" << jsonEscape(preview) << "\"," 
-        << "\"previewUrl\":\"" << jsonEscape(preview) << "\"," 
-        << "\"image\":\"" << jsonEscape(preview) << "\"," 
+        << "\"title\":\"" << jsonEscape(details.title) << "\","
+        << "\"description\":\"" << jsonEscape(details.description) << "\","
+        << "\"preview_url\":\"" << jsonEscape(preview) << "\","
+        << "\"previewUrl\":\"" << jsonEscape(preview) << "\","
+        << "\"image\":\"" << jsonEscape(preview) << "\","
         << "\"time_created\":" << details.timeCreated << ','
         << "\"time_updated\":" << details.timeUpdated << ','
         << "\"timeCreated\":" << details.timeCreated << ','
@@ -369,31 +371,36 @@ std::string collectQuery(uint64_t handle, const SteamUGCQueryCompleted &complete
     return out.str();
 }
 
-bool applyQueryOptions(uint64_t handle, const char *searchText, const char *requiredTags,
+void applyQueryOptions(uint64_t handle, const char *searchText, const char *requiredTags,
                        const char *excludedTags, int matchAnyTag, int longDescription) {
-    for (const auto &tag : splitTags(requiredTags)) {
-        api.addRequiredTag(api.ugc, handle, tag.c_str());
-    }
-    for (const auto &tag : splitTags(excludedTags)) {
-        api.addExcludedTag(api.ugc, handle, tag.c_str());
-    }
+    for (const auto &tag : splitTags(requiredTags)) api.addRequiredTag(api.ugc, handle, tag.c_str());
+    for (const auto &tag : splitTags(excludedTags)) api.addExcludedTag(api.ugc, handle, tag.c_str());
     api.setMatchAnyTag(api.ugc, handle, matchAnyTag != 0);
     api.setReturnMetadata(api.ugc, handle, true);
     api.setReturnAdditionalPreviews(api.ugc, handle, true);
     api.setReturnLongDescription(api.ugc, handle, longDescription != 0);
     api.setAllowCachedResponse(api.ugc, handle, 0);
     if (searchText && *searchText) api.setSearchText(api.ugc, handle, searchText);
-    return true;
 }
 
 bool initialized() {
     return api.library && api.ugc && api.utils;
+}
+
+void unload(bool callShutdown) {
+    if (!api.library) return;
+    void *library = api.library;
+    ShutdownFn shutdown = api.shutdown;
+    if (callShutdown && shutdown) shutdown();
+    api = Api{};
+    dlclose(library);
 }
 }
 
 extern "C" int lwe_steam_init(uint32_t app_id) {
     std::lock_guard<std::mutex> lock(apiMutex);
     if (initialized()) return 1;
+
     lastError.clear();
     api.appId = app_id ? app_id : kWallpaperEngineAppId;
     const std::string id = std::to_string(api.appId);
@@ -408,35 +415,22 @@ extern "C" int lwe_steam_init(uint32_t app_id) {
         setError("libsteam_api.so was not found. Set LWE_STEAM_API_LIBRARY to the Steamworks redistributable path.");
         return 0;
     }
-    if (!loadRequiredSymbols()) {
-        dlclose(api.library);
-        api = Api{};
+    if (!loadCoreSymbols()) {
+        unload(false);
         return 0;
     }
     if (!api.isSteamRunning()) {
         setError("Steam client is not running");
-        dlclose(api.library);
-        api = Api{};
+        unload(false);
         return 0;
     }
     if (!api.init()) {
         setError("SteamAPI_Init failed for app 431960");
-        dlclose(api.library);
-        api = Api{};
+        unload(false);
         return 0;
     }
-    // Interfaces can change after initialization; refresh them now.
-    InterfaceFn ugcAccessor = symbol<InterfaceFn>("SteamAPI_SteamUGC_v021");
-    if (!ugcAccessor) ugcAccessor = symbol<InterfaceFn>("SteamAPI_SteamUGC_v020");
-    InterfaceFn utilsAccessor = symbol<InterfaceFn>("SteamAPI_SteamUtils_v011");
-    if (!utilsAccessor) utilsAccessor = symbol<InterfaceFn>("SteamAPI_SteamUtils_v010");
-    api.ugc = ugcAccessor ? ugcAccessor() : nullptr;
-    api.utils = utilsAccessor ? utilsAccessor() : nullptr;
-    if (!api.ugc || !api.utils) {
-        setError("Steamworks interfaces are unavailable after initialization");
-        api.shutdown();
-        dlclose(api.library);
-        api = Api{};
+    if (!loadRuntimeSymbols()) {
+        unload(true);
         return 0;
     }
     return 1;
@@ -444,10 +438,7 @@ extern "C" int lwe_steam_init(uint32_t app_id) {
 
 extern "C" void lwe_steam_shutdown(void) {
     std::lock_guard<std::mutex> lock(apiMutex);
-    if (!api.library) return;
-    if (api.shutdown) api.shutdown();
-    dlclose(api.library);
-    api = Api{};
+    unload(true);
 }
 
 extern "C" int lwe_steam_available(void) {
@@ -477,7 +468,7 @@ extern "C" char *lwe_steam_query_json(int query_type, int item_type, uint32_t pa
         api.releaseQuery(api.ugc, handle);
         return nullptr;
     }
-    std::string result = collectQuery(handle, completed);
+    const std::string result = collectQuery(handle, completed);
     api.releaseQuery(api.ugc, handle);
     return copyResult(result);
 }
