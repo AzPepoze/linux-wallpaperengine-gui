@@ -1,0 +1,47 @@
+app-id: io.github.AzPepoze.linux-wallpaperengine-gui
+runtime: org.kde.Platform
+runtime-version: '6.10'
+sdk: org.kde.Sdk
+base: io.qt.qtwebengine.BaseApp
+base-version: '6.10'
+command: linux-wallpaperengine-gui
+
+finish-args:
+  # Qt WebEngine / Chromium rendering
+  - --share=ipc
+  - --share=network
+  - --socket=wayland
+  - --socket=fallback-x11
+  - --device=dri
+
+  # Tray integration
+  - --talk-name=org.kde.StatusNotifierWatcher
+
+  # linux-wallpaperengine is a host application. flatpak-spawn forwards
+  # lifecycle signals so the Go process manager can still stop/restart it.
+  - --talk-name=org.freedesktop.Flatpak
+
+  # Read Wallpaper Engine Workshop data from native or Flatpak Steam.
+  # Writes are required for config/properties and Steam-managed workshop state.
+  - --filesystem=~/.local/share/Steam:rw
+  - --filesystem=~/.steam:rw
+  - --filesystem=~/.var/app/com.valvesoftware.Steam/.local/share/Steam:rw
+
+cleanup-commands:
+  - /app/cleanup-BaseApp.sh
+
+modules:
+  - name: linux-wallpaperengine-gui
+    buildsystem: simple
+    build-commands:
+      - install -Dm755 bin/linux-wallpaperengine-gui /app/bin/linux-wallpaperengine-gui
+      - install -Dm755 lib/linux-wallpaperengine-gui/linux-wallpaperengine-webview /app/lib/linux-wallpaperengine-gui/linux-wallpaperengine-webview
+      - cp -a share/linux-wallpaperengine-gui /app/share/
+      - install -Dm644 share/applications/io.github.AzPepoze.linux-wallpaperengine-gui.desktop /app/share/applications/io.github.AzPepoze.linux-wallpaperengine-gui.desktop
+      - install -Dm644 share/metainfo/io.github.AzPepoze.linux-wallpaperengine-gui.metainfo.xml /app/share/metainfo/io.github.AzPepoze.linux-wallpaperengine-gui.metainfo.xml
+      - install -Dm644 share/icons/hicolor/256x256/apps/io.github.AzPepoze.linux-wallpaperengine-gui.png /app/share/icons/hicolor/256x256/apps/io.github.AzPepoze.linux-wallpaperengine-gui.png
+    sources:
+      # `bun run build` creates this small staging tree without Electron,
+      # Chromium or Qt libraries. Qt WebEngine is supplied by the BaseApp.
+      - type: dir
+        path: ../dist/linux-unpacked
