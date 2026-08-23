@@ -109,6 +109,7 @@ func Start() {
 	conf, err := config.GetConfig()
 	if err != nil {
 		logger.Printf("Failed to read UI configuration: %v", err)
+		conf = config.DefaultConfig
 	}
 
 	args := make([]string, 0, 8)
@@ -121,7 +122,7 @@ func Start() {
 		return
 	}
 
-	if conf != nil && conf.TransparentUi {
+	if conf.TransparentUi {
 		args = append(args, "--transparent")
 	}
 	if hasArg("--debug-mode") {
@@ -133,11 +134,7 @@ func Start() {
 
 	forceNativeWayland := hasArg("--native-wayland")
 	if IsWaylandSession() {
-		nativeWayland := forceNativeWayland
-		if conf != nil {
-			nativeWayland = nativeWayland || conf.NativeWayland
-		}
-		if nativeWayland {
+		if forceNativeWayland || conf.NativeWayland {
 			cmd.Env = append(cmd.Env, "QT_QPA_PLATFORM=wayland")
 			logger.Println("Configuring Qt WebEngine host for native Wayland")
 		} else {
