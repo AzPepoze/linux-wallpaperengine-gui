@@ -21,6 +21,14 @@ await mkdir(path.join(root, "share/icons/hicolor/256x256/apps"), { recursive: tr
 
 await cp("build/backend/linux-wallpaperengine-gui", path.join(root, "bin/linux-wallpaperengine-gui"));
 await chmod(path.join(root, "bin/linux-wallpaperengine-gui"), 0o755);
+await cp(
+	"build/backend/linux-wallpaperengine-steam-helper",
+	path.join(root, "lib/linux-wallpaperengine-gui/linux-wallpaperengine-steam-helper"),
+);
+await chmod(
+	path.join(root, "lib/linux-wallpaperengine-gui/linux-wallpaperengine-steam-helper"),
+	0o755,
+);
 await cp("build/native/linux-wallpaperengine-webview", path.join(root, "lib/linux-wallpaperengine-gui/linux-wallpaperengine-webview"));
 await chmod(path.join(root, "lib/linux-wallpaperengine-gui/linux-wallpaperengine-webview"), 0o755);
 await cp("build/frontend", path.join(root, "share/linux-wallpaperengine-gui/frontend"), { recursive: true });
@@ -33,7 +41,8 @@ await writeFile(
 	`Linux Wallpaper Engine GUI ${pkg.version}\n\n` +
 		"This package intentionally does not bundle Chromium/Electron.\n" +
 		"Runtime dependencies: Qt 6 Core/Gui/Widgets/Network/WebChannel/WebEngine.\n" +
-		"Steam Workshop support dynamically loads libsteam_api.so. Set LWE_STEAM_API_LIBRARY if it is not on the library path.\n",
+		"Steam Workshop uses a native Steamworks bridge. If Steam is the Flatpak com.valvesoftware.Steam, the packaged helper is entered into the already-running Steam sandbox automatically.\n" +
+		"Set LWE_STEAM_API_LIBRARY when libsteam_api.so is not otherwise discoverable.\n",
 );
 
 const archive = path.resolve(`dist/linux-wallpaperengine-gui-${pkg.version}-linux-x86_64.tar.gz`);
