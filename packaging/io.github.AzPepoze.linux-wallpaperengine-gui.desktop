@@ -1,0 +1,10 @@
+[Desktop Entry]
+Type=Application
+Name=Linux Wallpaper Engine GUI
+Comment=Manage Wallpaper Engine wallpapers on Linux
+Exec=linux-wallpaperengine-gui
+Icon=io.github.AzPepoze.linux-wallpaperengine-gui
+Terminal=false
+Categories=Utility;Settings;
+StartupNotify=true
+StartupWMClass=linux-wallpaperengine-gui

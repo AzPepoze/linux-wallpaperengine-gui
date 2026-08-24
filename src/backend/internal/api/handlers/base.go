@@ -47,6 +47,12 @@ func (handler *Handler) HandleIPC(request models.Request, encoder *json.Encoder)
 	case "get-installed-filters", "save-installed-filters", "get-workshop-filters", "save-workshop-filters":
 		return handler.HandleFilter(request)
 
+	case "is-steam-running", "get-published-file-details", "get-ugc-file-details",
+		"query-workshop-files", "subscribe-workshop-item", "unsubscribe-workshop-item",
+		"get-subscribed-items", "get-workshop-item-download-info", "get-workshop-item-install-info",
+		"get-all-downloading-items":
+		return handler.HandleWorkshop(request)
+
 	default:
 		return models.Response{
 			ID:    request.ID,

@@ -22,7 +22,7 @@ const (
 )
 
 var ansiRegex = regexp.MustCompile("\033\\[[0-9;]*m")
-var frontendLogRegex = regexp.MustCompile(`^\d{4}/\d{2}/\d{2} \d{2}:\d{2}:\d{2} \[(ELECTRON|BACKEND|FRONTEND|WALLPAPER)\] `)
+var frontendLogRegex = regexp.MustCompile(`^\d{4}/\d{2}/\d{2} \d{2}:\d{2}:\d{2} \[(ELECTRON|WEBVIEW|UI|BACKEND|FRONTEND|WALLPAPER)\] `)
 
 type LogEntry struct {
 	Type    string
@@ -30,9 +30,9 @@ type LogEntry struct {
 }
 
 var (
-	listeners           []chan LogEntry
-	mu                  sync.Mutex
-	ignoredElectronLogs = []string{
+	listeners      []chan LogEntry
+	mu             sync.Mutex
+	ignoredUILogs = []string{
 		"[S_API] SteamAPI_Init()",
 	}
 )
@@ -80,16 +80,20 @@ func WallpaperLog(screen, msg string) {
 	broadcast("wallpaper", formatted)
 }
 
-func ElectronLog(msg string) {
-	// Strip redundant frontend timestamps and prefixes
+func UIHostLog(msg string) {
 	msg = frontendLogRegex.ReplaceAllString(msg, "")
-	for _, term := range ignoredElectronLogs {
+	for _, term := range ignoredUILogs {
 		if strings.Contains(msg, term) {
 			return
 		}
 	}
-	log.Printf("%s[ELECTRON]%s %s", colorBlue, colorReset, msg)
-	broadcast("electron", msg)
+	log.Printf("%s[WEBVIEW]%s %s", colorBlue, colorReset, msg)
+	broadcast("frontend", msg)
+}
+
+// ElectronLog is kept temporarily for source compatibility on migration branches.
+func ElectronLog(msg string) {
+	UIHostLog(msg)
 }
 
 func Error(format string, v ...interface{}) {

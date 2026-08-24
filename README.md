@@ -4,201 +4,250 @@
 </h1>
 
 <p align="center">
-  <strong>◈ A graphical user interface for managing wallpapers for [linux-wallpaperengine](https://github.com/Almamu/linux-wallpaperengine) ◈</strong>
+  <strong>◈ A graphical user interface for managing wallpapers for <a href="https://github.com/Almamu/linux-wallpaperengine">linux-wallpaperengine</a> ◈</strong>
   <br>
-  <strong>◈ Powered by Go (Backend) and Electron (Frontend) ◈</strong>
+  <strong>◈ Go backend + Svelte UI + shared Qt 6 WebEngine (Chromium) runtime ◈</strong>
 </p>
 
 <p align="center">
-  <a href="https://github.com/AzPepoze/linux-wallpaperengine-gui/releases/latest">
-    <img src="https://img.shields.io/github/v/release/AzPepoze/linux-wallpaperengine-gui?style=for-the-badge&label=%E2%97%88%20RELEASE%20%E2%97%88&labelColor=%23181818&color=%23007bff" alt="Latest Release">
-  </a>
-  <a href="LICENSE">
-    <img src="https://img.shields.io/github/license/AzPepoze/linux-wallpaperengine-gui?style=for-the-badge&label=%E2%97%88%20LICENSE%20%E2%97%88&labelColor=%23181818&color=%23007bff" alt="License">
-  </a>
-  <a href="https://github.com/AzPepoze/linux-wallpaperengine-gui/stargazers">
-    <img src="https://img.shields.io/github/stars/AzPepoze/linux-wallpaperengine-gui?style=for-the-badge&label=%E2%97%88%20STARS%20%E2%97%88&labelColor=%23181818&color=%23007bff" alt="Stars">
-  </a>
-  <a href="https://aur.archlinux.org/packages/linux-wallpaperengine-gui-git">
-    <img src="https://img.shields.io/aur/popularity/linux-wallpaperengine-gui-git?style=for-the-badge&label=%E2%97%88%20AUR%20POPULARITY%20%E2%97%88&labelColor=%23181818&color=%23007bff" alt="AUR Popularity">
-  </a>
-  <a href="https://aur.archlinux.org/packages/linux-wallpaperengine-gui-git">
-    <img src="https://img.shields.io/aur/votes/linux-wallpaperengine-gui-git?style=for-the-badge&label=%E2%97%88%20AUR%20VOTES%20%E2%97%88&labelColor=%23181818&color=%23007bff" alt="AUR Votes">
-  </a>
+  <a href="https://github.com/AzPepoze/linux-wallpaperengine-gui/releases/latest"><img src="https://img.shields.io/github/v/release/AzPepoze/linux-wallpaperengine-gui?style=for-the-badge&label=%E2%97%88%20RELEASE%20%E2%97%88&labelColor=%23181818&color=%23007bff" alt="Latest Release"></a>
+  <a href="LICENSE"><img src="https://img.shields.io/github/license/AzPepoze/linux-wallpaperengine-gui?style=for-the-badge&label=%E2%97%88%20LICENSE%20%E2%97%88&labelColor=%23181818&color=%23007bff" alt="License"></a>
+  <a href="https://github.com/AzPepoze/linux-wallpaperengine-gui/stargazers"><img src="https://img.shields.io/github/stars/AzPepoze/linux-wallpaperengine-gui?style=for-the-badge&label=%E2%97%88%20STARS%20%E2%97%88&labelColor=%23181818&color=%23007bff" alt="Stars"></a>
+  <a href="https://aur.archlinux.org/packages/linux-wallpaperengine-gui-git"><img src="https://img.shields.io/aur/popularity/linux-wallpaperengine-gui-git?style=for-the-badge&label=%E2%97%88%20AUR%20POPULARITY%20%E2%97%88&labelColor=%23181818&color=%23007bff" alt="AUR Popularity"></a>
+  <a href="https://aur.archlinux.org/packages/linux-wallpaperengine-gui-git"><img src="https://img.shields.io/aur/votes/linux-wallpaperengine-gui-git?style=for-the-badge&label=%E2%97%88%20AUR%20VOTES%20%E2%97%88&labelColor=%23181818&color=%23007bff" alt="AUR Votes"></a>
 </p>
 
 ## CONTENTS
 
-- [CONTENTS](#contents)
 - [SCREENSHOTS](#screenshots)
 - [FEATURES](#features)
-- [MEMORY EFFICIENCY](#memory-efficiency)
+- [SHARED WEB RUNTIME](#shared-web-runtime)
 - [PREREQUISITES](#prerequisites)
 - [INSTALLATION](#installation)
-  - [Arch Linux (AUR)](#arch-linux-aur)
-  - [Other Distributions](#other-distributions)
 - [USAGE](#usage)
-  - [\[Options\]](#options)
+- [STEAM WORKSHOP](#steam-workshop)
 - [MIGRATION](#migration)
 - [BUILD FROM SOURCE](#build-from-source)
 - [DEVELOPMENT](#development)
-- [STONKS!](#stonks)
 
 > [!NOTE]
-> This GUI will be compatible with my [linux-wallpaperengine](https://github.com/AzPepoze/linux-wallpaperengine) in the future.
->
-> It's a [Go](https://go.dev/) implementation of Wallpaper Engine for Linux. It's still in early development. Maybe you want to check it out!
+> This GUI is also being developed alongside [AzPepoze/linux-wallpaperengine](https://github.com/AzPepoze/linux-wallpaperengine), a Go implementation of Wallpaper Engine for Linux.
 
 ## SCREENSHOTS
 
-|           Main Window           |
-| :-----------------------------: |
+| Main Window |
+| :--: |
 | ![Main Window](showcase/main.png) |
 
-|          Main Window (List)          |
-| :----------------------------------: |
+| Main Window (List) |
+| :--: |
 | ![Main Window](showcase/main-list.png) |
 
-|        Display Settings        |
-| :----------------------------: |
+| Display Settings |
+| :--: |
 | ![Details](showcase/display.png) |
 
-|            WORKSHOP            |
-| :-----------------------------: |
-| ![Details](showcase/workshop.png) |
+| Workshop |
+| :--: |
+| ![Workshop](showcase/workshop.png) |
 
-|          PLAYLIST          |
-| :--------------------------------------: |
-| ![Details](showcase/playlist.png) |
+| Playlist |
+| :--: |
+| ![Playlist](showcase/playlist.png) |
 
-|          PLAYLIST - SETTING          |
-| :--------------------------------------: |
-| ![Details](showcase/playlist-setting.png) |
+| Playlist Settings |
+| :--: |
+| ![Playlist Settings](showcase/playlist-setting.png) |
 
-|          WORKSHOP - DOWNLOADING          |
-| :--------------------------------------: |
-| ![Details](showcase/workshop-download.jpg) |
+| Workshop Downloading |
+| :--: |
+| ![Workshop Downloading](showcase/workshop-download.jpg) |
 
-|               Settings               |
-| :----------------------------------: |
-| ![Select Screen](showcase/setting.png) |
+| Settings |
+| :--: |
+| ![Settings](showcase/setting.png) |
 
 ## FEATURES
 
 | Feature | Description |
-|---------|-------------|
-| Wallpaper Management | Browse and select wallpapers from your Steam Workshop content |
-| Steam Workshop Integration | Search and download wallpapers directly from Steam Workshop |
-| Playlist Support | Create and manage playlists including dynamic "Random All" |
+|---|---|
+| Wallpaper Management | Browse and select wallpapers from Steam Workshop content |
+| Steam Workshop Integration | Query, subscribe and track Workshop downloads through the Go backend |
+| Native + Flatpak Steam | The native GUI can bind Steamworks to either native Steam or a running `com.valvesoftware.Steam` Flatpak |
+| Playlist Support | Create and manage playlists including dynamic Random All |
 | Wallpaper Properties | Adjust individual wallpaper settings |
-| Multi-Monitor Support | Choose which screen to apply wallpapers to |
-| Auto-Save & Auto-Run | Remembers and applies last used wallpaper on startup |
-| Native Wayland Support | Optional native Wayland mode for fixing scaling issues |
-| Customizable Settings | Edit settings or raw JSON config |
-| System Tray | Minimize to tray for seamless background operation |
+| Multi-Monitor Support | Individual, clone and span display modes |
+| Auto-Save & Auto-Run | Remembers and applies the last configuration on startup |
+| Wayland Support | Native Wayland or XWayland UI mode |
+| System Tray | Close the Chromium UI process while wallpaper management stays active |
+| Shared Chromium Runtime | Uses system Qt WebEngine instead of shipping a Chromium/Electron copy with every app |
 
-## MEMORY EFFICIENCY
+## SHARED WEB RUNTIME
 
-I know that many users are scared of Electron applications due to their reputation for being "RAM eaters". This GUI is specifically designed for maximum efficiency to address those concerns:
+This project intentionally **does not bundle Electron or Chromium** on Linux.
 
-- **Go Backend:** A lightweight Go process handles the system tray, configuration, and wallpaper management.
-- **Electron Frontend:** The Electron-based UI is only launched when needed. When you minimize the application to the tray, the Electron process is **completely terminated**, freeing up all the memory it was using.
+The Svelte frontend runs inside a small native **Qt 6-only** host built with **Xmake**. Qt WebEngine is Chromium-based and is supplied by the Linux distribution, so multiple applications can share the same installed runtime. Qt 5 is not supported and the native build rejects it.
+
+```text
+Svelte / Vite
+     │
+Qt WebChannel
+     │
+Qt 6 WebEngine host ── system/shared Chromium runtime
+     │
+Unix socket
+     │
+Go backend ─────────── wallpaper/config/playlist/Steam Workshop
+```
+
+The Qt WebEngine UI is still a separate process tree. Closing the UI to the tray terminates that host, while the lightweight Go backend keeps wallpapers and playlists running.
+
+Linux WebKitGTK is not used as a renderer backend.
 
 ## PREREQUISITES
 
 > [!IMPORTANT]
-> This application requires [linux-wallpaperengine](https://github.com/Almamu/linux-wallpaperengine) to be installed on your system to function.
+> [linux-wallpaperengine](https://github.com/Almamu/linux-wallpaperengine) must be installed and available on the host system.
+
+A normal distro package also needs the shared Qt 6 runtime components:
+
+- Qt 6 Base
+- Qt 6 WebChannel
+- Qt 6 WebEngine
+
+For example, on Arch Linux the runtime packages are provided by the normal Qt packages (`qt6-base`, `qt6-webchannel`, `qt6-webengine`). They are dependencies, not copied into this application's package.
+
+`flatpak` is only needed when the Steam client itself is installed as `com.valvesoftware.Steam`. The GUI remains a normal native application.
 
 ## INSTALLATION
 
 ### Arch Linux (AUR)
 
-Install using your favorite AUR helper:
-
 ```bash
-# Using yay
 yay -S linux-wallpaperengine-gui-git
-
-# Using paru
+# or
 paru -S linux-wallpaperengine-gui-git
 ```
 
-### Other Distributions
+The AUR package should depend on the system Qt 6 WebEngine packages rather than Electron.
 
-Download the latest pre-built binaries (AppImage, deb, rpm) from the [**Releases**](https://github.com/AzPepoze/linux-wallpaperengine-gui/releases/latest) page.
+### Other distributions
+
+The release tarball contains only this project's backend, native Qt host, Steamworks helper, frontend assets and desktop metadata. It does **not** contain Qt WebEngine/Chromium. Install the Qt 6 runtime dependencies from your distribution, then place the staged files under the corresponding system prefixes.
 
 ## USAGE
-
-Launch it from your application menu or via terminal:
 
 ```bash
 linux-wallpaperengine-gui [options]
 ```
 
-### [Options]
-
 | Option | Description |
-|--------|-------------|
-| `--minimized` | Starts the application minimized in the system tray. |
-| `--native-wayland` | Makes electron use native Wayland instead of XWayland to solve fractional scaling issues (only works on Wayland sessions) |
-| `--debug-mode` | Enables debug mode for the application. |
+|---|---|
+| `--minimized` | Start in the system tray without starting the Chromium UI host |
+| `--native-wayland` | Run the Qt UI with the native Wayland platform instead of XWayland |
+| `--debug-mode` | Enable debug mode and Qt WebEngine remote debugging |
+
+## STEAM WORKSHOP
+
+Steam Workshop integration lives in the Go backend instead of `steamworks.js`/Node.
+
+The backend uses a narrow C++ bridge over Steamworks' flat C ABI and dynamically loads the official Steamworks redistributable (`libsteam_api.so`) at runtime. The Steamworks SDK/binary is **not vendored from unofficial mirrors into this repository**.
+
+### Native Steam
+
+With a normal native Steam installation the Go backend calls the Steamworks bridge directly.
+
+### Steam installed through Flatpak
+
+The GUI itself stays native. When `com.valvesoftware.Steam` is the running Steam client, the backend automatically selects a Flatpak Steam provider:
+
+```text
+native linux-wallpaperengine-gui
+        │
+        │ JSON-lines over stdin/stdout
+        ▼
+flatpak enter com.valvesoftware.Steam
+        │
+        ▼
+linux-wallpaperengine-steam-helper
+(runs inside the already-running Steam sandbox)
+        │
+        ▼
+Steamworks API / Steam IPC
+```
+
+The helper is packaged with the native application. A versioned copy is staged under Steam Flatpak's persistent app-data directory and then launched with `flatpak enter`, which is intentionally different from starting a second Steam sandbox with `flatpak run`.
+
+Provider selection is automatic, but it can be overridden while debugging:
+
+```bash
+LWE_STEAM_PROVIDER=auto     linux-wallpaperengine-gui
+LWE_STEAM_PROVIDER=native   linux-wallpaperengine-gui
+LWE_STEAM_PROVIDER=flatpak  linux-wallpaperengine-gui
+```
+
+If `libsteam_api.so` is not discoverable, set:
+
+```bash
+export LWE_STEAM_API_LIBRARY=/path/to/libsteam_api.so
+```
+
+When the Flatpak Steam provider is selected, an explicitly configured/packaged `libsteam_api.so` is staged next to the helper inside Steam's app-data mapping. Steamworks redistributables still need to come from an authorized source in accordance with Valve's SDK terms.
+
+If Steam or the Steamworks redistributable is unavailable, the rest of the GUI continues to work and Workshop reports Steam as unavailable instead of preventing startup.
 
 ## MIGRATION
 
-> [!NOTE]
-> Users upgrading from versions prior to `v0.4.8` can safely remove legacy cache directories under `~/.config/linux-wallpaperengine-gui/` to free up disk space:
+Older Electron releases may have left Chromium cache data under `~/.config/linux-wallpaperengine-gui/`. It is no longer used by the Qt shared-runtime build and can be removed:
 
 ```bash
 rm -rf ~/.config/linux-wallpaperengine-gui/{Cache,Code\ Cache,GPUCache,DawnGraphiteCache,DawnWebGPUCache,blob_storage,Local\ Storage,Session\ Storage,Crashpad,SharedStorage,Dictionaries,Shared\ Dictionary,DIPS}
 ```
 
-Thanks to [@CrasAtHeri](https://github.com/CrasAtHeri).
+Thanks to [@CrasAtHeri](https://github.com/CrasAtHeri) for the original cache cleanup note.
 
 ## BUILD FROM SOURCE
 
-**Requirements:**
+Requirements:
 
-- [Go](https://golang.org/) (1.21+)
-- [bun](https://bun.sh/)
+- Go
+- Bun
+- Xmake + a C++20 compiler
+- Qt 6 Base development files
+- Qt 6 WebChannel development files
+- Qt 6 WebEngine development files
+- GTK/AppIndicator development files used by the existing Go tray backend
 
-1. **Clone & Enter:**
+On Arch Linux, the native/UI build dependencies can be installed with:
 
-   ```bash
-   git clone https://github.com/AzPepoze/linux-wallpaperengine-gui
-   cd linux-wallpaperengine-gui
-   ```
-2. **Install Deps:**
+```bash
+sudo pacman -S xmake qt6-base qt6-webchannel qt6-webengine
+```
 
-   ```bash
-   bun install
-   ```
-3. **Build:**
+Then:
 
-   ```bash
-   bun run build
-   ```
+```bash
+git clone https://github.com/AzPepoze/linux-wallpaperengine-gui
+cd linux-wallpaperengine-gui
+bun install
+bun run build
+```
 
-   The output will be in the `dist` directory.
+`bun run build:backend` builds both the main Go backend and `linux-wallpaperengine-steam-helper`. `bun run build:native` configures Xmake for the Qt 6 major line and the `xmake.lua` target rejects a detected Qt 5 SDK.
+
+The staged browser-free install tree is written to `dist/linux-unpacked`, and a tarball is written to `dist/`.
 
 ## DEVELOPMENT
 
-Run with hot-reloading:
+`bun run dev` builds the Go backend and Xmake-based Qt 6 host, starts Vite on `127.0.0.1:5173`, and opens the development frontend in the Qt WebEngine host with hot reload:
 
 ```bash
 bun run dev
 ```
 
-## STONKS!
+The renderer bridge is exposed as `window.runtimeAPI`. `window.electronAPI` currently remains as a compatibility alias while existing Svelte components are migrated to the platform-neutral name.
 
 <div align="center">
-  <a href="https://www.star-history.com/#AzPepoze/linux-wallpaperengine-gui&type=date&legend=top-left">
-    <picture>
-      <source media="(prefers-color-scheme: dark)" srcset="https://api.star-history.com/svg?repos=AzPepoze/linux-wallpaperengine-gui&type=date&theme=dark&legend=top-left" />
-      <source media="(prefers-color-scheme: light)" srcset="https://api.star-history.com/svg?repos=AzPepoze/linux-wallpaperengine-gui&type=date&legend=top-left" />
-      <img alt="Star History Chart" src="https://api.star-history.com/svg?repos=AzPepoze/linux-wallpaperengine-gui&type=date&legend=top-left" width="600" />
-    </picture>
-  </a>
-  <br>
   <br>
   <strong>✦ Made with ♥︎ by AzPepoze ✦</strong>
 </div>

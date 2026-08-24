@@ -20,8 +20,8 @@ import (
 	"linux-wallpaperengine-gui/src/backend/internal/platform/fullscreen"
 	"linux-wallpaperengine-gui/src/backend/internal/platform/notification"
 	"linux-wallpaperengine-gui/src/backend/internal/platform/process"
-	"linux-wallpaperengine-gui/src/backend/internal/ui/electron"
 	"linux-wallpaperengine-gui/src/backend/internal/ui/tray"
+	"linux-wallpaperengine-gui/src/backend/internal/ui/webview"
 )
 
 type App struct {
@@ -47,40 +47,33 @@ func NewApp(options Options) *App {
 }
 
 func (application *App) Run() {
-	// Detect and log Wayland session
-	if electron.IsWaylandSession() {
+	if webview.IsWaylandSession() {
 		logger.Println("⚠️  Wayland session detected")
 	}
 
-	// Handle single instance
 	if application.handleSingleInstance() {
 		return
 	}
 
-	// Ensure config is initialized
 	if err := config.EnsureInitialized(); err != nil {
 		logger.Printf("Failed to initialize config: %v", err)
 	}
 
-	// Start components
 	application.setupDisplayWatcher()
 	application.setupFullscreenDetector()
 	application.applyInitialWallpapers()
 	application.setupTray()
 	application.handleSignals()
 
-	// Start socket server
 	apiHandler := handlers.NewHandler(application.wallpaperService, application.playlistService, application.Cleanup)
 	go api.StartServer(application.socketPath, apiHandler)
 
-	// Start UI if not minimized
 	if !application.options.Minimized {
-		go electron.Start()
+		go webview.Start()
 	} else {
 		logger.Println("Starting in minimized mode")
 	}
 
-	// Run tray loop (blocking)
 	tray.Run()
 }
 
@@ -153,25 +146,25 @@ func (application *App) applyInitialWallpapers() {
 
 func (application *App) setupTray() {
 	tray.RegisterCallbacks(
-		func() { // Open callback
-			if !electron.IsRunning() {
-				go electron.Start()
+		func() {
+			if !webview.IsRunning() {
+				go webview.Start()
 			}
 		},
-		func() { // Close callback
-			if electron.IsRunning() {
+		func() {
+			if webview.IsRunning() {
 				logger.Println("Closing UI to tray...")
-				electron.Stop()
+				webview.Stop()
 			}
 		},
-		func() { // Restart wallpaper callback
+		func() {
 			logger.Println("Restarting wallpapers from tray...")
 			application.wallpaperService.KillAllWallpapers()
 			if err := application.wallpaperService.ApplyWallpapers(); err != nil {
 				logger.Printf("Failed to apply wallpapers on restart: %v", err)
 			}
 		},
-		func() { // Quit callback
+		func() {
 			application.Cleanup()
 			os.Exit(0)
 		},
@@ -193,7 +186,7 @@ func (application *App) Cleanup() {
 	logger.Println("Performing cleanup...")
 	application.processManager.KillAll()
 	fullscreen.StopDetector()
-	electron.Stop()
+	webview.Stop()
 	if _, err := os.Stat(application.socketPath); err == nil {
 		if err := os.Remove(application.socketPath); err != nil {
 			logger.Printf("Error removing socket file during cleanup: %v", err)
