@@ -73,6 +73,7 @@
 |---|---|
 | Wallpaper Management | Browse and select wallpapers from Steam Workshop content |
 | Steam Workshop Integration | Query, subscribe and track Workshop downloads through the Go backend |
+| Native + Flatpak Steam | The native GUI can bind Steamworks to either native Steam or a running `com.valvesoftware.Steam` Flatpak |
 | Playlist Support | Create and manage playlists including dynamic Random All |
 | Wallpaper Properties | Adjust individual wallpaper settings |
 | Multi-Monitor Support | Individual, clone and span display modes |
@@ -80,13 +81,12 @@
 | Wayland Support | Native Wayland or XWayland UI mode |
 | System Tray | Close the Chromium UI process while wallpaper management stays active |
 | Shared Chromium Runtime | Uses system Qt WebEngine instead of shipping a Chromium/Electron copy with every app |
-| Flatpak | Uses the Qt WebEngine BaseApp and launches linux-wallpaperengine on the host |
 
 ## SHARED WEB RUNTIME
 
 This project intentionally **does not bundle Electron or Chromium** on Linux.
 
-The Svelte frontend runs inside a small native **Qt 6-only** host built with **Xmake**. Qt WebEngine is Chromium-based and is supplied by the Linux distribution (or by the Flatpak Qt WebEngine BaseApp), so multiple applications can share the same installed runtime. Qt 5 is not supported and the native build rejects it.
+The Svelte frontend runs inside a small native **Qt 6-only** host built with **Xmake**. Qt WebEngine is Chromium-based and is supplied by the Linux distribution, so multiple applications can share the same installed runtime. Qt 5 is not supported and the native build rejects it.
 
 ```text
 Svelte / Vite
@@ -117,6 +117,8 @@ A normal distro package also needs the shared Qt 6 runtime components:
 
 For example, on Arch Linux the runtime packages are provided by the normal Qt packages (`qt6-base`, `qt6-webchannel`, `qt6-webengine`). They are dependencies, not copied into this application's package.
 
+`flatpak` is only needed when the Steam client itself is installed as `com.valvesoftware.Steam`. The GUI remains a normal native application.
+
 ## INSTALLATION
 
 ### Arch Linux (AUR)
@@ -129,24 +131,9 @@ paru -S linux-wallpaperengine-gui-git
 
 The AUR package should depend on the system Qt 6 WebEngine packages rather than Electron.
 
-### Flatpak
-
-Release builds provide a `.flatpak` bundle using:
-
-- `org.kde.Platform//6.10`
-- `io.qt.qtwebengine.BaseApp//6.10`
-
-Install a downloaded bundle with:
-
-```bash
-flatpak install ./linux-wallpaperengine-gui.flatpak
-```
-
-The GUI itself runs in the sandbox. Wallpaper rendering is intentionally started on the host with `flatpak-spawn --host`, because `linux-wallpaperengine` is a host application that needs direct compositor/display access.
-
 ### Other distributions
 
-The release tarball contains only this project's backend, native Qt host, frontend assets and desktop metadata. It does **not** contain Qt WebEngine/Chromium. Install the Qt 6 runtime dependencies from your distribution, then place the staged files under the corresponding system prefixes.
+The release tarball contains only this project's backend, native Qt host, Steamworks helper, frontend assets and desktop metadata. It does **not** contain Qt WebEngine/Chromium. Install the Qt 6 runtime dependencies from your distribution, then place the staged files under the corresponding system prefixes.
 
 ## USAGE
 
@@ -162,19 +149,52 @@ linux-wallpaperengine-gui [options]
 
 ## STEAM WORKSHOP
 
-Steam Workshop integration now lives in the Go backend instead of `steamworks.js`/Node.
+Steam Workshop integration lives in the Go backend instead of `steamworks.js`/Node.
 
 The backend uses a narrow C++ bridge over Steamworks' flat C ABI and dynamically loads the official Steamworks redistributable (`libsteam_api.so`) at runtime. The Steamworks SDK/binary is **not vendored from unofficial mirrors into this repository**.
 
-If `libsteam_api.so` is not on the loader path, set:
+### Native Steam
+
+With a normal native Steam installation the Go backend calls the Steamworks bridge directly.
+
+### Steam installed through Flatpak
+
+The GUI itself stays native. When `com.valvesoftware.Steam` is the running Steam client, the backend automatically selects a Flatpak Steam provider:
+
+```text
+native linux-wallpaperengine-gui
+        │
+        │ JSON-lines over stdin/stdout
+        ▼
+flatpak enter com.valvesoftware.Steam
+        │
+        ▼
+linux-wallpaperengine-steam-helper
+(runs inside the already-running Steam sandbox)
+        │
+        ▼
+Steamworks API / Steam IPC
+```
+
+The helper is packaged with the native application. A versioned copy is staged under Steam Flatpak's persistent app-data directory and then launched with `flatpak enter`, which is intentionally different from starting a second Steam sandbox with `flatpak run`.
+
+Provider selection is automatic, but it can be overridden while debugging:
+
+```bash
+LWE_STEAM_PROVIDER=auto     linux-wallpaperengine-gui
+LWE_STEAM_PROVIDER=native   linux-wallpaperengine-gui
+LWE_STEAM_PROVIDER=flatpak  linux-wallpaperengine-gui
+```
+
+If `libsteam_api.so` is not discoverable, set:
 
 ```bash
 export LWE_STEAM_API_LIBRARY=/path/to/libsteam_api.so
 ```
 
-When an authorized Steamworks redistributable is unavailable, the rest of the application continues to work and the Workshop integration reports Steam as unavailable instead of failing the GUI startup.
+When the Flatpak Steam provider is selected, an explicitly configured/packaged `libsteam_api.so` is staged next to the helper inside Steam's app-data mapping. Steamworks redistributables still need to come from an authorized source in accordance with Valve's SDK terms.
 
-For Flatpak, this same rule applies: a redistributable must be provided through an authorized packaging source before native Workshop calls can be enabled. The Flatpak does not silently copy a Steamworks binary from the host or an unofficial mirror.
+If Steam or the Steamworks redistributable is unavailable, the rest of the GUI continues to work and Workshop reports Steam as unavailable instead of preventing startup.
 
 ## MIGRATION
 
@@ -213,16 +233,9 @@ bun install
 bun run build
 ```
 
-`bun run build:native` configures Xmake for the Qt 6 major line and the `xmake.lua` target rejects a detected Qt 5 SDK.
+`bun run build:backend` builds both the main Go backend and `linux-wallpaperengine-steam-helper`. `bun run build:native` configures Xmake for the Qt 6 major line and the `xmake.lua` target rejects a detected Qt 5 SDK.
 
 The staged browser-free install tree is written to `dist/linux-unpacked`, and a tarball is written to `dist/`.
-
-To build a local Flatpak after the normal build:
-
-```bash
-flatpak remote-add --user --if-not-exists flathub https://flathub.org/repo/flathub.flatpakrepo
-bun run flatpak
-```
 
 ## DEVELOPMENT
 
