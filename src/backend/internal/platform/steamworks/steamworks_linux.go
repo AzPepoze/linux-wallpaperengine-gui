@@ -70,12 +70,18 @@ func ensure() error {
 }
 
 func Available() bool {
+	if shouldUseFlatpakSteam() {
+		return flatpakAvailable()
+	}
 	mu.Lock()
 	defer mu.Unlock()
 	return ensure() == nil
 }
 
 func LastError() string {
+	if shouldUseFlatpakSteam() {
+		return flatpakError()
+	}
 	mu.Lock()
 	defer mu.Unlock()
 	return C.GoString(C.lwe_steam_last_error())
@@ -95,10 +101,23 @@ func takeJSON(ptr *C.char, target interface{}) error {
 }
 
 func Query(options QueryOptions) (QueryResult, error) {
+	if shouldUseFlatpakSteam() {
+		var result QueryResult
+		if err := flatpakCall("query", options, &result); err != nil {
+			return QueryResult{}, err
+		}
+		return result, nil
+	}
+
 	mu.Lock()
 	defer mu.Unlock()
 	if err := ensure(); err != nil {
 		return QueryResult{}, err
+	}
+	queryType := options.QueryType
+	itemType := options.ItemType
+	if itemType == 0 {
+		itemType = 13
 	}
 	page := options.Page
 	if page <= 0 {
@@ -117,7 +136,7 @@ func Query(options QueryOptions) (QueryResult, error) {
 		matchAny = 0
 	}
 	ptr := C.lwe_steam_query_json(
-		C.int(options.QueryType), C.int(options.ItemType), C.uint32_t(page),
+		C.int(queryType), C.int(itemType), C.uint32_t(page),
 		search, required, excluded, matchAny, 0,
 	)
 	var result QueryResult
@@ -131,6 +150,15 @@ func Query(options QueryOptions) (QueryResult, error) {
 }
 
 func Details(ids []string, longDescription bool) ([]map[string]interface{}, error) {
+	if shouldUseFlatpakSteam() {
+		params := map[string]interface{}{"ids": ids, "long_description": longDescription}
+		var result []map[string]interface{}
+		if err := flatpakCall("details", params, &result); err != nil {
+			return nil, err
+		}
+		return result, nil
+	}
+
 	mu.Lock()
 	defer mu.Unlock()
 	if err := ensure(); err != nil {
@@ -160,10 +188,16 @@ func Details(ids []string, longDescription bool) ([]map[string]interface{}, erro
 }
 
 func Subscribe(id string) error {
+	if shouldUseFlatpakSteam() {
+		return flatpakCall("subscribe", map[string]string{"id": id}, nil)
+	}
 	return subscriptionCall(id, true)
 }
 
 func Unsubscribe(id string) error {
+	if shouldUseFlatpakSteam() {
+		return flatpakCall("unsubscribe", map[string]string{"id": id}, nil)
+	}
 	return subscriptionCall(id, false)
 }
 
@@ -190,6 +224,14 @@ func subscriptionCall(id string, subscribe bool) error {
 }
 
 func ItemState(id string) (uint32, error) {
+	if shouldUseFlatpakSteam() {
+		var result uint32
+		if err := flatpakCall("item-state", map[string]string{"id": id}, &result); err != nil {
+			return 0, err
+		}
+		return result, nil
+	}
+
 	mu.Lock()
 	defer mu.Unlock()
 	if err := ensure(); err != nil {
@@ -203,6 +245,14 @@ func ItemState(id string) (uint32, error) {
 }
 
 func SubscribedItems() ([]string, error) {
+	if shouldUseFlatpakSteam() {
+		var result []string
+		if err := flatpakCall("subscribed-items", nil, &result); err != nil {
+			return nil, err
+		}
+		return result, nil
+	}
+
 	mu.Lock()
 	defer mu.Unlock()
 	if err := ensure(); err != nil {
@@ -217,6 +267,14 @@ func SubscribedItems() ([]string, error) {
 }
 
 func Download(id string) (*DownloadInfo, error) {
+	if shouldUseFlatpakSteam() {
+		var result *DownloadInfo
+		if err := flatpakCall("download", map[string]string{"id": id}, &result); err != nil {
+			return nil, err
+		}
+		return result, nil
+	}
+
 	mu.Lock()
 	defer mu.Unlock()
 	if err := ensure(); err != nil {
@@ -238,6 +296,14 @@ func Download(id string) (*DownloadInfo, error) {
 }
 
 func Install(id string) (*InstallInfo, error) {
+	if shouldUseFlatpakSteam() {
+		var result *InstallInfo
+		if err := flatpakCall("install", map[string]string{"id": id}, &result); err != nil {
+			return nil, err
+		}
+		return result, nil
+	}
+
 	mu.Lock()
 	defer mu.Unlock()
 	if err := ensure(); err != nil {
@@ -259,6 +325,7 @@ func Install(id string) (*InstallInfo, error) {
 }
 
 func Shutdown() {
+	flatpakShutdown()
 	mu.Lock()
 	defer mu.Unlock()
 	C.lwe_steam_shutdown()
