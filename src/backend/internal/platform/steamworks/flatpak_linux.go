@@ -246,11 +246,11 @@ func startFlatpakHelper() (*flatpakHelperClient, error) {
 		return nil, fmt.Errorf("stage libsteam_api.so: %w", err)
 	}
 
-	command := `export LWE_STEAM_PROVIDER=native; `
+	command := "export LWE_STEAM_PROVIDER=native; "
 	if insideLibrary != "" {
-		command += `export LWE_STEAM_API_LIBRARY="` + insideLibrary + `"; `
+		command += "export LWE_STEAM_API_LIBRARY=\"" + insideLibrary + "\"; "
 	}
-	command += `exec "` + insideHelper + `"`
+	command += "exec \"" + insideHelper + "\""
 
 	cmd := exec.Command("flatpak", "enter", flatpakSteamAppID, "/usr/bin/sh", "-lc", command)
 	stdin, err := cmd.StdinPipe()
