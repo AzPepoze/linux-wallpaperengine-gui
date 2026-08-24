@@ -6,7 +6,7 @@
 <p align="center">
   <strong>◈ A graphical user interface for managing wallpapers for <a href="https://github.com/Almamu/linux-wallpaperengine">linux-wallpaperengine</a> ◈</strong>
   <br>
-  <strong>◈ Go backend + Svelte UI + shared Qt WebEngine (Chromium) runtime ◈</strong>
+  <strong>◈ Go backend + Svelte UI + shared Qt 6 WebEngine (Chromium) runtime ◈</strong>
 </p>
 
 <p align="center">
@@ -86,18 +86,18 @@
 
 This project intentionally **does not bundle Electron or Chromium** on Linux.
 
-The Svelte frontend runs inside a small native Qt 6 host. Qt WebEngine is Chromium-based and is supplied by the Linux distribution (or by the Flatpak Qt WebEngine BaseApp), so multiple applications can share the same installed runtime.
+The Svelte frontend runs inside a small native **Qt 6-only** host built with **Xmake**. Qt WebEngine is Chromium-based and is supplied by the Linux distribution (or by the Flatpak Qt WebEngine BaseApp), so multiple applications can share the same installed runtime. Qt 5 is not supported and the native build rejects it.
 
 ```text
 Svelte / Vite
      │
 Qt WebChannel
      │
-Qt WebEngine host ───── system/shared Chromium runtime
+Qt 6 WebEngine host ── system/shared Chromium runtime
      │
 Unix socket
      │
-Go backend ──────────── wallpaper/config/playlist/Steam Workshop
+Go backend ─────────── wallpaper/config/playlist/Steam Workshop
 ```
 
 The Qt WebEngine UI is still a separate process tree. Closing the UI to the tray terminates that host, while the lightweight Go backend keeps wallpapers and playlists running.
@@ -127,7 +127,7 @@ yay -S linux-wallpaperengine-gui-git
 paru -S linux-wallpaperengine-gui-git
 ```
 
-The AUR package should depend on the system Qt WebEngine packages rather than Electron.
+The AUR package should depend on the system Qt 6 WebEngine packages rather than Electron.
 
 ### Flatpak
 
@@ -192,16 +192,16 @@ Requirements:
 
 - Go
 - Bun
-- CMake + Ninja + a C++20 compiler
+- Xmake + a C++20 compiler
 - Qt 6 Base development files
 - Qt 6 WebChannel development files
 - Qt 6 WebEngine development files
 - GTK/AppIndicator development files used by the existing Go tray backend
 
-On Arch Linux, the Qt side can be installed with:
+On Arch Linux, the native/UI build dependencies can be installed with:
 
 ```bash
-sudo pacman -S qt6-base qt6-webchannel qt6-webengine cmake ninja
+sudo pacman -S xmake qt6-base qt6-webchannel qt6-webengine
 ```
 
 Then:
@@ -212,6 +212,8 @@ cd linux-wallpaperengine-gui
 bun install
 bun run build
 ```
+
+`bun run build:native` configures Xmake for the Qt 6 major line and the `xmake.lua` target rejects a detected Qt 5 SDK.
 
 The staged browser-free install tree is written to `dist/linux-unpacked`, and a tarball is written to `dist/`.
 
@@ -224,7 +226,7 @@ bun run flatpak
 
 ## DEVELOPMENT
 
-`bun run dev` builds the Go backend and Qt host, starts Vite on `127.0.0.1:5173`, and opens the development frontend in the Qt WebEngine host with hot reload:
+`bun run dev` builds the Go backend and Xmake-based Qt 6 host, starts Vite on `127.0.0.1:5173`, and opens the development frontend in the Qt WebEngine host with hot reload:
 
 ```bash
 bun run dev
