@@ -73,6 +73,16 @@ jobs:
              - name: Build shared-runtime application
                run: bun run build
 
+             - name: Verify Steam helper protocol
+               shell: bash
+               run: |
+                    set -euo pipefail
+                    test -x build/backend/linux-wallpaperengine-steam-helper
+                    response="$(printf '%s\n' '{"id":1,"method":"ping"}' | build/backend/linux-wallpaperengine-steam-helper)"
+                    echo "$response"
+                    grep -F '"id":1' <<<"$response"
+                    grep -F '"result":"pong"' <<<"$response"
+
              - name: Run checks
                run: bun run check
 
@@ -82,6 +92,7 @@ jobs:
                     set -euo pipefail
                     test -x dist/linux-unpacked/bin/linux-wallpaperengine-gui
                     test -x dist/linux-unpacked/lib/linux-wallpaperengine-gui/linux-wallpaperengine-webview
+                    test -x dist/linux-unpacked/lib/linux-wallpaperengine-gui/linux-wallpaperengine-steam-helper
                     test -f dist/linux-unpacked/share/linux-wallpaperengine-gui/frontend/index.html
 
                     if find dist/linux-unpacked -type f \( \
