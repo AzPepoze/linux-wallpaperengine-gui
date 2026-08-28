@@ -42,6 +42,7 @@
 - [MIGRATION](#migration)
 - [BUILD FROM SOURCE](#build-from-source)
 - [DEVELOPMENT](#development)
+- [USING NIX FLAKES](#using-nix-flakes)
 - [STONKS!](#stonks)
 
 > [!NOTE]
@@ -155,38 +156,51 @@ rm -rf ~/.config/linux-wallpaperengine-gui/{Cache,Code\ Cache,GPUCache,DawnGraph
 Thanks to [@CrasAtHeri](https://github.com/CrasAtHeri).
 
 ## BUILD FROM SOURCE
-
 **Requirements:**
-
 - [Go](https://golang.org/) (1.21+)
 - [bun](https://bun.sh/)
+- GTK3 and libayatana-appindicator development headers, required to compile the systray integration:
+  - Debian/Ubuntu: `sudo apt install libgtk-3-dev libayatana-appindicator3-dev pkg-config`
+  - Other distros: install the packages providing `gtk+-3.0` and `ayatana-appindicator3-0.1` via `pkg-config`
 
 1. **Clone & Enter:**
-
    ```bash
    git clone https://github.com/AzPepoze/linux-wallpaperengine-gui
    cd linux-wallpaperengine-gui
    ```
 2. **Install Deps:**
-
    ```bash
    bun install
    ```
 3. **Build:**
-
    ```bash
    bun run build
    ```
-
    The output will be in the `dist` directory.
 
 ## DEVELOPMENT
-
 Run with hot-reloading:
-
 ```bash
 bun run dev
 ```
+
+## USING NIX FLAKES
+If you use [Nix](https://nixos.org/), this repository provides a `flake.nix` with a development shell containing all the requirements above (`go`, `bun`, `pkg-config`, `gtk3`, `libayatana-appindicator`), plus `golangci-lint` for bun run check, so you don't need to install anything manually.
+
+**With Nix installed:**
+```bash
+nix develop
+```
+This drops you into a shell with all the dependencies from **Requirements** above, continue with `bun install`, `bun run build`, or `bun run dev` as normal.
+
+> [!NOTE]
+> `bun run build:all` currently fails on NixOS under the Nix devShell due to a known NixOS limitation with generic dynamically-linked binaries downloaded by electron-builder (see https://nix.dev/permalink/stub-ld). `bun run build` works fine.
+
+**With [direnv](https://direnv.net/) installed:**
+```bash
+direnv allow
+```
+This automatically loads the same shell whenever you `cd` into the project directory.
 
 ## STONKS!
 
