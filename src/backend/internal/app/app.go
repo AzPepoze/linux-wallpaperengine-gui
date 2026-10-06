@@ -17,6 +17,7 @@ import (
 	"linux-wallpaperengine-gui/src/backend/internal/core/wallpaper"
 	"linux-wallpaperengine-gui/src/backend/internal/logger"
 	"linux-wallpaperengine-gui/src/backend/internal/platform/display"
+	"linux-wallpaperengine-gui/src/backend/internal/platform/engine"
 	"linux-wallpaperengine-gui/src/backend/internal/platform/fullscreen"
 	"linux-wallpaperengine-gui/src/backend/internal/platform/notification"
 	"linux-wallpaperengine-gui/src/backend/internal/platform/process"
@@ -60,6 +61,13 @@ func (application *App) Run() {
 	// Ensure config is initialized
 	if err := config.EnsureInitialized(); err != nil {
 		logger.Printf("Failed to initialize config: %v", err)
+	}
+
+	// Detect which wallpaper engine binary is configured and log its identity
+	if appConfig, err := config.ReadConfig(); err != nil {
+		logger.Printf("Failed to read config during engine detection: %v", err)
+	} else {
+		engine.Detect(engine.ResolveExecutable(appConfig.CustomExecutableLocation))
 	}
 
 	// Start components
