@@ -1,6 +1,7 @@
 <script lang="ts">
 	import { onMount } from 'svelte';
 	import General from '@/features/settings/components/General.svelte';
+	import WallpaperEngine from '@/features/settings/components/WallpaperEngine.svelte';
 	import Audio from '@/features/settings/components/Audio.svelte';
 	import Interaction from '@/features/settings/components/Interaction.svelte';
 	import Advanced from '@/features/settings/components/Advanced.svelte';
@@ -26,33 +27,51 @@
 			id: 'general',
 			labelKey: 'settings.sectionGeneral',
 			icon: 'monitor',
-			component: General
+			component: General,
+			group: 'ui'
 		},
-		{ id: 'audio', labelKey: 'settings.sectionAudio', icon: 'volume_up', component: Audio },
+		{
+			id: 'engine',
+			labelKey: 'settings.sectionEngine',
+			icon: 'wallpaper',
+			component: WallpaperEngine,
+			group: 'engine'
+		},
+		{ id: 'audio', labelKey: 'settings.sectionAudio', icon: 'volume_up', component: Audio, group: 'engine' },
 		{
 			id: 'interaction',
 			labelKey: 'settings.sectionInteraction',
 			icon: 'mouse',
-			component: Interaction
-		},
-		{
-			id: 'advanced',
-			labelKey: 'settings.sectionAdvanced',
-			icon: 'settings',
-			component: Advanced
+			component: Interaction,
+			group: 'engine'
 		},
 		{
 			id: 'executable',
 			labelKey: 'settings.sectionExecutable',
 			icon: 'folder',
-			component: Executable
+			component: Executable,
+			group: 'engine'
+		},
+		{
+			id: 'advanced',
+			labelKey: 'settings.sectionAdvanced',
+			icon: 'settings',
+			component: Advanced,
+			group: 'app'
 		},
 		{
 			id: 'about',
 			labelKey: 'settings.sectionAbout',
 			icon: 'info',
-			component: About
+			component: About,
+			group: 'app'
 		}
+	];
+
+	const groups = [
+		{ id: 'ui', labelKey: 'settings.groupUi' },
+		{ id: 'engine', labelKey: 'settings.groupEngine' },
+		{ id: 'app', labelKey: 'settings.groupApplication' }
 	];
 
 	let activeSection = 'general';
@@ -122,15 +141,20 @@
 			<p>{$t('settings.subtitle')}</p>
 		</div>
 		<nav class="sidebar-nav">
-			{#each sections as section}
-				<button
-					class="nav-item"
-					class:active={activeSection === section.id}
-					on:click={() => scrollToSection(section.id)}
-				>
-					<Icon name={section.icon} size={18} />
-					<span>{$t(section.labelKey)}</span>
-				</button>
+			{#each groups as group}
+				<div class="nav-group">
+					<span class="nav-group-title">{$t(group.labelKey)}</span>
+					{#each sections.filter((section) => section.group === group.id) as section}
+						<button
+							class="nav-item"
+							class:active={activeSection === section.id}
+							on:click={() => scrollToSection(section.id)}
+						>
+							<Icon name={section.icon} size={18} />
+							<span>{$t(section.labelKey)}</span>
+						</button>
+					{/each}
+				</div>
 			{/each}
 		</nav>
 
@@ -204,7 +228,25 @@
 			flex: 1;
 			display: flex;
 			flex-direction: column;
-			gap: 8px;
+			gap: 20px;
+			overflow-y: auto;
+
+			.nav-group {
+				display: flex;
+				flex-direction: column;
+				gap: 8px;
+			}
+
+			.nav-group-title {
+				padding: 0 20px 8px;
+				font-size: 0.95em;
+				font-weight: 800;
+				letter-spacing: 0.05em;
+				text-transform: uppercase;
+				color: var(--text-color);
+				border-bottom: 1px solid var(--border-color);
+				margin-bottom: 4px;
+			}
 
 			.nav-item {
 				display: flex;

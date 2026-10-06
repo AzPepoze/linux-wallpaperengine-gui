@@ -312,6 +312,15 @@ func (service *Service) buildWallpaperCommandInternal(appConfig config.AppConfig
 	if appConfig.Layer != "" {
 		arguments = append(arguments, "--layer", appConfig.Layer)
 	}
+	if appConfig.Transition != "" {
+		arguments = append(arguments, "--transition", appConfig.Transition)
+	}
+	if appConfig.TransitionDuration > 0 {
+		arguments = append(arguments, "--transition-duration", strconv.Itoa(appConfig.TransitionDuration))
+	}
+	if appConfig.TransitionMode != "" {
+		arguments = append(arguments, "--transition-mode", appConfig.TransitionMode)
+	}
 	if appConfig.DisableMouse {
 		arguments = append(arguments, "--disable-mouse")
 	}
