@@ -51,6 +51,7 @@ export interface SettingsState {
 	enableScrollMask: boolean;
 	hookEnabled: boolean;
 	hideTrayLabel: boolean;
+	language: string;
 	wallpaperChangeCommand: string;
 	enableGridWarpAnimation: boolean;
 	performanceMode: boolean;
@@ -98,6 +99,7 @@ const configFieldMap: Record<string, string> = {
 	enableScrollMask: "enableScrollMask",
 	hookEnabled: "hookEnabled",
 	hideTrayLabel: "hideTrayLabel",
+	language: "language",
 	wallpaperChangeCommand: "wallpaperChangeCommand",
 	enableGridWarpAnimation: "enableGridWarpAnimation",
 	performanceMode: "performanceMode",
@@ -128,6 +130,7 @@ export async function loadSettings(): Promise<void> {
 			if (settings.playlistInterval === undefined) settings.playlistInterval = 0;
 			if (settings.enableGridWarpAnimation === undefined) settings.enableGridWarpAnimation = true;
 			if (settings.performanceMode === undefined) settings.performanceMode = false;
+			if (settings.language === undefined) settings.language = 'en';
 
 			settingsStore.set(settings as SettingsState);
 		} else {

@@ -24,6 +24,7 @@ interface ElectronAPI {
 	getAppIcon: () => Promise<ArrayBuffer>;
 	openExternal: (url: string) => Promise<void>;
 	openPath: (path: string) => Promise<string>;
+	setLanguage: (code: string) => Promise<{ success: boolean; error?: string }>;
 
 	// File system operations
 	readDirectory: (path: string) => Promise<{ entry: string; type: "DIRECTORY" | "FILE" }[]>;

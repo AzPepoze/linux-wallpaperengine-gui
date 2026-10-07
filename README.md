@@ -36,18 +36,18 @@
 - [PREREQUISITES](#prerequisites)
 - [INSTALLATION](#installation)
   - [Arch Linux (AUR)](#arch-linux-aur)
+  - [Nix Flakes](#nix-flakes)
   - [Other Distributions](#other-distributions)
 - [USAGE](#usage)
   - [\[Options\]](#options)
-- [MIGRATION](#migration)
 - [BUILD FROM SOURCE](#build-from-source)
 - [DEVELOPMENT](#development)
 - [STONKS!](#stonks)
 
 > [!NOTE]
-> This GUI will be compatible with my [linux-wallpaperengine](https://github.com/AzPepoze/linux-wallpaperengine) in the future.
+> This GUI is also compatible with my [linux-wallpaperengine](https://github.com/AzPepoze/linux-wallpaperengine).
 >
-> It's a [Go](https://go.dev/) implementation of Wallpaper Engine for Linux. It's still in early development. Maybe you want to check it out!
+> It's a [C++](https://isocpp.org/) (with [sokol](https://github.com/floooh/sokol)) implementation of Wallpaper Engine for Linux. It's still in early development and missing some features. Maybe you want to check it out!
 
 ## SCREENSHOTS
 
@@ -107,9 +107,24 @@ I know that many users are scared of Electron applications due to their reputati
 ## PREREQUISITES
 
 > [!IMPORTANT]
-> This application requires [linux-wallpaperengine](https://github.com/Almamu/linux-wallpaperengine) to be installed on your system to function.
+> This application requires [linux-wallpaperengine (Almamu)](https://github.com/Almamu/linux-wallpaperengine) or [linux-wallpaperengine (AzPepoze)](https://github.com/AzPepoze/linux-wallpaperengine) (still missing some features) to be installed on your system to function.
 
 ## INSTALLATION
+
+> [!IMPORTANT]
+> Requires (fails without):
+>
+> - [linux-wallpaperengine (Almamu)](https://github.com/Almamu/linux-wallpaperengine) or [linux-wallpaperengine (AzPepoze)](https://github.com/AzPepoze/linux-wallpaperengine) (still missing some features) — renders the wallpapers
+> - `xrandr` — detects connected screens (`get-screens` fails, no wallpaper applied)
+> - `libayatana-appindicator3` (`libayatana-appindicator3.so.1`) — system tray support (backend won't start)
+>
+> Optional (feature degraded if missing):
+>
+> - `xprop` — fullscreen pause detection
+> - `notify-send` (`libnotify`) — desktop notifications
+> - `killall` (`psmisc`) — cleanup of stale engine processes
+> - `zenity` (GNOME/GTK) or `kdialog` (KDE) — prompting dialogs
+> - `xdg-open` (`xdg-utils`) — open config file in editor
 
 ### Arch Linux (AUR)
 
@@ -122,6 +137,27 @@ yay -S linux-wallpaperengine-gui-git
 # Using paru
 paru -S linux-wallpaperengine-gui-git
 ```
+
+### Nix Flakes
+
+If you use [Nix](https://nixos.org/), this repository provides a `flake.nix` with a development shell containing all the build requirements (`go`, `bun`, `pkg-config`, `gtk3`, `libayatana-appindicator`), plus `golangci-lint` for `bun run check`, so you don't need to install anything manually.
+
+**With Nix installed:**
+```bash
+nix develop
+```
+This drops you into a shell with all the dependencies, continue with `bun install`, `bun run build`, or `bun run dev` as normal.
+
+> [!NOTE]
+> `bun run build:all` currently fails on NixOS under the Nix devShell due to a known NixOS limitation with generic dynamically-linked binaries downloaded by electron-builder (see https://nix.dev/permalink/stub-ld). `bun run build` works fine.
+
+**With [direnv](https://direnv.net/) installed:**
+```bash
+direnv allow
+```
+This automatically loads the same shell whenever you `cd` into the project directory.
+
+Thanks to [@Maxxavec2x](https://github.com/Maxxavec2x)!
 
 ### Other Distributions
 
@@ -143,47 +179,31 @@ linux-wallpaperengine-gui [options]
 | `--native-wayland` | Makes electron use native Wayland instead of XWayland to solve fractional scaling issues (only works on Wayland sessions) |
 | `--debug-mode` | Enables debug mode for the application. |
 
-## MIGRATION
-
-> [!NOTE]
-> Users upgrading from versions prior to `v0.4.8` can safely remove legacy cache directories under `~/.config/linux-wallpaperengine-gui/` to free up disk space:
-
-```bash
-rm -rf ~/.config/linux-wallpaperengine-gui/{Cache,Code\ Cache,GPUCache,DawnGraphiteCache,DawnWebGPUCache,blob_storage,Local\ Storage,Session\ Storage,Crashpad,SharedStorage,Dictionaries,Shared\ Dictionary,DIPS}
-```
-
-Thanks to [@CrasAtHeri](https://github.com/CrasAtHeri).
-
 ## BUILD FROM SOURCE
-
 **Requirements:**
-
 - [Go](https://golang.org/) (1.21+)
 - [bun](https://bun.sh/)
+- GTK3 and libayatana-appindicator development headers, required to compile the systray integration:
+  - Debian/Ubuntu: `sudo apt install libgtk-3-dev libayatana-appindicator3-dev pkg-config`
+  - Other distros: install the packages providing `gtk+-3.0` and `ayatana-appindicator3-0.1` via `pkg-config`
 
 1. **Clone & Enter:**
-
    ```bash
    git clone https://github.com/AzPepoze/linux-wallpaperengine-gui
    cd linux-wallpaperengine-gui
    ```
 2. **Install Deps:**
-
    ```bash
    bun install
    ```
 3. **Build:**
-
    ```bash
    bun run build
    ```
-
    The output will be in the `dist` directory.
 
 ## DEVELOPMENT
-
 Run with hot-reloading:
-
 ```bash
 bun run dev
 ```

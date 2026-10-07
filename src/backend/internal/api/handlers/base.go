@@ -25,7 +25,7 @@ func NewHandler(wallpaperService *wallpaper.Service, playlistService *playlist.S
 
 func (handler *Handler) HandleIPC(request models.Request, encoder *json.Encoder) models.Response {
 	switch request.Method {
-	case "ping", "quit", "open-ui", "restart-ui":
+	case "ping", "quit", "open-ui", "restart-ui", "set-language":
 		return handler.HandleSystem(request, encoder)
 
 	case "get-config", "write-config", "open-config-editor", "toggle-autostart":

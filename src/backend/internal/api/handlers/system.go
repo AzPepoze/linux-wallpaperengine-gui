@@ -8,6 +8,7 @@ import (
 	"linux-wallpaperengine-gui/src/backend/internal/api/models"
 	"linux-wallpaperengine-gui/src/backend/internal/logger"
 	"linux-wallpaperengine-gui/src/backend/internal/ui/electron"
+	"linux-wallpaperengine-gui/src/backend/internal/ui/tray"
 )
 
 func (handler *Handler) HandleSystem(request models.Request, encoder *json.Encoder) models.Response {
@@ -44,6 +45,14 @@ func (handler *Handler) HandleSystem(request models.Request, encoder *json.Encod
 			time.Sleep(500 * time.Millisecond)
 			electron.Start()
 		}()
+	case "set-language":
+		var language string
+		if err := json.Unmarshal(request.Params, &language); err != nil {
+			response.Error = err.Error()
+		} else {
+			tray.SetLanguage(language)
+			response.Result = map[string]bool{"success": true}
+		}
 	}
 
 	return response

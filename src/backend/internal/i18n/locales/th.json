@@ -1,0 +1,14 @@
+{
+	"tray": {
+		"menu": {
+			"show": "แสดง",
+			"showTooltip": "เปิดหน้าต่างโปรแกรม",
+			"hide": "ซ่อน",
+			"hideTooltip": "ซ่อนหน้าต่างลงถาดระบบ",
+			"restartWallpaper": "เริ่มวอลเปเปอร์ใหม่",
+			"restartWallpaperTooltip": "เริ่มวอลเปเปอร์ปัจจุบันใหม่",
+			"quit": "ออก",
+			"quitTooltip": "ออกจากโปรแกรมโดยสมบูรณ์"
+		}
+	}
+}

@@ -1,4 +1,5 @@
 import { ipcMain, app, shell } from "electron";
+import { socketClient } from "../socket-client";
 import { logger } from "../logger";
 
 export function registerSystemService() {
@@ -25,5 +26,10 @@ export function registerSystemService() {
 	ipcMain.handle("open-path", async (_, path: string) => {
 		logger.ipcReceived("open-path", path);
 		return await shell.openPath(path);
+	});
+
+	ipcMain.handle("set-language", async (_, language: string) => {
+		logger.ipcReceived("set-language", language);
+		return await socketClient.send("set-language", language);
 	});
 }
