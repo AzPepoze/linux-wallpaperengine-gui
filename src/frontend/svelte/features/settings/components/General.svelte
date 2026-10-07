@@ -9,6 +9,11 @@
 
 	const langOptions = availableLocales;
 
+	function handleLanguageChange(code: string) {
+		setLocale(code);
+		settingsStore.update((s) => (s ? { ...s, language: code } : s));
+	}
+
 	async function handleRestart() {
 		if (confirm($t('playlist.messages.restartRequired'))) {
 			if ($settingsStore) {
@@ -29,7 +34,7 @@
 			id="language"
 			bind:value={$locale}
 			options={langOptions}
-			onChange={(v) => setLocale(v)}
+			onChange={handleLanguageChange}
 		/>
 	</SettingItem>
 

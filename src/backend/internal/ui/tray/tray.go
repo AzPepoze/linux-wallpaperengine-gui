@@ -70,7 +70,7 @@ func onReady() {
 		systray.SetTitle("Linux Wallpaper Engine GUI")
 	}
 
-	language := i18n.Detect()
+	language := i18n.Resolve(appConfig.Language)
 	menuText := func(key string) string { return i18n.T(language, "tray.menu."+key) }
 
 	mShow := systray.AddMenuItem(menuText("show"), menuText("showTooltip"))

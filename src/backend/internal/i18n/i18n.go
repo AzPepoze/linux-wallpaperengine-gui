@@ -86,6 +86,13 @@ func Detect() string {
 	return fallbackLanguage
 }
 
+func Resolve(configured string) string {
+	if Available(configured) {
+		return configured
+	}
+	return Detect()
+}
+
 // T returns the translation of a dotted key ("menu.show") in the given
 // language, falling back to English and finally to the key itself.
 func T(language string, key string) string {

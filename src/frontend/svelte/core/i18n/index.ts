@@ -49,6 +49,11 @@ export function detectLocale(preferred: readonly string[] = navigator.languages 
 	return 'en';
 }
 
+export function resolveLocale(saved?: string): string {
+	if (saved && dictionaries[saved]) return saved;
+	return detectLocale();
+}
+
 function resolveValue(dict: Dict, key: string): string | null {
 	const keys = key.split('.');
 	let result: any = dict;

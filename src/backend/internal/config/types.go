@@ -76,6 +76,7 @@ type AppConfig struct {
 	EnableScrollMask         bool           `json:"enableScrollMask"`
 	HookEnabled              bool           `json:"hookEnabled"`
 	HideTrayLabel            bool           `json:"hideTrayLabel"`
+	Language                 string         `json:"language,omitempty"`
 	WallpaperChangeCommand   string         `json:"wallpaperChangeCommand,omitempty"`
 	EnableGridWarpAnimation  bool           `json:"enableGridWarpAnimation,omitempty"`
 	PerformanceMode          bool           `json:"performanceMode,omitempty"`
