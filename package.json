@@ -1,6 +1,6 @@
 {
 	"name": "linux-wallpaperengine-gui",
-	"version": "0.6.0-dev.7e752ab",
+	"version": "0.6.1-dev.06ccdc2",
 	"type": "module",
 	"description": "A graphical user interface for managing wallpapers on Linux, powered by Go(Backend) Electron(Frontend) and linux-wallpaperengine.",
 	"author": {
