@@ -31,6 +31,7 @@ contextBridge.exposeInMainWorld("electronAPI", {
 	getVersion: createInvokeMethod("get-version"),
 	getAppIcon: createInvokeMethod("get-app-icon"),
 	openPath: createInvokeMethod("open-path"),
+	setLanguage: createInvokeMethod("set-language"),
 
 	// File system
 	readDirectory: createInvokeMethod("fs-read-dir"),

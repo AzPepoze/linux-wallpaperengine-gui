@@ -7,6 +7,7 @@ import (
 
 	"linux-wallpaperengine-gui/src/backend/internal/config"
 	"linux-wallpaperengine-gui/src/backend/internal/i18n"
+	"linux-wallpaperengine-gui/src/backend/internal/logger"
 
 	"github.com/getlantern/systray"
 )
@@ -16,6 +17,12 @@ var (
 	onClose            func()
 	onRestartWallpaper func()
 	onQuit             func()
+
+	menuLanguage string
+	menuShow     *systray.MenuItem
+	menuClose    *systray.MenuItem
+	menuRestart  *systray.MenuItem
+	menuQuit     *systray.MenuItem
 )
 
 func RegisterCallbacks(show func(), close func(), restart func(), quit func()) {
@@ -71,30 +78,31 @@ func onReady() {
 	}
 
 	language := i18n.Resolve(appConfig.Language)
-	menuText := func(key string) string { return i18n.T(language, "tray.menu."+key) }
+	menuLanguage = language
 
-	mShow := systray.AddMenuItem(menuText("show"), menuText("showTooltip"))
-	mClose := systray.AddMenuItem(menuText("hide"), menuText("hideTooltip"))
-	mRestart := systray.AddMenuItem(menuText("restartWallpaper"), menuText("restartWallpaperTooltip"))
+	menuShow = systray.AddMenuItem("", "")
+	menuClose = systray.AddMenuItem("", "")
+	menuRestart = systray.AddMenuItem("", "")
 	systray.AddSeparator()
-	mQuit := systray.AddMenuItem(menuText("quit"), menuText("quitTooltip"))
+	menuQuit = systray.AddMenuItem("", "")
+	relabel()
 
 	go func() {
 		for {
 			select {
-			case <-mShow.ClickedCh:
+			case <-menuShow.ClickedCh:
 				if onShow != nil {
 					onShow()
 				}
-			case <-mClose.ClickedCh:
+			case <-menuClose.ClickedCh:
 				if onClose != nil {
 					onClose()
 				}
-			case <-mRestart.ClickedCh:
+			case <-menuRestart.ClickedCh:
 				if onRestartWallpaper != nil {
 					onRestartWallpaper()
 				}
-			case <-mQuit.ClickedCh:
+			case <-menuQuit.ClickedCh:
 				if onQuit != nil {
 					onQuit()
 				}
@@ -105,6 +113,29 @@ func onReady() {
 
 func onExit() {
 	// Cleanup if needed
+}
+
+// SetLanguage relabels the tray menu in place. Unknown codes are ignored.
+func SetLanguage(language string) {
+	if !i18n.Available(language) {
+		logger.Printf("Ignoring unknown tray language: %q", language)
+		return
+	}
+	menuLanguage = language
+	relabel()
+}
+
+func relabel() {
+	text := func(key string) string { return i18n.T(menuLanguage, "tray.menu."+key) }
+
+	menuShow.SetTitle(text("show"))
+	menuShow.SetTooltip(text("showTooltip"))
+	menuClose.SetTitle(text("hide"))
+	menuClose.SetTooltip(text("hideTooltip"))
+	menuRestart.SetTitle(text("restartWallpaper"))
+	menuRestart.SetTooltip(text("restartWallpaperTooltip"))
+	menuQuit.SetTitle(text("quit"))
+	menuQuit.SetTooltip(text("quitTooltip"))
 }
 
 // UpdateTitle sets or hides the tray label at runtime (no restart needed).

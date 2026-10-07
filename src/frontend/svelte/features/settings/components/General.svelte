@@ -12,6 +12,7 @@
 	function handleLanguageChange(code: string) {
 		setLocale(code);
 		settingsStore.update((s) => (s ? { ...s, language: code } : s));
+		window.electronAPI.setLanguage(code);
 	}
 
 	async function handleRestart() {
