@@ -112,11 +112,19 @@ I know that many users are scared of Electron applications due to their reputati
 ## INSTALLATION
 
 > [!IMPORTANT]
-> Requires:
+> Requires (fails without):
 >
 > - [linux-wallpaperengine (Almamu)](https://github.com/Almamu/linux-wallpaperengine) or [linux-wallpaperengine (AzPepoze)](https://github.com/AzPepoze/linux-wallpaperengine) (still missing some features) — renders the wallpapers
-> - `xrandr` — detects connected screens
-> - `libayatana-appindicator3` — system tray support
+> - `xrandr` — detects connected screens (`get-screens` fails, no wallpaper applied)
+> - `libayatana-appindicator3` (`libayatana-appindicator3.so.1`) — system tray support (backend won't start)
+>
+> Optional (feature degraded if missing):
+>
+> - `xprop` — fullscreen pause detection
+> - `notify-send` (`libnotify`) — desktop notifications
+> - `killall` (`psmisc`) — cleanup of stale engine processes
+> - `zenity` (GNOME/GTK) or `kdialog` (KDE) — prompting dialogs
+> - `xdg-open` (`xdg-utils`) — open config file in editor
 
 ### Arch Linux (AUR)
 
