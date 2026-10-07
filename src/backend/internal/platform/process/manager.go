@@ -12,9 +12,7 @@ import (
 	"linux-wallpaperengine-gui/src/backend/internal/logger"
 )
 
-// handoffWindow is the default time a handoff candidate may run before it is
-// assumed to have taken over as the live owner instead of exiting after the
-// crossfade.
+// handoffWindow is how long a handoff candidate may run before it is treated as the new owner.
 const handoffWindow = 1500 * time.Millisecond
 
 type ActiveWallpaper struct {
@@ -36,8 +34,7 @@ func NewManager() *Manager {
 	}
 }
 
-// SetControlSocketHandoff enables live wallpaper handoff for engines that
-// support the control socket. When disabled, updates keep the kill+spawn path.
+// SetControlSocketHandoff enables live handoff for engines with a control socket.
 func (manager *Manager) SetControlSocketHandoff(enabled bool) {
 	manager.mutex.Lock()
 	defer manager.mutex.Unlock()
@@ -67,7 +64,6 @@ func (manager *Manager) UpdateWallpapers(desiredWallpapers []struct {
 		desiredScreens[desiredWallpaper.Screen] = true
 	}
 
-	// Kill wallpapers no longer desired (excluding __PREVIEW__)
 	for screen := range manager.activeWallpapers {
 		if screen == "__PREVIEW__" {
 			continue
@@ -77,7 +73,6 @@ func (manager *Manager) UpdateWallpapers(desiredWallpapers []struct {
 		}
 	}
 
-	// Start or update wallpapers
 	for _, desiredWallpaper := range desiredWallpapers {
 		active, exists := manager.activeWallpapers[desiredWallpaper.Screen]
 		if exists {
@@ -103,8 +98,7 @@ func (manager *Manager) UpdateWallpapers(desiredWallpapers []struct {
 	}
 }
 
-// handoffWallpaper starts a transient candidate that instructs the live owner to
-// crossfade, and returns false when the candidate could not be started.
+// handoffWallpaper spawns a transient candidate to crossfade; false if it won't start.
 func (manager *Manager) handoffWallpaper(screen string, owner *ActiveWallpaper, execPath string, args []string, fullCommand string) bool {
 	candidate, err := manager.spawnProcess(screen, execPath, args)
 	if err != nil {
@@ -116,9 +110,8 @@ func (manager *Manager) handoffWallpaper(screen string, owner *ActiveWallpaper, 
 	return true
 }
 
-// watchHandoffCandidate resolves the handoff asynchronously so UpdateWallpapers
-// never blocks: a candidate that exits quickly performed the crossfade, while one
-// that outlives the window became the new owner.
+// watchHandoffCandidate resolves the handoff without blocking: a quick exit means
+// the crossfade ran, outliving the window means the candidate is the new owner.
 func (manager *Manager) watchHandoffCandidate(screen string, owner *ActiveWallpaper, candidate *exec.Cmd, fullCommand string) {
 	exited := make(chan error, 1)
 	go func() {
@@ -138,8 +131,7 @@ func (manager *Manager) watchHandoffCandidate(screen string, owner *ActiveWallpa
 		manager.mutex.Lock()
 		current, exists := manager.activeWallpapers[screen]
 		if exists && current != owner {
-			// The tracked owner changed while the candidate was starting; the
-			// candidate is no longer wanted.
+			// Owner changed mid-handoff; this candidate is stale.
 			manager.mutex.Unlock()
 			terminateProcess(candidate)
 			<-exited
@@ -152,7 +144,7 @@ func (manager *Manager) watchHandoffCandidate(screen string, owner *ActiveWallpa
 		manager.mutex.Unlock()
 		logger.Printf("Handoff candidate for %s is still running; promoted it to owner", screen)
 
-		// Reap and untrack the promoted candidate once it eventually exits.
+		// Untrack the promoted candidate once it exits.
 		<-exited
 		manager.mutex.Lock()
 		if tracked, ok := manager.activeWallpapers[screen]; ok && tracked.Cmd == candidate {
@@ -173,8 +165,7 @@ func (manager *Manager) killWallpaperInternal(screen string) {
 	delete(manager.activeWallpapers, screen)
 }
 
-// terminateProcess kills the command's process group when possible, falling back
-// to killing the process itself.
+// terminateProcess kills the process group, falling back to the process itself.
 func terminateProcess(command *exec.Cmd) {
 	if command == nil || command.Process == nil {
 		return
@@ -228,7 +219,7 @@ func (manager *Manager) spawnWallpaper(screen string, execPath string, args []st
 	}()
 }
 
-// spawnProcess starts a command in its own process group and streams its output.
+// spawnProcess starts a command in its own process group with streamed output.
 func (manager *Manager) spawnProcess(screen string, execPath string, args []string) (*exec.Cmd, error) {
 	command := exec.Command(execPath, args...)
 	command.SysProcAttr = &syscall.SysProcAttr{Setpgid: true}
@@ -246,9 +237,7 @@ func (manager *Manager) spawnProcess(screen string, execPath string, args []stri
 		return nil, err
 	}
 
-	// Handle stdout
 	go manager.captureOutput(screen, stdout)
-	// Handle stderr
 	go manager.captureOutput(screen, stderr)
 
 	return command, nil

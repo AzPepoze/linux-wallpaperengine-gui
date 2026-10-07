@@ -13,14 +13,12 @@ import (
 
 const defaultExecutable = "linux-wallpaperengine"
 
-// probeTimeout bounds the --whoareyou probe so an upstream engine that stalls on
-// an unknown flag cannot block wallpaper application.
+// probeTimeout bounds the --whoareyou probe so a stalled engine can't block wallpaper setup.
 var probeTimeout = 1500 * time.Millisecond
 
 const probeContextGrace = 500 * time.Millisecond
 
-// Info describes the detected wallpaper engine, matching the frozen
-// `--whoareyou` contract.
+// Info describes the detected engine per the --whoareyou contract.
 type Info struct {
 	Name           string   `json:"name"`
 	Implementation string   `json:"implementation"`
@@ -39,8 +37,7 @@ func (info Info) Supports(feature string) bool {
 	return false
 }
 
-// ResolveExecutable returns the configured executable when set, otherwise the
-// bare command name resolved through PATH.
+// ResolveExecutable returns the custom executable, or the default via PATH.
 func ResolveExecutable(custom string) string {
 	if strings.TrimSpace(custom) != "" {
 		return custom
@@ -58,9 +55,8 @@ var (
 	detectCache = make(map[string]detectionResult)
 )
 
-// Detect probes the executable with `--whoareyou` and reports whether it is an
-// AzPepoze engine. Results are cached per executable path, so a changed path is
-// re-probed. A timeout, non-zero exit or unparseable output means upstream.
+// Detect probes the executable with `--whoareyou`. Results are cached per path;
+// timeout, non-zero exit or unparseable output means upstream.
 func Detect(execPath string) (Info, bool) {
 	detectMutex.Lock()
 	defer detectMutex.Unlock()
@@ -86,8 +82,7 @@ func probe(execPath string) (Info, bool) {
 	defer cancel()
 
 	command := exec.CommandContext(ctx, execPath, "--whoareyou")
-	// Ensure Wait returns even if a grandchild keeps the output pipe open after
-	// the timed-out process is killed.
+	// WaitDelay lets Wait return even if a grandchild holds the pipe open.
 	command.WaitDelay = probeContextGrace
 
 	output, err := command.Output()
@@ -111,8 +106,7 @@ func probe(execPath string) (Info, bool) {
 	return info, true
 }
 
-// firstJSONObjectLine returns the first stdout line that is a valid JSON
-// object, skipping any log noise around it.
+// firstJSONObjectLine returns the first stdout line holding a JSON object.
 func firstJSONObjectLine(output string) string {
 	for _, raw := range strings.Split(output, "\n") {
 		line := strings.TrimSpace(raw)
