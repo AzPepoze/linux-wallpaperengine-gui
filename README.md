@@ -39,15 +39,14 @@
   - [Other Distributions](#other-distributions)
 - [USAGE](#usage)
   - [\[Options\]](#options)
-- [MIGRATION](#migration)
 - [BUILD FROM SOURCE](#build-from-source)
 - [DEVELOPMENT](#development)
 - [STONKS!](#stonks)
 
 > [!NOTE]
-> This GUI will be compatible with my [linux-wallpaperengine](https://github.com/AzPepoze/linux-wallpaperengine) in the future.
+> This GUI is also compatible with my [linux-wallpaperengine](https://github.com/AzPepoze/linux-wallpaperengine).
 >
-> It's a [Go](https://go.dev/) implementation of Wallpaper Engine for Linux. It's still in early development. Maybe you want to check it out!
+> It's a [C++](https://isocpp.org/) (with [sokol](https://github.com/floooh/sokol)) implementation of Wallpaper Engine for Linux. It's still in early development and missing some features. Maybe you want to check it out!
 
 ## SCREENSHOTS
 
@@ -107,9 +106,16 @@ I know that many users are scared of Electron applications due to their reputati
 ## PREREQUISITES
 
 > [!IMPORTANT]
-> This application requires [linux-wallpaperengine](https://github.com/Almamu/linux-wallpaperengine) to be installed on your system to function.
+> This application requires [linux-wallpaperengine (Almamu)](https://github.com/Almamu/linux-wallpaperengine) or [linux-wallpaperengine (AzPepoze)](https://github.com/AzPepoze/linux-wallpaperengine) (still missing some features) to be installed on your system to function.
 
 ## INSTALLATION
+
+> [!IMPORTANT]
+> Requires:
+>
+> - [linux-wallpaperengine (Almamu)](https://github.com/Almamu/linux-wallpaperengine) or [linux-wallpaperengine (AzPepoze)](https://github.com/AzPepoze/linux-wallpaperengine) (still missing some features) — renders the wallpapers
+> - `xrandr` — detects connected screens
+> - `libayatana-appindicator3` — system tray support
 
 ### Arch Linux (AUR)
 
@@ -142,17 +148,6 @@ linux-wallpaperengine-gui [options]
 | `--minimized` | Starts the application minimized in the system tray. |
 | `--native-wayland` | Makes electron use native Wayland instead of XWayland to solve fractional scaling issues (only works on Wayland sessions) |
 | `--debug-mode` | Enables debug mode for the application. |
-
-## MIGRATION
-
-> [!NOTE]
-> Users upgrading from versions prior to `v0.4.8` can safely remove legacy cache directories under `~/.config/linux-wallpaperengine-gui/` to free up disk space:
-
-```bash
-rm -rf ~/.config/linux-wallpaperengine-gui/{Cache,Code\ Cache,GPUCache,DawnGraphiteCache,DawnWebGPUCache,blob_storage,Local\ Storage,Session\ Storage,Crashpad,SharedStorage,Dictionaries,Shared\ Dictionary,DIPS}
-```
-
-Thanks to [@CrasAtHeri](https://github.com/CrasAtHeri).
 
 ## BUILD FROM SOURCE
 
