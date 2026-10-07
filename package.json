@@ -68,7 +68,45 @@
 		"linux": {
 			"artifactName": "${productName}.${ext}",
 			"executableName": "linux-wallpaperengine-gui",
-			"category": "Utility"
+			"category": "Utility",
+			"deb": {
+				"depends": [
+					"libgtk-3-0",
+					"libnotify4",
+					"libnss3",
+					"libxss1",
+					"libxtst6",
+					"xdg-utils",
+					"libatspi2.0-0",
+					"libuuid1",
+					"libsecret-1-0",
+					"libayatana-appindicator3-1",
+					"x11-xserver-utils",
+					"x11-utils",
+					"libnotify-bin",
+					"psmisc"
+				],
+				"recommends": [
+					"libappindicator3-1",
+					"zenity | kdialog"
+				]
+			},
+			"rpm": {
+				"depends": [
+					"gtk3",
+					"libnotify",
+					"nss",
+					"libXScrnSaver",
+					"(libXtst or libXtst6)",
+					"xdg-utils",
+					"at-spi2-core",
+					"(libuuid or libuuid1)",
+					"libayatana-appindicator-gtk3",
+					"/usr/bin/xrandr",
+					"/usr/bin/xprop",
+					"/usr/bin/killall"
+				]
+			}
 		}
 	}
 }
