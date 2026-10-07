@@ -46,6 +46,8 @@ This project uses a dynamically loaded, namespace-based translation system. Engl
 3. **Translate**: Open the other language files and translate the strings that have the `[NYT_LANG]` prefix, removing the prefix once done.
 4. **Verify**: Use `bun run check:frontend` (or `bun run i18n:check`) to see a report of any missing keys.
 
+Some strings are drawn outside the web view (currently the system tray menu). The generator mirrors those namespaces into `src/backend/internal/i18n/locales/`, which the Go binary embeds at build time. Those files are generated - edit the locales under `src/frontend/svelte/core/i18n/locales/` and rerun the generator, then commit the mirrored files along with them.
+
 ## Branch Structure
 
 - `main` - Stable release branch

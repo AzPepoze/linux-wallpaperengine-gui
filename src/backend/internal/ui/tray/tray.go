@@ -6,6 +6,7 @@ import (
 	"path/filepath"
 
 	"linux-wallpaperengine-gui/src/backend/internal/config"
+	"linux-wallpaperengine-gui/src/backend/internal/i18n"
 
 	"github.com/getlantern/systray"
 )
@@ -69,11 +70,14 @@ func onReady() {
 		systray.SetTitle("Linux Wallpaper Engine GUI")
 	}
 
-	mShow := systray.AddMenuItem("Show", "Open the GUI")
-	mClose := systray.AddMenuItem("Hide", "Hide the GUI to system tray")
-	mRestart := systray.AddMenuItem("Restart Wallpaper", "Restart the current wallpapers")
+	language := i18n.Detect()
+	menuText := func(key string) string { return i18n.T(language, "tray.menu."+key) }
+
+	mShow := systray.AddMenuItem(menuText("show"), menuText("showTooltip"))
+	mClose := systray.AddMenuItem(menuText("hide"), menuText("hideTooltip"))
+	mRestart := systray.AddMenuItem(menuText("restartWallpaper"), menuText("restartWallpaperTooltip"))
 	systray.AddSeparator()
-	mQuit := systray.AddMenuItem("Quit", "Exit completely")
+	mQuit := systray.AddMenuItem(menuText("quit"), menuText("quitTooltip"))
 
 	go func() {
 		for {

@@ -1,0 +1,12 @@
+{
+	"menu": {
+		"show": "[NYT_TH] Show",
+		"showTooltip": "[NYT_TH] Open the GUI",
+		"hide": "[NYT_TH] Hide",
+		"hideTooltip": "[NYT_TH] Hide the GUI to system tray",
+		"restartWallpaper": "[NYT_TH] Restart Wallpaper",
+		"restartWallpaperTooltip": "[NYT_TH] Restart the current wallpapers",
+		"quit": "[NYT_TH] Quit",
+		"quitTooltip": "[NYT_TH] Exit completely"
+	}
+}

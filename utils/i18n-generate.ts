@@ -5,6 +5,9 @@ const i18nDir = path.resolve(process.cwd(), 'src/frontend/svelte/core/i18n');
 const localesDir = path.join(i18nDir, 'locales');
 const enDir = path.join(localesDir, 'en');
 const typesFile = path.resolve(process.cwd(), 'src/frontend/svelte/core/i18n/types.ts');
+const backendLocalesDir = path.resolve(process.cwd(), 'src/backend/internal/i18n/locales');
+// Namespaces the Go backend needs at runtime (tray menu, notifications, ...).
+const backendNamespaces = ['tray.json'];
 
 function generateKeys(obj: any, prefix = ''): string[] {
 	let keys: string[] = [];
@@ -86,6 +89,36 @@ for (const lang of allLangs) {
 			const syncedData = syncObjects(enData, langData, lang);
 			fs.writeFileSync(langPath, JSON.stringify(syncedData, null, '\t') + '\n', 'utf-8');
 		}
+	}
+}
+
+// Mirror the namespaces used by the backend into the Go package, which embeds
+// them at build time. English stays the only place strings are authored.
+fs.mkdirSync(backendLocalesDir, { recursive: true });
+
+const mirroredLangs = allLangs.filter(lang =>
+	backendNamespaces.some(file => fs.existsSync(path.join(localesDir, lang, file)))
+);
+
+for (const existing of fs.readdirSync(backendLocalesDir).filter(f => f.endsWith('.json'))) {
+	if (!mirroredLangs.includes(existing.replace('.json', ''))) {
+		fs.unlinkSync(path.join(backendLocalesDir, existing));
+		console.log(`Removed extra backend locale: ${existing}`);
+	}
+}
+
+for (const lang of mirroredLangs) {
+	const merged: any = {};
+	for (const file of backendNamespaces) {
+		const source = path.join(localesDir, lang, file);
+		if (!fs.existsSync(source)) continue;
+		merged[file.replace('.json', '')] = JSON.parse(fs.readFileSync(source, 'utf-8'));
+	}
+	const target = path.join(backendLocalesDir, `${lang}.json`);
+	const content = JSON.stringify(merged, null, '\t') + '\n';
+	if (!fs.existsSync(target) || fs.readFileSync(target, 'utf-8') !== content) {
+		fs.writeFileSync(target, content, 'utf-8');
+		console.log(`Synced backend locale: ${lang}.json`);
 	}
 }
 
