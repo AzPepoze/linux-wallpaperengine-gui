@@ -11,6 +11,7 @@ import (
 	"linux-wallpaperengine-gui/src/backend/internal/config"
 	"linux-wallpaperengine-gui/src/backend/internal/logger"
 	"linux-wallpaperengine-gui/src/backend/internal/platform/display"
+	"linux-wallpaperengine-gui/src/backend/internal/platform/engine"
 	"linux-wallpaperengine-gui/src/backend/internal/platform/process"
 )
 
@@ -38,6 +39,10 @@ func (service *Service) ApplyWallpapers() error {
 	if err != nil {
 		return err
 	}
+
+	executable := engine.ResolveExecutable(appConfig.CustomExecutableLocation)
+	engineInfo, detected := engine.Detect(executable)
+	service.processManager.SetControlSocketHandoff(detected && engineInfo.ControlSocket && engineInfo.Supports("control-socket"))
 
 	availableScreens, err := display.GetScreens()
 	if err != nil {
@@ -275,10 +280,7 @@ func (service *Service) buildWallpaperCommandInternal(appConfig config.AppConfig
 		fps = 60
 	}
 
-	executable := appConfig.CustomExecutableLocation
-	if executable == "" {
-		executable = "linux-wallpaperengine"
-	}
+	executable := engine.ResolveExecutable(appConfig.CustomExecutableLocation)
 
 	wallpaperPath := wallpaperID
 	if config.WorkshopPath != "" {
@@ -309,6 +311,15 @@ func (service *Service) buildWallpaperCommandInternal(appConfig config.AppConfig
 	}
 	if appConfig.Layer != "" {
 		arguments = append(arguments, "--layer", appConfig.Layer)
+	}
+	if appConfig.Transition != "" {
+		arguments = append(arguments, "--transition", appConfig.Transition)
+	}
+	if appConfig.TransitionDuration > 0 {
+		arguments = append(arguments, "--transition-duration", strconv.Itoa(appConfig.TransitionDuration))
+	}
+	if appConfig.TransitionMode != "" {
+		arguments = append(arguments, "--transition-mode", appConfig.TransitionMode)
 	}
 	if appConfig.DisableMouse {
 		arguments = append(arguments, "--disable-mouse")

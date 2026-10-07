@@ -1,35 +1,13 @@
 <script lang="ts">
 	import SettingItem from '@/ui/SettingItem.svelte';
 	import Toggle from '@/ui/Toggle.svelte';
-	import Input from '@/ui/Input.svelte';
 	import Select from '@/ui/Select.svelte';
 	import Range from '@/ui/Range.svelte';
-	import ListEditor from '@/ui/ListEditor.svelte';
 	import { slide } from 'svelte/transition';
 	import { settingsStore, saveSettings, handleAutostart } from '@/features/settings/scripts/settings';
 	import { t, locale, setLocale, availableLocales } from '@/core/i18n';
 
 	const langOptions = availableLocales;
-
-	$: scalingOptions = [
-		{ value: 'default', label: $t('settings.generalScaling.default') },
-		{ value: 'stretch', label: $t('settings.generalScaling.stretch') },
-		{ value: 'fit', label: $t('settings.generalScaling.fit') },
-		{ value: 'fill', label: $t('settings.generalScaling.fill') }
-	];
-
-	$: clampingOptions = [
-		{ value: 'clamp', label: $t('settings.generalClamping.clamp') },
-		{ value: 'border', label: $t('settings.generalClamping.border') },
-		{ value: 'repeat', label: $t('settings.generalClamping.repeat') }
-	];
-
-	$: layerOptions = [
-		{ value: 'bottom', label: $t('settings.generalLayer.bottom') },
-		{ value: 'background', label: $t('settings.generalLayer.background') },
-		{ value: 'top', label: $t('settings.generalLayer.top') },
-		{ value: 'overlay', label: $t('settings.generalLayer.overlay') }
-	];
 
 	async function handleRestart() {
 		if (confirm($t('playlist.messages.restartRequired'))) {
@@ -89,7 +67,6 @@
 		/>
 	</SettingItem>
 
-
 	<SettingItem
 		label={$t('settings.general.transparentUi')}
 		id="transparentUi"
@@ -122,112 +99,6 @@
 			</SettingItem>
 		</div>
 	{/if}
-
-	<SettingItem
-		label={$t('settings.general.fpsLimit')}
-		id="fps"
-		description={$t('settings.general.fpsLimitDesc')}
-	>
-		<Input
-			type="number"
-			id="fps"
-			bind:value={$settingsStore.fps}
-			min={1}
-		/>
-	</SettingItem>
-
-	<SettingItem
-		label={$t('settings.general.scalingMode')}
-		id="scaling"
-		description={$t('settings.general.scalingModeDesc')}
-	>
-		<Select
-			id="scaling"
-			bind:value={$settingsStore.scaling}
-			options={scalingOptions}
-		/>
-	</SettingItem>
-
-	<SettingItem
-		label={$t('settings.general.clampingMode')}
-		id="clamping"
-		description={$t('settings.general.clampingModeDesc')}
-	>
-		<Select
-			id="clamping"
-			bind:value={$settingsStore.clamping}
-			options={clampingOptions}
-		/>
-	</SettingItem>
-
-	<SettingItem
-		label={$t('settings.general.layer')}
-		id="layer"
-		description={$t('settings.general.layerDesc')}
-	>
-		<Select
-			id="layer"
-			bind:value={$settingsStore.layer}
-			options={layerOptions}
-		/>
-	</SettingItem>
-
-	<SettingItem
-		label={$t('settings.general.noFullscreenPause')}
-		id="noFullscreenPause"
-		description={$t('settings.general.noFullscreenPauseDesc')}
-	>
-		<Toggle
-			id="noFullscreenPause"
-			bind:checked={$settingsStore.noFullscreenPause}
-		/>
-	</SettingItem>
-
-	{#if !$settingsStore.noFullscreenPause}
-		<div 
-			transition:slide={{ duration: 300 }}
-			style="display: flex; flex-direction: column; gap: 16px;"
-		>
-			<SettingItem
-				label={$t('settings.general.fullscreenPauseOnlyActive')}
-				id="fullscreenPauseOnlyActive"
-				description={$t('settings.general.fullscreenPauseOnlyActiveDesc')}
-			>
-				<Toggle
-					id="fullscreenPauseOnlyActive"
-					bind:checked={$settingsStore.fullscreenPauseOnlyActive}
-				/>
-			</SettingItem>
-
-			<SettingItem
-				label={$t('settings.general.fullscreenPauseIgnoreAppIds')}
-				id="fullscreenPauseIgnoreAppIds"
-				vertical
-				description={$t('settings.general.fullscreenPauseIgnoreAppIdsDesc')}
-			>
-				<ListEditor
-					items={$settingsStore.fullscreenPauseIgnoreAppIds || []}
-					placeholder={$t('settings.general.fullscreenPauseIgnoreAppIdsPlaceholder')}
-					on:change={(e) => {
-						if ($settingsStore) {
-							$settingsStore.fullscreenPauseIgnoreAppIds = e.detail;
-						}
-					}}
-				/>
-			</SettingItem>
-		</div>
-	{/if}
-
-	<SettingItem
-		label={$t('settings.general.disableParticles')}
-		id="disableParticles"
-		description={$t('settings.general.disableParticlesDesc')}
-	>
-		<Toggle
-			id="disableParticles"
-			bind:checked={$settingsStore.disableParticles}
-		/>
-	</SettingItem>
 
 	<SettingItem
 		label={$t('settings.general.scrollMask')}

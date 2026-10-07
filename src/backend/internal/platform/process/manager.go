@@ -7,9 +7,13 @@ import (
 	"strings"
 	"sync"
 	"syscall"
+	"time"
 
 	"linux-wallpaperengine-gui/src/backend/internal/logger"
 )
+
+// handoffWindow is how long a handoff candidate may run before it is treated as the new owner.
+const handoffWindow = 1500 * time.Millisecond
 
 type ActiveWallpaper struct {
 	Cmd     *exec.Cmd
@@ -17,13 +21,32 @@ type ActiveWallpaper struct {
 }
 
 type Manager struct {
-	activeWallpapers map[string]*ActiveWallpaper
-	mutex            sync.Mutex
+	activeWallpapers     map[string]*ActiveWallpaper
+	mutex                sync.Mutex
+	controlSocketHandoff bool
+	handoffTimeout       time.Duration
 }
 
 func NewManager() *Manager {
 	return &Manager{
 		activeWallpapers: make(map[string]*ActiveWallpaper),
+		handoffTimeout:   handoffWindow,
+	}
+}
+
+// SetControlSocketHandoff enables live handoff for engines with a control socket.
+func (manager *Manager) SetControlSocketHandoff(enabled bool) {
+	manager.mutex.Lock()
+	defer manager.mutex.Unlock()
+
+	if manager.controlSocketHandoff == enabled {
+		return
+	}
+	manager.controlSocketHandoff = enabled
+	if enabled {
+		logger.Printf("Engine control-socket handoff enabled")
+	} else {
+		logger.Printf("Engine control-socket handoff disabled")
 	}
 }
 
@@ -41,7 +64,6 @@ func (manager *Manager) UpdateWallpapers(desiredWallpapers []struct {
 		desiredScreens[desiredWallpaper.Screen] = true
 	}
 
-	// Kill wallpapers no longer desired (excluding __PREVIEW__)
 	for screen := range manager.activeWallpapers {
 		if screen == "__PREVIEW__" {
 			continue
@@ -51,7 +73,6 @@ func (manager *Manager) UpdateWallpapers(desiredWallpapers []struct {
 		}
 	}
 
-	// Start or update wallpapers
 	for _, desiredWallpaper := range desiredWallpapers {
 		active, exists := manager.activeWallpapers[desiredWallpaper.Screen]
 		if exists {
@@ -59,12 +80,77 @@ func (manager *Manager) UpdateWallpapers(desiredWallpapers []struct {
 				logger.Printf("Wallpaper for %s is already running.", desiredWallpaper.Screen)
 				continue
 			}
+
+			if manager.controlSocketHandoff {
+				logger.Printf("Handing off wallpaper for %s...", desiredWallpaper.Screen)
+				if manager.handoffWallpaper(desiredWallpaper.Screen, active, desiredWallpaper.Exec, desiredWallpaper.Args, desiredWallpaper.Command) {
+					continue
+				}
+				logger.Printf("Handoff for %s could not start; falling back to restart", desiredWallpaper.Screen)
+			}
+
 			logger.Printf("Updating wallpaper for %s...", desiredWallpaper.Screen)
 			manager.killWallpaperInternal(desiredWallpaper.Screen)
 		}
 
 		logger.Printf("Starting wallpaper for %s... (%s %v)", desiredWallpaper.Screen, desiredWallpaper.Exec, desiredWallpaper.Args)
 		manager.spawnWallpaper(desiredWallpaper.Screen, desiredWallpaper.Exec, desiredWallpaper.Args, desiredWallpaper.Command)
+	}
+}
+
+// handoffWallpaper spawns a transient candidate to crossfade; false if it won't start.
+func (manager *Manager) handoffWallpaper(screen string, owner *ActiveWallpaper, execPath string, args []string, fullCommand string) bool {
+	candidate, err := manager.spawnProcess(screen, execPath, args)
+	if err != nil {
+		logger.Printf("Failed to spawn handoff candidate for %s: %v", screen, err)
+		return false
+	}
+
+	go manager.watchHandoffCandidate(screen, owner, candidate, fullCommand)
+	return true
+}
+
+// watchHandoffCandidate resolves the handoff without blocking: a quick exit means
+// the crossfade ran, outliving the window means the candidate is the new owner.
+func (manager *Manager) watchHandoffCandidate(screen string, owner *ActiveWallpaper, candidate *exec.Cmd, fullCommand string) {
+	exited := make(chan error, 1)
+	go func() {
+		exited <- candidate.Wait()
+	}()
+
+	select {
+	case <-exited:
+		manager.mutex.Lock()
+		if current, exists := manager.activeWallpapers[screen]; exists && current == owner {
+			current.Command = fullCommand
+		}
+		manager.mutex.Unlock()
+		logger.Printf("Wallpaper handoff succeeded for %s", screen)
+
+	case <-time.After(manager.handoffTimeout):
+		manager.mutex.Lock()
+		current, exists := manager.activeWallpapers[screen]
+		if exists && current != owner {
+			// Owner changed mid-handoff; this candidate is stale.
+			manager.mutex.Unlock()
+			terminateProcess(candidate)
+			<-exited
+			logger.Printf("Discarded stale handoff candidate for %s", screen)
+			return
+		}
+
+		delete(manager.activeWallpapers, screen)
+		manager.activeWallpapers[screen] = &ActiveWallpaper{Cmd: candidate, Command: fullCommand}
+		manager.mutex.Unlock()
+		logger.Printf("Handoff candidate for %s is still running; promoted it to owner", screen)
+
+		// Untrack the promoted candidate once it exits.
+		<-exited
+		manager.mutex.Lock()
+		if tracked, ok := manager.activeWallpapers[screen]; ok && tracked.Cmd == candidate {
+			delete(manager.activeWallpapers, screen)
+		}
+		manager.mutex.Unlock()
 	}
 }
 
@@ -75,20 +161,26 @@ func (manager *Manager) killWallpaperInternal(screen string) {
 	}
 
 	logger.Printf("Killing wallpaper for %s", screen)
-	if active.Cmd.Process != nil {
-		// Try to kill process group
-		processGroupID, err := syscall.Getpgid(active.Cmd.Process.Pid)
-		if err == nil {
-			if err := syscall.Kill(-processGroupID, syscall.SIGTERM); err != nil {
-				logger.Printf("Error killing process group: %v", err)
-			}
-		} else {
-			if err := active.Cmd.Process.Kill(); err != nil {
-				logger.Printf("Error killing process: %v", err)
-			}
-		}
-	}
+	terminateProcess(active.Cmd)
 	delete(manager.activeWallpapers, screen)
+}
+
+// terminateProcess kills the process group, falling back to the process itself.
+func terminateProcess(command *exec.Cmd) {
+	if command == nil || command.Process == nil {
+		return
+	}
+
+	processGroupID, err := syscall.Getpgid(command.Process.Pid)
+	if err == nil {
+		if err := syscall.Kill(-processGroupID, syscall.SIGTERM); err != nil {
+			logger.Printf("Error killing process group: %v", err)
+		}
+		return
+	}
+	if err := command.Process.Kill(); err != nil {
+		logger.Printf("Error killing process: %v", err)
+	}
 }
 
 func (manager *Manager) KillByFolderName(folderName string) {
@@ -104,13 +196,8 @@ func (manager *Manager) KillByFolderName(folderName string) {
 }
 
 func (manager *Manager) spawnWallpaper(screen string, execPath string, args []string, fullCommand string) {
-	command := exec.Command(execPath, args...)
-	command.SysProcAttr = &syscall.SysProcAttr{Setpgid: true}
-
-	stdout, _ := command.StdoutPipe()
-	stderr, _ := command.StderrPipe()
-
-	if err := command.Start(); err != nil {
+	command, err := manager.spawnProcess(screen, execPath, args)
+	if err != nil {
 		logger.Printf("Failed to spawn wallpaper for %s: %v", screen, err)
 		return
 	}
@@ -119,11 +206,6 @@ func (manager *Manager) spawnWallpaper(screen string, execPath string, args []st
 		Cmd:     command,
 		Command: fullCommand,
 	}
-
-	// Handle stdout
-	go manager.captureOutput(screen, stdout)
-	// Handle stderr
-	go manager.captureOutput(screen, stderr)
 
 	go func() {
 		if err := command.Wait(); err != nil {
@@ -135,6 +217,30 @@ func (manager *Manager) spawnWallpaper(screen string, execPath string, args []st
 		}
 		manager.mutex.Unlock()
 	}()
+}
+
+// spawnProcess starts a command in its own process group with streamed output.
+func (manager *Manager) spawnProcess(screen string, execPath string, args []string) (*exec.Cmd, error) {
+	command := exec.Command(execPath, args...)
+	command.SysProcAttr = &syscall.SysProcAttr{Setpgid: true}
+
+	stdout, err := command.StdoutPipe()
+	if err != nil {
+		return nil, err
+	}
+	stderr, err := command.StderrPipe()
+	if err != nil {
+		return nil, err
+	}
+
+	if err := command.Start(); err != nil {
+		return nil, err
+	}
+
+	go manager.captureOutput(screen, stdout)
+	go manager.captureOutput(screen, stderr)
+
+	return command, nil
 }
 
 func (manager *Manager) captureOutput(screen string, readCloser io.ReadCloser) {

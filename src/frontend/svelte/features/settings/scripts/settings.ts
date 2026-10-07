@@ -22,6 +22,9 @@ export interface SettingsState {
 	scaling: string;
 	clamping: string;
 	layer: string;
+	transition: string;
+	transitionDuration: number;
+	transitionMode: string;
 	disableMouse: boolean;
 	disableParallax: boolean;
 	noFullscreenPause: boolean;
@@ -66,6 +69,9 @@ const configFieldMap: Record<string, string> = {
 	scaling: "scaling",
 	clamping: "clamping",
 	layer: "layer",
+	transition: "transition",
+	transitionDuration: "transitionDuration",
+	transitionMode: "transitionMode",
 	disableMouse: "disableMouse",
 	disableParallax: "disableParallax",
 	noFullscreenPause: "noFullscreenPause",
@@ -114,6 +120,9 @@ export async function loadSettings(): Promise<void> {
 
 			// Ensure defaults
 			if (settings.layer === undefined) settings.layer = 'bottom';
+			if (settings.transition === undefined) settings.transition = '';
+			if (settings.transitionDuration === undefined) settings.transitionDuration = 0;
+			if (settings.transitionMode === undefined) settings.transitionMode = '';
 			if (settings.fullscreenPauseIgnoreAppIds === undefined) settings.fullscreenPauseIgnoreAppIds = [];
 			if (settings.playlist === undefined) settings.playlist = '';
 			if (settings.playlistInterval === undefined) settings.playlistInterval = 0;

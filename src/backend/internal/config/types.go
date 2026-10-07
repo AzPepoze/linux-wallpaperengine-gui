@@ -30,6 +30,11 @@ type AppConfig struct {
 	Playlist         string  `json:"playlist"`
 	PlaylistInterval float64 `json:"playlistInterval,omitempty"`
 
+	// Transitions
+	Transition         string `json:"transition,omitempty"`
+	TransitionDuration int    `json:"transitionDuration,omitempty"`
+	TransitionMode     string `json:"transitionMode,omitempty"`
+
 	// Audio Settings
 	Volume *float64 `json:"volume,omitempty"`
 
