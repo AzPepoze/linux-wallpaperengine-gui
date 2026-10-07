@@ -36,12 +36,12 @@
 - [PREREQUISITES](#prerequisites)
 - [INSTALLATION](#installation)
   - [Arch Linux (AUR)](#arch-linux-aur)
+  - [Nix Flakes](#nix-flakes)
   - [Other Distributions](#other-distributions)
 - [USAGE](#usage)
   - [\[Options\]](#options)
 - [BUILD FROM SOURCE](#build-from-source)
 - [DEVELOPMENT](#development)
-- [USING NIX FLAKES](#using-nix-flakes)
 - [STONKS!](#stonks)
 
 > [!NOTE]
@@ -138,6 +138,27 @@ yay -S linux-wallpaperengine-gui-git
 paru -S linux-wallpaperengine-gui-git
 ```
 
+### Nix Flakes
+
+If you use [Nix](https://nixos.org/), this repository provides a `flake.nix` with a development shell containing all the build requirements (`go`, `bun`, `pkg-config`, `gtk3`, `libayatana-appindicator`), plus `golangci-lint` for `bun run check`, so you don't need to install anything manually.
+
+**With Nix installed:**
+```bash
+nix develop
+```
+This drops you into a shell with all the dependencies, continue with `bun install`, `bun run build`, or `bun run dev` as normal.
+
+> [!NOTE]
+> `bun run build:all` currently fails on NixOS under the Nix devShell due to a known NixOS limitation with generic dynamically-linked binaries downloaded by electron-builder (see https://nix.dev/permalink/stub-ld). `bun run build` works fine.
+
+**With [direnv](https://direnv.net/) installed:**
+```bash
+direnv allow
+```
+This automatically loads the same shell whenever you `cd` into the project directory.
+
+Thanks to [@Maxxavec2x](https://github.com/Maxxavec2x)!
+
 ### Other Distributions
 
 Download the latest pre-built binaries (AppImage, deb, rpm) from the [**Releases**](https://github.com/AzPepoze/linux-wallpaperengine-gui/releases/latest) page.
@@ -186,24 +207,6 @@ Run with hot-reloading:
 ```bash
 bun run dev
 ```
-
-## USING NIX FLAKES
-If you use [Nix](https://nixos.org/), this repository provides a `flake.nix` with a development shell containing all the requirements above (`go`, `bun`, `pkg-config`, `gtk3`, `libayatana-appindicator`), plus `golangci-lint` for bun run check, so you don't need to install anything manually.
-
-**With Nix installed:**
-```bash
-nix develop
-```
-This drops you into a shell with all the dependencies from **Requirements** above, continue with `bun install`, `bun run build`, or `bun run dev` as normal.
-
-> [!NOTE]
-> `bun run build:all` currently fails on NixOS under the Nix devShell due to a known NixOS limitation with generic dynamically-linked binaries downloaded by electron-builder (see https://nix.dev/permalink/stub-ld). `bun run build` works fine.
-
-**With [direnv](https://direnv.net/) installed:**
-```bash
-direnv allow
-```
-This automatically loads the same shell whenever you `cd` into the project directory.
 
 ## STONKS!
 
