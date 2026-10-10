@@ -55,6 +55,7 @@ export interface SettingsState {
 	wallpaperChangeCommand: string;
 	enableGridWarpAnimation: boolean;
 	performanceMode: boolean;
+	doubleClickApply: boolean;
 }
 
 export const settingsStore: Writable<SettingsState | null> = writable(null);
@@ -103,6 +104,7 @@ const configFieldMap: Record<string, string> = {
 	wallpaperChangeCommand: "wallpaperChangeCommand",
 	enableGridWarpAnimation: "enableGridWarpAnimation",
 	performanceMode: "performanceMode",
+	doubleClickApply: "doubleClickApply",
 };
 
 // Settings Actions
@@ -130,6 +132,7 @@ export async function loadSettings(): Promise<void> {
 			if (settings.playlistInterval === undefined) settings.playlistInterval = 0;
 			if (settings.enableGridWarpAnimation === undefined) settings.enableGridWarpAnimation = true;
 			if (settings.performanceMode === undefined) settings.performanceMode = false;
+			if (settings.doubleClickApply === undefined) settings.doubleClickApply = true;
 			if (settings.language === undefined) settings.language = 'en';
 
 			settingsStore.set(settings as SettingsState);

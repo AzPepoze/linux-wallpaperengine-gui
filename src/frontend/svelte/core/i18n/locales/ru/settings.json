@@ -50,6 +50,8 @@
 		"hideTrayLabelDesc": "Показывать в системном лотке только значок, без надписи «Linux Wallpaper Engine».",
 		"gridWarpAnimation": "[NYT_RU] Grid Warp Animation",
 		"gridWarpAnimationDesc": "[NYT_RU] Animate grid items smoothly when the layout wraps to new rows on resize or filter.",
+		"doubleClickApply": "[NYT_RU] Double-Click to Apply",
+		"doubleClickApplyDesc": "[NYT_RU] Apply a wallpaper when you double-click its card.",
 		"performanceMode": "[NYT_RU] Performance Mode",
 		"performanceModeDesc": "[NYT_RU] Disable heavy animations, shimmer effects, and backdrop blur for better performance.",
 		"transitionEffect": "[NYT_RU] Transition Effect",

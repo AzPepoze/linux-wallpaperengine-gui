@@ -55,6 +55,7 @@ func init() {
 		TransparentUi:       true,
 		UiTransparency:      90,
 		EnableScrollMask:    true,
+		DoubleClickApply:    true,
 		HookEnabled:              false,
 		HideTrayLabel:            false,
 		WallpaperChangeCommand:   "",

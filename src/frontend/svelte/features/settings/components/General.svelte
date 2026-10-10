@@ -118,6 +118,17 @@
 	</SettingItem>
 
 	<SettingItem
+		label={$t('settings.general.doubleClickApply')}
+		id="doubleClickApply"
+		description={$t('settings.general.doubleClickApplyDesc')}
+	>
+		<Toggle
+			id="doubleClickApply"
+			bind:checked={$settingsStore.doubleClickApply}
+		/>
+	</SettingItem>
+
+	<SettingItem
 		label={$t('settings.general.hideTrayLabel')}
 		id="hideTrayLabel"
 		description={$t('settings.general.hideTrayLabelDesc')}

@@ -50,6 +50,8 @@
 		"hideTrayLabelDesc": "แสดงเฉพาะไอคอนในถาดระบบ และซ่อนข้อความ “Linux Wallpaper Engine”",
 		"gridWarpAnimation": "อนิเมชั่นการจัดเรียง wallpaper",
 		"gridWarpAnimationDesc": "แสดงอนิเมชั่นการจัดเรียง wallpaper เมื่อจัดแถวใหม่จากการย่อ/ขยายหน้าต่างหรือการกรอง",
+		"doubleClickApply": "[NYT_TH] Double-Click to Apply",
+		"doubleClickApplyDesc": "[NYT_TH] Apply a wallpaper when you double-click its card.",
 		"performanceMode": "โหมดประสิทธิภาพ",
 		"performanceModeDesc": "ปิดภาพเคลื่อนไหวหนักๆ เอฟเฟกต์แสงระยิบระยับ และการเบลอพื้นหลัง เพื่อให้ใช้งานได้ลื่นขึ้นและกินทรัพยากรน้อยลง",
 		"transitionEffect": "เอฟเฟกต์เปลี่ยนภาพ",
