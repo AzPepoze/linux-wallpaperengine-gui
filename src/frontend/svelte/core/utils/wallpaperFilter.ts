@@ -1,5 +1,7 @@
 import type { WallpaperData, FilterConfig } from '@shared/types';
 
+const UNSPECIFIED_TAG = 'unspecified';
+
 export function searchWallpapers(
 	wallpapers: Record<string, WallpaperData>,
 	query: string
@@ -148,9 +150,10 @@ export function filterWallpapers(
 				// Skip resolution filtering for local items for now
 				continue;
 			} else {
-				// Check if wallpaper has any of the tags in this category
+				// Untagged wallpapers count as "Unspecified"
+				const genreTags = wpTags.length > 0 ? wpTags : [UNSPECIFIED_TAG];
 				const hasTagInCat = tags.some((t) =>
-					wpTags.includes(t)
+					genreTags.includes(t)
 				);
 				if (!hasTagInCat) {
 					matches = false;
