@@ -16,7 +16,6 @@ var (
 	AutostartPath       string
 	WorkshopPath        string
 	WallpaperEnginePath string
-	DefaultConfig       AppConfig
 
 	corruptConfigPrompt struct {
 		sync.Mutex
@@ -33,32 +32,36 @@ func init() {
 
 	ConfigPath = filepath.Join(HomePath, ".config/linux-wallpaperengine-gui/config.json")
 	AutostartPath = filepath.Join(HomePath, ".config/autostart/linux-wallpaperengine-gui.desktop")
+}
 
-	DefaultConfig = AppConfig{
-		FPS:                 60,
-		Silence:             false,
-		CustomArgs:          "",
-		CustomArgsEnabled:   false,
-		Volume:              newFloat(100),
-		NoAutomute:          false,
-		NoAudioProcessing:   false,
-		Scaling:             "default",
-		Clamping:            "clamp",
-		Layer:               "bottom",
-		ScreenshotDelay:     5,
-		Properties:          make(map[string]string),
-		WallpaperProperties: make(map[string]map[string]string),
-		Playlist:            "",
-		Autostart:           false,
-		DynamicUiTheme:      true,
-		DynamicSidebarTheme: true,
-		TransparentUi:       true,
-		UiTransparency:      90,
-		EnableScrollMask:    true,
-		DoubleClickApply:    true,
-		HookEnabled:              false,
-		HideTrayLabel:            false,
-		WallpaperChangeCommand:   "",
+// NewDefaultConfig returns a fresh default config. Each call gets its own maps and pointers,
+// so unmarshalling into one config never mutates another.
+func NewDefaultConfig() AppConfig {
+	return AppConfig{
+		FPS:                    60,
+		Silence:                false,
+		CustomArgs:             "",
+		CustomArgsEnabled:      false,
+		Volume:                 newFloat(100),
+		NoAutomute:             false,
+		NoAudioProcessing:      false,
+		Scaling:                "default",
+		Clamping:               "clamp",
+		Layer:                  "bottom",
+		ScreenshotDelay:        5,
+		Properties:             make(map[string]string),
+		WallpaperProperties:    make(map[string]map[string]string),
+		Playlist:               "",
+		Autostart:              false,
+		DynamicUiTheme:         true,
+		DynamicSidebarTheme:    true,
+		TransparentUi:          true,
+		UiTransparency:         90,
+		EnableScrollMask:       true,
+		DoubleClickApply:       true,
+		HookEnabled:            false,
+		HideTrayLabel:          false,
+		WallpaperChangeCommand: "",
 		SteamPaths: []string{
 			".local/share/Steam",
 			".var/app/com.valvesoftware.Steam/.local/share/Steam",
@@ -197,7 +200,7 @@ func EnsureInitialized() error {
 	wallpaperEngineSuffix := "steamapps/common/wallpaper_engine"
 	steamPaths := conf.SteamPaths
 	if len(steamPaths) == 0 {
-		steamPaths = DefaultConfig.SteamPaths
+		steamPaths = NewDefaultConfig().SteamPaths
 	}
 
 	// 1. Resolve Wallpaper Engine Path
@@ -249,29 +252,31 @@ func ReadConfig() (AppConfig, error) {
 	data, err := os.ReadFile(ConfigPath)
 	if err != nil {
 		if os.IsNotExist(err) {
-			if werr := WriteConfig(DefaultConfig); werr != nil {
-				return DefaultConfig, werr
+			defaults := NewDefaultConfig()
+			if werr := WriteConfig(defaults); werr != nil {
+				return defaults, werr
 			}
 			clearCorruptConfigPrompt()
-			return DefaultConfig, nil
+			return defaults, nil
 		}
-		return DefaultConfig, err
+		return NewDefaultConfig(), err
 	}
 
-	conf := DefaultConfig
+	conf := NewDefaultConfig()
 	if err := json.Unmarshal(data, &conf); err != nil {
 		switch showCorruptConfigPromptOnce() {
 		case resetCorruptConfigAction:
-			if werr := WriteConfig(DefaultConfig); werr == nil {
+			defaults := NewDefaultConfig()
+			if werr := WriteConfig(defaults); werr == nil {
 				clearCorruptConfigPrompt()
-				return DefaultConfig, nil
+				return defaults, nil
 			}
 		case openCorruptConfigInEditorAction:
 			if openErr := OpenConfigEditor(); openErr != nil {
-				return DefaultConfig, openErr
+				return NewDefaultConfig(), openErr
 			}
 		}
-		return DefaultConfig, err
+		return NewDefaultConfig(), err
 	}
 
 	// Merge with defaults if necessary

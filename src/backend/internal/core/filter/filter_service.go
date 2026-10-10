@@ -11,7 +11,7 @@ func GetInstalledFilters() (*config.FilterConfig, error) {
 	}
 
 	if appConfig.InstalledFilters == nil {
-		return config.DefaultConfig.InstalledFilters, nil
+		return config.NewDefaultConfig().InstalledFilters, nil
 	}
 
 	return appConfig.InstalledFilters, nil
@@ -33,7 +33,7 @@ func GetWorkshopFilters() (*config.FilterConfig, error) {
 	}
 
 	if appConfig.WorkshopFilters == nil {
-		return config.DefaultConfig.WorkshopFilters, nil
+		return config.NewDefaultConfig().WorkshopFilters, nil
 	}
 
 	return appConfig.WorkshopFilters, nil
