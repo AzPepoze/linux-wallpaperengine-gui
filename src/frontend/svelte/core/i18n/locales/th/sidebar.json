@@ -4,7 +4,13 @@
 	"applyAll": "[NYT_TH] Apply to All Displays",
 	"empty": {
 		"title": "[NYT_TH] No wallpaper selected",
-		"hint": "[NYT_TH] Select a wallpaper to see its details."
+		"hint": "[NYT_TH] Select a wallpaper to see its details.",
+		"click": "[NYT_TH] Click",
+		"clickDesc": "[NYT_TH] See details",
+		"doubleClick": "[NYT_TH] Double-click",
+		"doubleClickDesc": "[NYT_TH] Apply it",
+		"rightClick": "[NYT_TH] Right-click",
+		"rightClickDesc": "[NYT_TH] More options"
 	},
 	"local": {
 		"folder": "โฟลเดอร์:",

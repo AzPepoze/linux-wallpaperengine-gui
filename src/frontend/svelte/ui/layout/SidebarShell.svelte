@@ -6,9 +6,8 @@
 		type SidebarTheme
 	} from '@/features/home/scripts/sidebarTheme';
 	import { settingsStore } from '@/features/settings/scripts/settings';
-	import { t } from '@/core/i18n';
 	import CloseIcon from '@/ui/icons/CloseIcon.svelte';
-	import EmptyState from '@/ui/EmptyState.svelte';
+	import SidebarEmpty from '@/ui/layout/SidebarEmpty.svelte';
 	import ResizeHandle from '@/ui/ResizeHandle.svelte';
 	import type { Wallpaper } from '@shared/types';
 
@@ -70,7 +69,7 @@
 	{/if}
 
 	<div class="sidebar-container">
-		<div class="sidebar-content">
+		<div class="sidebar-content" class:is-empty={!selectedWallpaper}>
 			{#if selectedWallpaper}
 				{#if selectedWallpaper.previewPath}
 					<img
@@ -89,11 +88,7 @@
 					<slot />
 				</div>
 			{:else}
-				<EmptyState
-					icon="wallpaper"
-					title={$t('sidebar.empty.title')}
-					description={$t('sidebar.empty.hint')}
-				/>
+				<SidebarEmpty />
 			{/if}
 		</div>
 
@@ -245,6 +240,11 @@
 		.sidebar-footer {
 			padding: 10px 0;
 			flex-shrink: 0;
+		}
+
+		.sidebar-content.is-empty {
+			display: flex;
+			flex-direction: column;
 		}
 
 		/* Global Typography for any content inside the shell */

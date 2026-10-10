@@ -4,7 +4,13 @@
 	"applyAll": "[NYT_RU] Apply to All Displays",
 	"empty": {
 		"title": "[NYT_RU] No wallpaper selected",
-		"hint": "[NYT_RU] Select a wallpaper to see its details."
+		"hint": "[NYT_RU] Select a wallpaper to see its details.",
+		"click": "[NYT_RU] Click",
+		"clickDesc": "[NYT_RU] See details",
+		"doubleClick": "[NYT_RU] Double-click",
+		"doubleClickDesc": "[NYT_RU] Apply it",
+		"rightClick": "[NYT_RU] Right-click",
+		"rightClickDesc": "[NYT_RU] More options"
 	},
 	"local": {
 		"folder": "Папка:",
