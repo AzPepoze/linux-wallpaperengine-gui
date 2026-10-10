@@ -1,6 +1,6 @@
 <script lang="ts">
 	import type { Playlist, WallpaperData } from '@shared/types';
-	import { WALLPAPER_ENGINE_APP_ID } from '@shared/constants';
+	import { parseWallpaperIdFromPath } from './PlaylistManager.svelte.ts';
 	import Icon from '@/ui/Icon.svelte';
 	import { fly, fade } from 'svelte/transition';
 
@@ -47,13 +47,8 @@
 								onSelect(itemPath)}
 						>
 							{#if itemPath}
-								{@const idMatch = itemPath.match(
-									new RegExp(
-										`${WALLPAPER_ENGINE_APP_ID}[\\/\\\\](\\d+)[\\/\\\\]`
-									)
-								)}
-								{#if idMatch}
-									{@const id = idMatch[1]}
+								{@const id = parseWallpaperIdFromPath(itemPath)}
+								{#if id}
 									{@const wpData = wallpapers[id]}
 									{#if wpData}
 										<img

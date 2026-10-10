@@ -240,7 +240,8 @@ func (service *Service) UpdatePlaylistInterval(screenName string, intervalMinute
 
 func (service *Service) extractWallpaperIDs(items []string) []string {
 	var ids []string
-	regex := regexp.MustCompile(`431960[/\\](\d+)[/\\]`)
+	// Workshop items live under 431960/<id>, built-in ones under defaultprojects/<name>.
+	regex := regexp.MustCompile(`(?:431960|defaultprojects)[/\\]([^/\\]+)[/\\]`)
 
 	for _, item := range items {
 		matches := regex.FindStringSubmatch(item)
