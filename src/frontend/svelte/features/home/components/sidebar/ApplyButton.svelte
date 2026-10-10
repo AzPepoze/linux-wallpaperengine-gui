@@ -23,6 +23,6 @@
 	on:click={() => applyWallpaper(folderName)}
 	style="width: 100%; height: 40px; border-radius: 25px;"
 >
-	<Icon name="desktop_windows" size={18} />
+	<Icon name="desktop_windows" size={18} color="inherit" />
 	{label}
 </Button>

@@ -14,7 +14,7 @@
 	aria-pressed={isVisible}
 	on:click={() => sidebarHidden.update((v) => !v)}
 >
-	<Icon name="view_sidebar" size={20} />
+	<Icon name="view_sidebar" size={20} color="inherit" />
 </button>
 
 <style lang="scss">
