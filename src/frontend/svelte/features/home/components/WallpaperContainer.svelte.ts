@@ -1,6 +1,7 @@
 import { logger } from '@/core/logger';
 import type { FilterConfig, Playlist, WallpaperData } from '@shared/types';
 import { DEFAULT_INSTALLED_FILTER_CONFIG } from '@shared/filterConstants';
+import { mergeFilterConfig } from '@/core/utils/filterConfig';
 
 export async function checkSteamStatus(): Promise<boolean> {
 	try {
@@ -15,10 +16,7 @@ export async function loadInstalledFilters(): Promise<FilterConfig> {
 	try {
 		const result = await window.electronAPI.getInstalledFilters();
 		if (result.success) {
-			return {
-				...DEFAULT_INSTALLED_FILTER_CONFIG,
-				...result.filters
-			};
+			return mergeFilterConfig(DEFAULT_INSTALLED_FILTER_CONFIG, result.filters);
 		}
 	} catch (err) {
 		console.error('Failed to load filters:', err);

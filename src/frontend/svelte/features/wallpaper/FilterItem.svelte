@@ -6,29 +6,25 @@
 	export let onClick: () => void;
 
 	let isClicking = false;
-	let displayActive = false;
 
 	function handleClick(e: MouseEvent) {
 		e.preventDefault();
 		isClicking = true;
-		displayActive = !displayActive;
 		onClick();
 		setTimeout(() => {
 			isClicking = false;
 		}, 600);
 	}
-
-	$: displayActive = isActive;
 </script>
 
 <button
 	class="filter-item"
-	class:active={displayActive}
+	class:active={isActive}
 	class:clicking={isClicking}
 	on:click={handleClick}
 >
 	<div class="checkbox">
-		{#if displayActive}
+		{#if isActive}
 			<Icon name="check" size={14} strokeWidth={3} />
 		{/if}
 	</div>

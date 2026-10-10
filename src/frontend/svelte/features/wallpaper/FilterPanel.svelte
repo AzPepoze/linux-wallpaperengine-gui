@@ -1,11 +1,6 @@
 <script lang="ts">
-	import { onMount } from 'svelte';
 	import { fly } from 'svelte/transition';
-	import {
-		buildFilterCategories,
-		DEFAULT_WORKSHOP_FILTER_CONFIG,
-		type FilterCategory
-	} from '@shared/filterConstants';
+	import { FILTER_CATEGORIES, type FilterCategory } from '@shared/filterConstants';
 	import type { FilterConfig } from '@shared/types';
 	import { logger } from '@/core/logger';
 	import Button from '@/ui/Button.svelte';
@@ -14,38 +9,33 @@
 	import ResizeHandle from '@/ui/ResizeHandle.svelte';
 	import FilterCategorySection from './FilterCategorySection.svelte';
 	import { filterPanelWidth } from '@/core/ui';
+	import {
+		getCategoryItems,
+		setTags,
+		toggleTag
+	} from '@/core/utils/filterConfig';
 
+	// The page owns the config; the panel only shows it and reports changes.
 	export let config: FilterConfig;
+	export let defaults: FilterConfig;
 	export let show: boolean = true;
-	export let onSave: ((config: FilterConfig) => void) | undefined =
-		undefined;
-	export let onChange: ((config: FilterConfig) => void) | undefined =
-		undefined;
+	export let hiddenCategories: string[] = [];
+	export let onChange: (config: FilterConfig) => void;
 	export let onClose: () => void = () => {};
 
-	let localConfig: FilterConfig = JSON.parse(JSON.stringify(config));
-	let expandedCategories: Record<string, boolean> = {};
-	let filterCategories: FilterCategory[] =
-		buildFilterCategories(localConfig);
+	let expandedCategories: Record<string, boolean> = Object.fromEntries(
+		FILTER_CATEGORIES.map((category) => [category.name, true])
+	);
 	let isResizing = false;
 
-	onMount(() => {
-		filterCategories.forEach((cat) => {
-			expandedCategories[cat.name] = true;
-		});
-	});
+	$: visibleCategories = FILTER_CATEGORIES.filter(
+		(category) => !hiddenCategories.includes(category.name)
+	);
 
 	function handleToggleTag(internalKey: keyof FilterConfig, item: string) {
-		if (!localConfig[internalKey]) {
-			(localConfig[internalKey] as any) = {};
-		}
-		const tags = localConfig[internalKey] as Record<string, boolean>;
-		tags[item] = !tags[item];
-		localConfig = { ...localConfig };
-		logger.log(
-			`Filter toggled: [${internalKey}] ${item} -> ${tags[item]}`
-		);
-		if (onChange) onChange(localConfig);
+		const next = toggleTag(config, internalKey, item);
+		logger.log(`Filter toggled: [${internalKey}] ${item}`);
+		onChange(next);
 	}
 
 	function handleSetGroupState(
@@ -53,52 +43,17 @@
 		items: string[],
 		state: boolean
 	) {
-		if (!localConfig[internalKey]) {
-			(localConfig as any)[internalKey] = {};
-		}
-		const tags = {
-			...(localConfig[internalKey] as Record<string, boolean>)
-		};
-		items.forEach((item) => (tags[item] = state));
-		(localConfig as any)[internalKey] = tags;
-		localConfig = { ...localConfig };
-		if (onChange) onChange(localConfig);
+		onChange(setTags(config, internalKey, items, state));
 	}
 
 	function handleSetCategoryState(category: FilterCategory, state: boolean) {
 		const internalKey = category.internalKey as keyof FilterConfig;
-		if (!localConfig[internalKey]) {
-			(localConfig as any)[internalKey] = {};
-		}
-		const tags = {
-			...(localConfig[internalKey] as Record<string, boolean>)
-		};
-
-		if (category.items) {
-			category.items.forEach((item) => (tags[item] = state));
-		}
-
-		if (category.groups) {
-			category.groups.forEach((group) => {
-				group.items.forEach((item) => (tags[item] = state));
-			});
-		}
-
-		(localConfig as any)[internalKey] = tags;
-		localConfig = { ...localConfig };
-		if (onChange) onChange(localConfig);
-	}
-
-	function handleSave() {
-		if (onSave) onSave(localConfig);
+		const items = getCategoryItems(category);
+		onChange(setTags(config, internalKey, items, state));
 	}
 
 	function handleReset() {
-		localConfig = JSON.parse(
-			JSON.stringify(DEFAULT_WORKSHOP_FILTER_CONFIG)
-		);
-		filterCategories = buildFilterCategories(localConfig);
-		if (onChange) onChange(localConfig);
+		onChange(defaults);
 	}
 </script>
 
@@ -138,16 +93,14 @@
 						<Icon name="restart_alt" size={16} />
 						<span>{$t('filter.ui.reset')}</span>
 					</Button>
-					{#if onSave}
-						<Button
-							variant="primary"
-							on:click={handleSave}
-							style="padding: 4px 12px; font-size: 0.8em;"
-						>
-							<Icon name="done" size={16} />
-							<span>{$t('filter.ui.apply')}</span>
-						</Button>
-					{/if}
+					<Button
+						variant="primary"
+						on:click={onClose}
+						style="padding: 4px 12px; font-size: 0.8em;"
+					>
+						<Icon name="done" size={16} />
+						<span>{$t('filter.ui.apply')}</span>
+					</Button>
 					<Button
 						variant="secondary"
 						on:click={onClose}
@@ -159,10 +112,10 @@
 			</div>
 
 			<div class="panel-content">
-				{#each filterCategories as category (category.name)}
+				{#each visibleCategories as category (category.name)}
 					<FilterCategorySection
 						{category}
-						{localConfig}
+						{config}
 						bind:isExpanded={expandedCategories[category.name]}
 						onToggleTag={handleToggleTag}
 						onSetGroupState={handleSetGroupState}

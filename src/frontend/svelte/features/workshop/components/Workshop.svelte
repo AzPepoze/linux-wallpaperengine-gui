@@ -6,9 +6,8 @@
 	import type { WorkshopItem } from '@/core/utils/workshopHelper';
 	import type { FilterConfig } from '@shared/types';
 	import {
-		buildFilterCategories,
 		DEFAULT_WORKSHOP_FILTER_CONFIG,
-		type FilterCategory
+		FILTER_CATEGORIES
 	} from '@shared/filterConstants';
 	import FilterPanel from '@/features/wallpaper/FilterPanel.svelte';
 	import WorkshopControls from './WorkshopControls.svelte';
@@ -21,10 +20,12 @@
 		performWorkshopQuery
 	} from './Workshop.svelte.ts';
 
-	let workshopFilters: FilterConfig = { ...DEFAULT_WORKSHOP_FILTER_CONFIG };
-	let filterCategories: FilterCategory[] = buildFilterCategories().filter(
+	// Workshop items are always remote, so the Source filter is not searched.
+	const searchCategories = FILTER_CATEGORIES.filter(
 		(cat) => cat.internalKey !== 'sourcetags'
 	);
+
+	let workshopFilters: FilterConfig = DEFAULT_WORKSHOP_FILTER_CONFIG;
 	let initialLoadDone = false;
 	let showFilterPanel = false;
 	let searching = false;
@@ -76,17 +77,7 @@
 	async function handleLoadFilters() {
 		const loaded = await loadFilters();
 		if (loaded) {
-			workshopFilters = loaded.filters;
-			filterCategories = loaded.categories;
-		}
-	}
-
-	async function handleSaveFilters(newConfig: FilterConfig) {
-		const success = await saveFilters(newConfig);
-		if (success) {
-			workshopFilters = newConfig;
-			showFilterPanel = false;
-			handleSearch();
+			workshopFilters = loaded;
 		}
 	}
 
@@ -115,7 +106,7 @@
 			const result = await performWorkshopQuery({
 				searchText,
 				filters: workshopFilters,
-				categories: filterCategories,
+				categories: searchCategories,
 				page: browsePage,
 				sortOrder,
 				itemType,
@@ -157,7 +148,7 @@
 			const result = await performWorkshopQuery({
 				searchText,
 				filters: workshopFilters,
-				categories: filterCategories,
+				categories: searchCategories,
 				page: browsePage,
 				sortOrder,
 				itemType,
@@ -218,9 +209,10 @@
 			/>
 		{:else}
 			<FilterPanel
-				show={showFilterPanel && !!workshopFilters}
-				config={workshopFilters || DEFAULT_WORKSHOP_FILTER_CONFIG}
-				onSave={handleSaveFilters}
+				show={showFilterPanel}
+				config={workshopFilters}
+				defaults={DEFAULT_WORKSHOP_FILTER_CONFIG}
+				hiddenCategories={['Source']}
 				onChange={handleFilterChange}
 				onClose={() => (showFilterPanel = false)}
 			/>
