@@ -3,14 +3,7 @@
 	"applyTo": "Apply to {screen}",
 	"applyAll": "Apply to All Displays",
 	"empty": {
-		"title": "No wallpaper selected",
-		"hint": "Pick one from the grid to see its details.",
-		"click": "Click",
-		"clickDesc": "See details",
-		"doubleClick": "Double-click",
-		"doubleClickDesc": "Apply it",
-		"rightClick": "Right-click",
-		"rightClickDesc": "More options"
+		"title": "No wallpaper selected"
 	},
 	"local": {
 		"folder": "Folder:",
