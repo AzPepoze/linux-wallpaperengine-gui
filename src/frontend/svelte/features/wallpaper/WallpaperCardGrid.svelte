@@ -22,6 +22,7 @@
 		index: number;
 		handleSelect: () => void;
 		handleContextMenu: (e: MouseEvent) => void;
+		handleDoubleClick: () => void;
 	}
 
 	let {
@@ -37,7 +38,8 @@
 		isWorkshop,
 		index,
 		handleSelect,
-		handleContextMenu
+		handleContextMenu,
+		handleDoubleClick
 	}: Props = $props();
 
 	let loaded = $state(false);
@@ -88,6 +90,7 @@
 	class:is-downloaded={isWorkshopItem && isDownloaded}
 	class:is-downloading={isWorkshopItem && isDownloading && !isDownloaded}
 	onclick={handleSelect}
+	ondblclick={handleDoubleClick}
 	oncontextmenu={handleContextMenu}
 	onkeydown={(e) => (e.key === 'Enter' || e.key === ' ') && handleSelect()}
 >

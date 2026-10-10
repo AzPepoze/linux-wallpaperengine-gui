@@ -1,6 +1,7 @@
 <script lang="ts">
 	import { t } from '@/core/i18n';
 	import { showDisplayManager, showPlaylistManager } from '@/core/ui';
+	import SidebarToggle from '@/ui/SidebarToggle.svelte';
 	import Button from '@/ui/Button.svelte';
 	import Icon from '@/ui/Icon.svelte';
 	import Refresh from '@/ui/Refresh.svelte';
@@ -83,6 +84,8 @@
 		<div class="mode-toggles">
 			<ViewToggle bind:viewMode />
 		</div>
+
+		<SidebarToggle />
 	</div>
 </Toolbar>
 

@@ -13,8 +13,7 @@
 	} from '@/core/ui';
 	import {
 		selectedScreen,
-		cloneMode,
-		screens
+		cloneMode
 	} from '@/features/home/scripts/display';
 	import {
 		wallpapers,
@@ -23,12 +22,10 @@
 		workshopPathValid,
 		wallpaperEnginePathValid,
 		selectedFolderName,
-		activeFolderName,
 		selectedWallpaper,
 		activeWallpaper,
 		setWallpaperData
 	} from '@/features/home/scripts/wallpaperStore';
-	import { logger } from '@/core/logger';
 
 	let playlistManagerComponent: any;
 	let wallpaperContainerComponent: any;
@@ -66,20 +63,7 @@
 		};
 	}
 
-	async function handleSelectWallpaper(folderName: string) {
-		if ($selectedScreen) {
-			await window.electronAPI.setWallpaper(
-				$selectedScreen,
-				folderName
-			);
-			activeFolderName.set(folderName);
-			screens.update((s) => ({
-				...s,
-				[$selectedScreen as string]: folderName
-			}));
-		} else {
-			logger.warn('No screen selected for configuration.');
-		}
+	function handleSelectWallpaper(folderName: string) {
 		selectedFolderName.set(folderName);
 	}
 </script>
@@ -144,6 +128,7 @@
 	<Sidebar
 		selectedWallpaper={$selectedWallpaper}
 		onClose={() => selectedFolderName.set(null)}
+		canSubscribe={false}
 	/>
 </div>
 

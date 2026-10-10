@@ -13,10 +13,13 @@
 	import { showContextMenu, hideContextMenu, contextMenuStore } from '@/core/contextMenuStore';
 	import { showToast } from '@/core/toastStore';
 	import { logger } from '@/core/logger';
+	import { getWallpaperFolder } from '@/core/utils/workshopHelper';
+	import { openFolderPath } from '@/features/wallpaper/scripts/openFolder';
 	import { get } from 'svelte/store';
-	import { screens, selectedScreen, cloneMode, spanMode } from '@/features/home/scripts/display';
-	import { activeFolderName, selectedFolderName } from '@/features/home/scripts/wallpaperStore';
+	import { screens } from '@/features/home/scripts/display';
 	import { previewingWallpaperId, startWallpaperPreview, stopWallpaperPreview } from '@/features/wallpaper/scripts/preview';
+	import { applyWallpaper } from '@/features/wallpaper/scripts/applyWallpaper';
+	import { settingsStore } from '@/features/settings/scripts/settings';
 
 	export let folderName: string;
 	export let wallpaper: WallpaperData;
@@ -52,54 +55,10 @@
 		onSelect(folderName, wallpaper);
 	}
 
-	async function applyWallpaper(targetScreen?: string) {
-		try {
-			let screen = targetScreen || get(selectedScreen);
-			let allScreens = Object.keys(get(screens));
-
-			if (!screen && allScreens.length > 0) {
-				screen = allScreens[0];
-				selectedScreen.set(screen);
-			}
-
-			if (!screen) {
-				const resScreens = await window.electronAPI.getScreens();
-				if (resScreens?.screens && resScreens.screens.length > 0) {
-					screen = resScreens.screens[0];
-					selectedScreen.set(screen);
-					allScreens = resScreens.screens;
-				}
-			}
-
-			if (screen) {
-				const isClone = get(cloneMode);
-				const isSpan = get(spanMode);
-				if ((isClone || isSpan) && !targetScreen) {
-					for (const s of allScreens) {
-						await window.electronAPI.setWallpaper(s, folderName);
-					}
-					screens.update((s) => {
-						const updated = { ...s };
-						allScreens.forEach((scr) => (updated[scr] = folderName));
-						return updated;
-					});
-				} else {
-					await window.electronAPI.setWallpaper(screen, folderName);
-					screens.update((s) => ({
-						...s,
-						[screen as string]: folderName
-					}));
-				}
-				activeFolderName.set(folderName);
-				selectedFolderName.set(folderName);
-				showToast(`Applied wallpaper to ${targetScreen || screen}`, 'info');
-			} else {
-				showToast('No active display found', 'error');
-			}
-		} catch (err) {
-			logger.error('Failed to apply wallpaper:', err);
-			showToast('Failed to apply wallpaper', 'error');
-		}
+	function handleDoubleClick() {
+		if (!$settingsStore?.doubleClickApply) return;
+		if (isWorkshopItem && !isDownloaded) return;
+		applyWallpaper(folderName);
 	}
 
 	async function handleContextMenu(e: MouseEvent) {
@@ -120,7 +79,7 @@
 				menuItems.push({
 					label: 'Apply Wallpaper',
 					icon: 'desktop_windows',
-					action: () => applyWallpaper()
+					action: () => applyWallpaper(folderName)
 				});
 				menuItems.push({
 					label: 'Apply to Display',
@@ -128,14 +87,14 @@
 					subMenu: allScreens.map((scr) => ({
 						label: scr,
 						icon: 'desktop_windows',
-						action: () => applyWallpaper(scr)
+						action: () => applyWallpaper(folderName, scr)
 					}))
 				});
 			} else {
 				menuItems.push({
 					label: 'Apply Wallpaper',
 					icon: 'desktop_windows',
-					action: () => applyWallpaper()
+					action: () => applyWallpaper(folderName)
 				});
 			}
 
@@ -188,7 +147,7 @@
 				icon: 'folder_open',
 				action: async () => {
 					const basePath = await window.electronAPI.getWallpaperBasePath();
-					await window.electronAPI.openPath(`${basePath}/${folderName}`);
+					await openFolderPath(getWallpaperFolder(folderName, wallpaper.folderPath, basePath));
 				}
 			});
 
@@ -197,7 +156,7 @@
 				icon: 'content_copy',
 				action: async () => {
 					const basePath = await window.electronAPI.getWallpaperBasePath();
-					navigator.clipboard.writeText(`${basePath}/${folderName}`);
+					navigator.clipboard.writeText(getWallpaperFolder(folderName, wallpaper.folderPath, basePath));
 					showToast('Path copied to clipboard', 'info');
 				}
 			});
@@ -332,6 +291,7 @@
 		{index}
 		{handleSelect}
 		{handleContextMenu}
+		{handleDoubleClick}
 	/>
 {:else}
 	<WallpaperCardList
@@ -348,5 +308,6 @@
 		{index}
 		{handleSelect}
 		{handleContextMenu}
+		{handleDoubleClick}
 	/>
 {/if}

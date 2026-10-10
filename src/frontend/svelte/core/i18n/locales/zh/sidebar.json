@@ -1,4 +1,11 @@
 {
+	"apply": "[NYT_ZH] Apply Wallpaper",
+	"applyTo": "[NYT_ZH] Apply to {screen}",
+	"applyAll": "[NYT_ZH] Apply to All Displays",
+	"empty": {
+		"title": "[NYT_ZH] No wallpaper selected",
+		"hint": "[NYT_ZH] Select a wallpaper to see its details."
+	},
 	"local": {
 		"folder": "文件夹：",
 		"fileInfo": "文件信息",

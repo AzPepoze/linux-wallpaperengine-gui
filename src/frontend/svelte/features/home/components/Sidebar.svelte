@@ -3,10 +3,19 @@
 	import WorkshopActions from './sidebar/WorkshopActions.svelte';
 	import WorkshopItemContent from './sidebar/WorkshopItemContent.svelte';
 	import LocalWallpaperContent from './sidebar/LocalWallpaperContent.svelte';
+	import ApplyButton from './sidebar/ApplyButton.svelte';
 	import type { Wallpaper } from '@shared/types';
+	import { getWallpaperFolder, isWorkshopWallpaper } from '@/core/utils/workshopHelper';
+	import { downloadStatus } from '@/features/workshop/scripts/workshop';
 
 	export let selectedWallpaper: Wallpaper | null = null;
 	export let onClose: () => void = () => {};
+	export let canSubscribe: boolean = true;
+
+	$: canApply =
+		!!selectedWallpaper &&
+		(!isWorkshopWallpaper(selectedWallpaper.folderName, selectedWallpaper.projectData) ||
+			!!$downloadStatus[selectedWallpaper.folderName]);
 
 	let lastWallpaperId: string | null = null;
 	let calculatedFileSize: number | null = null;
@@ -17,7 +26,7 @@
 				const basePath = await window.electronAPI.getWallpaperBasePath();
 				if (basePath) {
 					calculatedFileSize = await window.electronAPI.getDirectorySize(
-						`${basePath}/${wallpaper.folderName}`
+						getWallpaperFolder(wallpaper.folderName, wallpaper.folderPath, basePath)
 					);
 				}
 			} else {
@@ -41,7 +50,7 @@
 <SidebarShell {selectedWallpaper} {onClose}>
 	<div slot="actions">
 		{#if selectedWallpaper}
-			<WorkshopActions wallpaper={selectedWallpaper} />
+			<WorkshopActions wallpaper={selectedWallpaper} {canSubscribe} />
 		{/if}
 	</div>
 
@@ -58,4 +67,9 @@
 			/>
 		{/if}
 	{/if}
+	<div slot="footer">
+		{#if canApply && selectedWallpaper}
+			<ApplyButton folderName={selectedWallpaper.folderName} />
+		{/if}
+	</div>
 </SidebarShell>
