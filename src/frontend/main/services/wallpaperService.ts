@@ -154,6 +154,11 @@ export function registerWallpaperService() {
 		return await socketClient.send("get-wallpaper-base-path");
 	});
 
+	ipcMain.handle("get-builtin-wallpaper-base-path", async () => {
+		logger.ipcReceived("get-builtin-wallpaper-base-path");
+		return await socketClient.send("get-builtin-wallpaper-base-path");
+	});
+
 	ipcMain.handle("get-assets-base-path", async () => {
 		logger.ipcReceived("get-assets-base-path");
 		return await socketClient.send("get-assets-base-path");

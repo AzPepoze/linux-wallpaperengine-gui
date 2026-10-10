@@ -45,6 +45,7 @@ interface ElectronAPI {
 	openConfigInEditor: () => Promise<{ success: boolean; error?: string }>;
 	getWallpaperExecutableLocation: () => Promise<string>;
 	getWallpaperBasePath: () => Promise<string>;
+	getBuiltInWallpaperBasePath: () => Promise<string>;
 	getAssetsBasePath: () => Promise<string>;
 	validateExecutable: () => Promise<boolean>;
 

@@ -56,6 +56,12 @@ func (handler *Handler) HandleWallpaper(request models.Request) models.Response 
 		} else {
 			response.Result = config.WorkshopPath
 		}
+	case "get-builtin-wallpaper-base-path":
+		if err := config.EnsureInitialized(); err != nil {
+			response.Error = err.Error()
+		} else {
+			response.Result = wallpaper.BuiltInWallpaperDir()
+		}
 	case "get-assets-base-path":
 		if err := config.EnsureInitialized(); err != nil {
 			response.Error = err.Error()

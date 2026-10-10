@@ -130,11 +130,11 @@ func (service *Service) ApplyWallpapers() error {
 			if wallpaperID != "" {
 				if wd, ok := service.wallpapers[wallpaperID]; ok && wd.ProjectData != nil && wd.ProjectData.Preview != "" {
 					pd := wd.ProjectData
-					previewPath := filepath.Join(config.WorkshopPath, wallpaperID, pd.Preview)
+					previewPath := filepath.Join(ResolveWallpaperDir(wallpaperID), pd.Preview)
 					var videoPath string
 					isVideo := "false"
 					if pd.Type == "Video" && pd.File != "" {
-						videoPath = filepath.Join(config.WorkshopPath, wallpaperID, pd.File)
+						videoPath = filepath.Join(ResolveWallpaperDir(wallpaperID), pd.File)
 						isVideo = "true"
 					}
 
@@ -164,11 +164,11 @@ func (service *Service) ApplyWallpapers() error {
 				}
 				pd := wd.ProjectData
 
-				previewPath := filepath.Join(config.WorkshopPath, wallpaperID, pd.Preview)
+				previewPath := filepath.Join(ResolveWallpaperDir(wallpaperID), pd.Preview)
 				var videoPath string
 				isVideo := "false"
 				if pd.Type == "Video" && pd.File != "" {
-					videoPath = filepath.Join(config.WorkshopPath, wallpaperID, pd.File)
+					videoPath = filepath.Join(ResolveWallpaperDir(wallpaperID), pd.File)
 					isVideo = "true"
 				}
 
@@ -282,10 +282,7 @@ func (service *Service) buildWallpaperCommandInternal(appConfig config.AppConfig
 
 	executable := engine.ResolveExecutable(appConfig.CustomExecutableLocation)
 
-	wallpaperPath := wallpaperID
-	if config.WorkshopPath != "" {
-		wallpaperPath = filepath.Join(config.WorkshopPath, wallpaperID)
-	}
+	wallpaperPath := ResolveWallpaperDir(wallpaperID)
 
 	// Build arguments as a slice to avoid shell interpolation
 	arguments := append([]string{wallpaperPath}, screenArgs...)

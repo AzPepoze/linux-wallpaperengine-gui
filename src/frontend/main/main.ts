@@ -42,6 +42,19 @@ process.env.VITE_PUBLIC = process.env.VITE_DEV_SERVER_URL
 
 let win: BrowserWindow | null = null;
 let cachedWallpaperBasePath = "";
+let cachedBuiltInWallpaperBasePath = "";
+
+async function getAllowedWallpaperPaths(): Promise<string[]> {
+	if (!cachedWallpaperBasePath) {
+		cachedWallpaperBasePath = await socketClient.send("get-wallpaper-base-path");
+	}
+	if (!cachedBuiltInWallpaperBasePath) {
+		cachedBuiltInWallpaperBasePath = await socketClient.send(
+			"get-builtin-wallpaper-base-path",
+		);
+	}
+	return [cachedWallpaperBasePath, cachedBuiltInWallpaperBasePath];
+}
 
 const VITE_DEV_SERVER_URL = process.env["VITE_DEV_SERVER_URL"];
 const isMinimized = process.argv.includes("--minimized");
@@ -214,25 +227,25 @@ app.whenReady().then(async () => {
 		const url = request.url.replace("wallpaper://", "");
 		const filePath = decodeURIComponent(url);
 
-		if (!cachedWallpaperBasePath) {
-			try {
-				cachedWallpaperBasePath = await socketClient.send(
-					"get-wallpaper-base-path",
-				);
-			} catch (err) {
-				logger.backend(
-					"Error getting wallpaper base path in handler:",
-					err,
-				);
-				return new Response("Internal Server Error", {
-					status: 500,
-				});
-			}
+		let allowedPaths: string[];
+		try {
+			allowedPaths = await getAllowedWallpaperPaths();
+		} catch (err) {
+			logger.backend(
+				"Error getting wallpaper base path in handler:",
+				err,
+			);
+			return new Response("Internal Server Error", {
+				status: 500,
+			});
 		}
 
-		if (!filePath.startsWith(cachedWallpaperBasePath)) {
+		const isAllowed = allowedPaths.some(
+			(basePath) => basePath !== "" && filePath.startsWith(basePath),
+		);
+		if (!isAllowed) {
 			logger.backend(
-				`Blocked wallpaper:// access to: ${filePath} (not in ${cachedWallpaperBasePath})`,
+				`Blocked wallpaper:// access to: ${filePath} (not in ${allowedPaths.join(", ")})`,
 			);
 			return new Response("Access Denied", { status: 403 });
 		}
