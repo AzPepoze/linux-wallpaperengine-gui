@@ -10,8 +10,9 @@
 	import SidebarEmpty from '@/ui/layout/SidebarEmpty.svelte';
 	import ResizeHandle from '@/ui/ResizeHandle.svelte';
 	import type { Wallpaper } from '@shared/types';
-	import { blur, fade } from 'svelte/transition';
-	import { motionMs } from '@/ui/scripts/motion';
+	import { fade } from 'svelte/transition';
+
+	const SWAP_OUT_MS = 150;
 
 	export let selectedWallpaper: Wallpaper | null = null;
 	export let onClose: () => void = () => {};
@@ -20,6 +21,12 @@
 	let isResizing = false;
 
 	$: selectedFolderName = selectedWallpaper?.folderName;
+	$: swapOutDuration = getSwapOutDuration($settingsStore?.performanceMode);
+
+	function getSwapOutDuration(performanceMode: boolean | undefined): number {
+		const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+		return performanceMode || reducedMotion ? 0 : SWAP_OUT_MS;
+	}
 	$: isOpen = !$sidebarHidden;
 
 	// Picking a different wallpaper shows the sidebar again
@@ -73,27 +80,27 @@
 	<div class="sidebar-container">
 		<div class="sidebar-content" class:is-empty={!selectedWallpaper}>
 			{#if selectedWallpaper}
-				<div class="preview-stack">
-					{#key selectedWallpaper.previewPath}
-						{#if selectedWallpaper.previewPath}
-							<img
-								src={selectedWallpaper.previewPath}
-								alt="{selectedWallpaper.projectData?.title ||
-									selectedWallpaper.folderName} preview"
-								class="preview-image"
-								in:blur={{ amount: 10, duration: motionMs(350) }}
-								out:fade={{ duration: motionMs(150) }}
-							/>
-						{/if}
+				<div class="swap-stack">
+					{#key selectedFolderName}
+						<div class="wallpaper-swap" out:fade={{ duration: swapOutDuration }}>
+							{#if selectedWallpaper.previewPath}
+								<img
+									src={selectedWallpaper.previewPath}
+									alt="{selectedWallpaper.projectData?.title ||
+										selectedWallpaper.folderName} preview"
+									class="preview-image"
+								/>
+							{/if}
+
+							<div class="actions-slot">
+								<slot name="actions" />
+							</div>
+
+							<div class="content-slot">
+								<slot />
+							</div>
+						</div>
 					{/key}
-				</div>
-
-				<div class="actions-slot">
-					<slot name="actions" />
-				</div>
-
-				<div class="content-slot">
-					<slot />
 				</div>
 			{:else}
 				<SidebarEmpty />
@@ -212,13 +219,7 @@
 			border-radius: 15px;
 			padding: 0 10px;
 
-			.preview-stack {
-				display: grid;
-			}
-
-			/* Old and new preview share one cell, so the swap does not shift layout */
 			.preview-image {
-				grid-area: 1 / 1;
 				width: 100%;
 				aspect-ratio: 1 / 1;
 				border-radius: 20px;
@@ -259,6 +260,36 @@
 		.sidebar-content.is-empty {
 			display: flex;
 			flex-direction: column;
+		}
+
+		/* Old and new content share one grid cell, so the crossfade does not shift layout */
+		.swap-stack {
+			display: grid;
+		}
+
+		.wallpaper-swap {
+			grid-area: 1 / 1;
+			min-width: 0;
+			animation: swap-in 0.3s ease-out both;
+		}
+
+		@keyframes swap-in {
+			from {
+				opacity: 0;
+			}
+			to {
+				opacity: 1;
+			}
+		}
+
+		@media (prefers-reduced-motion: reduce) {
+			.wallpaper-swap {
+				animation: none;
+			}
+		}
+
+		:global(html.performance-mode) & .wallpaper-swap {
+			animation: none !important;
 		}
 
 		/* Global Typography for any content inside the shell */
