@@ -7,6 +7,8 @@
 	import Button from '@/ui/Button.svelte';
 	import Icon from '@/ui/Icon.svelte';
 	import { logger } from '@/core/logger';
+	import { getWallpaperFolder } from '@/core/utils/workshopHelper';
+	import { openFolderPath } from '@/features/wallpaper/scripts/openFolder';
 
 	import {
 		previewingWallpaperId,
@@ -54,9 +56,7 @@
 	async function handleOpenFolder() {
 		try {
 			const basePath = await window.electronAPI.getWallpaperBasePath();
-			if (basePath && folderName) {
-				await window.electronAPI.openPath(`${basePath}/${folderName}`);
-			}
+			await openFolderPath(getWallpaperFolder(wallpaper.folderName, wallpaper.folderPath, basePath));
 		} catch (e) {
 			logger.error('Failed to open wallpaper folder:', e);
 		}

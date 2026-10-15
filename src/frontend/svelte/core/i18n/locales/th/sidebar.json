@@ -1,4 +1,10 @@
 {
+	"apply": "[NYT_TH] Apply Wallpaper",
+	"applyTo": "[NYT_TH] Apply to {screen}",
+	"applyAll": "[NYT_TH] Apply to All Displays",
+	"empty": {
+		"title": "[NYT_TH] No wallpaper selected"
+	},
 	"local": {
 		"folder": "โฟลเดอร์:",
 		"fileInfo": "ข้อมูลไฟล์",

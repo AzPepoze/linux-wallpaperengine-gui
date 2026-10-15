@@ -1,4 +1,10 @@
 {
+	"apply": "Apply Wallpaper",
+	"applyTo": "Apply to {screen}",
+	"applyAll": "Apply to All Displays",
+	"empty": {
+		"title": "No wallpaper selected"
+	},
 	"local": {
 		"folder": "Folder:",
 		"fileInfo": "File Info",

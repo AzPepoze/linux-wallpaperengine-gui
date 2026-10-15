@@ -50,6 +50,7 @@ contextBridge.exposeInMainWorld("electronAPI", {
 	openConfigInEditor: createInvokeMethod("open-config-editor"),
 	getWallpaperExecutableLocation: createInvokeMethod("get-wallpaper-executable"),
 	getWallpaperBasePath: createInvokeMethod("get-wallpaper-base-path"),
+	getBuiltInWallpaperBasePath: createInvokeMethod("get-builtin-wallpaper-base-path"),
 	getAssetsBasePath: createInvokeMethod("get-assets-base-path"),
 	validateExecutable: createInvokeMethod("validate-executable"),
 
@@ -65,6 +66,8 @@ contextBridge.exposeInMainWorld("electronAPI", {
 	getWallpaperProjectData: createInvokeMethod("get-wallpaper-project-data"),
 	getWallpaperProperties: createInvokeMethod("get-wallpaper-properties"),
 	saveWallpaperProperty: createInvokeMethod("save-wallpaper-property"),
+	resetWallpaperProperty: createInvokeMethod("reset-wallpaper-property"),
+	resetWallpaperProperties: createInvokeMethod("reset-wallpaper-properties"),
 	startPreview: createInvokeMethod("start-preview"),
 	stopPreview: createInvokeMethod("stop-preview"),
 	isPreviewRunning: createInvokeMethod("is-preview-running"),

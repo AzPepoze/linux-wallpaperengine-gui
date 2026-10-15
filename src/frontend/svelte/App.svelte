@@ -10,15 +10,16 @@
 	import { flip } from 'svelte/animate';
 	import { initLogger } from '@/core/logger';
 	import { loadSettings, settingsStore } from '@/features/settings/scripts/settings';
-	import { 
-		initializeApp, 
-		setupGlobalListeners 
+	import {
+		initializeApp,
+		setupGlobalListeners
 	} from '@/core/appService';
 	import { selectedWallpaper } from '@/features/home/scripts/wallpaperStore';
 	import { applyDynamicTheme } from '@/core/theme';
 	import Topbar from '@/ui/layout/Topbar.svelte';
 	import Toast from '@/ui/Toast.svelte';
 	import ContextMenu from '@/ui/ContextMenu.svelte';
+	import ApplyNotice from '@/ui/ApplyNotice.svelte';
 	import { toastStore } from '@/core/toastStore';
 	import { setLocale, resolveLocale } from '@/core/i18n';
 	import { get } from 'svelte/store';
@@ -108,30 +109,19 @@
 {/if}
 
 <div class="toast-stack">
-	{#if isPerformanceMode}
-		{#each $toastStore as toast (toast.id)}
-			<div>
-				<Toast
-					id={toast.id}
-					message={toast.message}
-					type={toast.type}
-					duration={toast.duration}
-				/>
-			</div>
-		{/each}
-	{:else}
-		{#each $toastStore as toast (toast.id)}
-			<div animate:flip={{ duration: 300 }}>
-				<Toast
-					id={toast.id}
-					message={toast.message}
-					type={toast.type}
-					duration={toast.duration}
-				/>
-			</div>
-		{/each}
-	{/if}
+	{#each $toastStore as toast (toast.id)}
+		<div animate:flip={{ duration: isPerformanceMode ? 0 : 300 }}>
+			<Toast
+				id={toast.id}
+				message={toast.message}
+				type={toast.type}
+				duration={toast.duration}
+			/>
+		</div>
+	{/each}
 </div>
+
+<ApplyNotice />
 
 <ContextMenu />
 

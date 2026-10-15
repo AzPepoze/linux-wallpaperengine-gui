@@ -16,21 +16,62 @@ func GetWallpapers() (map[string]WallpaperData, error) {
 		return nil, err
 	}
 
-	basePath := config.WorkshopPath
+	wallpapers := make(map[string]WallpaperData)
+
+	if err := scanWallpaperDir(config.WorkshopPath, wallpapers); err != nil {
+		return nil, err
+	}
+
+	// Built-in wallpapers never override a Workshop item with the same folder name.
+	_ = scanWallpaperDir(BuiltInWallpaperDir(), wallpapers)
+
+	return wallpapers, nil
+}
+
+// BuiltInWallpaperDir returns the folder holding the wallpapers bundled with Wallpaper Engine.
+func BuiltInWallpaperDir() string {
+	if config.WallpaperEnginePath == "" {
+		return ""
+	}
+	return filepath.Join(config.WallpaperEnginePath, "projects", "defaultprojects")
+}
+
+// ResolveWallpaperDir returns the folder of a wallpaper, checking Workshop first, then built-in.
+func ResolveWallpaperDir(folderName string) string {
+	workshopDir := filepath.Join(config.WorkshopPath, folderName)
+	if isWallpaperDir(workshopDir) {
+		return workshopDir
+	}
+
+	if builtInDir := BuiltInWallpaperDir(); builtInDir != "" {
+		builtInItemDir := filepath.Join(builtInDir, folderName)
+		if isWallpaperDir(builtInItemDir) {
+			return builtInItemDir
+		}
+	}
+
+	return workshopDir
+}
+
+func isWallpaperDir(dir string) bool {
+	_, err := os.Stat(filepath.Join(dir, "project.json"))
+	return err == nil
+}
+
+// scanWallpaperDir adds every wallpaper folder under basePath to wallpapers, skipping names already present.
+func scanWallpaperDir(basePath string, wallpapers map[string]WallpaperData) error {
 	if basePath == "" {
-		return make(map[string]WallpaperData), nil
+		return nil
 	}
 
 	if _, err := os.Stat(basePath); os.IsNotExist(err) {
-		return make(map[string]WallpaperData), nil
+		return nil
 	}
 
 	entries, err := os.ReadDir(basePath)
 	if err != nil {
-		return nil, err
+		return err
 	}
-
-	wallpapers := make(map[string]WallpaperData)
 
 	for _, entry := range entries {
 		if !entry.IsDir() {
@@ -38,9 +79,11 @@ func GetWallpapers() (map[string]WallpaperData, error) {
 		}
 
 		folderName := entry.Name()
-		projectJSONPath := filepath.Join(basePath, folderName, "project.json")
+		if _, exists := wallpapers[folderName]; exists {
+			continue
+		}
 
-		data, err := os.ReadFile(projectJSONPath)
+		data, err := os.ReadFile(filepath.Join(basePath, folderName, "project.json"))
 		if err != nil {
 			continue
 		}
@@ -68,10 +111,11 @@ func GetWallpapers() (map[string]WallpaperData, error) {
 			ProjectData: &projectData,
 			PreviewPath: previewPath,
 			InstallDate: installDate,
+			FolderPath:  filepath.Join(basePath, folderName),
 		}
 	}
 
-	return wallpapers, nil
+	return nil
 }
 
 func GetWallpaperProjectData(folderName string) (map[string]interface{}, error) {
@@ -79,7 +123,7 @@ func GetWallpaperProjectData(folderName string) (map[string]interface{}, error) 
 		return nil, err
 	}
 
-	projectJSONPath := filepath.Join(config.WorkshopPath, folderName, "project.json")
+	projectJSONPath := filepath.Join(ResolveWallpaperDir(folderName), "project.json")
 	data, err := os.ReadFile(projectJSONPath)
 	if err != nil {
 		return nil, err

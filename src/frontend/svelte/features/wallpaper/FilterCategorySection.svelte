@@ -8,7 +8,7 @@
 	import FilterGroupSection from './FilterGroupSection.svelte';
 
 	export let category: FilterCategory;
-	export let localConfig: FilterConfig;
+	export let config: FilterConfig;
 	export let isExpanded: boolean;
 	export let onToggleTag: (
 		internalKey: keyof FilterConfig,
@@ -35,7 +35,7 @@
 
 	$: categoryKey = category.internalKey as keyof FilterConfig;
 	$: categoryConfig =
-		(localConfig[categoryKey] as Record<string, boolean>) || {};
+		(config[categoryKey] as Record<string, boolean>) || {};
 
 	function itemLabel(item: string): string {
 		const ns = ITEM_NS[categoryKey];

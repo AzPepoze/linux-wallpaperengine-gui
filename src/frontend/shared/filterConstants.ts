@@ -87,4 +87,3 @@ export const FILTER_CATEGORIES: FilterCategory[] = [
 	{ name: 'Miscellaneous', internalKey: 'utilitytags', items: [] }
 ];
 
-export const buildFilterCategories = (_?: FilterConfig): FilterCategory[] => FILTER_CATEGORIES;

@@ -26,6 +26,10 @@
 
 <style lang="scss">
 	.range-wrapper {
+		/* Brighter than the raw accent so the fill reads on dark sidebars */
+		--range-fill: color-mix(in srgb, var(--btn-primary-bg) 70%, white);
+		--range-track: color-mix(in srgb, var(--text-color) 18%, transparent);
+
 		flex: 1;
 		display: flex;
 		align-items: center;
@@ -91,10 +95,10 @@
 			cursor: pointer;
 			background: linear-gradient(
 				to right,
-				var(--btn-primary-bg) 0%,
-				var(--btn-primary-bg) var(--progress-percent, 0%),
-				var(--bg-surface-active) var(--progress-percent, 0%),
-				var(--bg-surface-active) 100%
+				var(--range-fill) 0%,
+				var(--range-fill) var(--progress-percent, 0%),
+				var(--range-track) var(--progress-percent, 0%),
+				var(--range-track) 100%
 			);
 			border-radius: var(--radius-full);
 			border: none;
@@ -143,10 +147,10 @@
 			cursor: pointer;
 			background: linear-gradient(
 				to right,
-				var(--btn-primary-bg) 0%,
-				var(--btn-primary-bg) var(--progress-percent, 0%),
-				var(--bg-surface-active) var(--progress-percent, 0%),
-				var(--bg-surface-active) 100%
+				var(--range-fill) 0%,
+				var(--range-fill) var(--progress-percent, 0%),
+				var(--range-track) var(--progress-percent, 0%),
+				var(--range-track) 100%
 			);
 			border-radius: var(--radius-full);
 			border: none;

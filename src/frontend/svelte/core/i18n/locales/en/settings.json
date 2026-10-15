@@ -50,6 +50,8 @@
 		"hideTrayLabelDesc": "Show only the icon in the system tray, hiding the \"Linux Wallpaper Engine\" text.",
 		"gridWarpAnimation": "Grid Warp Animation",
 		"gridWarpAnimationDesc": "Animate grid items smoothly when the layout wraps to new rows on resize or filter.",
+		"doubleClickApply": "Double-Click to Apply",
+		"doubleClickApplyDesc": "Apply a wallpaper when you double-click its card.",
 		"performanceMode": "Performance Mode",
 		"performanceModeDesc": "Disable heavy animations, shimmer effects, and backdrop blur for better performance.",
 		"transitionEffect": "Transition Effect",

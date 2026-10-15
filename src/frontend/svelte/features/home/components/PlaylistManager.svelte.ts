@@ -1,5 +1,6 @@
 import { showToast } from '@/core/toastStore';
 import { WALLPAPER_ENGINE_APP_ID } from '@shared/constants';
+import { getWallpaperFolder } from '@/core/utils/workshopHelper';
 import type { Playlist, WallpaperData } from '@shared/types';
 
 export function getPlaylistOptions(playlists: Playlist[]) {
@@ -100,8 +101,11 @@ export async function removePlaylistItem(
 	}
 }
 
+// Workshop items sit under <appId>/<id>, built-in ones under defaultprojects/<name>.
 export function parseWallpaperIdFromPath(itemPath: string): string | null {
-	const regex = new RegExp(`${WALLPAPER_ENGINE_APP_ID}[\\/\\\\](\\d+)[\\/\\\\]`);
+	const regex = new RegExp(
+		`(?:${WALLPAPER_ENGINE_APP_ID}|defaultprojects)[\\/\\\\]([^\\/\\\\]+)[\\/\\\\]`
+	);
 	const match = itemPath.match(regex);
 	return match && match[1] ? match[1] : null;
 }
@@ -123,9 +127,10 @@ export async function toggleWallpaperInPlaylist(
 		const normalizedBase = basePath
 			.replace(/[\/]+$/, '')
 			.replace(/\\/g, '/');
+		const folderPath = getWallpaperFolder(folderName, wpInfo.folderPath, normalizedBase);
 		const rawFile = wpInfo.projectData.file;
 		const wallpaperFile = rawFile === 'scene.json' ? 'scene.pkg' : rawFile;
-		const itemPath = `Z:${normalizedBase}/${folderName}/${wallpaperFile}`;
+		const itemPath = `Z:${folderPath}/${wallpaperFile}`;
 
 		let newItems: string[];
 		const alreadyIn = playlist.items.some((p) => p.includes(`/${folderName}/`));

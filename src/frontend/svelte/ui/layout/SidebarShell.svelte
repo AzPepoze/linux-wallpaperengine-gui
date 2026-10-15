@@ -1,36 +1,48 @@
+<script context="module" lang="ts">
+	// Shared by every sidebar instance, so changing pages does not count as a new pick
+	let lastPickedFolder: string | undefined;
+</script>
+
 <script lang="ts">
-	import { sidebarWidth } from '@/core/ui';
-	import {
-		calculateSidebarTheme,
-		DEFAULT_THEME,
-		type SidebarTheme
-	} from '@/features/home/scripts/sidebarTheme';
+	import { sidebarHidden, sidebarWidth } from '@/core/ui';
+	import { DEFAULT_THEME, type SidebarTheme } from '@/features/home/scripts/sidebarTheme';
 	import { settingsStore } from '@/features/settings/scripts/settings';
+	import CloseIcon from '@/ui/icons/CloseIcon.svelte';
+	import SidebarEmpty from '@/ui/layout/SidebarEmpty.svelte';
 	import ResizeHandle from '@/ui/ResizeHandle.svelte';
 	import type { Wallpaper } from '@shared/types';
+	import { fade } from 'svelte/transition';
+
+	const SWAP_OUT_MS = 150;
 
 	export let selectedWallpaper: Wallpaper | null = null;
 	export let onClose: () => void = () => {};
+	export let theme: SidebarTheme = DEFAULT_THEME;
 
-	let theme: SidebarTheme = DEFAULT_THEME;
 	let isResizing = false;
 
-	$: {
-		if (selectedWallpaper) {
-			calculateSidebarTheme(selectedWallpaper, $settingsStore).then(
-				(t) => {
-					theme = t;
-				}
-			);
-		} else {
-			theme = DEFAULT_THEME;
-		}
+	$: selectedFolderName = selectedWallpaper?.folderName;
+	$: swapOutDuration = getSwapOutDuration($settingsStore?.performanceMode);
+
+	function getSwapOutDuration(performanceMode: boolean | undefined): number {
+		const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+		return performanceMode || reducedMotion ? 0 : SWAP_OUT_MS;
+	}
+	$: isOpen = !$sidebarHidden;
+
+	$: revealOnPick(selectedFolderName);
+
+	// Only a new pick opens the sidebar; mounting or changing pages does not
+	function revealOnPick(folderName: string | undefined) {
+		if (!folderName || folderName === lastPickedFolder) return;
+		lastPickedFolder = folderName;
+		sidebarHidden.set(false);
 	}
 </script>
 
 <div
 	class="sidebar-shell"
-	class:open={!!selectedWallpaper}
+	class:open={isOpen}
 	class:resizing={isResizing}
 	class:dynamic-theme={$settingsStore?.dynamicSidebarTheme}
 	style="
@@ -44,10 +56,10 @@
           --palette-track: ${theme.accentColor ? `rgb(${theme.accentColor.join(',')})` : 'var(--sidebar-text)'};
 		`
 		: ''}
-		width: {selectedWallpaper ? $sidebarWidth + 'px' : '0'};
+		width: {isOpen ? $sidebarWidth + 'px' : '0'};
 	"
 >
-	{#if selectedWallpaper}
+	{#if isOpen}
 		<ResizeHandle
 			bind:isResizing
 			position="left"
@@ -61,30 +73,49 @@
 	{/if}
 
 	<div class="sidebar-container">
-		<div class="sidebar-content">
-			{#if selectedWallpaper?.previewPath}
-				<img
-					src={selectedWallpaper.previewPath}
-					alt="{selectedWallpaper.projectData?.title ||
-						selectedWallpaper.folderName} preview"
-					class="preview-image"
-				/>
+		<div class="sidebar-content" class:is-empty={!selectedWallpaper}>
+			{#if selectedWallpaper}
+				<div class="swap-stack">
+					{#key selectedFolderName}
+						<div class="wallpaper-swap" out:fade={{ duration: swapOutDuration }}>
+							{#if selectedWallpaper.previewPath}
+								<img
+									src={selectedWallpaper.previewPath}
+									alt="{selectedWallpaper.projectData?.title ||
+										selectedWallpaper.folderName} preview"
+									class="preview-image"
+								/>
+							{/if}
+
+							<div class="actions-slot">
+								<slot name="actions" />
+							</div>
+
+							<div class="content-slot">
+								<slot />
+							</div>
+						</div>
+					{/key}
+				</div>
+			{:else}
+				<SidebarEmpty />
 			{/if}
-
-			<div class="actions-slot">
-				<slot name="actions" />
-			</div>
-
-			<div class="content-slot">
-				<slot />
-			</div>
 		</div>
 
-		<div class="sidebar-footer">
-			<button type="button" class="close-btn" on:click={onClose}
-				>Close</button
+		{#if selectedWallpaper}
+			<div class="sidebar-footer">
+				<slot name="footer" />
+			</div>
+
+			<button
+				type="button"
+				class="close-btn"
+				aria-label="Close sidebar"
+				on:click={onClose}
 			>
-		</div>
+				<CloseIcon width="18" height="18" />
+			</button>
+		{/if}
 	</div>
 </div>
 
@@ -193,35 +224,67 @@
 			}
 		}
 
-		.sidebar-footer {
-			padding: 10px 0;
-			display: flex;
-			justify-content: center;
-			align-items: center;
-			flex-shrink: 0;
-			position: relative;
-			z-index: 5;
-		}
-
 		.close-btn {
-			background-color: var(--btn-primary-bg);
+			position: absolute;
+			top: 12px;
+			right: 12px;
+			z-index: 6;
+			width: 32px;
+			height: 32px;
+			padding: 0;
 			border: none;
-			font-size: 1em;
-			font-weight: bold;
-			cursor: pointer;
-			color: var(--sidebar-btn-text-final);
-			width: 100%;
-			height: 40px;
-			border-radius: 25px;
+			border-radius: 50%;
 			display: flex;
 			justify-content: center;
 			align-items: center;
-			gap: 8px;
-			transition: all 0.3s ease;
+			background-color: var(--top-bar-bg);
+			color: var(--text-color);
+			cursor: pointer;
+			transition: background-color 0.2s ease;
 
 			&:hover {
-				filter: brightness(1.2);
+				background-color: var(--bg-surface-hover);
 			}
+		}
+
+		.sidebar-footer {
+			padding: 10px 0;
+			flex-shrink: 0;
+		}
+
+		.sidebar-content.is-empty {
+			display: flex;
+			flex-direction: column;
+		}
+
+		/* Old and new content share one grid cell, so the crossfade does not shift layout */
+		.swap-stack {
+			display: grid;
+		}
+
+		.wallpaper-swap {
+			grid-area: 1 / 1;
+			min-width: 0;
+			animation: swap-in 0.3s ease-out both;
+		}
+
+		@keyframes swap-in {
+			from {
+				opacity: 0;
+			}
+			to {
+				opacity: 1;
+			}
+		}
+
+		@media (prefers-reduced-motion: reduce) {
+			.wallpaper-swap {
+				animation: none;
+			}
+		}
+
+		:global(html.performance-mode) & .wallpaper-swap {
+			animation: none !important;
 		}
 
 		/* Global Typography for any content inside the shell */

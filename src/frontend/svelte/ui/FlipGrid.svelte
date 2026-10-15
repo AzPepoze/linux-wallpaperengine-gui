@@ -84,7 +84,7 @@
 	}
 
 	@media (prefers-reduced-motion: reduce) {
-		.flip-grid [data-flip-key] {
+		.flip-grid :global([data-flip-key]) {
 			animation: none !important;
 		}
 	}

@@ -6,52 +6,68 @@
 	export let palette: [number, number, number][] = [];
 	export let onInput: (val: string) => void = () => {};
 
+	const hexPattern = /^#?([0-9a-f]{3}|[0-9a-f]{6})$/i;
+	const floatPattern = /^\s*\d*\.?\d+(\s+\d*\.?\d+){2}\s*$/;
+
 	$: hexValue = rgbFloatToHex(value);
 
-	function handleInput(e: Event) {
-		const target = e.target as HTMLInputElement;
-		const rgbFloat = hexToRgbFloat(target.value);
-		value = rgbFloat;
+	// Text the user is typing; reset whenever the color changes from elsewhere
+	let draft = '';
+	$: draft = hexValue;
+
+	function commit(next: string) {
+		value = next;
 		onInput(value);
 	}
 
-	function handleTextInput(e: Event) {
+	function handleSwatchChange(e: Event) {
 		const target = e.target as HTMLInputElement;
-		value = target.value;
-		onInput(value);
+		commit(hexToRgbFloat(target.value));
+	}
+
+	function commitDraft() {
+		const text = draft.trim();
+		if (hexPattern.test(text)) {
+			commit(hexToRgbFloat(text.startsWith('#') ? text : `#${text}`));
+		} else if (floatPattern.test(text)) {
+			commit(text);
+		} else {
+			draft = hexValue;
+		}
+	}
+
+	function handleKeydown(e: KeyboardEvent) {
+		if (e.key === 'Enter') {
+			(e.currentTarget as HTMLInputElement).blur();
+		}
 	}
 
 	function selectFromPalette(color: [number, number, number]) {
 		const rgbFloat = `${(color[0] / 255).toFixed(3)} ${(color[1] / 255).toFixed(3)} ${(color[2] / 255).toFixed(3)}`;
-		value = rgbFloat;
-		onInput(value);
+		commit(rgbFloat);
 	}
 </script>
 
 <div class="color-picker-container">
-	<div class="picker-main">
-		<div class="picker-wrapper">
+	<div class="color-field">
+		<span class="swatch" style="background-color: {hexValue}">
 			<input
 				type="color"
 				{id}
 				value={hexValue}
-				on:change={handleInput}
-				class="picker-input"
+				on:change={handleSwatchChange}
+				aria-label="Pick color"
 			/>
-			<div
-				class="color-preview"
-				style="background-color: {hexValue}"
-			></div>
-		</div>
-		<div class="input-wrapper">
-			<input
-				type="text"
-				{value}
-				on:input={handleTextInput}
-				class="hex-input"
-				placeholder="1.0 1.0 1.0"
-			/>
-		</div>
+		</span>
+		<input
+			type="text"
+			class="hex-input"
+			bind:value={draft}
+			on:blur={commitDraft}
+			on:keydown={handleKeydown}
+			spellcheck="false"
+			autocomplete="off"
+		/>
 	</div>
 
 	{#if palette.length > 0}
@@ -81,73 +97,59 @@
 		color: var(--text-color);
 	}
 
-	.picker-main {
+	.color-field {
 		display: flex;
 		align-items: center;
 		gap: 10px;
-		width: 100%;
+		padding: 4px 12px 4px 4px;
+		background: var(--bg-surface-active);
+		border: 1px solid var(--border-color);
+		border-radius: var(--radius-md);
+		cursor: text;
+		transition: var(--transition-base);
+
+		&:hover {
+			border-color: var(--border-color-hover);
+		}
+
+		&:focus-within {
+			border-color: var(--btn-primary-bg);
+			box-shadow: 0 0 0 3px var(--focus-ring);
+		}
 	}
 
-	.picker-wrapper {
+	.swatch {
 		position: relative;
-		width: 36px;
-		height: 36px;
+		width: 32px;
+		height: 32px;
 		flex-shrink: 0;
+		border-radius: 8px;
+		border: 1px solid rgba(255, 255, 255, 0.2);
 		cursor: pointer;
+		overflow: hidden;
 
-		.picker-input {
+		input {
 			position: absolute;
-			top: 0;
-			left: 0;
+			inset: 0;
 			width: 100%;
 			height: 100%;
 			opacity: 0;
 			cursor: pointer;
-			z-index: 2;
 		}
-
-		.color-preview {
-			width: 100%;
-			height: 100%;
-			border-radius: var(--radius-sm);
-			border: 1px solid var(--border-color);
-			box-shadow: var(--shadow-sm);
-			transition: var(--transition-base);
-		}
-
-		&:hover .color-preview {
-			transform: scale(1.05);
-			border-color: var(--border-color-hover);
-		}
-	}
-
-	.input-wrapper {
-		flex-grow: 1;
 	}
 
 	.hex-input {
-		width: 100%;
-		background: var(--bg-surface);
-		border: 1px solid var(--border-color);
-		border-radius: var(--radius-md);
+		flex: 1;
+		min-width: 0;
+		padding: 6px 0;
+		background: transparent;
+		border: none;
 		color: var(--text-color);
-		padding: 8px 14px;
 		font-family: monospace;
 		font-size: 0.9em;
+		letter-spacing: 0.04em;
+		text-transform: uppercase;
 		outline: none;
-		transition: var(--transition-base);
-
-		&:hover {
-			background-color: var(--bg-surface-hover);
-			border-color: var(--border-color-hover);
-		}
-
-		&:focus {
-			border-color: var(--btn-primary-bg);
-			background: var(--bg-surface-active);
-			box-shadow: 0 0 0 3px
-				color-mix(in srgb, var(--btn-primary-bg), transparent 85%);
-		}
 	}
 
 	.palette-container {

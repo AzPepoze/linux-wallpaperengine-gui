@@ -83,3 +83,20 @@ export function isValidWorkshopItem(file: PublishedFileDetails): boolean {
 	// Result code 1 = success, 9 = file not found
 	return !!(file.result === 1 && file.title && file.publishedfileid);
 }
+
+// Workshop items are stored under their numeric Steam file id.
+export function isWorkshopWallpaper(
+	folderName: string,
+	projectData: { workshopid?: string } | null
+): boolean {
+	return !!projectData?.workshopid || /^\d+$/.test(folderName);
+}
+
+// Prefers the folder the backend reported, so built-in wallpapers resolve correctly.
+export function getWallpaperFolder(
+	folderName: string,
+	folderPath: string | undefined,
+	workshopBase: string
+): string {
+	return folderPath || `${workshopBase}/${folderName}`;
+}

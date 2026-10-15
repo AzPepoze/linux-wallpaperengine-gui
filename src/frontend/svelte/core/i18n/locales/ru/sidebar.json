@@ -1,4 +1,10 @@
 {
+	"apply": "[NYT_RU] Apply Wallpaper",
+	"applyTo": "[NYT_RU] Apply to {screen}",
+	"applyAll": "[NYT_RU] Apply to All Displays",
+	"empty": {
+		"title": "[NYT_RU] No wallpaper selected"
+	},
 	"local": {
 		"folder": "Папка:",
 		"fileInfo": "О файле",

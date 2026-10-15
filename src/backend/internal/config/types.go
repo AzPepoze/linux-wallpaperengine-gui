@@ -80,6 +80,7 @@ type AppConfig struct {
 	WallpaperChangeCommand   string         `json:"wallpaperChangeCommand,omitempty"`
 	EnableGridWarpAnimation  bool           `json:"enableGridWarpAnimation,omitempty"`
 	PerformanceMode          bool           `json:"performanceMode,omitempty"`
+	DoubleClickApply         bool           `json:"doubleClickApply"`
 
 	// Fixed Filters
 	InstalledFilters *FilterConfig `json:"installedFilters,omitempty"`

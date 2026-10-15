@@ -6,10 +6,10 @@ import {
 } from '@/core/utils/workshopHelper';
 import type { FilterConfig } from '@shared/types';
 import {
-	buildFilterCategories,
 	DEFAULT_WORKSHOP_FILTER_CONFIG,
 	type FilterCategory
 } from '@shared/filterConstants';
+import { mergeFilterConfig } from '@/core/utils/filterConfig';
 import { getSearchParameters } from '@/features/workshop/scripts/workshopSearch';
 
 export async function checkSteamStatus(): Promise<boolean> {
@@ -25,19 +25,11 @@ export function launchSteam(): void {
 	window.electronAPI.openExternal('steam://open/main');
 }
 
-export async function loadFilters(): Promise<{
-	filters: FilterConfig;
-	categories: FilterCategory[];
-} | null> {
+export async function loadFilters(): Promise<FilterConfig | null> {
 	try {
 		const result = await window.electronAPI.getWorkshopFilters();
 		if (result.success) {
-			const filters = {
-				...DEFAULT_WORKSHOP_FILTER_CONFIG,
-				...result.filters
-			};
-			const categories = buildFilterCategories(filters);
-			return { filters, categories };
+			return mergeFilterConfig(DEFAULT_WORKSHOP_FILTER_CONFIG, result.filters);
 		}
 	} catch (err) {
 		console.error('Failed to load filters:', err);

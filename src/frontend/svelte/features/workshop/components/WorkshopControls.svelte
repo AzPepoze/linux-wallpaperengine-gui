@@ -8,6 +8,7 @@
 	import Toolbar from '@/ui/layout/Toolbar.svelte';
 	import ViewToggle from '@/ui/ViewToggle.svelte';
 	import { t } from '@/core/i18n';
+	import SidebarToggle from '@/ui/SidebarToggle.svelte';
 
 	onMount(() => {
 		const handleGlobalKeydown = (e: KeyboardEvent) => {
@@ -132,6 +133,8 @@
 		<div class="mode-toggle-wrap">
 			<ViewToggle bind:viewMode />
 		</div>
+
+		<SidebarToggle />
 	</div>
 </Toolbar>
 

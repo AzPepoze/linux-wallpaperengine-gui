@@ -10,12 +10,24 @@
 	import Icon from '@/ui/Icon.svelte';
 	import type { Wallpaper } from '@shared/types';
 	import { t } from '@/core/i18n';
+	import { isWorkshopWallpaper } from '@/core/utils/workshopHelper';
 
 	export let wallpaper: Wallpaper;
+	export let canSubscribe: boolean = true;
+
+	let steamRunning = false;
 
 	function getDownloadPercent(progress: ProgressInfo | undefined): number {
 		if (!progress || progress.total === 0) return 0;
 		return Math.round((Number(progress.current) / Number(progress.total)) * 100);
+	}
+
+	async function refreshSteamStatus() {
+		try {
+			steamRunning = await window.electronAPI.isSteamRunning();
+		} catch {
+			steamRunning = false;
+		}
 	}
 
 	async function handleSubscribe() {
@@ -34,64 +46,68 @@
 		}
 	}
 
+	$: isWorkshopItem = isWorkshopWallpaper(wallpaper.folderName, wallpaper.projectData);
 	$: isSubscribed = $subscribedIds.has(wallpaper.folderName);
 	$: progress = $downloadProgress[wallpaper.folderName];
 	$: percent = getDownloadPercent(progress);
 	$: isDownloading = !!progress;
+	$: if (wallpaper.folderName) refreshSteamStatus();
 </script>
 
-<div class="workshop-actions">
-	<button
-		type="button"
-		class="workshop-btn secondary-btn"
-		on:click={() => {
-			const url = `steam://url/CommunityFilePage/${wallpaper.folderName}`;
-			window.electronAPI.openExternal(url);
-		}}
-	>
-		<Icon name="storefront" size={18} />
-		{$t('workshop.actions.viewOnWorkshop')}
-	</button>
-
-	{#if isSubscribed}
-		{#if isDownloading}
-			<button type="button" class="workshop-btn downloading">
-				<div class="progress-cool" style="width: {percent}%">
-					<div class="progress-glow"></div>
-					<div class="progress-shimmer"></div>
-				</div>
-				<span class="progress-text">{$t('workshop.actions.downloading', { percent })}</span>
-			</button>
-		{:else}
-			<button
-				type="button"
-				class="workshop-btn unsubscribe-btn"
-				on:click={handleUnsubscribe}
-			>
-				<Icon name="remove_shopping_cart" size={18} />
-				{$t('workshop.actions.unsubscribe')}
-			</button>
-		{/if}
-	{:else}
+{#if isWorkshopItem}
+	<div class="workshop-actions">
 		<button
 			type="button"
-			class="workshop-btn"
-			class:downloading={isDownloading}
-			on:click={handleSubscribe}
+			class="workshop-btn secondary-btn"
+			on:click={() => {
+				const url = `steam://url/CommunityFilePage/${wallpaper.folderName}`;
+				window.electronAPI.openExternal(url);
+			}}
 		>
-			{#if isDownloading}
-				<div class="progress-cool" style="width: {percent}%">
-					<div class="progress-glow"></div>
-					<div class="progress-shimmer"></div>
-				</div>
-				<span class="progress-text">{$t('workshop.actions.downloading', { percent })}</span>
-			{:else}
-				<Icon name="download" size={18} />
-				{$t('workshop.actions.subscribe')}
-			{/if}
+			<Icon name="storefront" size={18} />
+			{$t('workshop.actions.viewOnWorkshop')}
 		</button>
-	{/if}
-</div>
+
+		{#if isSubscribed}
+			{#if isDownloading}
+				<button type="button" class="workshop-btn downloading">
+					<div class="progress-cool" style="width: {percent}%">
+						<div class="progress-glow"></div>
+						<div class="progress-shimmer"></div>
+					</div>
+					<span class="progress-text">{$t('workshop.actions.downloading', { percent })}</span>
+				</button>
+			{:else if steamRunning}
+				<button
+					type="button"
+					class="workshop-btn unsubscribe-btn"
+					on:click={handleUnsubscribe}
+				>
+					<Icon name="remove_shopping_cart" size={18} />
+					{$t('workshop.actions.unsubscribe')}
+				</button>
+			{/if}
+		{:else if canSubscribe || isDownloading}
+			<button
+				type="button"
+				class="workshop-btn"
+				class:downloading={isDownloading}
+				on:click={handleSubscribe}
+			>
+				{#if isDownloading}
+					<div class="progress-cool" style="width: {percent}%">
+						<div class="progress-glow"></div>
+						<div class="progress-shimmer"></div>
+					</div>
+					<span class="progress-text">{$t('workshop.actions.downloading', { percent })}</span>
+				{:else}
+					<Icon name="download" size={18} />
+					{$t('workshop.actions.subscribe')}
+				{/if}
+			</button>
+		{/if}
+	</div>
+{/if}
 
 <style lang="scss">
 	.workshop-actions {

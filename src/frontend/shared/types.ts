@@ -18,6 +18,7 @@ export type WallpaperData = {
 	projectData: WallpaperProjectData | null;
 	previewPath: string | undefined;
 	installDate?: number;
+	folderPath?: string;
 };
 
 export type Wallpaper = WallpaperData & { folderName: string };
@@ -63,6 +64,7 @@ export type AppConfig = {
 	autostart?: boolean;
 	dynamicUiTheme?: boolean;
 	dynamicSidebarTheme?: boolean;
+	doubleClickApply?: boolean;
 	transparentUi?: boolean;
 	uiTransparency?: number;
 	steamPaths?: string[];

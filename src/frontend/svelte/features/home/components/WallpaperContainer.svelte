@@ -135,15 +135,6 @@
 		installedFilters = await loadInstalledFilters();
 	}
 
-	async function saveFilters(newConfig: FilterConfig) {
-		const success = await saveInstalledFilters(newConfig);
-		if (success) {
-			installedFilters = newConfig;
-			showFilterPanel = false;
-			logger.log('Home filters applied and saved');
-		}
-	}
-
 	function handleFilterChange(newConfig: FilterConfig) {
 		installedFilters = newConfig;
 		saveInstalledFilters(newConfig);
@@ -197,13 +188,15 @@
 	{/if}
 
 	<div class="content-area">
-		<FilterPanel
-			show={showFilterPanel && !!installedFilters}
-			config={installedFilters || DEFAULT_INSTALLED_FILTER_CONFIG}
-			onSave={saveFilters}
-			onChange={handleFilterChange}
-			onClose={() => (showFilterPanel = false)}
-		/>
+		{#if installedFilters}
+			<FilterPanel
+				show={showFilterPanel}
+				config={installedFilters}
+				defaults={DEFAULT_INSTALLED_FILTER_CONFIG}
+				onChange={handleFilterChange}
+				onClose={() => (showFilterPanel = false)}
+			/>
+		{/if}
 
 		<div
 			class="wallpaper-container"

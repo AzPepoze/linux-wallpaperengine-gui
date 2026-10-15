@@ -188,7 +188,7 @@
 	}
 
 	@media (prefers-reduced-motion: reduce) {
-		.virtual-grid-content [data-flip-key] {
+		.virtual-grid-content :global([data-flip-key]) {
 			animation: none !important;
 		}
 	}
