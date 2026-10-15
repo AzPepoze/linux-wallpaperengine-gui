@@ -71,22 +71,26 @@
 	<div class="sidebar-container">
 		<div class="sidebar-content" class:is-empty={!selectedWallpaper}>
 			{#if selectedWallpaper}
-				{#if selectedWallpaper.previewPath}
-					<img
-						src={selectedWallpaper.previewPath}
-						alt="{selectedWallpaper.projectData?.title ||
-							selectedWallpaper.folderName} preview"
-						class="preview-image"
-					/>
-				{/if}
+				{#key selectedFolderName}
+					<div class="wallpaper-swap">
+						{#if selectedWallpaper.previewPath}
+							<img
+								src={selectedWallpaper.previewPath}
+								alt="{selectedWallpaper.projectData?.title ||
+									selectedWallpaper.folderName} preview"
+								class="preview-image"
+							/>
+						{/if}
 
-				<div class="actions-slot">
-					<slot name="actions" />
-				</div>
+						<div class="actions-slot">
+							<slot name="actions" />
+						</div>
 
-				<div class="content-slot">
-					<slot />
-				</div>
+						<div class="content-slot">
+							<slot />
+						</div>
+					</div>
+				{/key}
 			{:else}
 				<SidebarEmpty />
 			{/if}
@@ -245,6 +249,31 @@
 		.sidebar-content.is-empty {
 			display: flex;
 			flex-direction: column;
+		}
+
+		.wallpaper-swap {
+			animation: swap-in 0.3s ease-out both;
+		}
+
+		@keyframes swap-in {
+			from {
+				opacity: 0;
+				transform: translateY(8px);
+			}
+			to {
+				opacity: 1;
+				transform: none;
+			}
+		}
+
+		@media (prefers-reduced-motion: reduce) {
+			.wallpaper-swap {
+				animation: none;
+			}
+		}
+
+		:global(html.performance-mode) & .wallpaper-swap {
+			animation: none !important;
 		}
 
 		/* Global Typography for any content inside the shell */
