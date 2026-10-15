@@ -6,13 +6,9 @@
 	import { t } from '@/core/i18n';
 	import Button from '@/ui/Button.svelte';
 	import Icon from '@/ui/Icon.svelte';
-	import Swap from '@/ui/Swap.svelte';
 	import { logger } from '@/core/logger';
-	import { motionMs } from '@/ui/scripts/motion';
 	import { getWallpaperFolder } from '@/core/utils/workshopHelper';
 	import { openFolderPath } from '@/features/wallpaper/scripts/openFolder';
-	import { slide } from 'svelte/transition';
-	import { flip } from 'svelte/animate';
 
 	import {
 		previewingWallpaperId,
@@ -49,22 +45,13 @@
 			: projectData.fileSize);
 
 	$: description = projectData.description || '';
-
+	
 	$: installDate = wallpaper?.installDate ? wallpaper.installDate * 1000 : undefined;
-
+	
 	const formatDate = (dateNum: number) => {
 		const d = new Date(dateNum);
 		return d.toLocaleDateString() + ' ' + d.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
 	};
-
-	// Rows keyed by label, so rows both wallpapers share stay in place
-	$: infoRows = [
-		...(displayFileSize ? [{ label: $t('sidebar.local.size'), value: formatBytes(displayFileSize) }] : []),
-		...(projectData.type ? [{ label: $t('sidebar.local.type'), value: projectData.type }] : []),
-		...(projectData.version ? [{ label: $t('sidebar.local.version'), value: projectData.version }] : []),
-		...(projectData.contentrating ? [{ label: $t('sidebar.local.rating'), value: projectData.contentrating }] : []),
-		...(installDate ? [{ label: $t('sidebar.local.installed'), value: formatDate(installDate) }] : [])
-	];
 
 	async function handleOpenFolder() {
 		try {
@@ -86,7 +73,7 @@
 
 <div class="local-sidebar">
 	<div class="section header-section">
-		<h3 class="title"><Swap value={projectData?.title || folderName}>{projectData?.title || folderName}</Swap></h3>
+		<h3 class="title">{projectData?.title || folderName}</h3>
 		<div class="actions-row">
 			<Button
 				variant="ghost"
@@ -113,21 +100,41 @@
 	<div class="section info-section">
 		<h4 class="section-title">{$t('sidebar.local.fileInfo')}</h4>
 		<div class="info-list">
-			{#each infoRows as row, index (row.label)}
-				<div
-					class="info-item"
-					animate:flip={{ duration: motionMs(250) }}
-					transition:slide={{ duration: motionMs(200) }}
-				>
-					<span class="info-label">{row.label}</span>
-					<span class="info-value"><Swap value={row.value} delay={index * 40}>{row.value}</Swap></span>
+			{#if displayFileSize}
+				<div class="info-item">
+					<span class="info-label">{$t('sidebar.local.size')}</span>
+					<span class="info-value">{formatBytes(displayFileSize)}</span>
 				</div>
-			{/each}
+			{/if}
+			{#if projectData.type}
+				<div class="info-item">
+					<span class="info-label">{$t('sidebar.local.type')}</span>
+					<span class="info-value">{projectData.type}</span>
+				</div>
+			{/if}
+			{#if projectData.version}
+				<div class="info-item">
+					<span class="info-label">{$t('sidebar.local.version')}</span>
+					<span class="info-value">{projectData.version}</span>
+				</div>
+			{/if}
+			{#if projectData.contentrating}
+				<div class="info-item">
+					<span class="info-label">{$t('sidebar.local.rating')}</span>
+					<span class="info-value">{projectData.contentrating}</span>
+				</div>
+			{/if}
+			{#if installDate}
+				<div class="info-item">
+					<span class="info-label">{$t('sidebar.local.installed')}</span>
+					<span class="info-value">{formatDate(installDate)}</span>
+				</div>
+			{/if}
 		</div>
 	</div>
 
 	{#if description}
-		<div class="section description-section" transition:slide={{ duration: motionMs(220) }}>
+		<div class="section description-section">
 			<h4 class="section-title">{$t('sidebar.local.description')}</h4>
 			<div class="description-content">
 				{@html renderMarkdown(description)}

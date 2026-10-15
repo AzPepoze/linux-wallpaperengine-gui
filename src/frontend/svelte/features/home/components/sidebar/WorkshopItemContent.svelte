@@ -3,10 +3,6 @@
 	import { formatBytes, formatDate } from '@/core/utils/formatHelper';
 	import type { Wallpaper } from '@shared/types';
 	import { t } from '@/core/i18n';
-	import Swap from '@/ui/Swap.svelte';
-	import { motionMs } from '@/ui/scripts/motion';
-	import { scale, slide } from 'svelte/transition';
-	import { flip } from 'svelte/animate';
 
 	interface InfoItem {
 		label: string;
@@ -121,7 +117,7 @@
 <div class="workshop-sidebar">
 	<!-- Header Section -->
 	<div class="section header-section">
-		<h3 class="title"><Swap value={projectData?.title || folderName}>{projectData?.title || folderName}</Swap></h3>
+		<h3 class="title">{projectData?.title || folderName}</h3>
 		<div class="header-meta">
 			{#if projectData?.creator}
 				<p class="creator">by {projectData.creator}</p>
@@ -136,12 +132,12 @@
 
 	<!-- Tags -->
 	{#if hasContent.tags}
-		<div class="section content-section" transition:slide={{ duration: motionMs(220) }}>
+		<div class="section content-section">
 			<h4 class="section-title">{$t('sidebar.workshop.tags')}</h4>
 			{#if projectData?.tags?.length}
 				<div class="tags-container">
 					{#each projectData.tags as tag (tag)}
-						<span class="tag" animate:flip={{ duration: motionMs(250) }} in:scale={{ start: 0.8, duration: motionMs(200) }}>{tag}</span>
+						<span class="tag">{tag}</span>
 					{/each}
 				</div>
 			{/if}
@@ -150,7 +146,7 @@
 
 	<!-- Description -->
 	{#if hasContent.description}
-		<div class="section description-section" transition:slide={{ duration: motionMs(220) }}>
+		<div class="section description-section">
 			<h4 class="section-title">{$t('sidebar.workshop.description')}</h4>
 			<div class="description-content">
 				{@html renderMarkdown(description)}
@@ -160,13 +156,13 @@
 
 	<!-- Engagement Stats -->
 	{#if hasContent.stats}
-		<div class="section stats-section" transition:slide={{ duration: motionMs(220) }}>
+		<div class="section stats-section">
 			<h4 class="section-title">{$t('sidebar.workshop.engagement')}</h4>
 			<div class="stats-grid">
 				{#each engagementStats as stat (stat.label)}
 					<div class="stat-card">
 						<div class="stat-value">
-							<Swap value={stat.value}>{formatStat(stat.value)}</Swap>
+							{formatStat(stat.value)}
 						</div>
 						<div class="stat-label">{stat.label}</div>
 					</div>
@@ -177,16 +173,16 @@
 
 	<!-- File Information -->
 	{#if hasContent.fileInfo}
-		<div class="section info-section" transition:slide={{ duration: motionMs(220) }}>
+		<div class="section info-section">
 			<h4 class="section-title">{$t('sidebar.workshop.fileInfo')}</h4>
 			<div class="info-list">
-				{#each fileInfo as item, index (item.label)}
-					<div class="info-item" animate:flip={{ duration: motionMs(250) }} transition:slide={{ duration: motionMs(200) }}>
+				{#each fileInfo as item (item.label)}
+					<div class="info-item">
 						<span class="info-label">{item.label}:</span>
 						<span
 							class="info-value"
 							class:banned={item.banned}
-							><Swap value={item.value} delay={index * 40}>{item.value}</Swap></span
+							>{item.value}</span
 						>
 					</div>
 				{/each}
