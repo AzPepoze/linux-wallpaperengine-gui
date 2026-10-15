@@ -6,6 +6,8 @@ import {
 	updateScreenConfig,
 	updateConfig,
 	updateWallpaperProperties,
+	resetWallpaperProperty,
+	resetWallpaperProperties,
 } from "../utils/configHelper";
 
 export function registerWallpaperService() {
@@ -148,6 +150,21 @@ export function registerWallpaperService() {
 			return await socketClient.send("apply-wallpapers");
 		},
 	);
+
+	ipcMain.handle(
+		"reset-wallpaper-property",
+		async (_, id: string, key: string) => {
+			logger.ipcReceived("reset-wallpaper-property", id, key);
+			await resetWallpaperProperty(id, key);
+			return await socketClient.send("apply-wallpapers");
+		},
+	);
+
+	ipcMain.handle("reset-wallpaper-properties", async (_, id: string) => {
+		logger.ipcReceived("reset-wallpaper-properties", id);
+		await resetWallpaperProperties(id);
+		return await socketClient.send("apply-wallpapers");
+	});
 
 	ipcMain.handle("get-wallpaper-base-path", async () => {
 		logger.ipcReceived("get-wallpaper-base-path");

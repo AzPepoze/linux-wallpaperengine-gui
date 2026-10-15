@@ -50,3 +50,18 @@ export async function updateWallpaperProperties(
 	config.wallpaperProperties[id][key] = value;
 	await writeConfig(config);
 }
+
+export async function resetWallpaperProperty(
+	id: string,
+	key: string,
+): Promise<void> {
+	const config = await getConfig();
+	delete config.wallpaperProperties?.[id]?.[key];
+	await writeConfig(config);
+}
+
+export async function resetWallpaperProperties(id: string): Promise<void> {
+	const config = await getConfig();
+	delete config.wallpaperProperties?.[id];
+	await writeConfig(config);
+}
