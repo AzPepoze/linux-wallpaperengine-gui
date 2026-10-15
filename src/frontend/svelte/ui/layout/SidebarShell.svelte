@@ -10,6 +10,8 @@
 	import SidebarEmpty from '@/ui/layout/SidebarEmpty.svelte';
 	import ResizeHandle from '@/ui/ResizeHandle.svelte';
 	import type { Wallpaper } from '@shared/types';
+	import { blur, fade } from 'svelte/transition';
+	import { motionMs } from '@/ui/scripts/motion';
 
 	export let selectedWallpaper: Wallpaper | null = null;
 	export let onClose: () => void = () => {};
@@ -71,26 +73,28 @@
 	<div class="sidebar-container">
 		<div class="sidebar-content" class:is-empty={!selectedWallpaper}>
 			{#if selectedWallpaper}
-				{#key selectedFolderName}
-					<div class="wallpaper-swap">
+				<div class="preview-stack">
+					{#key selectedWallpaper.previewPath}
 						{#if selectedWallpaper.previewPath}
 							<img
 								src={selectedWallpaper.previewPath}
 								alt="{selectedWallpaper.projectData?.title ||
 									selectedWallpaper.folderName} preview"
 								class="preview-image"
+								in:blur={{ amount: 10, duration: motionMs(350) }}
+								out:fade={{ duration: motionMs(150) }}
 							/>
 						{/if}
+					{/key}
+				</div>
 
-						<div class="actions-slot">
-							<slot name="actions" />
-						</div>
+				<div class="actions-slot">
+					<slot name="actions" />
+				</div>
 
-						<div class="content-slot">
-							<slot />
-						</div>
-					</div>
-				{/key}
+				<div class="content-slot">
+					<slot />
+				</div>
 			{:else}
 				<SidebarEmpty />
 			{/if}
@@ -208,7 +212,13 @@
 			border-radius: 15px;
 			padding: 0 10px;
 
+			.preview-stack {
+				display: grid;
+			}
+
+			/* Old and new preview share one cell, so the swap does not shift layout */
 			.preview-image {
+				grid-area: 1 / 1;
 				width: 100%;
 				aspect-ratio: 1 / 1;
 				border-radius: 20px;
@@ -249,31 +259,6 @@
 		.sidebar-content.is-empty {
 			display: flex;
 			flex-direction: column;
-		}
-
-		.wallpaper-swap {
-			animation: swap-in 0.3s ease-out both;
-		}
-
-		@keyframes swap-in {
-			from {
-				opacity: 0;
-				transform: translateY(8px);
-			}
-			to {
-				opacity: 1;
-				transform: none;
-			}
-		}
-
-		@media (prefers-reduced-motion: reduce) {
-			.wallpaper-swap {
-				animation: none;
-			}
-		}
-
-		:global(html.performance-mode) & .wallpaper-swap {
-			animation: none !important;
 		}
 
 		/* Global Typography for any content inside the shell */
