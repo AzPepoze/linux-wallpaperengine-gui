@@ -55,9 +55,19 @@
 		onSelect(folderName, wallpaper);
 	}
 
+	function canApply() {
+		return !(isWorkshopItem && !isDownloaded);
+	}
+
+	// A single click applies only when double-click apply is off
+	function handleClick() {
+		handleSelect();
+		if ($settingsStore?.doubleClickApply || !canApply()) return;
+		applyWallpaper(folderName);
+	}
+
 	function handleDoubleClick() {
-		if (!$settingsStore?.doubleClickApply) return;
-		if (isWorkshopItem && !isDownloaded) return;
+		if (!$settingsStore?.doubleClickApply || !canApply()) return;
 		applyWallpaper(folderName);
 	}
 
@@ -289,7 +299,7 @@
 		{percent}
 		{isWorkshop}
 		{index}
-		{handleSelect}
+		handleSelect={handleClick}
 		{handleContextMenu}
 		{handleDoubleClick}
 	/>
@@ -306,7 +316,7 @@
 		{percent}
 		{isWorkshop}
 		{index}
-		{handleSelect}
+		handleSelect={handleClick}
 		{handleContextMenu}
 		{handleDoubleClick}
 	/>
