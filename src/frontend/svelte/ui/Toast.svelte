@@ -1,7 +1,6 @@
 <script lang="ts">
-	import { fly, scale } from 'svelte/transition';
-	import { backOut, cubicOut } from 'svelte/easing';
-	import { onMount } from 'svelte';
+	import { fly, fade } from 'svelte/transition';
+	import { backOut, cubicIn } from 'svelte/easing';
 	import Icon from './Icon.svelte';
 	import { removeToast } from '@/core/toastStore';
 
@@ -9,34 +8,6 @@
 	export let message: string;
 	export let type: 'success' | 'error' | 'warn' | 'info' = 'success';
 	export let duration: number = 3000;
-
-	let remaining = duration;
-	let isPaused = false;
-	let lastTick = Date.now();
-	
-	$: progress = (remaining / duration) * 100;
-
-	onMount(() => {
-		const interval = setInterval(() => {
-			if (isPaused) {
-				lastTick = Date.now();
-				return;
-			}
-
-			const now = Date.now();
-			const delta = now - lastTick;
-			lastTick = now;
-
-			remaining -= delta;
-
-			if (remaining <= 0) {
-				clearInterval(interval);
-				removeToast(id);
-			}
-		}, 10);
-		
-		return () => clearInterval(interval);
-	});
 
 	const typeIcons = {
 		success: 'check_circle',
@@ -52,137 +23,128 @@
 		info: 'var(--info-bg)'
 	};
 
-	function handleMouseEnter() {
-		isPaused = true;
-	}
+	const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+	const enter = reduceMotion ? fade : fly;
+	const exit = reduceMotion ? fade : fly;
+	const enterParams = reduceMotion ? { duration: 200 } : { x: 24, duration: 300, easing: backOut };
+	const exitParams = reduceMotion ? { duration: 150 } : { x: 24, duration: 200, easing: cubicIn };
 
-	function handleMouseLeave() {
-		isPaused = false;
-		lastTick = Date.now();
+	const isAssertive = type === 'error' || type === 'warn';
+
+	function handleCountdownEnd() {
+		removeToast(id);
 	}
 </script>
 
-<!-- svelte-ignore a11y_no_static_element_interactions -->
 <div
-	class="toast-card {type}"
-	in:fly={{ y: 20, duration: 400, easing: backOut }}
-	out:scale={{ duration: 300, start: 0.9, easing: cubicOut, opacity: 0 }}
-	on:mouseenter={handleMouseEnter}
-	on:mouseleave={handleMouseLeave}
+	class="toast-card"
+	role={isAssertive ? 'alert' : 'status'}
+	style="--type-color: {typeColors[type]}; --duration: {duration}ms"
+	in:enter={enterParams}
+	out:exit={exitParams}
 >
-	<div class="icon-wrap">
-		<Icon name={typeIcons[type]} size={20} />
-	</div>
-	
-	<div class="content">
-		<span class="message">{message}</span>
+	<div class="icon-chip">
+		<Icon name={typeIcons[type]} size={18} />
 	</div>
 
-	<button class="close-btn" on:click={() => removeToast(id)}>
+	<span class="message">{message}</span>
+
+	<button class="close-btn" aria-label="Dismiss" on:click={() => removeToast(id)}>
 		<Icon name="close" size={16} />
 	</button>
 
-	<div class="progress-bar">
-		<div 
-			class="progress-fill" 
-			style="width: {progress}%; background: {typeColors[type]}"
-		></div>
-	</div>
+	<div class="countdown" on:animationend={handleCountdownEnd}></div>
 </div>
 
 <style lang="scss">
 	.toast-card {
+		position: relative;
 		display: flex;
 		align-items: center;
-		gap: 14px;
+		gap: 12px;
 		min-width: 280px;
-		max-width: 450px;
-		padding: 14px 16px 14px 20px;
-		background: rgba(30, 30, 30, 0.95);
-		border: 1px solid rgba(255, 255, 255, 0.1);
+		max-width: 420px;
+		padding: 12px 10px 14px 12px;
+		background: var(--bg-overlay);
+		backdrop-filter: blur(12px);
+		-webkit-backdrop-filter: blur(12px);
+		border: 1px solid rgba(255, 255, 255, 0.08);
 		border-radius: var(--radius-lg);
-		box-shadow: 0 12px 32px rgba(0, 0, 0, 0.4);
-		position: relative;
+		box-shadow: 0 8px 24px rgba(0, 0, 0, 0.3);
 		overflow: hidden;
-		transition: transform 0.2s ease, box-shadow 0.2s ease;
 		pointer-events: auto;
+		transition: border-color 0.2s ease;
 
 		&:hover {
-			transform: scale(1.02) translateX(-5px);
-			box-shadow: 0 16px 40px rgba(0, 0, 0, 0.5);
-			border-color: rgba(255, 255, 255, 0.2);
+			border-color: rgba(255, 255, 255, 0.16);
+
+			.countdown {
+				animation-play-state: paused;
+			}
 		}
 
-		&.success {
-			border-left: 4px solid var(--success-bg);
-			.icon-wrap { color: var(--success-bg); }
-		}
-
-		&.error {
-			border-left: 4px solid var(--error-bg);
-			.icon-wrap { color: var(--error-bg); }
-		}
-
-		&.warn {
-			border-left: 4px solid var(--warn-bg);
-			.icon-wrap { color: var(--warn-bg); }
-		}
-
-		&.info {
-			border-left: 4px solid var(--info-bg);
-			.icon-wrap { color: var(--info-bg); }
-		}
-
-		.icon-wrap {
+		.icon-chip {
 			display: flex;
 			align-items: center;
 			justify-content: center;
 			flex-shrink: 0;
+			width: 28px;
+			height: 28px;
+			border-radius: 50%;
+			color: var(--type-color);
+			background: color-mix(in srgb, var(--type-color) 15%, transparent);
 		}
 
-		.content {
+		.message {
 			flex-grow: 1;
-			
-			.message {
-				color: #fff;
-				font-weight: 600;
-				font-size: 0.95em;
-				line-height: 1.4;
-			}
+			color: var(--text-color);
+			font-weight: 500;
+			font-size: 0.9em;
+			line-height: 1.4;
 		}
 
 		.close-btn {
-			background: transparent;
-			border: none;
-			color: rgba(255, 255, 255, 0.4);
-			cursor: pointer;
-			padding: 4px;
 			display: flex;
 			align-items: center;
 			justify-content: center;
+			flex-shrink: 0;
+			padding: 4px;
+			background: transparent;
+			border: none;
 			border-radius: 4px;
-			transition: all 0.2s ease;
-			margin-left: 4px;
+			color: var(--text-muted);
+			cursor: pointer;
+			transition: color 0.2s ease, background 0.2s ease;
 
 			&:hover {
-				color: #fff;
+				color: var(--text-color);
 				background: rgba(255, 255, 255, 0.1);
 			}
+
+			&:focus-visible {
+				outline: 2px solid var(--type-color);
+				outline-offset: 2px;
+			}
+		}
+
+		.countdown {
+			position: absolute;
+			left: 0;
+			bottom: 0;
+			width: 100%;
+			height: 2px;
+			background: var(--type-color);
+			transform-origin: left;
+			animation: drain var(--duration) linear forwards;
 		}
 	}
 
-	.progress-bar {
-		position: absolute;
-		bottom: 0;
-		left: 0;
-		width: 100%;
-		height: 4px;
-		background: rgba(255, 255, 255, 0.1);
-		z-index: 5;
-
-		.progress-fill {
-			height: 100%;
-			border-top-right-radius: 2px;
+	@keyframes drain {
+		from {
+			transform: scaleX(1);
+		}
+		to {
+			transform: scaleX(0);
 		}
 	}
 </style>
