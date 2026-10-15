@@ -1,10 +1,6 @@
 <script lang="ts">
 	import { sidebarHidden, sidebarWidth } from '@/core/ui';
-	import {
-		calculateSidebarTheme,
-		DEFAULT_THEME,
-		type SidebarTheme
-	} from '@/features/home/scripts/sidebarTheme';
+	import { DEFAULT_THEME, type SidebarTheme } from '@/features/home/scripts/sidebarTheme';
 	import { settingsStore } from '@/features/settings/scripts/settings';
 	import CloseIcon from '@/ui/icons/CloseIcon.svelte';
 	import SidebarEmpty from '@/ui/layout/SidebarEmpty.svelte';
@@ -16,8 +12,8 @@
 
 	export let selectedWallpaper: Wallpaper | null = null;
 	export let onClose: () => void = () => {};
+	export let theme: SidebarTheme = DEFAULT_THEME;
 
-	let theme: SidebarTheme = DEFAULT_THEME;
 	let isResizing = false;
 
 	$: selectedFolderName = selectedWallpaper?.folderName;
@@ -31,18 +27,6 @@
 
 	// Picking a different wallpaper shows the sidebar again
 	$: selectedFolderName, sidebarHidden.set(false);
-
-	$: {
-		if (selectedWallpaper) {
-			calculateSidebarTheme(selectedWallpaper, $settingsStore).then(
-				(t) => {
-					theme = t;
-				}
-			);
-		} else {
-			theme = DEFAULT_THEME;
-		}
-	}
 </script>
 
 <div
