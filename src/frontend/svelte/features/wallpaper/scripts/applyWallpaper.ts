@@ -1,10 +1,12 @@
 import { get } from 'svelte/store';
-import { showToast } from '@/core/toastStore';
+import { showApplyNotice } from '@/core/applyNotice';
 import { logger } from '@/core/logger';
 import { screens, selectedScreen, cloneMode, spanMode } from '@/features/home/scripts/display';
-import { activeFolderName, selectedFolderName } from '@/features/home/scripts/wallpaperStore';
+import { activeFolderName, selectedFolderName, wallpapers } from '@/features/home/scripts/wallpaperStore';
 
 export async function applyWallpaper(folderName: string, targetScreen?: string) {
+	const title = get(wallpapers)[folderName]?.projectData?.title || folderName;
+
 	try {
 		let screen = targetScreen || get(selectedScreen);
 		let allScreens = Object.keys(get(screens));
@@ -46,12 +48,12 @@ export async function applyWallpaper(folderName: string, targetScreen?: string) 
 			}
 			activeFolderName.set(folderName);
 			selectedFolderName.set(folderName);
-			showToast(`Applied wallpaper to ${appliedTo}`, 'info');
+			showApplyNotice(`Applied "${title}" to ${appliedTo}`, 'success');
 		} else {
-			showToast('No active display found', 'error');
+			showApplyNotice(`Could not apply "${title}": no display found`, 'error');
 		}
 	} catch (err) {
 		logger.error('Failed to apply wallpaper:', err);
-		showToast('Failed to apply wallpaper', 'error');
+		showApplyNotice(`Could not apply "${title}"`, 'error');
 	}
 }
