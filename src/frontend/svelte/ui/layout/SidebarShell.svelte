@@ -1,3 +1,8 @@
+<script context="module" lang="ts">
+	// Shared by every sidebar instance, so changing pages does not count as a new pick
+	let lastPickedFolder: string | undefined;
+</script>
+
 <script lang="ts">
 	import { sidebarHidden, sidebarWidth } from '@/core/ui';
 	import { DEFAULT_THEME, type SidebarTheme } from '@/features/home/scripts/sidebarTheme';
@@ -25,8 +30,14 @@
 	}
 	$: isOpen = !$sidebarHidden;
 
-	// Picking a different wallpaper shows the sidebar again
-	$: selectedFolderName, sidebarHidden.set(false);
+	$: revealOnPick(selectedFolderName);
+
+	// Only a new pick opens the sidebar; mounting or changing pages does not
+	function revealOnPick(folderName: string | undefined) {
+		if (!folderName || folderName === lastPickedFolder) return;
+		lastPickedFolder = folderName;
+		sidebarHidden.set(false);
+	}
 </script>
 
 <div
