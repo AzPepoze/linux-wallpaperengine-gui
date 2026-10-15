@@ -58,7 +58,7 @@ func NewDefaultConfig() AppConfig {
 		TransparentUi:          true,
 		UiTransparency:         90,
 		EnableScrollMask:       true,
-		DoubleClickApply:       true,
+		DoubleClickApply:       false,
 		HookEnabled:            false,
 		HideTrayLabel:          false,
 		WallpaperChangeCommand: "",

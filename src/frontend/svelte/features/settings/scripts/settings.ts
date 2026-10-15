@@ -132,7 +132,7 @@ export async function loadSettings(): Promise<void> {
 			if (settings.playlistInterval === undefined) settings.playlistInterval = 0;
 			if (settings.enableGridWarpAnimation === undefined) settings.enableGridWarpAnimation = true;
 			if (settings.performanceMode === undefined) settings.performanceMode = false;
-			if (settings.doubleClickApply === undefined) settings.doubleClickApply = true;
+			if (settings.doubleClickApply === undefined) settings.doubleClickApply = false;
 			if (settings.language === undefined) settings.language = 'en';
 
 			settingsStore.set(settings as SettingsState);
