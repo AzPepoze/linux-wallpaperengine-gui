@@ -6,6 +6,7 @@
 	import { screens, selectedScreen, cloneMode, spanMode } from '@/features/home/scripts/display';
 
 	export let folderName: string;
+	export let disabled = false;
 
 	$: screenNames = Object.keys($screens);
 	$: isUnified = $cloneMode || $spanMode;
@@ -20,6 +21,7 @@
 
 <Button
 	variant="primary"
+	{disabled}
 	on:click={() => applyWallpaper(folderName)}
 	style="width: 100%; height: 40px; border-radius: 25px;"
 >

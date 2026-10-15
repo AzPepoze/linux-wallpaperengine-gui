@@ -6,19 +6,24 @@
 	import ApplyButton from './sidebar/ApplyButton.svelte';
 	import type { Wallpaper } from '@shared/types';
 	import { getWallpaperFolder, isWorkshopWallpaper } from '@/core/utils/workshopHelper';
-	import { downloadStatus } from '@/features/workshop/scripts/workshop';
+	import { isWallpaperFolderExist } from '@/features/workshop/scripts/workshop';
 
 	export let selectedWallpaper: Wallpaper | null = null;
 	export let onClose: () => void = () => {};
 	export let canSubscribe: boolean = true;
 
-	$: canApply =
-		!!selectedWallpaper &&
-		(!isWorkshopWallpaper(selectedWallpaper.folderName, selectedWallpaper.projectData) ||
-			!!$downloadStatus[selectedWallpaper.folderName]);
-
+	let isInstalled = false;
 	let lastWallpaperId: string | null = null;
 	let calculatedFileSize: number | null = null;
+
+	$: canApply =
+		!selectedWallpaper ||
+		!isWorkshopWallpaper(selectedWallpaper.folderName, selectedWallpaper.projectData) ||
+		isInstalled;
+
+	async function resolveInstalled(wallpaper: Wallpaper) {
+		isInstalled = await isWallpaperFolderExist(wallpaper.folderName, true);
+	}
 
 	async function resolveFileSize(wallpaper: Wallpaper) {
 		try {
@@ -44,6 +49,7 @@
 		lastWallpaperId = selectedWallpaper.folderName;
 		calculatedFileSize = null;
 		resolveFileSize(selectedWallpaper);
+		resolveInstalled(selectedWallpaper);
 	}
 </script>
 
@@ -68,8 +74,8 @@
 		{/if}
 	{/if}
 	<div slot="footer">
-		{#if canApply && selectedWallpaper}
-			<ApplyButton folderName={selectedWallpaper.folderName} />
+		{#if selectedWallpaper}
+			<ApplyButton folderName={selectedWallpaper.folderName} disabled={!canApply} />
 		{/if}
 	</div>
 </SidebarShell>
