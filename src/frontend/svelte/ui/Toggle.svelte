@@ -18,10 +18,14 @@
 
 <style lang="scss">
 	.toggle-switch {
+		/* Same fill and track as Range, so controls match in every theme */
+		--range-fill: color-mix(in srgb, var(--btn-primary-bg) 70%, white);
+		--range-track: color-mix(in srgb, var(--text-color) 18%, transparent);
+
 		position: relative;
 		display: inline-block;
-		width: 48px;
-		height: 26px;
+		width: 44px;
+		height: 24px;
 		flex-shrink: 0;
 
 		input {
@@ -34,70 +38,39 @@
 
 	.slider {
 		position: absolute;
+		inset: 0;
 		cursor: pointer;
-		top: 0;
-		left: 0;
-		right: 0;
-		bottom: 0;
-		background-color: var(--bg-surface-active);
-		transition: var(--transition-slow);
+		background-color: var(--range-track);
 		border-radius: var(--radius-full);
-		border: 1px solid var(--border-color);
-		box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.2);
-		overflow: hidden;
+		transition: background-color 0.25s ease;
 
-		/* Background overlay for smooth gradient transition */
-		&::after {
+		&::before {
 			content: '';
 			position: absolute;
-			top: 0;
-			left: 0;
-			right: 0;
-			bottom: 0;
-			background: linear-gradient(
-				135deg,
-				var(--btn-primary-bg) 0%,
-				var(--btn-primary-hover-bg) 100%
-			);
-			opacity: 0;
-			transition: opacity 0.3s ease;
-			z-index: 0;
-		}
-
-		&:before {
-			position: absolute;
-			content: '';
-			height: 20px;
-			width: 20px;
-			left: 2px;
-			bottom: 2px;
-			background-color: #fff;
-			transition: all 0.3s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+			top: 3px;
+			left: 3px;
+			width: 18px;
+			height: 18px;
 			border-radius: 50%;
-			box-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
-			z-index: 1;
+			background-color: #fff;
+			box-shadow: 0 1px 3px rgba(0, 0, 0, 0.35);
+			transition: transform 0.25s cubic-bezier(0.34, 1.56, 0.64, 1);
 		}
 	}
 
 	input:checked + .slider {
-		border-color: transparent;
+		background-color: var(--range-fill);
 
-		&::after {
-			opacity: 1;
-		}
-
-		&:before {
-			transform: translateX(22px);
-			background-color: white;
+		&::before {
+			transform: translateX(20px);
 		}
 	}
 
-	input:focus + .slider {
+	input:focus-visible + .slider {
 		box-shadow: 0 0 0 3px var(--focus-ring);
 	}
 
 	.toggle-switch:hover .slider {
 		filter: brightness(1.1);
-		border-color: var(--border-color-hover);
 	}
 </style>
