@@ -1,0 +1,37 @@
+{
+	"apply": "Aplicar fondo",
+	"applyTo": "Aplicar a {screen}",
+	"applyAll": "Aplicar a todas las pantallas",
+	"empty": {
+		"title": "Ningún fondo seleccionado"
+	},
+	"local": {
+		"folder": "Carpeta:",
+		"fileInfo": "Información del archivo",
+		"size": "Tamaño:",
+		"type": "Tipo:",
+		"version": "Versión:",
+		"rating": "Clasificación:",
+		"description": "Descripción",
+		"properties": "Propiedades",
+		"installed": "Instalado:",
+		"livePreview": "Vista previa en vivo",
+		"stopPreview": "Detener vista previa"
+	},
+	"workshop": {
+		"tags": "Etiquetas",
+		"description": "Descripción",
+		"engagement": "Interacción",
+		"views": "Visitas",
+		"subs": "Suscriptores",
+		"favorites": "Favoritos",
+		"upvotes": "Votos positivos",
+		"fileInfo": "Información del archivo",
+		"fileSize": "Tamaño del archivo",
+		"created": "Creado",
+		"updated": "Actualizado",
+		"status": "Estado",
+		"banned": "Prohibido",
+		"installed": "Instalado"
+	}
+}

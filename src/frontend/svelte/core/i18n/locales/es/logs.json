@@ -1,0 +1,19 @@
+{
+	"viewer": {
+		"systemLogs": "Registros del sistema",
+		"backgroundLogs": "Registros en segundo plano",
+		"uiLogs": "Registros de la interfaz",
+		"wallpaperLogs": "Registros de los fondos",
+		"clearAll": "Borrar todo",
+		"allHidden": "Todas las columnas están ocultas",
+		"allHiddenDesc": "Activa al menos una categoría de registros en el selector de arriba para verlos."
+	},
+	"toolbar": {
+		"searchPlaceholder": "Buscar en los registros...",
+		"allLevels": "Todos los niveles",
+		"info": "Información",
+		"success": "Éxito",
+		"warning": "Advertencia",
+		"error": "Error"
+	}
+}

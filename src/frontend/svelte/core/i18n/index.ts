@@ -27,6 +27,7 @@ export const locale = writable<string>('en');
  */
 const localeNames: Record<string, string> = {
 	en: 'English',
+	es: 'Español',
 	ru: 'Русский',
 	th: 'ไทย',
 	zh: '中文'

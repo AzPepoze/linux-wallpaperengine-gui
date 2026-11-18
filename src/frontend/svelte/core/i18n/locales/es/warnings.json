@@ -1,0 +1,13 @@
+{
+	"path": {
+		"workshopTitle": "No se ha encontrado la ruta del Workshop de Steam",
+		"workshopDesc": "La aplicación no ha encontrado el contenido del Workshop de Wallpaper Engine. Revisa las rutas de búsqueda de Steam en Ajustes.",
+		"workshopAction": "Configurar rutas de búsqueda",
+		"assetsTitle": "No se han encontrado los recursos de Wallpaper Engine",
+		"assetsDesc": "No se han podido detectar automáticamente los recursos opcionales de algunos fondos (como efectos o shaders). Puede que algunos fondos no se vean bien.",
+		"assetsAction": "Corregir ruta de recursos",
+		"weConfigTitle": "No se ha encontrado la configuración de Wallpaper Engine",
+		"weConfigDesc": "No se ha encontrado la configuración de Wallpaper Engine. Ejecuta Wallpaper Engine al menos una vez para inicializarla.",
+		"weConfigAction": "Abrir Steam"
+	}
+}

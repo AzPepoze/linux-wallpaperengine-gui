@@ -8,6 +8,7 @@
   <name>Linux Wallpaper Engine GUI</name>
 
   <summary>Manage animated wallpapers with linux-wallpaperengine</summary>
+  <summary xml:lang="es">Gestiona fondos de pantalla animados con linux-wallpaperengine</summary>
   <summary xml:lang="ru">Управление живыми обоями через linux-wallpaperengine</summary>
 
   <developer id="io.github.azpepoze">
@@ -21,6 +22,12 @@
       through Steam, shows them with their previews, and applies them to the
       screens of your choice.
     </p>
+    <p xml:lang="es">
+      Una interfaz gráfica para linux-wallpaperengine, el reproductor de fondos
+      de Wallpaper Engine para Linux. Encuentra los fondos ya instalados a través
+      de Steam, los muestra con sus vistas previas y los aplica a las pantallas
+      que elijas.
+    </p>
     <p xml:lang="ru">
       Графическая оболочка для linux-wallpaperengine — проигрывателя обоев
       Wallpaper Engine под Linux. Она находит обои, уже установленные через
@@ -28,26 +35,38 @@
       к выбранным мониторам.
     </p>
     <p>Features:</p>
+    <p xml:lang="es">Funciones:</p>
     <p xml:lang="ru">Возможности:</p>
     <ul>
       <li>a separate wallpaper for every monitor, or one shared across all of them;</li>
+      <li xml:lang="es">un fondo distinto para cada monitor o uno compartido entre todos;</li>
       <li xml:lang="ru">отдельные обои для каждого монитора или одни на все;</li>
       <li>playlists with timed or random rotation;</li>
+      <li xml:lang="es">listas de reproducción con rotación temporizada o aleatoria;</li>
       <li xml:lang="ru">плейлисты с ротацией по времени или в случайном порядке;</li>
       <li>browsing and subscribing to the Steam Workshop without leaving the application;</li>
+      <li xml:lang="es">exploración del Workshop de Steam y suscripción a sus elementos sin salir de la aplicación;</li>
       <li xml:lang="ru">просмотр Мастерской Steam и подписка на обои, не выходя из программы;</li>
       <li>filtering by type, genre, resolution and age rating;</li>
+      <li xml:lang="es">filtros por tipo, género, resolución y clasificación por edad;</li>
       <li xml:lang="ru">фильтры по типу, жанру, разрешению и возрастному рейтингу;</li>
       <li>per-wallpaper properties, volume, frame rate limit and scaling;</li>
+      <li xml:lang="es">propiedades de cada fondo, volumen, límite de fotogramas y escalado;</li>
       <li xml:lang="ru">свойства отдельных обоев, громкость, ограничение частоты кадров и масштабирование;</li>
       <li>a shell command that runs on every wallpaper change, for colour schemes and the like;</li>
+      <li xml:lang="es">un comando de shell que se ejecuta en cada cambio de fondo, para esquemas de color y similares;</li>
       <li xml:lang="ru">команда оболочки при каждой смене обоев — например, для подстройки цветовой схемы;</li>
       <li>a system tray icon and optional start on login.</li>
+      <li xml:lang="es">un icono en la bandeja del sistema e inicio opcional al iniciar sesión.</li>
       <li xml:lang="ru">значок в системном лотке и запуск при входе в систему.</li>
     </ul>
     <p>
       Wallpaper Engine itself is not part of this application: its wallpapers and
       assets have to be installed through Steam beforehand.
+    </p>
+    <p xml:lang="es">
+      Wallpaper Engine no forma parte de esta aplicación: sus fondos y recursos
+      deben instalarse antes a través de Steam.
     </p>
     <p xml:lang="ru">
       Сам Wallpaper Engine в состав программы не входит: обои и ресурсы к ним
@@ -64,31 +83,37 @@
   <screenshots>
     <screenshot type="default">
       <caption>The wallpaper library with previews</caption>
+      <caption xml:lang="es">La biblioteca de fondos con vistas previas</caption>
       <caption xml:lang="ru">Библиотека обоев с предпросмотром</caption>
       <image type="source" width="1918" height="1078">https://raw.githubusercontent.com/AzPepoze/linux-wallpaperengine-gui/main/showcase/main.png</image>
     </screenshot>
     <screenshot>
       <caption>The same library as a detailed list</caption>
+      <caption xml:lang="es">La misma biblioteca como lista detallada</caption>
       <caption xml:lang="ru">Та же библиотека в виде подробного списка</caption>
       <image type="source" width="1918" height="1078">https://raw.githubusercontent.com/AzPepoze/linux-wallpaperengine-gui/main/showcase/main-list.png</image>
     </screenshot>
     <screenshot>
       <caption>Browsing the Steam Workshop</caption>
+      <caption xml:lang="es">Exploración del Workshop de Steam</caption>
       <caption xml:lang="ru">Просмотр Мастерской Steam</caption>
       <image type="source" width="1918" height="1078">https://raw.githubusercontent.com/AzPepoze/linux-wallpaperengine-gui/main/showcase/workshop.png</image>
     </screenshot>
     <screenshot>
       <caption>Playlists</caption>
+      <caption xml:lang="es">Listas de reproducción</caption>
       <caption xml:lang="ru">Плейлисты</caption>
       <image type="source" width="1918" height="1078">https://raw.githubusercontent.com/AzPepoze/linux-wallpaperengine-gui/main/showcase/playlist.png</image>
     </screenshot>
     <screenshot>
       <caption>Choosing which wallpaper goes on which monitor</caption>
+      <caption xml:lang="es">Elección del fondo para cada monitor</caption>
       <caption xml:lang="ru">Выбор обоев для каждого монитора</caption>
       <image type="source" width="1917" height="1078">https://raw.githubusercontent.com/AzPepoze/linux-wallpaperengine-gui/main/showcase/display.png</image>
     </screenshot>
     <screenshot>
       <caption>Settings</caption>
+      <caption xml:lang="es">Ajustes</caption>
       <caption xml:lang="ru">Настройки</caption>
       <image type="source" width="1918" height="1078">https://raw.githubusercontent.com/AzPepoze/linux-wallpaperengine-gui/main/showcase/setting.png</image>
     </screenshot>
