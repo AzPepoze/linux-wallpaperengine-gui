@@ -1,0 +1,29 @@
+{
+	"toolbar": {
+		"playlist": "Listas",
+		"filter": "Filtro",
+		"currentlyUsing": "EN USO:",
+		"display": "PANTALLA:",
+		"displayBtn": "Pantallas",
+		"individualMode": "Individual",
+		"cloneMode": "Clonar",
+		"spanMode": "Extender"
+	},
+	"sort": {
+		"dateDesc": "Fecha (más reciente)",
+		"dateAsc": "Fecha (más antigua)",
+		"nameAsc": "Nombre (A-Z)",
+		"nameDesc": "Nombre (Z-A)"
+	},
+	"search": {
+		"placeholder": "Buscar fondos...",
+		"noResults": "No se han encontrado fondos que coincidan con la búsqueda.",
+		"noResultsHint": "Prueba con otra palabra clave o borra la búsqueda.",
+		"clear": "Borrar búsqueda"
+	},
+	"properties": {
+		"title": "Propiedades",
+		"loading": "Cargando propiedades...",
+		"noConfigurable": "No hay propiedades configurables."
+	}
+}

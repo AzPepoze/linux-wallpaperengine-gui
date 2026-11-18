@@ -1,0 +1,14 @@
+{
+	"tray": {
+		"menu": {
+			"show": "Mostrar",
+			"showTooltip": "Abrir la ventana de la aplicación",
+			"hide": "Ocultar",
+			"hideTooltip": "Ocultar la ventana en la bandeja del sistema",
+			"restartWallpaper": "Reiniciar fondo",
+			"restartWallpaperTooltip": "Reiniciar los fondos actuales",
+			"quit": "Salir",
+			"quitTooltip": "Cerrar la aplicación por completo"
+		}
+	}
+}

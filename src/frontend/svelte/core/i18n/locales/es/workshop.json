@@ -1,0 +1,31 @@
+{
+	"actions": {
+		"viewOnWorkshop": "Ver en el Workshop",
+		"subscribe": "Suscribirse",
+		"unsubscribe": "Cancelar suscripción",
+		"downloading": "Descargando {percent} %"
+	},
+	"controls": {
+		"filter": "Filtro",
+		"search": "Buscar",
+		"sort": "ORDENAR:",
+		"type": "TIPO:",
+		"page": "POR PÁGINA:",
+		"infinite": "Scroll infinito",
+		"itemsFound": "{count} elementos encontrados",
+		"searchPlaceholder": "Buscar fondos...",
+		"sortTrend": "Tendencia",
+		"sortRecent": "Más recientes",
+		"sortPopular": "Más populares",
+		"sortSubscriptions": "Más suscritos",
+		"sortVotedUp": "Más votados",
+		"sortLastUpdated": "Actualizados recientemente",
+		"typeAll": "Todo",
+		"typeItems": "Elementos",
+		"typeCollections": "Colecciones",
+		"page50": "50 elementos",
+		"page100": "100 elementos",
+		"page150": "150 elementos",
+		"page200": "200 elementos"
+	}
+}

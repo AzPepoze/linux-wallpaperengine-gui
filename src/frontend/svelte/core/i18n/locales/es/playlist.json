@@ -1,0 +1,29 @@
+{
+	"settings": {
+		"title": "Ajustes de la lista",
+		"namePlaceholder": "Nombre de la lista",
+		"save": "Guardar",
+		"cancel": "Cancelar",
+		"new": "Nueva",
+		"rename": "Renombrar",
+		"delete": "Eliminar",
+		"dynamicPlaylist": "Lista dinámica",
+		"interval": "Intervalo (minutos):",
+		"none": "Ninguna",
+		"randomAll": "Todo aleatorio (dinámica)"
+	},
+	"messages": {
+		"startedPlaylist": "Lista de reproducción iniciada en {display}: {name}",
+		"startedRandom": "Rotación aleatoria dinámica iniciada en {display}",
+		"created": "Lista de reproducción creada",
+		"renamed": "Lista de reproducción renombrada",
+		"deleted": "Lista de reproducción eliminada",
+		"itemRemoved": "Elemento quitado",
+		"cannotAddToRandom": "No se puede añadir a «Todo aleatorio» (ya lo incluye todo)",
+		"selectPlaylistFirst": "Selecciona una lista de reproducción para añadir fondos",
+		"noItemsFound": "No se han encontrado elementos",
+		"errorSearching": "Error al buscar: {message}",
+		"errorBrowsing": "Error al explorar el Workshop: {message}",
+		"restartRequired": "Para cambiar este ajuste hay que reiniciar. ¿Quieres reiniciar ahora?"
+	}
+}
