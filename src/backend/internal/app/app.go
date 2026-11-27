@@ -48,6 +48,11 @@ func NewApp(options Options) *App {
 }
 
 func (application *App) Run() {
+	if application.options.Quit {
+		application.quitRunningInstance()
+		return
+	}
+
 	// Detect and log Wayland session
 	if electron.IsWaylandSession() {
 		logger.Println("⚠️  Wayland session detected")

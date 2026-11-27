@@ -176,6 +176,7 @@ linux-wallpaperengine-gui [options]
 | Option | Description |
 |--------|-------------|
 | `--minimized` | Starts the application minimized in the system tray. |
+| `--quit` | Quits the running application and stops all linux-wallpaperengine processes. |
 | `--native-wayland` | Makes electron use native Wayland instead of XWayland to solve fractional scaling issues (only works on Wayland sessions) |
 | `--debug-mode` | Enables debug mode for the application. |
 

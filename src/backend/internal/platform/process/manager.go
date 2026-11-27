@@ -259,7 +259,7 @@ func (manager *Manager) KillAll() {
 	for screen := range manager.activeWallpapers {
 		manager.killWallpaperInternal(screen)
 	}
-	if err := exec.Command("killall", "-e", "linux-wallpaperengine").Run(); err != nil {
+	if _, err := StopEngines(); err != nil {
 		logger.Printf("killall linux-wallpaperengine failed: %v", err)
 	}
 }
