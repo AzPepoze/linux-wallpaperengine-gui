@@ -4,17 +4,22 @@ import "os"
 
 type Options struct {
 	Minimized bool
+	Quit      bool
 }
 
 func ParseOptions() Options {
-	options := Options{
-		Minimized: false,
-	}
+	return parseArguments(os.Args)
+}
 
-	for _, argument := range os.Args {
-		if argument == "--minimized" {
+func parseArguments(arguments []string) Options {
+	options := Options{}
+
+	for _, argument := range arguments {
+		switch argument {
+		case "--minimized":
 			options.Minimized = true
-			break
+		case "--quit":
+			options.Quit = true
 		}
 	}
 
